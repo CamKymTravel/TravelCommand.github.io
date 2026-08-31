@@ -1,0 +1,40 @@
+@layer tokens {
+  :root {
+    --bg-app: #07101f;
+    --bg-app-deep: #040a14;
+    --surface-sidebar: rgba(9, 20, 37, 0.96);
+    --surface-panel: rgba(16, 32, 54, 0.82);
+    --surface-elevated: rgba(22, 42, 70, 0.92);
+    --border-soft: rgba(150, 196, 255, 0.14);
+    --border-strong: rgba(150, 196, 255, 0.28);
+    --text-primary: #f5f9ff;
+    --text-secondary: #a9bad1;
+    --text-muted: #72859f;
+    --accent-home: #58c7ff;
+    --success: #57d69b;
+    --warning: #ffd15b;
+    --danger: #ff6f83;
+    --feature-teal: #46d9ca;
+    --feature-blue: #5d8dff;
+    --feature-indigo: #806dff;
+    --feature-violet: #b86dff;
+    --feature-magenta: #f165bd;
+    --feature-red: #ff6f83;
+    --feature-orange: #ff9a5a;
+    --feature-yellow: #ffd15b;
+    --feature-green: #57d69b;
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --space-1: 6px;
+    --space-2: 10px;
+    --space-3: 14px;
+    --space-4: 18px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --control-h: 48px;
+    --sidebar-w: 240px;
+    --shadow-panel: 0 18px 42px rgba(0,0,0,.28);
+    --glow-soft: 0 0 24px rgba(88,199,255,.10);
+  }
+}
