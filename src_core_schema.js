@@ -1,10 +1,11 @@
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+export const APP_VERSION = '1.2.0-v44-ipad-visual-candidate';
 
 export const TRAVEL_TYPES = Object.freeze(['standard', 'motorhome', 'cruise']);
 export const RESERVATION_TYPES = Object.freeze(['flight', 'train', 'cruise', 'rv', 'accommodation', 'ticket']);
-export const RESERVATION_STATUSES = Object.freeze(['paid', 'unpaid', 'booked', 'to-book', 'completed']);
+export const FLIGHT_SCOPES = Object.freeze(['domestic', 'international']);
+export const RESERVATION_STATUSES = Object.freeze(['paid', 'unpaid', 'booked', 'to-book']);
 export const EXPENSE_CATEGORIES = Object.freeze(['groceries', 'eating-out', 'transport', 'entertainment', 'shopping', 'miscellaneous']);
-export const BUDGET_ALLOCATIONS = Object.freeze(['destination', 'annual']);
 
 export function createEmptyState(now = new Date().toISOString()) {
   return {
@@ -13,7 +14,7 @@ export function createEmptyState(now = new Date().toISOString()) {
       createdAt: now,
       modifiedAt: now,
       revision: 0,
-      appVersion: '1.1.0-simulation-package-green'
+      appVersion: APP_VERSION
     },
     settings: {
       journeyStartDate: null,
@@ -23,10 +24,14 @@ export function createEmptyState(now = new Date().toISOString()) {
       annualBudgetAUD: 0,
       pinEnabled: false,
       pinHash: null,
+      pinRecoveryNotice: '',
       schengen: {
         status: 'not-checked',
         daysUsed: null,
         daysRemaining: null,
+        entryDate: null,
+        plannedExitDate: null,
+        mustLeaveByDate: null,
         lastCheckedDate: null,
         note: ''
       }
@@ -51,7 +56,12 @@ export function createEmptyState(now = new Date().toISOString()) {
       pendingOpen: null,
       calendarView: 'month',
       calendarMonth: null,
-      checklistListType: 'permanent'
+      checklistListType: 'permanent',
+      checklistStage: null,
+      reservationType: 'flight',
+      reservationCompletedOpen: false,
+      itineraryCompletedOpen: false,
+      journeyHistoryPage: 1
     }
   };
 }

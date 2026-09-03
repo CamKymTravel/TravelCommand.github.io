@@ -1,17 +1,6 @@
 import { formatAUDate, toISODate } from './src_core_dates.js';
 
 const DAY_MS = 86_400_000;
-const ITINERARY_PALETTE = Object.freeze([
-  { color:'#46d9ca', rgb:'70,217,202' },
-  { color:'#5d8dff', rgb:'93,141,255' },
-  { color:'#806dff', rgb:'128,109,255' },
-  { color:'#b86dff', rgb:'184,109,255' },
-  { color:'#f165bd', rgb:'241,101,189' },
-  { color:'#ff6f83', rgb:'255,111,131' },
-  { color:'#ff9a5a', rgb:'255,154,90' },
-  { color:'#ffd15b', rgb:'255,209,91' },
-  { color:'#57d69b', rgb:'87,214,155' }
-]);
 const RESERVATION_COLOURS = Object.freeze({
   flight:{ color:'#5d8dff', rgb:'93,141,255' },
   train:{ color:'#46d9ca', rgb:'70,217,202' },
@@ -20,6 +9,7 @@ const RESERVATION_COLOURS = Object.freeze({
   accommodation:{ color:'#f165bd', rgb:'241,101,189' },
   ticket:{ color:'#ffd15b', rgb:'255,209,91' }
 });
+const RESERVATION_TYPE_LABELS = Object.freeze({ flight:'Flight', train:'Train', cruise:'Cruise', rv:'RV', accommodation:'Accommodation', ticket:'Tickets & Attractions' });
 const PERSONAL_COLOURS = Object.freeze({
   reminder:{ color:'#ffd15b', rgb:'255,209,91' },
   note:{ color:'#b86dff', rgb:'184,109,255' },
@@ -42,8 +32,39 @@ function hash(value) {
   return result >>> 0;
 }
 
+function hslToRgb(hue, saturation = 72, lightness = 59) {
+  const h=((Number(hue)%360)+360)%360/360, s=Number(saturation)/100, l=Number(lightness)/100;
+  const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
+  const channel=t=>{let x=t;if(x<0)x+=1;if(x>1)x-=1;if(x<1/6)return p+(q-p)*6*x;if(x<1/2)return q;if(x<2/3)return p+(q-p)*(2/3-x)*6;return p;};
+  return [channel(h+1/3),channel(h),channel(h-1/3)].map(value=>Math.round(value*255));
+}
+
+function colourFromSeed(seed, probe = 0) {
+  const value=hash(seed);
+  const hue=(value + probe * 47) % 360;
+  const saturation=66+(((value>>>9) + probe * 5)%17);
+  const lightness=53+(((value>>>17) + probe * 3)%13);
+  const [r,g,b]=hslToRgb(hue,saturation,lightness);
+  const hex=value=>value.toString(16).padStart(2,'0');
+  return { color:`#${hex(r)}${hex(g)}${hex(b)}`, rgb:`${r},${g},${b}` };
+}
+
+function itineraryColourMap(entries) {
+  const used=new Set();
+  const map=new Map();
+  const ordered=[...(entries||[])].sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||''))||String(a.id||'').localeCompare(String(b.id||'')));
+  for(const entry of ordered){
+    const seed=entry?.id || `${entry?.name || ''}:${entry?.startDate || ''}`;
+    let probe=0, colour=colourFromSeed(seed,probe);
+    while(used.has(colour.color) && probe<720){ probe+=1; colour=colourFromSeed(seed,probe); }
+    used.add(colour.color); map.set(entry.id,colour);
+  }
+  return map;
+}
+
 export function itineraryCalendarColour(entry) {
-  return ITINERARY_PALETTE[hash(entry?.id || `${entry?.name || ''}:${entry?.startDate || ''}`) % ITINERARY_PALETTE.length];
+  const seed=entry?.id || `${entry?.name || ''}:${entry?.startDate || ''}`;
+  return colourFromSeed(seed,0);
 }
 
 function normalizeMonthInput(value, currentDate) {
@@ -51,7 +72,7 @@ function normalizeMonthInput(value, currentDate) {
   const candidate = String(value || fallback);
   if (!/^\d{4}-\d{2}$/.test(candidate)) return fallback;
   const [year, month] = candidate.split('-').map(Number);
-  if (month < 1 || month > 12 || year < 1) return fallback;
+  if (month < 1 || month > 12 || year < 1000 || year > 9998) return fallback;
   return candidate;
 }
 
@@ -80,8 +101,8 @@ function enteredTime(value) {
   return match ? `${match[1]}:${match[2]}` : '';
 }
 
-function itineraryEvent(entry) {
-  const colour = itineraryCalendarColour(entry);
+function itineraryEvent(entry, resolvedColour = null) {
+  const colour = resolvedColour || itineraryCalendarColour(entry);
   return {
     id:`itinerary:${entry.id}`,
     sourceId:entry.id,
@@ -97,9 +118,9 @@ function itineraryEvent(entry) {
   };
 }
 
-function reservationEvent(record, itineraryById) {
+function reservationEvent(record, itineraryById, colourByItineraryId) {
   const linked = record.itineraryId ? itineraryById.get(record.itineraryId) : null;
-  const colour = linked ? itineraryCalendarColour(linked) : (RESERVATION_COLOURS[record.type] || RESERVATION_COLOURS.flight);
+  const colour = linked ? (colourByItineraryId.get(linked.id) || itineraryCalendarColour(linked)) : (RESERVATION_COLOURS[record.type] || RESERVATION_COLOURS.flight);
   const date = record.dateTime ? toISODate(record.dateTime) : null;
   return {
     id:`reservation:${record.id}`,
@@ -107,7 +128,7 @@ function reservationEvent(record, itineraryById) {
     sourceCollection:'reservations',
     kind:'reservation',
     title:record.title,
-    subtitle:[record.type ? record.type[0].toUpperCase() + record.type.slice(1) : 'Reservation', linked?.name, enteredTime(record.dateTime)].filter(Boolean).join(' · '),
+    subtitle:[RESERVATION_TYPE_LABELS[record.type] || 'Reservation', linked?.name, enteredTime(record.dateTime)].filter(Boolean).join(' · '),
     startDate:date,
     endDate:date,
     dateTime:record.dateTime || null,
@@ -118,10 +139,10 @@ function reservationEvent(record, itineraryById) {
   };
 }
 
-function personalEvent(record, itineraryById) {
+function personalEvent(record, itineraryById, colourByItineraryId) {
   const linked = record.itineraryId ? itineraryById.get(record.itineraryId) : null;
   const type = record.type || 'note';
-  const colour = linked ? itineraryCalendarColour(linked) : (PERSONAL_COLOURS[type] || PERSONAL_COLOURS.note);
+  const colour = linked ? (colourByItineraryId.get(linked.id) || itineraryCalendarColour(linked)) : (PERSONAL_COLOURS[type] || PERSONAL_COLOURS.note);
   const rawDate = record.dateTime || record.date;
   const date = rawDate ? toISODate(rawDate) : null;
   return {
@@ -142,12 +163,14 @@ function personalEvent(record, itineraryById) {
 }
 
 function allCalendarEvents(state) {
-  const itineraryById = new Map((state.itinerary || []).map(item => [item.id, item]));
-  const itinerary = (state.itinerary || []).map(itineraryEvent);
-  const reservations = (state.reservations || []).filter(item => item.dateTime).map(item => reservationEvent(item, itineraryById));
+  const itineraryRecords=state.itinerary || [];
+  const itineraryById = new Map(itineraryRecords.map(item => [item.id, item]));
+  const colourByItineraryId=itineraryColourMap(itineraryRecords);
+  const itinerary = itineraryRecords.map(item => itineraryEvent(item,colourByItineraryId.get(item.id)));
+  const reservations = (state.reservations || []).filter(item => item.dateTime && item.status !== 'to-book').map(item => reservationEvent(item, itineraryById, colourByItineraryId));
   const personal = (state.calendarEvents || [])
     .filter(item => !item.reservationId && (item.dateTime || item.date))
-    .map(item => personalEvent(item, itineraryById));
+    .map(item => personalEvent(item, itineraryById, colourByItineraryId));
   return { itinerary, reservations, personal, all:[...itinerary, ...reservations, ...personal] };
 }
 

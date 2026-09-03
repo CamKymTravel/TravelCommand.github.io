@@ -19,3 +19,9 @@ export async function verifyPin(pin, storedHash) {
   if (/^[a-f0-9]{64}$/.test(value)) return hashed.slice('sha256:'.length) === value;
   return false;
 }
+export async function upgradedPinHashAfterSuccessfulVerify(pin, storedHash) {
+  const value = normalizeHash(storedHash);
+  if (/^\d{4,8}$/.test(value)) return hashPin(pin);
+  if (/^[a-f0-9]{64}$/.test(value)) return `sha256:${value}`;
+  return value || null;
+}

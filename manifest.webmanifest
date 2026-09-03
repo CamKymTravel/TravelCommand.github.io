@@ -1,11 +1,11 @@
 {
-  "name": "Travel Command Centre — Year 4 Simulation",
-  "short_name": "TCC Simulation",
+  "name": "Travel Command Centre",
+  "short_name": "Travel Command Centre",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline Travel Command Centre Year 4 Türkiye simulation using the production master UI."
+  "description": "Offline Travel Command Centre for Cameron & Kym."
 }

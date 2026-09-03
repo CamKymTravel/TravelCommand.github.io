@@ -6,7 +6,7 @@ export function createId(prefix = 'rec') {
 export function assertUniqueIds(records, label = 'records') {
   const seen = new Set();
   for (const record of records) {
-    if (!record?.id) throw new Error(`${label}: record missing id`);
+    if (typeof record?.id !== 'string' || !record.id.trim()) throw new Error(`${label}: record missing valid text id`);
     if (seen.has(record.id)) throw new Error(`${label}: duplicate id ${record.id}`);
     seen.add(record.id);
   }

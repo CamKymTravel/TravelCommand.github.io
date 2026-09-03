@@ -20,12 +20,34 @@ export function detectTimelineIssues(entries) {
   const sorted = sortItinerary(entries);
   const gaps = [];
   const overlaps = [];
+  if (!sorted.length) return { gaps, overlaps };
+
+  // Compare each next stay with the furthest date already covered, not merely
+  // the immediately previous row. With nested overlaps, the previous row can
+  // end earlier than an older stay; comparing only adjacent rows can therefore
+  // invent a gap that is actually covered and can miss a later overlap.
+  let coverageEntry = sorted[0];
+  let coverageEnd = dayNumber(coverageEntry.endDate);
   for (let i = 1; i < sorted.length; i += 1) {
-    const previous = sorted[i - 1];
     const current = sorted[i];
-    const delta = dayNumber(current.startDate) - dayNumber(previous.endDate);
-    if (delta > 1) gaps.push({ afterId: previous.id, beforeId: current.id, days: delta - 1 });
-    if (delta <= 0) overlaps.push({ firstId: previous.id, secondId: current.id, days: 1 - delta });
+    const currentStart = dayNumber(current.startDate);
+    const currentEnd = dayNumber(current.endDate);
+    const delta = currentStart - coverageEnd;
+
+    if (delta > 1) {
+      gaps.push({ afterId:coverageEntry.id, beforeId:current.id, days:delta - 1 });
+      coverageEntry = current;
+      coverageEnd = currentEnd;
+      continue;
+    }
+    if (delta <= 0) {
+      const overlapEnd = Math.min(coverageEnd, currentEnd);
+      overlaps.push({ firstId:coverageEntry.id, secondId:current.id, days:overlapEnd - currentStart + 1 });
+    }
+    if (currentEnd > coverageEnd) {
+      coverageEntry = current;
+      coverageEnd = currentEnd;
+    }
   }
   return { gaps, overlaps };
 }

@@ -1,22 +1,30 @@
 import { createRecord, touchRecord } from './src_core_records.js';
-import { validateDateTime } from './src_core_dates.js';
+import { toISODate, validateDateTime } from './src_core_dates.js';
 
 export const PERSONAL_CALENDAR_TYPES = Object.freeze(['reminder', 'note']);
 
 function normalizeFields(fields = {}) {
-  const type = String(fields.type || 'reminder');
-  if (!PERSONAL_CALENDAR_TYPES.includes(type)) throw new Error('Invalid calendar event type');
-  const title = String(fields.title || '').trim();
+  const typeInput = fields.type == null || fields.type === '' ? 'reminder' : fields.type;
+  if (typeof typeInput !== 'string' || !PERSONAL_CALENDAR_TYPES.includes(typeInput)) throw new Error('Invalid calendar event type');
+  const type = typeInput;
+  const title = typeof fields.title === 'string' ? fields.title.trim() : '';
   if (!title) throw new Error('Calendar event title is required');
-  const dateTime = String(fields.dateTime || '').trim();
-  if (!dateTime) throw new Error('Calendar event date and time are required');
-  validateDateTime(dateTime);
-  if (fields.itineraryId != null && !String(fields.itineraryId).trim()) throw new Error('Invalid itinerary relationship');
+  const date = fields.date ? toISODate(fields.date) : null;
+  const time = typeof fields.time === 'string' ? fields.time.trim() : '';
+  let dateTime = null;
+  if (!date) throw new Error('Calendar event date is required');
+  if (time) {
+    if (!/^\d{2}:\d{2}$/.test(time)) throw new Error('Invalid calendar event time');
+    dateTime = `${date}T${time}`;
+    validateDateTime(dateTime);
+  }
+  if (fields.itineraryId != null && (typeof fields.itineraryId !== 'string' || !fields.itineraryId.trim())) throw new Error('Invalid itinerary relationship');
   return {
     type,
     title,
+    date: dateTime ? null : date,
     dateTime,
-    notes:String(fields.notes || '').trim(),
+    notes:typeof fields.notes === 'string' ? fields.notes.trim() : '',
     itineraryId:fields.itineraryId || null,
     reservationId:null
   };

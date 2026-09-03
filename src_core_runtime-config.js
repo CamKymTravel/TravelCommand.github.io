@@ -28,6 +28,14 @@ export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? 
   };
 }
 
+
+export function runtimeNowISO(config, nowDate = new Date()) {
+  const date = nowDate instanceof Date ? nowDate : new Date(nowDate);
+  if (Number.isNaN(date.valueOf())) throw new Error('Runtime clock is invalid');
+  const iso = date.toISOString();
+  return config?.currentDate ? `${toISODate(config.currentDate)}T${iso.slice(11)}` : iso;
+}
+
 export async function fetchRuntimeFixture(config, fetchFn = globalThis.fetch) {
   if (config?.mode !== 'simulation' || !config?.fixtureUrl) return null;
   if (typeof fetchFn !== 'function') throw new Error('Simulation fixture loader is unavailable');

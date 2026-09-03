@@ -1,31 +1,58 @@
 import { createReservation } from './src_core_entities.js';
+import { resolveDestinationBudgetForDate, deriveAUDForStay } from './src_core_budget.js';
+import { toISODate } from './src_core_dates.js';
 import { touchRecord } from './src_core_records.js';
 
 const RESERVATION_FIELDS = Object.freeze([
-  'itineraryId','type','title','dateTime','originalCurrency','originalAmount',
-  'audAmount','status','allocation','notes'
+  'itineraryId','type','flightScope','title','dateTime','originalCurrency','originalAmount',
+  'audAmount','status','needsBudgetRepair','notes'
 ]);
 
 function pickReservationFields(record) {
   return Object.fromEntries(RESERVATION_FIELDS.map(key => [key, record[key]]));
 }
 
-function normalizedDuplicateKey(record) {
-  const dateTime = String(record?.dateTime || '').trim();
+function reservationDuplicateParts(record) {
+  const dateTime = typeof record?.dateTime === 'string' ? record.dateTime.trim() : '';
   if (!dateTime) return null;
-  const type = String(record?.type || '').trim().toLowerCase();
-  const title = String(record?.title || '').trim().replace(/\s+/g, ' ').toLowerCase();
-  return `${type}|${title}|${dateTime}`;
+  const date = dateTime.match(/^(\d{4}-\d{2}-\d{2})/)?.[1];
+  if (!date) return null;
+  const time = dateTime.match(/T(\d{2}):(\d{2})/)?.slice(1,3).join(':') || '';
+  const type = String(record?.type || '').normalize('NFC').trim().toLowerCase();
+  const title = String(record?.title || '').normalize('NFC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('en-AU');
+  if (!type || !title) return null;
+  return { base:`${type}|${title}|${date}`, time };
+}
+
+export function reservationDuplicateKey(record) {
+  const parts = reservationDuplicateParts(record);
+  return parts ? `${parts.base}|${parts.time}` : null;
+}
+
+export function reservationsConflict(a, b) {
+  const left = reservationDuplicateParts(a);
+  const right = reservationDuplicateParts(b);
+  if (!left || !right || left.base !== right.base) return false;
+  // Reservation time is optional. If either copy has no entered time, the two
+  // records are indistinguishable on the same type/title/date and should be
+  // treated as a duplicate. Two explicit, different times remain legitimate.
+  return !left.time || !right.time || left.time === right.time;
 }
 
 export function findDuplicateReservation(records, candidate, excludeId = null) {
-  const candidateKey = normalizedDuplicateKey(candidate);
-  if (!candidateKey) return null;
-  return (records || []).find(record => record.id !== excludeId && normalizedDuplicateKey(record) === candidateKey) || null;
+  return (records || []).find(record => record.id !== excludeId && reservationsConflict(record, candidate)) || null;
 }
 
 export function saveReservationDraft(draft, { reservationId = null, fields }, options = {}) {
-  const validated = createReservation(fields, options);
+  if (!fields.dateTime) throw new Error('Reservation date is required');
+  const stay = resolveDestinationBudgetForDate(draft.itinerary || [], toISODate(fields.dateTime));
+  const normalized = {
+    ...fields,
+    itineraryId: stay.id,
+    needsBudgetRepair: false,
+    audAmount: deriveAUDForStay(fields, stay)
+  };
+  const validated = createReservation(normalized, options);
   const duplicate = findDuplicateReservation(draft.reservations, validated, reservationId);
   if (duplicate) throw new Error('Duplicate reservation already exists');
 

@@ -15,5 +15,9 @@ export function audToLocal(audAmount, localPerAUD) {
 }
 
 export function formatMoney(amount, currency = 'AUD') {
-  return new Intl.NumberFormat('en-AU', { style: 'currency', currency, maximumFractionDigits: 2 }).format(Number(amount) || 0);
+  const raw=String(currency||'').trim().toUpperCase();
+  const safeCurrency=/^[A-Z]{3}$/.test(raw)?raw:'XXX';
+  const value=Number(amount);
+  try { return new Intl.NumberFormat('en-AU', { style:'currency', currency:safeCurrency, maximumFractionDigits:2 }).format(Number.isFinite(value)?value:0); }
+  catch { return `${safeCurrency} ${(Number.isFinite(value)?value:0).toFixed(2)}`; }
 }

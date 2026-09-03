@@ -20,20 +20,6 @@ const SCREEN_NAMES = Object.freeze({
   settings: 'Settings'
 });
 
-function renderFoundationScreen(screenId) {
-  const main = document.createElement('main');
-  main.className = 'screen-root';
-  main.dataset.screen = screenId;
-  main.innerHTML = `
-    <section class="foundation-marker" aria-labelledby="screen-title">
-      <p class="eyebrow">TCC V1 REBUILD · FOUNDATION</p>
-      <h1 id="screen-title"></h1>
-      <p>Screen module registered. Production screen rebuild has not started.</p>
-    </section>`;
-  main.querySelector('h1').textContent = SCREEN_NAMES[screenId];
-  return main;
-}
-
 export function renderScreen(screenId, context = {}) {
   if (!SCREEN_NAMES[screenId]) throw new Error(`Unknown screen ${screenId}`);
   if (screenId === 'home') return renderHomeScreen(context);
@@ -45,7 +31,7 @@ export function renderScreen(screenId, context = {}) {
   if (screenId === 'checklist') return renderChecklistScreen(context);
   if (screenId === 'vault') return renderVaultScreen(context);
   if (screenId === 'settings') return renderSettingsScreen(context);
-  return renderFoundationScreen(screenId);
+  throw new Error(`No renderer registered for screen ${screenId}`);
 }
 
 export function isValidScreen(screenId) { return Boolean(SCREEN_NAMES[screenId]); }

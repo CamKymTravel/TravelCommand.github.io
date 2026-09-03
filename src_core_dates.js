@@ -8,23 +8,30 @@ function validateISOCalendarDate(iso) {
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
-export function toISODate(value) {
-  if (!value) return null;
-  if (typeof value === 'string') {
-    const leadingDate = value.match(/^(\d{4}-\d{2}-\d{2})(?:$|T|\s)/)?.[1];
-    if (leadingDate) {
-      if (!validateISOCalendarDate(leadingDate)) throw new Error('Invalid date');
-      return leadingDate;
-    }
-  }
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.valueOf())) throw new Error('Invalid date');
-  return date.toISOString().slice(0, 10);
+export function legacyAUDateToISO(value) {
+  if (typeof value !== 'string') return null;
+  const match = value.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+  const iso = `${match[3]}-${match[2]}-${match[1]}`;
+  return validateISOCalendarDate(iso) ? iso : null;
 }
 
+export function toISODate(value) {
+  if (value == null || value === '') return null;
+  if (value instanceof Date) {
+    if (Number.isNaN(value.valueOf())) throw new Error('Invalid date');
+    return value.toISOString().slice(0, 10);
+  }
+  if (typeof value !== 'string') throw new Error('Invalid date');
+  const text = value.trim();
+  const leadingDate = text.match(/^(\d{4}-\d{2}-\d{2})(?:$|T)/)?.[1];
+  if (!leadingDate || !validateISOCalendarDate(leadingDate)) throw new Error('Invalid date');
+  return leadingDate;
+}
 
 export function validateDateTime(value) {
-  const text = String(value || '');
+  if (typeof value !== 'string') throw new Error('Invalid date and time');
+  const text = value.trim();
   const match = text.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,3})?)?(?:Z|[+-](\d{2}):(\d{2}))?$/);
   if (!match) throw new Error('Invalid date and time');
   toISODate(text);
@@ -37,6 +44,14 @@ export function validateDateTime(value) {
   return text;
 }
 
+export function validateDateOrDateTime(value) {
+  if (typeof value !== 'string' || !value.trim()) throw new Error('Invalid date');
+  const text = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return toISODate(text);
+  validateDateTime(text);
+  return text;
+}
+
 export function formatAUDate(value) {
   const iso = toISODate(value);
   if (!iso) return '';
@@ -45,8 +60,11 @@ export function formatAUDate(value) {
 }
 
 export function stayDurationDays(start, end) {
-  const a = new Date(`${toISODate(start)}T00:00:00Z`);
-  const b = new Date(`${toISODate(end)}T00:00:00Z`);
+  const startISO = toISODate(start);
+  const endISO = toISODate(end);
+  if (!startISO || !endISO) throw new Error('Stay dates are required');
+  const a = new Date(`${startISO}T00:00:00Z`);
+  const b = new Date(`${endISO}T00:00:00Z`);
   if (b < a) throw new Error('End date precedes start date');
   return Math.floor((b - a) / DAY_MS) + 1;
 }

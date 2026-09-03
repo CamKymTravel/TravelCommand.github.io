@@ -10,7 +10,7 @@ export const VAULT_CATEGORY_LABELS = Object.freeze({
 });
 
 export const VAULT_CATEGORY_ICONS = Object.freeze({
-  passport:'▣', visa:'◆', insurance:'✚', accommodation:'⌂', emergency:'☎'
+  passport:'🛂', visa:'🎫', insurance:'🛡', accommodation:'🏨', emergency:'✚'
 });
 
 function newestFirst(a, b) { return String(b.modifiedAt || '').localeCompare(String(a.modifiedAt || '')); }
@@ -37,10 +37,26 @@ export function buildVaultViewModel(state, { unlocked = false, activeSection = '
     return { unlocked:false, activeSection:'locked', categoryCards, records:[], streaming:[], recentActivity:[], protectedEmailCount:0 };
   }
   const records = state.vault.filter(record => record.category === activeSection).sort(newestFirst).map(record => recordView(record, state.attachments));
+  const vaultById = new Map(state.vault.map(record => [record.id, record]));
   const activity = [
-    ...state.vault.map(record => ({ id:record.id, kind:'record', title:record.title, subtitle:VAULT_CATEGORY_LABELS[record.category], modifiedAt:record.modifiedAt })),
-    ...state.attachments.map(record => ({ id:record.id, kind:'attachment', title:record.name, subtitle:'Screenshot attachment', modifiedAt:record.modifiedAt })),
-    ...state.streaming.map(record => ({ id:record.id, kind:'streaming', title:record.service, subtitle:'Streaming', modifiedAt:record.modifiedAt }))
+    ...state.vault.map(record => ({
+      id:record.id, kind:'record', title:record.title,
+      subtitle:[VAULT_CATEGORY_LABELS[record.category], record.owner || 'Shared'].filter(Boolean).join(' · '),
+      vaultRecordId:record.id, modifiedAt:record.modifiedAt
+    })),
+    ...state.attachments.map(record => {
+      const parent=vaultById.get(record.vaultRecordId);
+      return {
+        id:record.id, kind:'attachment', title:record.name,
+        subtitle:['Screenshot', parent?.title, parent?.owner || 'Shared'].filter(Boolean).join(' · '),
+        vaultRecordId:record.vaultRecordId, modifiedAt:record.modifiedAt
+      };
+    }),
+    ...state.streaming.map(record => ({
+      id:record.id, kind:'streaming', title:record.service,
+      subtitle:['Streaming', record.owner || 'Shared'].filter(Boolean).join(' · '),
+      modifiedAt:record.modifiedAt
+    }))
   ].sort(newestFirst).slice(0, 6);
   return {
     unlocked:true,

@@ -32,7 +32,7 @@ export function markStreamingOpened(ui) {
 }
 
 export function canRevealHiddenEmails(ui) {
-  return ui.vaultUnlocked === true && ui.streamingOpenedSinceUnlock === true;
+  return ui.vaultUnlocked === true && ui.streamingOpenedSinceUnlock === true && ui.activeSection === 'streaming';
 }
 
 export function revealHiddenEmails(ui) {
@@ -43,4 +43,10 @@ export function revealHiddenEmails(ui) {
 
 export function hideHiddenEmails(ui) {
   ui.hiddenEmailsRevealed = false;
+}
+
+export function leaveStreaming(ui) {
+  ui.streamingOpenedSinceUnlock = false;
+  ui.hiddenEmailsRevealed = false;
+  if (ui.activeSection === 'streaming') ui.activeSection = 'overview';
 }

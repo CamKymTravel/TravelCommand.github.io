@@ -1,8 +1,9 @@
 import { createExpense } from './src_core_entities.js';
+import { resolveDestinationBudgetForDate, deriveAUDForStay } from './src_core_budget.js';
 import { touchRecord } from './src_core_records.js';
 
 const EXPENSE_FIELDS = Object.freeze([
-  'itineraryId','date','category','allocation','description',
+  'itineraryId','date','category','needsBudgetRepair','description',
   'originalCurrency','originalAmount','audAmount'
 ]);
 
@@ -11,7 +12,14 @@ function pickExpenseFields(record) {
 }
 
 export function saveExpenseDraft(draft, { expenseId = null, fields }, options = {}) {
-  const validated = createExpense(fields, options);
+  const stay = resolveDestinationBudgetForDate(draft.itinerary || [], fields.date);
+  const normalized = {
+    ...fields,
+    itineraryId: stay.id,
+    needsBudgetRepair: false,
+    audAmount: deriveAUDForStay(fields, stay)
+  };
+  const validated = createExpense(normalized, options);
   if (!expenseId) {
     draft.expenses.push(validated);
     return validated;

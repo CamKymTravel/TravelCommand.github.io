@@ -1,8 +1,10 @@
 import { createItineraryEntry, createRoutePoint } from './src_core_entities.js';
 import { touchRecord } from './src_core_records.js';
+import { formatAUDate, toISODate } from './src_core_dates.js';
+import { staysCoveringDate } from './src_core_budget.js';
 
 const ITINERARY_FIELDS = Object.freeze([
-  'name','travelType','startDate','endDate','startCity','country','localCurrency',
+  'name','travelType','startDate','endDate','startCity','startCountry','country','localCurrency',
   'fixedLocalPerAUD','destinationBudgetAUD','lat','long'
 ]);
 
@@ -20,17 +22,101 @@ function validateRoutePoints(itineraryId, routePoints, options) {
   }, options));
 }
 
+function recordDate(record, kind) {
+  return kind === 'Expense' ? toISODate(record.date) : toISODate(record.dateTime || record.date);
+}
+
+function recordName(record, kind) {
+  if (kind === 'Expense') return record.description?.trim() || record.category || 'Expense';
+  return record.title?.trim() || record.type || 'Reservation';
+}
+
+function normalDatedCosts(state) {
+  return [
+    ...(state.expenses || []).filter(record => !record.needsBudgetRepair).map(record => ({ record, kind:'Expense' })),
+    ...(state.reservations || []).filter(record => !record.needsBudgetRepair).map(record => ({ record, kind:'Reservation' }))
+  ];
+}
+
+function normalCostsLinkedTo(state, itineraryId) {
+  return normalDatedCosts(state).filter(({ record }) => record.itineraryId === itineraryId);
+}
+
+function assertDatedCostsRemainRoutable(state, proposedItinerary) {
+  for (const { record, kind } of normalDatedCosts(state)) {
+    const date = recordDate(record, kind);
+    const matches = staysCoveringDate(proposedItinerary, date);
+    if (matches.length !== 1) {
+      const reason = matches.length ? 'more than one stay' : 'no stay';
+      throw new Error(`Cannot change stay dates: ${kind} “${recordName(record, kind)}” on ${formatAUDate(date)} would match ${reason}.`);
+    }
+    if (matches[0].id !== record.itineraryId) {
+      throw new Error(`Cannot change stay dates: ${kind} “${recordName(record, kind)}” on ${formatAUDate(date)} would move to ${matches[0].name || 'another stay'}.`);
+    }
+  }
+}
+
+function normalizedCurrency(value) {
+  return value == null || value === '' ? null : String(value).trim().toUpperCase();
+}
+
+function normalizedRate(value) {
+  if (value == null || value === '') return null;
+  if (typeof value === 'boolean' || (value != null && typeof value === 'object')) throw new Error('Exchange rate must be numeric');
+  return Number(value);
+}
+
+
+function savedRoutePointsRemoved(state, itineraryId, proposedTravelType, routePoints = []) {
+  const existing = (state.routePoints || []).filter(point => point.itineraryId === itineraryId);
+  if (!existing.length) return [];
+  if (proposedTravelType === 'standard') return existing;
+  const retainedIds = new Set((routePoints || []).map(point => point?.id).filter(Boolean));
+  return existing.filter(point => !retainedIds.has(point.id));
+}
+
+function assertRoutePointRemovalConfirmed(state, itineraryId, proposedTravelType, routePoints, options) {
+  const removed = savedRoutePointsRemoved(state, itineraryId, proposedTravelType, routePoints);
+  if (!removed.length || options.allowRoutePointRemoval === true) return;
+  const noun = removed.length === 1 ? 'route point' : 'route points';
+  throw new Error(`Removing ${removed.length} saved ${noun} requires confirmation.`);
+}
+
+function assertNotBeforeJourneyStart(state, startDate) {
+  const journeyStart=state.settings?.journeyStartDate ? toISODate(state.settings.journeyStartDate) : null;
+  if(journeyStart && toISODate(startDate) < journeyStart) throw new Error(`Stay start ${formatAUDate(startDate)} is before Journey Start ${formatAUDate(journeyStart)}. Change Journey Start in Settings first.`);
+}
+
+function assertCurrencyRateUnlocked(state, current, next) {
+  if (!normalCostsLinkedTo(state, current.id).length) return;
+  const currencyChanged = normalizedCurrency(current.localCurrency) !== normalizedCurrency(next.localCurrency);
+  const currentRate = normalizedRate(current.fixedLocalPerAUD);
+  const nextRate = normalizedRate(next.fixedLocalPerAUD);
+  const rateChanged = currentRate !== nextRate;
+  if (currencyChanged || rateChanged) {
+    throw new Error('Local currency and fixed exchange rate are locked because this stay already has dated costs. Edit or remove those costs first.');
+  }
+}
+
 export function saveItineraryDraft(draft, { entryId = null, fields, routePoints = [] }, options = {}) {
   const validated = createItineraryEntry(fields, options);
+  assertNotBeforeJourneyStart(draft, validated.startDate);
   let entry;
 
   if (entryId) {
     const index = draft.itinerary.findIndex(item => item.id === entryId);
     if (index < 0) throw new Error('Itinerary entry not found');
-    entry = touchRecord(draft.itinerary[index], pickItineraryFields(validated), options);
+    const current = draft.itinerary[index];
+    const proposed = { ...current, ...pickItineraryFields(validated), id:current.id };
+    assertRoutePointRemovalConfirmed(draft, current.id, proposed.travelType, routePoints, options);
+    assertCurrencyRateUnlocked(draft, current, proposed);
+    const proposedItinerary = draft.itinerary.map(item => item.id === current.id ? proposed : item);
+    assertDatedCostsRemainRoutable(draft, proposedItinerary);
+    entry = touchRecord(current, pickItineraryFields(validated), options);
     draft.itinerary[index] = entry;
   } else {
     entry = validated;
+    assertDatedCostsRemainRoutable(draft, [...draft.itinerary, entry]);
     draft.itinerary.push(entry);
   }
 
@@ -55,8 +141,8 @@ export function itineraryDeleteBlockers(state, itineraryId) {
   const checks = [
     ['expenses', 'expense'],
     ['reservations', 'reservation'],
-    ['journeyHistory', 'Journey History record'],
-    ['checklists', 'checklist record']
+    ['checklists', 'checklist record'],
+    ['calendarEvents', 'Calendar reminder/note']
   ];
   const blockers = [];
   for (const [collection, label] of checks) {
@@ -66,7 +152,7 @@ export function itineraryDeleteBlockers(state, itineraryId) {
   return blockers;
 }
 
-export function deleteItineraryDraft(draft, itineraryId) {
+export function deleteItineraryDraft(draft, itineraryId, options = {}) {
   const blockers = itineraryDeleteBlockers(draft, itineraryId);
   if (blockers.length) {
     const summary = blockers.map(item => `${item.count} ${item.label}${item.count === 1 ? '' : 's'}`).join(', ');
@@ -76,6 +162,48 @@ export function deleteItineraryDraft(draft, itineraryId) {
   draft.itinerary = draft.itinerary.filter(entry => entry.id !== itineraryId);
   if (draft.itinerary.length === before) throw new Error('Itinerary entry not found');
   draft.routePoints = draft.routePoints.filter(point => point.itineraryId !== itineraryId);
-  draft.calendarEvents = draft.calendarEvents.filter(event => event.itineraryId !== itineraryId);
+  // Journey History supplements are dependent metadata for the itinerary stay and
+  // have no independent edit/delete surface. Removing the parent stay must remove
+  // those supplements automatically; otherwise a completed stay can become
+  // undeletable after every user-editable dependency has already been cleared.
+  draft.journeyHistory = (draft.journeyHistory || []).filter(record => record.itineraryId !== itineraryId);
+  draft.checklists = (draft.checklists || []).map(item => {
+    if (item.listType !== 'permanent' || !Array.isArray(item.completedForItineraryIds) || !item.completedForItineraryIds.includes(itineraryId)) return item;
+    return touchRecord(item, { completedForItineraryIds:item.completedForItineraryIds.filter(id => id !== itineraryId) }, options);
+  });
   return true;
+}
+
+export function setDestinationBudgetDraft(draft, itineraryId, budgetAUD, options = {}) {
+  if (typeof budgetAUD === 'boolean' || (budgetAUD != null && typeof budgetAUD === 'object')) throw new Error('Destination budget must be numeric');
+  const amount = Number(budgetAUD);
+  if (!Number.isFinite(amount) || amount < 0) throw new Error('Destination budget cannot be negative');
+  if (amount > Number.MAX_SAFE_INTEGER) throw new Error('Destination budget exceeds the safe numeric range');
+  const index = draft.itinerary.findIndex(item => item.id === itineraryId);
+  if (index < 0) throw new Error('Itinerary entry not found');
+  const current = draft.itinerary[index];
+  const linkedCosts = normalCostsLinkedTo(draft, itineraryId);
+  if (amount <= 0 && linkedCosts.length) {
+    throw new Error('This destination already has dated costs. Remove or move those costs before removing the Destination Budget.');
+  }
+
+  const startDate = options.startDate != null ? toISODate(options.startDate) : current.startDate;
+  const endDate = options.endDate != null ? toISODate(options.endDate) : current.endDate;
+  if (endDate < startDate) throw new Error('End date precedes start date');
+  const localCurrency = options.localCurrency !== undefined ? normalizedCurrency(options.localCurrency) : normalizedCurrency(current.localCurrency);
+  let fixedLocalPerAUD = options.fixedLocalPerAUD !== undefined ? normalizedRate(options.fixedLocalPerAUD) : normalizedRate(current.fixedLocalPerAUD);
+  if(localCurrency === 'AUD') fixedLocalPerAUD = 1;
+  assertNotBeforeJourneyStart(draft, startDate);
+  if (amount > 0 && !/^[A-Z]{3}$/.test(String(localCurrency || ''))) throw new Error('A 3-letter local currency is required before this Destination Budget can be Locked In.');
+  if (amount > 0 && (!Number.isFinite(fixedLocalPerAUD) || fixedLocalPerAUD <= 0)) throw new Error('A fixed local-per-AUD exchange rate greater than zero is required before this Destination Budget can be Locked In.');
+  if (fixedLocalPerAUD != null && Math.abs(fixedLocalPerAUD) > Number.MAX_SAFE_INTEGER) throw new Error('Exchange rate exceeds the safe numeric range');
+
+  const proposed = { ...current, destinationBudgetAUD:amount, startDate, endDate, localCurrency, fixedLocalPerAUD };
+  assertCurrencyRateUnlocked(draft, current, proposed);
+  const proposedItinerary = draft.itinerary.map(item => item.id === itineraryId ? proposed : item);
+  assertDatedCostsRemainRoutable(draft, proposedItinerary);
+
+  const saved = touchRecord(current, { destinationBudgetAUD:amount, startDate, endDate, localCurrency, fixedLocalPerAUD }, { now:options.now });
+  draft.itinerary[index] = saved;
+  return saved;
 }

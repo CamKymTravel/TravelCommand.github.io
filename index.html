@@ -6,15 +6,21 @@
   <meta name="theme-color" content="#07101f">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="TCC Simulation">
-  <title>Travel Command Centre — Simulation</title>
+  <meta name="apple-mobile-web-app-title" content="Travel Command Centre">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <title>Travel Command Centre</title>
   <link rel="stylesheet" href="./src_design_app.css">
 </head>
 <body>
-  <div id="app" class="app-shell" aria-live="polite"></div>
+  <div id="app" class="app-shell"></div>
   <script type="module">
-    import { installSimulationRuntime } from './simulation-clock.js';
-    installSimulationRuntime({serviceWorkerUrl:'./sw.js'});
+    const params = new URLSearchParams(globalThis.location?.search || '');
+    if (params.get('simulation') === '1') {
+      const { installSimulationRuntime } = await import('./simulation-clock.js');
+      installSimulationRuntime({ serviceWorkerUrl:'./sw.js' });
+      document.title = 'Travel Command Centre — Simulation';
+      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Simulation');
+    }
     await import('./src_main.js');
   </script>
 </body>
