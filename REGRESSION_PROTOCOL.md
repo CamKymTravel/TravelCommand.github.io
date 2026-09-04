@@ -1,3 +1,19 @@
+# V55 Athens Simulation — Active Regression Protocol (5 Sep 2026)
+
+This section supersedes older V54/V53 first-step wording for the Athens derivative. Historical sections remain below for regression archaeology only.
+
+1. **First gate:** run `python3 verify_working_checkpoint_v55.py --verify`. Any mismatch is a stop condition unless the current batch intentionally changed that exact file.
+2. Never roll current V55 runtime/source back merely to satisfy the immutable V55 starting baseline or the historical V54 guard.
+3. Preserve the Athens derivative bootstrap: manifest start URL `./index.html?simulation=1` **and** `const forceAthensSimulation = true;` in this simulation-only `index.html`. Production must not inherit that force flag.
+4. Preserve the distinct V55 Athens acceptance service-worker generation and complete offline-shell inventory, including `app-icon.png`. The Athens simulation must request the same `navigator.storage.persist()` safeguard as production when WebKit exposes it; do not reintroduce a simulation-mode skip.
+5. Preserve canonical launch-country normalisation before flag lookup. At minimum, `Türkiye`/`Turkiye` must resolve to `turkey`/🇹🇷, and the existing Czech Republic, USA/US/U.S.A., UK/U.K. and UAE/U.A.E. aliases must remain covered by the executable acceptance probe.
+6. Preserve the R7 App Health trust boundary: internal Vault screenshot representation migration must not dirty a verified state, while every Restore/replacement must invalidate the prior whole-app verification even when restored travel data is identical; the same applies when a validated pending Restore is finally committed through Retry iPad Storage.
+7. After runtime changes: parse all JS, validate CSS structure, run `node v53_deep_acceptance.mjs`, `node v54_deep_acceptance.mjs`, and rerun the 1,461-day / 10,227-model sweep when model/state/routing code is touched.
+8. Keep the entire extracted package below 100 files using a recursive file count; generated nested files such as `__pycache__` are forbidden. The exact checkpoint manifest is regenerated **last** after all intentional edits and documentation updates are complete.
+9. Physical target-iPad acceptance is still required for 1024×768 appearance, real offline voices, IndexedDB/Vault lifecycle and final PWA launch behaviour.
+
+---
+
 # V54 Regression Protocol — Effective Cascade + Visual/Interaction + No-Loss
 
 Before editing: `python3 verify_regression_guard.py --verify`.

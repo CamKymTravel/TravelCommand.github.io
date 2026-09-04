@@ -204,7 +204,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
       if (active) button.append(createLineIcon('check', 'reservation-selected-tick'));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = type; if (!editorTone) setModalTone(modal, RESERVATION_TONES[type] || 'blue'); renderTypes(); renderFlightScope(); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = type; if (existing && !editorTone) setModalTone(modal, RESERVATION_TONES[type] || 'blue'); renderTypes(); renderFlightScope(); }));
       typeTiles.append(button);
     }
   }
@@ -286,7 +286,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     body.dataset.currencyAuto = existing ? 'false' : 'true';
     body.dataset.type = saved.type;
     body.dataset.flightScope = saved.flightScope || '';
-    setModalTone(modal, editorTone || RESERVATION_TONES[saved.type] || 'blue');
+    setModalTone(modal, existing ? (editorTone || RESERVATION_TONES[saved.type] || 'blue') : 'sky');
     renderTypes();
     renderFlightScope();
     const essentialsStep = node('section', 'reservation-editor-step reservation-editor-step-essentials');
@@ -377,7 +377,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
   );
 
   const reservationTone = RESERVATION_TONES[existing?.type || initialType] || 'blue';
-  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tcc-editor-modal tcc-reservation-editor-modal tone-${editorTone || reservationTone}` });
+  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tcc-editor-modal tcc-reservation-editor-modal tone-${existing ? (editorTone || reservationTone) : 'sky'}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -434,6 +434,61 @@ function healthPanel(model) {
   return panel;
 }
 
+
+function reservationPanelExpandedBody(title, records, openEditor) {
+  const body=node('div','reservation-expanded-detail');
+  const trusted=records.filter(record=>!record.needsBudgetRepair);
+  const totalAUD=trusted.reduce((sum,record)=>sum+Number(record.audAmount||0),0);
+  const destinations=new Set(records.map(record=>record.itineraryName).filter(Boolean));
+  const paid=records.filter(record=>record.status==='paid').length;
+  const open=records.filter(record=>record.status==='unpaid'||record.status==='booked').length;
+  const repairs=records.length-trusted.length;
+  const summary=node('div','reservation-expanded-summary');
+  summary.append(
+    node('strong','',`${records.length} ${records.length===1?'booking':'bookings'}`),
+    node('span','',`${formatMoney(totalAUD,'AUD')} trusted total`),
+    node('span','',`${destinations.size} destination${destinations.size===1?'':'s'}`),
+    node('small','',`Paid ${paid} · Open ${open}${repairs?` · Repair ${repairs}`:''}`)
+  );
+  body.append(summary);
+  const section=node('section','reservation-expanded-list-section');
+  const head=node('div','reservation-section-head');head.append(node('h3','',title),node('span','reservation-count',String(records.length)));section.append(head);
+  const list=node('div','reservation-list');
+  if(!records.length)list.append(node('p','reservation-empty','No entries yet'));
+  for(const record of records)list.append(reservationRow(record,openEditor));
+  section.append(list);body.append(section);
+  return body;
+}
+
+function allUpcomingPresented(state,currentDate) {
+  return RESERVATION_TABS.flatMap(([type])=>buildReservationsViewModel(state,currentDate,{activeType:type}).upcoming)
+    .sort((a,b)=>String(a.dateTime||'9999').localeCompare(String(b.dateTime||'9999'))||a.title.localeCompare(b.title));
+}
+
+function nextUpcomingExpandedBody(state,currentDate,openEditor) {
+  return reservationPanelExpandedBody('Next 20 Across All Categories',allUpcomingPresented(state,currentDate).slice(0,20),openEditor);
+}
+
+function bookedTotalExpandedBody(state) {
+  const body=node('div','reservation-booked-expanded');
+  const booked=(state.reservations||[]).filter(record=>record.status!=='to-book');
+  const totalTrusted=booked.filter(record=>!record.needsBudgetRepair).reduce((sum,record)=>sum+Number(record.audAmount||0),0);
+  const intro=node('div','reservation-expanded-summary');
+  intro.append(node('strong','',`${booked.length} booked reservations`),node('span','',`${formatMoney(totalTrusted,'AUD')} trusted total`));
+  body.append(intro);
+  const groups=node('div','reservation-booked-category-list');
+  for(const [type,label] of RESERVATION_TABS){
+    const records=booked.filter(record=>record.type===type);
+    const trusted=records.filter(record=>!record.needsBudgetRepair);
+    const amount=trusted.reduce((sum,record)=>sum+Number(record.audAmount||0),0);
+    const paid=records.filter(record=>record.status==='paid').length;
+    const repair=records.length-trusted.length;
+    const row=node('article',`reservation-booked-category reservation-booked-category-${type}`);
+    row.append(node('strong','',label),node('span','',`${records.length} booked · ${formatMoney(amount,'AUD')}`),node('small','',`Paid ${paid}${repair?` · Repair ${repair}`:''}`));
+    groups.append(row);
+  }
+  body.append(groups);return body;
+}
 
 function reservationAllFuture(state,currentDate){ return (state.reservations||[]).filter(r=>r.dateTime&&String(r.dateTime).slice(0,10)>=String(currentDate)&&r.status!=='to-book').sort((a,b)=>String(a.dateTime).localeCompare(String(b.dateTime))).slice(0,5); }
 
@@ -516,6 +571,51 @@ function renderBookedTotal(state){
   return panel;
 }
 
+function openReservationCategorySummary({ stateService, host, currentDate, type, onSelectType = null }) {
+  if(!host)return;
+  const state=stateService.snapshot();
+  const model=buildReservationsViewModel(state,currentDate,{activeType:type});
+  const label=RESERVATION_TABS.find(([value])=>value===type)?.[1]||'Reservations';
+  const body=node('div',`reservation-category-expanded reservation-category-expanded-${type}`);
+  const meta=reservationTabMeta(state,currentDate,type);
+  const summary=node('div','reservation-category-expanded-summary');
+  summary.append(
+    node('strong','',`${model.upcoming.length} upcoming`),
+    node('span','',`${model.toBook.length} to book`),
+    node('span','',`${model.completed.length} completed`)
+  );
+  if(type==='flight') summary.append(node('small','',`Upcoming flights · Domestic ${meta.flightDomestic} · International ${meta.flightInternational}${meta.flightUnclassified?` · Unclassified ${meta.flightUnclassified}`:''}`));
+  body.append(summary);
+  let dialog=null;
+  const openRecord=id=>{
+    if(dialog?.open)dialog.close();
+    queueMicrotask(()=>{
+      const liveHost=document.querySelector('[data-screen="reservations"]');
+      if(liveHost)openReservationEditor({stateService,host:liveHost,currentDate,reservationId:id,initialType:type,editorTone:RESERVATION_TONES[type]||'blue'});
+    });
+  };
+  const addGroup=(title,records,empty)=>{
+    const section=node('section','reservation-category-expanded-group');
+    const head=node('div','reservation-section-head');head.append(node('h3','',title),node('span','reservation-count',String(records.length)));section.append(head);
+    const list=node('div','reservation-list');
+    if(!records.length)list.append(node('p','reservation-empty',empty));
+    for(const record of records)list.append(reservationRow(record,openRecord));
+    section.append(list);body.append(section);
+  };
+  addGroup('Upcoming',model.upcoming,'No upcoming bookings in this category.');
+  addGroup('Future Bookings / To Book',model.toBook,'No To Book entries in this category.');
+  addGroup('Completed',model.completed,'No completed bookings in this category.');
+  dialog=createModal({
+    title:`${label} · All Bookings`,
+    body,
+    className:`tcc-expanded-modal reservation-category-expanded-modal tone-${RESERVATION_TONES[type]||'blue'}`,
+    actions:[{label:'Close',onClick:d=>d.close()}]
+  });
+  host.append(dialog);
+  dialog.addEventListener('close',()=>{dialog.remove();onSelectType?.(type);},{once:true});
+  dialog.showModal();
+}
+
 export function renderReservationsScreen({ stateService, currentDate, navigate }) {
   const main = node('main', 'screen-root reservations-screen');
   main.dataset.screen = 'reservations';
@@ -553,7 +653,18 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
       support.append(node('strong','reservation-support-primary',meta.primary),node('small','reservation-support-secondary',meta.secondary));
       button.append(top,count,support);
       button.setAttribute('aria-label',`${tab.label}: ${tab.count} bookings. ${meta.support}`);
-      button.addEventListener('click', () => stateService.commit(draft => { draft.ui.reservationType = tab.type; }));
+      button.addEventListener('click', () => {
+        openReservationCategorySummary({
+          stateService,
+          host:main,
+          currentDate,
+          type:tab.type,
+          onSelectType:selectedType=>{
+            if(stateService.snapshot().ui?.reservationType===selectedType)return;
+            stateService.commit(draft=>{draft.ui.reservationType=selectedType;});
+          }
+        });
+      });
       tabs.append(button);
     }
     const contentGrid=node('section','reservation-reference-grid');
@@ -563,15 +674,14 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     const toBookPanel=listPanel('Future Bookings / To Book', model.toBook, 'reservation-to-book', id=>openEditor(id,'gold'), 'No To Book entries yet');
     const upcomingPanel=listPanel('Upcoming', model.upcoming, 'reservation-upcoming', id=>openEditor(id,'blue'), 'No upcoming entries yet');
     left.append(toBookPanel,upcomingPanel);
-    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold'});
-    makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Reservations',tone:'blue'});
+    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',model.toBook,id=>openEditor(id,'gold'))});
+    makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Reservations',tone:'blue',bodyBuilder:()=>reservationPanelExpandedBody('Upcoming Reservations',model.upcoming,id=>openEditor(id,'blue'))});
     const completed = document.createElement('details'); completed.className='reservation-panel reservation-completed'; completed.open=options.completedOpen; completed.addEventListener('toggle',()=>{options.completedOpen=completed.open; if(stateService.snapshot().ui?.reservationCompletedOpen===completed.open)return; stateService.commit(draft=>{draft.ui.reservationCompletedOpen=completed.open;});}); const summary=node('summary'); summary.append(node('span','','Completed'),node('span','reservation-count',String(model.completed.length))); completed.append(summary); const completedList=node('div','reservation-list'); if(!model.completed.length) completedList.append(node('p','reservation-empty','No completed entries yet')); for(const record of model.completed) completedList.append(reservationRow(record,openEditor)); completed.append(completedList);
     const health=healthPanel(model); left.append(completed,health);
-    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:health.classList.contains('reservation-health-needs-attention')?'gold':'green'});
     const nextFive=renderNextFive(state,currentDate,id=>openEditor(id,'red')), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);
-    makeExpandableCard(nextFive,{host:main,title:'Next 5 Upcoming',tone:'red'});
-    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked',tone:'violet'});
+    makeExpandableCard(nextFive,{host:main,title:'Next 20 Upcoming',tone:'red',bodyBuilder:()=>nextUpcomingExpandedBody(state,currentDate,id=>openEditor(id,'red'))});
+    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked by Category',tone:'violet',bodyBuilder:()=>bookedTotalExpandedBody(state)});
     contentGrid.append(left,rail); main.append(contentGrid);
 
     const pending = state.ui?.pendingOpen;

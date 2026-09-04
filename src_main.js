@@ -1,11 +1,13 @@
 import { BrowserStorageAdapter, BrowserVaultAssetStore } from './src_core_storage.js';
 import { StateService } from './src_core_state.js';
 import { localISODate } from './src_core_device-time.js';
-import { readRuntimeConfig, fetchRuntimeFixture, runtimeNowISO } from './src_core_runtime-config.js';
+import { readRuntimeConfig, fetchRuntimeFixture, runtimeNowISO, shouldInstallRuntimeFixture, stampRuntimeFixtureRevision } from './src_core_runtime-config.js';
 import { restoreBackup } from './src_core_restore.js';
 import { createVaultAccessSession, lockVault, canRevealHiddenEmails, revealHiddenEmails } from './src_core_vault-access.js';
 import { renderSidebar } from './src_components_sidebar.js';
 import { renderScreen, isValidScreen } from './src_screens_registry.js';
+import { canonicalCountrySlug } from './src_core_entities.js';
+import { findCurrentStay } from './src_core_planning.js';
 
 const root = document.querySelector('#app');
 const runtimeConfig = readRuntimeConfig();
@@ -18,7 +20,11 @@ stateService.hydrate();
 
 async function requestPersistentOfflineStorage() {
   try {
-    if (runtimeConfig.mode !== 'production' || !navigator.storage?.persist) return;
+    // The Athens screenshot derivative uses a separate storage key but must
+    // exercise the same Home Screen persistence safeguard as production.
+    // Otherwise its Vault/IndexedDB lifecycle test is less durable than the
+    // real app it is intended to validate.
+    if (!navigator.storage?.persist) return;
     const alreadyPersistent = navigator.storage.persisted ? await navigator.storage.persisted() : false;
     if (!alreadyPersistent) await navigator.storage.persist();
   } catch {
@@ -27,10 +33,30 @@ async function requestPersistentOfflineStorage() {
     // StateService's transactional verification and Protected Recovery path.
   }
 }
-if (!stateService.isRecoveryMode() && !stateService.hadStoredState && runtimeConfig.seedIfEmpty) {
+if (!stateService.isRecoveryMode() && runtimeConfig.seedIfEmpty) {
   try {
-    const fixture = await fetchRuntimeFixture(runtimeConfig);
-    if (fixture) stateService.replaceValidated(fixture);
+    const fixtureRevision = String(runtimeConfig.testingFlags?.fixtureRevision || runtimeConfig.testingFlags?.fixture || runtimeConfig.fixtureUrl || 'simulation');
+    const markerKey = `${runtimeConfig.storageKey}:fixture-revision`;
+    let installedRevision = null;
+    try { installedRevision = globalThis.localStorage?.getItem(markerKey) || null; } catch {}
+    const shouldInstallFixture = shouldInstallRuntimeFixture({
+      hadStoredState:stateService.hadStoredState,
+      state:stateService.state,
+      externalRevision:installedRevision,
+      fixtureRevision
+    });
+    if (shouldInstallFixture) {
+      const fixture = await fetchRuntimeFixture(runtimeConfig);
+      if (fixture) {
+        // Persist the revision inside the same canonical state write as the
+        // fixture itself. The sidecar localStorage marker remains a backward-
+        // compatibility hint for older simulation installs, but it is no
+        // longer the sole guard against destructive reseeding.
+        stateService.replaceValidated(stampRuntimeFixtureRevision(fixture, fixtureRevision));
+        stateService.markAppHealthChecked();
+        try { globalThis.localStorage?.setItem(markerKey, fixtureRevision); } catch {}
+      }
+    }
   } catch (error) { console.error('Simulation seed failed', error); }
 }
 if (!stateService.isRecoveryMode()) {
@@ -45,6 +71,39 @@ if (!stateService.isRecoveryMode()) {
 }
 
 function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=text;return el;}
+
+function launchFlagEmoji(country='') {
+  const key=canonicalCountrySlug(country);
+  const codes={
+    albania:'AL',algeria:'DZ',argentina:'AR',australia:'AU',austria:'AT',bahamas:'BS',belgium:'BE','bosnia-and-herzegovina':'BA',brazil:'BR',bulgaria:'BG',cambodia:'KH',canada:'CA',chile:'CL',china:'CN',colombia:'CO','costa-rica':'CR',croatia:'HR',cyprus:'CY',czechia:'CZ',denmark:'DK','dominican-republic':'DO',egypt:'EG',estonia:'EE',finland:'FI',france:'FR',germany:'DE',greece:'GR',hungary:'HU',iceland:'IS',india:'IN',indonesia:'ID',ireland:'IE',italy:'IT',jamaica:'JM',japan:'JP',jordan:'JO',laos:'LA',latvia:'LV',liechtenstein:'LI',lithuania:'LT',luxembourg:'LU',malaysia:'MY',malta:'MT',mexico:'MX',monaco:'MC',montenegro:'ME',morocco:'MA',netherlands:'NL','new-zealand':'NZ','north-macedonia':'MK',norway:'NO',oman:'OM',panama:'PA',peru:'PE',philippines:'PH',poland:'PL',portugal:'PT',qatar:'QA',romania:'RO',russia:'RU',serbia:'RS',singapore:'SG',slovakia:'SK',slovenia:'SI','south-africa':'ZA','south-korea':'KR',spain:'ES','sri-lanka':'LK',sweden:'SE',switzerland:'CH',taiwan:'TW',thailand:'TH',tunisia:'TN',turkey:'TR','united-arab-emirates':'AE','united-kingdom':'GB','united-states':'US',vietnam:'VN'
+  };
+  const code=codes[key];
+  return code?[...code].map(ch=>String.fromCodePoint(127397+ch.charCodeAt(0))).join(''):'🌍';
+}
+
+function activeLaunchDestination(currentDate) {
+  const today=String(currentDate||'').slice(0,10);
+  const stay=findCurrentStay(stateService.state.itinerary||[],today);
+  if(!stay)return null;
+  const routed=['cruise','motorhome','rv'].includes(stay.travelType);
+  const country=String((routed?stay.startCountry:stay.country)||stay.country||stay.startCountry||'').trim();
+  const city=String((routed?stay.startCity:stay.name)||stay.startCity||stay.name||'Current destination').trim();
+  return {city,country,flag:launchFlagEmoji(country)};
+}
+
+function runLaunchSequence(currentDate) {
+  if(stateService.isRecoveryMode())return;
+  const destination=activeLaunchDestination(currentDate);
+  const overlay=node('div','tcc-launch-overlay');overlay.setAttribute('aria-hidden','true');
+  const compass=node('div','tcc-launch-compass');compass.innerHTML='<span class="brand-compass-ring"><svg class="brand-compass-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="m14.8 9.2-1.8 4.1-4.1 1.8 1.8-4.1 4.1-1.8Z"></path><path d="M12 2.5v2M21.5 12h-2M12 21.5v-2M2.5 12h2"></path></svg></span><strong>TRAVEL COMMAND CENTRE</strong>';
+  const place=node('div','tcc-launch-place');place.append(node('span','tcc-launch-flag',destination?.flag||'🌍'),node('strong','tcc-launch-city',destination?.city||'Travel Command Centre'),node('span','tcc-launch-country',destination?.country||'Offline travel command centre'));
+  overlay.append(compass,place);document.body.append(overlay);
+  const reduced=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const compassDelay=reduced?120:620;const placeDelay=reduced?520:1500;const removeDelay=reduced?720:1850;
+  setTimeout(()=>overlay.classList.add('show-destination'),compassDelay);
+  setTimeout(()=>overlay.classList.add('leaving'),placeDelay);
+  setTimeout(()=>overlay.remove(),removeDelay);
+}
 
 const ROOT_FOCUSABLE = 'button, a[href], input, select, textarea, summary, [role="button"], [tabindex]';
 const SCREEN_ACCESSIBLE_LABELS = Object.freeze({
@@ -278,6 +337,7 @@ function navigate(screenId, pendingOpen = null) {
 
 stateService.subscribe(render);
 render();
+runLaunchSequence(runtimeConfig.currentDate || localISODate());
 
 let dateRefreshTimer = null;
 function refreshForDeviceDate() {

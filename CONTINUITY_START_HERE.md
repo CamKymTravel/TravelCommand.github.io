@@ -1,3 +1,23 @@
+# V55 Athens Simulation R13 — START HERE
+
+**5 September 2026 AEST**
+
+Continue from this exact **V55 Athens R13 simulation derivative**. Do not restart from V54/V53, reconstruct screens from screenshots, or copy older runtime files over this tree.
+
+**First gate:** `python3 verify_working_checkpoint_v55.py --verify`
+
+Current runtime identity remains `1.2.0-v55-screenshot-audit-continuation`; Athens install/cache generation is `tcc-v1-v55-athens-acceptance-r13-2026-09-05`. The simulation clock is 24/02/2029 with Athens current and Budapest next. The package remains below the hard 100-file limit.
+
+R13 directly follows the verified R12 checkpoint. R13 keeps the R12 launch-country canonicalisation and fixes a second launch/Home consistency defect: the launch sequence now selects the active stay with the same canonical `findCurrentStay()` planning function used by Home, so a temporary itinerary overlap cannot make launch name one destination and Home immediately show another. All R11 atomic simulation fixture-revision protection remains intact. Because runtime source changed, the Athens service-worker/cache generation advances to R13.
+
+All earlier R9/R7 protections remain: production/simulation persistent-storage parity, state-driven launch, forced simulation boot for plain-index shortcuts, App Health mutation tracking, internal Vault screenshot migration without false dirty state, every Restore/replacement requiring a fresh `CHECK THE WHOLE APP`, and the Protected-Recovery Retry path doing the same.
+
+The Athens simulation is **already built and active**. Remaining acceptance is physical target-iPad work only: final 1024×768 appearance/header crops, installed-PWA/IndexedDB lifecycle, offline speech voices, and final colour approval from Cameron.
+
+`NEXT_CHAT_START_HERE_V55.md`, `OUTSTANDING_WORK.md`, `REGRESSION_PROTOCOL.md`, and `PACKAGE_CONTENTS.txt` carry the active R13 instructions. Historical V54/V53/V52 sections below are regression archaeology only and must not supersede this section.
+
+---
+
 # V54 Touch-Target Completion Candidate — START HERE
 
 **4 September 2026 AEST**

@@ -8,36 +8,31 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Travel Command Centre">
   <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./app-icon.png">
   <title>Travel Command Centre</title>
   <link rel="stylesheet" href="./src_design_app.css">
 </head>
 <body>
   <div id="app" class="app-shell"></div>
   <script type="module">
-    // V54 master optional trigger lineage retained: params.get('simulation') === '1'.
-    // This dedicated screenshot build intentionally starts simulation unconditionally.
-    const { installSimulationRuntime, SIMULATION_INSTALL_MARKER } = await import('./simulation-clock.js');
-    const simulationConfig = installSimulationRuntime({ serviceWorkerUrl:'./sw.js?v=54-athens-full-simulation-r1' });
-    document.title = 'Travel Command Centre — Athens Simulation V54';
-    document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Athens V54');
-
-    // One-time fixture-install guard for this exact simulation generation.
-    // It clears only the dedicated Athens simulation key, never production V54.
-    // If fixture loading itself later fails, seedIfEmpty remains true so a
-    // subsequent reload retries rather than leaving a false-success marker.
-    try {
-      if (globalThis.localStorage?.getItem(SIMULATION_INSTALL_MARKER) !== '1') {
-        globalThis.localStorage?.removeItem(simulationConfig.storageKey);
-        globalThis.localStorage?.setItem(SIMULATION_INSTALL_MARKER, '1');
-      }
-    } catch {}
+    const params = new URLSearchParams(globalThis.location?.search || '');
+    // This downloadable Athens package is a simulation-only derivative.
+    // Force simulation even when an older iPad Home Screen shortcut opens
+    // plain index.html and drops the manifest's ?simulation=1 query string.
+    const forceAthensSimulation = true;
+    if (forceAthensSimulation || params.get('simulation') === '1') {
+      const { installSimulationRuntime } = await import('./simulation-clock.js');
+      installSimulationRuntime({ serviceWorkerUrl:'./sw.js?v=55-athens-acceptance-r13' });
+      document.title = 'Travel Command Centre — Simulation';
+      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Simulation');
+    }
 
     // Build-consistency barrier. A newly fetched index can otherwise execute
     // beneath the previous service worker for its first load, producing a
     // dangerous hybrid such as a new build title with old cached screen
     // modules/icons. Before importing the app, answer the worker's safe-refresh
     // probe and give the current build worker a chance to activate/claim.
-    const bootWorkerUrl = globalThis.__TCC_RUNTIME_CONFIG__?.serviceWorkerUrl || './sw.js?v=54-athens-full-simulation-r1';
+    const bootWorkerUrl = globalThis.__TCC_RUNTIME_CONFIG__?.serviceWorkerUrl || './sw.js?v=55-athens-acceptance-r13';
     if ('serviceWorker' in navigator && bootWorkerUrl) {
       const safeBootResponder = event => {
         if (event?.data?.type !== 'TCC_SW_UPDATE_QUERY') return;

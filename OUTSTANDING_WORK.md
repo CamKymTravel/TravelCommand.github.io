@@ -1,3 +1,19 @@
+# V55 Athens R13 — Active Remaining Acceptance
+
+The V55 Athens simulation derivative is built, source/model verified and protected by the exact working checkpoint. **Athens is not blocked.** Do not return to V54/V53 or rebuild from screenshots.
+
+Source-verifiable work completed through R13 includes the state-driven launch, forced simulation boot for old plain-index shortcuts, coherent service-worker/cache generation, concealed three-tap Vault entry, exact hidden-email sequence, complete offline shell, production/simulation persistent-storage parity, atomic fixture revision protection against missing sidecar-marker reseeds, canonical launch-country aliases including Türkiye → Turkey for the correct flag, launch/Home current-stay selector parity through `findCurrentStay()`, App Health mutation tracking, internal Vault-migration false-dirty protection, Restore-forces-recheck including the Protected-Recovery Retry path, date-driven Destination Budget routing, To Book financial isolation, richer useful expansions and removal of clone-only expansion controls.
+
+Remaining acceptance before Gold/Master Lock genuinely requires the target iPad:
+- install the exact R13 ZIP and capture current screenshots across all nine screens plus Add/Edit and both Home helpers;
+- confirm final 1024×768 spacing, recognisable header crops, zero horizontal scrolling and effective touch targets;
+- verify Add to Home Screen/update behaviour from the prior test build;
+- test offline local Play / Slow / Repeat ×3 / Louder voices; if required voices are not reliably available offline, use a self-contained packaged-audio fallback rather than an online API;
+- perform practical Vault screenshot add/view/reopen/delete plus Backup/Restore/Protected-Recovery/Retry on the installed PWA;
+- complete final colour approval only from Cameron's explicit decisions. Screenshots remain structure/defect evidence, not automatic colour authority.
+
+---
+
 # V54 Immediate Carry-Forward / Remaining Acceptance
 
 V54 source candidate now also includes the proven indexed Reservations duplicate-health repair and Standard-stay Country integrity guard. These are implemented/protected work, not outstanding items.

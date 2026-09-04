@@ -66,7 +66,8 @@ function commonChecks() {
   assert(noStayRejected, 'Expense outside all stays was silently routed');
 
   const future = structuredClone(state);
-  future.meta.appVersion = '1.2.0-v54-future';
+  const currentGeneration=Number(APP_VERSION.match(/-v(\d+)/)?.[1]);
+  future.meta.appVersion = `1.2.0-v${currentGeneration+1}-future`;
   let futureRejected=false;
   try { migrateState(future, { now:'2031-01-13T23:00:00.000Z' }); } catch { futureRejected=true; }
   assert(futureRejected, 'Newer app-generation state was accepted');

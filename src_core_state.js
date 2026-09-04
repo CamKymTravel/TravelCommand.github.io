@@ -9,6 +9,37 @@ function canonicalClock(value) {
   return date.toISOString();
 }
 
+
+function appHealthFingerprint(state) {
+  const stable = structuredClone(state || {});
+  delete stable.meta;
+  delete stable.ui;
+  // Vault screenshot bytes can move between the JSON fixture/backup wrapper and
+  // IndexedDB without changing the user's saved travel information. Keep App
+  // Health keyed to the attachment record itself, not its internal storage
+  // representation, so that one-time asset migration cannot create a false
+  // dirty/red state. Add/delete/edit still changes attachment identity/metadata.
+  if (Array.isArray(stable.attachments)) {
+    stable.attachments = stable.attachments.map(attachment => {
+      const next = { ...attachment };
+      delete next.dataUrl;
+      delete next.assetKey;
+      delete next.byteLength;
+      return next;
+    });
+  }
+  const text = JSON.stringify(stable);
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index += 1) {
+    const code = text.charCodeAt(index);
+    hash ^= code & 0xff;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+    hash ^= code >>> 8;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+}
+
 function latestRecordModifiedAt(state) {
   let latest = state?.meta?.modifiedAt || '';
   for (const value of Object.values(state || {})) {
@@ -24,6 +55,8 @@ export class StateService {
   constructor(adapter, { now = () => new Date().toISOString(), vaultAssetStore = null } = {}) {
     this.adapter = adapter;
     this.vaultAssetStore = vaultAssetStore;
+    this.appHealthMarkerKey = `${adapter?.key || 'memory'}:app-health-fingerprint`;
+    this.appHealthCheckedFingerprint = this.readAppHealthFingerprint();
     this.vaultAssetIssues = [];
     // Vault audits are async and can overlap a Restore or screenshot Save.
     // Only the newest audit for the same canonical attachment set may publish
@@ -94,6 +127,41 @@ export class StateService {
   }
 
   snapshot() { return structuredClone(this.state); }
+
+  readAppHealthFingerprint() {
+    try {
+      if (this.adapter?.storage?.getItem) return this.adapter.storage.getItem(this.appHealthMarkerKey);
+      return this.adapter?._appHealthCheckedFingerprint || null;
+    } catch { return null; }
+  }
+
+  persistAppHealthFingerprint(value) {
+    const fingerprint = String(value || '');
+    try {
+      if (this.adapter?.storage?.setItem) this.adapter.storage.setItem(this.appHealthMarkerKey, fingerprint);
+      else if (this.adapter) this.adapter._appHealthCheckedFingerprint = fingerprint;
+      this.appHealthCheckedFingerprint = fingerprint;
+      return true;
+    } catch { return false; }
+  }
+
+  isAppHealthDirty() {
+    return appHealthFingerprint(this.state) !== String(this.appHealthCheckedFingerprint || '');
+  }
+
+  markAppHealthChecked() {
+    const fingerprint = appHealthFingerprint(this.state);
+    this.persistAppHealthFingerprint(fingerprint);
+    return fingerprint;
+  }
+
+  invalidateAppHealthCheck() {
+    try {
+      if (this.adapter?.storage?.removeItem) this.adapter.storage.removeItem(this.appHealthMarkerKey);
+      else if (this.adapter) this.adapter._appHealthCheckedFingerprint = null;
+    } catch {}
+    this.appHealthCheckedFingerprint = null;
+  }
   isRecoveryMode() { return this.recovery?.active === true; }
   rawRecoveryData() { return this.recovery?.raw ?? null; }
 
@@ -150,7 +218,7 @@ export class StateService {
     return this.snapshot();
   }
 
-  replaceValidated(nextState) {
+  replaceValidated(nextState, { invalidateHealth = true } = {}) {
     const migrated = migrateState(nextState, { now:this.now() });
     validateState(migrated);
     const before = this.snapshot();
@@ -180,6 +248,10 @@ export class StateService {
     this.state = migrated;
     this.lastGoodSerialized = serialized;
     this.recovery = null;
+    // Restore/replacement is a trust boundary: even an identical backup must
+    // require CHECK THE WHOLE APP again. Internal representation migrations can
+    // opt out explicitly because they do not change user travel data.
+    if (invalidateHealth) this.invalidateAppHealthCheck();
     this.notifyListeners();
     return this.snapshot();
   }
@@ -276,7 +348,7 @@ export class StateService {
         attachment.byteLength = bytes;
         delete attachment.dataUrl;
       }
-      this.replaceValidated(next);
+      this.replaceValidated(next, { invalidateHealth:false });
       this.releaseStagedVaultAssets(stagedKeys);
     } catch (error) {
       await this.removeVaultAssets(stagedKeys);
@@ -486,6 +558,12 @@ export class StateService {
         // Verify the canonical form too; migration may have repaired metadata.
         if (!this.adapter.write(this.lastGoodSerialized) || this.adapter.read() !== this.lastGoodSerialized) return false;
       } catch { return false; }
+      // Completing a backup Restore through Retry iPad Storage is still a
+      // Restore trust boundary. Even when the restored state is byte-for-byte
+      // identical to the previously verified state, require CHECK THE WHOLE
+      // APP again. Plain storage-recovery retries without a pending Restore do
+      // not invalidate App Health.
+      if (pendingRestore) this.invalidateAppHealthCheck();
       this.recovery = null;
       this.hadStoredState = true;
       this.notifyListeners();

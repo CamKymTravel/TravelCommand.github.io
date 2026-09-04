@@ -499,15 +499,10 @@ export function renderHomeScreen({stateService,currentDate,navigate}){
     main.append(renderHero(model,state,main,navigate));
     const daily=renderDailyBudget(model), destination=renderDestinationBudget(model), annual=renderAnnual(model,currentDate,state);
     const stats=node('section','home-ref-stats'); stats.append(daily,destination,annual); main.append(stats);
-    makeExpandableCard(daily,{host:main,title:'Daily Budget',tone:'teal'});
-    makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'violet'});
-    makeExpandableCard(annual,{host:main,title:'Annual Position',tone:'gold'});
     const upcoming=compactUpcoming(model,navigate), alerts=compactAlerts(model,navigate), schengen=compactSchengen(model), timeline=compactTimeline(state,currentDate,navigate);
     const minis=node('section','home-ref-minis'); minis.append(upcoming,alerts,schengen,timeline); main.append(minis);
     makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'blue'});
     makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'orange'});
-    makeExpandableCard(schengen,{host:main,title:'Schengen Status',tone:'green'});
-    makeExpandableCard(timeline,{host:main,title:'Trip Timeline',tone:'violet'});
     const search=document.createElement('input'); search.type='search'; search.className='home-ref-search'; search.placeholder='Search destinations, reservations, notes and more'; search.value=query; search.setAttribute('aria-label','Global search'); main.append(search);
     if(query.trim()){ const results=node('section','home-search-overlay'); results.append(renderSearchResults(model,navigate)); main.append(results); }
     search.addEventListener('input',e=>{const caret=e.target.selectionStart??e.target.value.length;const selectionEnd=e.target.selectionEnd??caret;query=e.target.value;render();const next=main.querySelector('.home-ref-search');next?.focus();next?.setSelectionRange(Math.min(caret,next.value.length),Math.min(selectionEnd,next.value.length));});

@@ -1,43 +1,39 @@
-Travel Command Centre V1 — V54 FULL ATHENS SIMULATION
+Travel Command Centre V1 — V55 Athens, Greece Full Simulation R13
 
-SIMULATION OVERRIDE — screenshot/acceptance build derived from the frozen V54 candidate.
-- Starts automatically in simulation mode; no query parameter required.
-- Fixed simulation date: 03/03/2029.
-- Current stay: Athens, Greece (11/02/2029–15/03/2029).
-- Next stay: Budapest, Hungary (16/03/2029–15/04/2029).
-- Dedicated storage key and dedicated service-worker/cache identity; production V54 data is not used.
-- One-time fixture-install marker clears only this simulation generation on first launch, then preserves simulation edits on later reloads.
-- Full V54 UI/runtime source is otherwise unchanged.
+Purpose
+- Screenshot/review simulation derivative of the protected V55 Screenshot-Audit Working Master.
+- Active simulation date: 24/02/2029.
+- Current destination: Athens, Greece (11/02/2029–15/03/2029).
+- Next destination: Budapest, Hungary (16/03/2029–15/04/2029).
+- Parent V55 working-checkpoint manifest SHA-256: dfb5c4f6b66f0c9dff03c15676d20e440d3fe945208a4e895c5aea487b8c799d.
 
---- V54 MASTER LINEAGE CONTENTS ---
-- Exact V54 PWA source/runtime tree continuing directly from the frozen V53 acceptance-repair build.
-- `ACCEPTANCE_MATRIX_V54.md` effective-final-cascade + visual/interaction acceptance contract.
-- `ACCEPTANCE_MATRIX_V53.md` preserved as the screen hierarchy/icon/helper predecessor authority.
-- `CHANGESET_V53_TO_V54.md` V54 touch-target + reservation-scale + Standard-country integrity repair ledger.
-- `CHANGESET_V52_TO_V53.md` preserved V53 repair lineage.
-- `REGRESSION_CONTRACT.json` machine-readable no-loss + V54 acceptance rules.
-- `verify_regression_guard.py` hash, structure, icon, hierarchy, final-touch-cascade, indexed-duplicate, Standard-country, offline-shell and deep behavioural verifier.
-- `v54_deep_acceptance.mjs` current migration / backup / date-routing / Standard-country / duplicate-semantics / 1,461-day model-sweep probe.
-- `v53_deep_acceptance.mjs` retained as predecessor evidence.
-- `VISUAL_REFERENCES.zip` preserving 21 reference images and helper direction evidence.
-- `header-assets.bin` / `header-index.json` and all offline runtime assets.
-- historical `simulation-data.json` retained only as migration/model fixture; this production candidate does not auto-seed Athens.
-- full continuity/no-loss documentation and historical 100-item ledger retained.
+Athens simulation population
+- Full retained long-term itinerary/history fixture remains present.
+- Athens Destination Budget is populated with dated EUR expenses and accommodation.
+- Current/future Athens reservation examples include Acropolis tickets, Athens→Thessaloniki rail and a Delphi To Book item.
+- February 2029 Calendar includes Athens reminders/notes.
+- Checklist preparation is populated for the next move to Budapest, including required tasks plus separate Cameron/Kym optional Needs & Wants.
+- Greece header, launch flag/city/country, Country Quick Look and Greek toilet-language helper are provided by the same V55 runtime.
 
-The outer package must remain below 100 extracted top-level files.
+Runtime integrity
+- App version: 1.2.0-v55-screenshot-audit-continuation.
+- Athens simulation has its own storage key and fixture revision so stale prior simulation data cannot suppress this fixture.
+- The Web App Manifest start URL is explicitly `./index.html?simulation=1`, so Add to Home Screen cannot silently drop into production mode.
+- The Athens derivative also forces simulation bootstrap even if an older installed shortcut opens plain `index.html`; this guard is simulation-only and must not be copied to production.
+- Every browser runtime JavaScript module is in the offline shell inventory.
+- Add to Home Screen now uses the packed Travel Command Centre compass app icon (manifest + Apple touch icon), also pre-cached offline.
+- Acceptance cache generation: `tcc-v1-v55-athens-acceptance-r13-2026-09-05`.
+- V53/V54 deep acceptance probes and the 1,461-day / 10,227-model sweep are retained for verification.
+- R9 runtime change: the simulation derivative now requests the same `navigator.storage.persist()` safeguard as production when available, while retaining its separate Athens storage key and unchanged fixture data.
+- R11 runtime change: the fixture revision is embedded inside canonical simulation state and missing sidecar-marker state is preserved instead of being destructively reseeded.
+- R12 runtime change retained: launch-country canonicalisation resolves itinerary aliases such as Türkiye/Turkey, Czech Republic/Czechia, USA/US/U.S.A., UK/U.K. and UAE/U.A.E. before selecting the country flag.
+- R13 runtime change: launch now uses the same canonical `findCurrentStay()` selector as Home, preventing temporary itinerary overlaps from making the launch destination disagree with the Home current stay; service-worker/cache generation advances to R13.
+- Immediate predecessor R12 working-checkpoint manifest SHA-256: 4377b43a580959e3cecae02ecb0950c0743492cafc992740c271b0cc3922c4be.
+- R7 App Health: internal Vault screenshot storage migration does not falsely dirty a verified state; every Restore/replacement forces a fresh whole-app check, even for identical data, including a pending Restore that is later committed through Retry iPad Storage.
+- `verify_working_checkpoint_v55.py --verify` verifies the exact Athens derivative packaged here.
+- The immutable original V55 95-file baseline remains documented by `ACTIVE_BASELINE_MANIFEST_V55.json`; do not use its expected differences as a rollback instruction.
 
-V54 freeze targets:
-- visual screenshots inside `VISUAL_REFERENCES.zip`: 21
-- historical no-loss ledger items: 100
-- JavaScript ES modules: 63
-- CSS files: 6
-- full deep model sweep: 1,461 days / 10,227 screen-model builds
-- runtime app version: `1.2.0-v54-touch-target-completion`
-- offline cache: `tcc-v1-v54-touch-target-completion-2026-09-04`
-- final effective touch height: Reservations flight-scope tiles ≥44px; Itinerary Forward Coverage switches ≥44px
-- Reservations duplicate-health path: indexed grouping with protected date-only wildcard semantics
-- Standard itinerary integrity: Country required for new/edited Standard stays; legacy blanks remain loadable and App Health-visible
-
-Protected manifest entries after freeze: **90**. Extracted top-level package files: **91**. Both remain below the 100-file cap.
-
-Gold/Master Lock is not claimed until the exact V54 candidate passes physical target-iPad screenshot, offline voice and practical Vault acceptance checks.
+Package rule
+- Extracted total file count: **99 files** (recursive extracted-file count; hard limit: below 100).
+- All extracted files, including any nested/generated files, must remain below 100.
+- This simulation is for Cameron's iPad screenshot/interaction review. Physical 1024×768 Safari appearance, actual iPad IndexedDB lifecycle and available offline speech voices still require target-device acceptance.

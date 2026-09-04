@@ -10,6 +10,8 @@ import { createStayBanner } from './src_components_page-hero.js';
 import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
+import { saveAccountDraft, deleteAccountDraft } from './src_core_account-mutations.js';
+import { saveGeneralSettingsDraft } from './src_core_settings-mutations.js';
 
 const CATEGORY_LABELS = Object.freeze({
   groceries:'Groceries',
@@ -167,7 +169,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
       if (active) button.append(createLineIcon('check', 'budget-selected-tick'));
       button.addEventListener('click', () => {
         body.dataset.category = category;
-        if (!editorTone) setModalTone(modal, CATEGORY_TONES[category] || 'sky');
+        if (existing && !editorTone) setModalTone(modal, CATEGORY_TONES[category] || 'sky');
         preserveLocalFocus(() => renderCategories());
       });
       categoryTiles.append(button);
@@ -263,7 +265,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     body.dataset.currencyAuto = existing ? 'false' : 'true';
     body.dataset.audAuto = 'false';
     body.dataset.category = saved.category;
-    setModalTone(modal, editorTone || CATEGORY_TONES[saved.category] || 'sky');
+    setModalTone(modal, existing ? (editorTone || CATEGORY_TONES[saved.category] || 'sky') : 'sky');
     renderCategories();
     const amountStep = node('section', 'budget-editor-step budget-editor-step-amount');
     const amountHead = node('div', 'budget-editor-step-head');
@@ -401,7 +403,21 @@ function renderPaceSummary(model) {
   return card;
 }
 
-function renderAnnualSummary(model) {
+function openAnnualBudgetEditor({stateService,host}) {
+  const state=stateService.snapshot();
+  const body=node('div','budget-annual-editor');
+  const field=node('label','budget-field budget-field-wide');field.append(node('span','','Annual Budget · AUD'));
+  const input=document.createElement('input');input.type='number';input.min='0';input.step='100';input.inputMode='decimal';input.value=String(Number(state.settings.annualBudgetAUD||0));field.append(input);
+  const help=node('p','budget-editor-help','This is the single Annual Budget used by Home, Budget forecasts and App Health. Destination Budgets remain separate dated stay budgets.');
+  const error=node('p','budget-form-error');body.append(field,help,error);
+  const modal=createModal({title:'Edit Annual Budget',body,className:'tcc-editor-modal tone-magenta',actions:[
+    {label:'Cancel',onClick:d=>d.close()},
+    {label:'Save',onClick:d=>{try{stateService.commit(draft=>saveGeneralSettingsDraft(draft,{journeyStartDate:draft.settings.journeyStartDate,defaultCurrency:draft.settings.defaultCurrency,annualBudgetAUD:input.value}));if(d.isConnected&&d.open)d.close();}catch(err){error.textContent=err.message;}}}
+  ]});
+  host.append(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
+}
+
+function renderAnnualSummary(model, openBudgetEditor = null) {
   const card = node('section', 'budget-summary-card budget-annual-card');
   card.append(node('p', 'budget-card-kicker', 'ANNUAL BUDGET'), node('h2', 'budget-card-title', `${model.annual.year} Budget`));
   const remaining = node('div', 'budget-primary-money');
@@ -413,6 +429,7 @@ function renderAnnualSummary(model) {
     paceMetric('After commitments',signedMoney(model.annual.afterCommitmentsAUD,'AUD'),'',model.annual.committedAUD ? `${signedMoney(model.annual.committedAUD,'AUD')} committed` : 'No future commitments')
   );
   card.append(meta);
+  if(openBudgetEditor){const edit=node('button','budget-annual-edit');edit.type='button';edit.append(createLineIcon('edit'),document.createTextNode(' EDIT BUDGET'));edit.addEventListener('click',openBudgetEditor);card.append(edit);}
   return card;
 }
 
@@ -747,22 +764,61 @@ function renderReservations(model, navigate) {
   return panel;
 }
 
-function renderAccounts(model) {
-  const details = document.createElement('details');
-  details.className = 'budget-panel budget-accounts';
-  details.open = true;
-  const summary = node('summary');
-  summary.append(node('span', '', 'Accounts'), node('strong', '', `${model.accounts.records.length} accounts · ${signedMoney(model.accounts.audTotal, 'AUD')} AUD total`));
-  details.append(summary);
-  const list = node('div', 'budget-list');
-  if (!model.accounts.records.length) list.append(node('p', 'budget-muted', 'No entries yet'));
+function openAccountEditor({ stateService, host, accountId = null, editorTone = 'teal' }) {
+  const state=stateService.snapshot();
+  const existing=accountId ? state.accounts.find(record=>record.id===accountId) : null;
+  if(accountId&&!existing)return;
+  const saved={ name:existing?.name||'', currency:existing?.currency||'AUD', balance:existing?.balance??'' };
+  const session=new FormSession(saved);
+  const body=node('div','budget-account-editor');
+  const fields=node('div','budget-account-form-grid');
+  const error=node('p','budget-form-error');
+  body.append(node('p','budget-account-editor-copy','Keep the balance current for a quick read-only travel money snapshot. No transfers are performed by Travel Command Centre.'),fields,error);
+  const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
+  const capture=()=>({ name:value('name'), currency:value('currency'), balance:value('balance') });
+  const populate=v=>{
+    error.textContent='';
+    const name=inputField('Account name','name','text',v.name);
+    const currency=inputField('Currency','currency','text',v.currency);
+    const balance=inputField('Current balance','balance','number',v.balance);
+    currency.querySelector('input').maxLength=3;
+    currency.querySelector('input').autocapitalize='characters';
+    balance.querySelector('input').step='0.01';
+    fields.replaceChildren(name,currency,balance);
+  };
+  populate(saved);
+  let dialog=null;
+  const actions=[];
+  if(existing) actions.push({label:'Delete',kind:'danger',onClick:()=>confirmDestructive({title:'Delete account',message:`Delete ${existing.name}? This removes only the saved account snapshot; it does not affect the bank account.`,tone:editorTone,onConfirm:()=>{stateService.commit(draft=>deleteAccountDraft(draft,existing.id));if(dialog?.open)dialog.close();}})});
+  actions.push(
+    {label:'Undo Changes',onClick:()=>populate(session.undo())},
+    {label:'Cancel',onClick:d=>{session.cancel();d.close();}},
+    {label:'Save',onClick:d=>{try{const draftValue=session.update(draft=>Object.assign(draft,capture()));stateService.commit(draft=>saveAccountDraft(draft,{accountId:existing?.id||null,fields:draftValue},{now:stateService.now}));session.markSaved(draftValue);if(d.open)d.close();}catch(err){error.textContent=err.message;}}}
+  );
+  dialog=createModal({title:existing?'Edit Account':'Add Account',body,actions,className:`tcc-editor-modal tcc-budget-account-editor-modal tone-${editorTone}`});
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+
+function renderAccounts(model, stateService, host) {
+  const panel = node('section', 'budget-panel budget-accounts');
+  const head=node('div','budget-section-head budget-accounts-head');
+  const copy=node('div','budget-accounts-title');
+  copy.append(node('h2','','Accounts'),node('small','',`${model.accounts.records.length} account${model.accounts.records.length===1?'':'s'} · ${signedMoney(model.accounts.audTotal, 'AUD')} AUD total`));
+  const add=node('button','button budget-add-account','Add Account');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' Add Account'));add.addEventListener('click',()=>openAccountEditor({stateService,host,editorTone:'teal'}));
+  head.append(copy,add);panel.append(head);
+  const list = node('div', 'budget-list budget-account-list');
+  if (!model.accounts.records.length) list.append(node('p', 'budget-muted', 'No accounts yet. Tap Add Account to save an Australian bank or travel-money balance.'));
   for (const account of model.accounts.records) {
-    const row = node('div', 'budget-list-row');
-    row.append(node('strong', '', account.name), node('span', '', signedMoney(account.balance, account.currency)));
+    const row = node('button', 'budget-list-row budget-account-row');row.type='button';
+    const rowCopy=node('span','budget-account-row-copy');rowCopy.append(node('strong','',account.name),node('small','',`${account.currency} balance`));
+    const amount=node('span','budget-account-row-amount');amount.append(node('strong','',signedMoney(account.balance, account.currency)));
+    row.append(rowCopy,amount);
+    row.setAttribute('aria-label',`Edit account ${account.name} · ${signedMoney(account.balance,account.currency)}`);
+    row.addEventListener('click',()=>openAccountEditor({stateService,host,accountId:account.id,editorTone:'teal'}));
     list.append(row);
   }
-  details.append(list);
-  return details;
+  panel.append(list);
+  return panel;
 }
 
 function categoryPeriodLabel(key, rawLabel) {
@@ -934,6 +990,24 @@ function renderMonthlySpendHistory(model, currentDate) {
   return panel;
 }
 
+function recentExpensesExpandedBody(state, currentDate, openExistingExpense) {
+  const body=node('div','budget-recent-expanded');
+  const stayById=new Map((state.itinerary||[]).map(item=>[item.id,item]));
+  const records=[...(state.expenses||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(b.modifiedAt||'').localeCompare(String(a.modifiedAt||''))).slice(0,30);
+  const totalAUD=records.reduce((sum,item)=>sum+Number(item.audAmount||0),0);
+  const futureCount=records.filter(item=>String(item.date)>String(currentDate||'').slice(0,10)).length;
+  const summary=node('div','budget-recent-expanded-summary');summary.append(node('strong','',`${records.length} recent entries`),node('span','',`${signedMoney(totalAUD,'AUD')} across these entries`),node('span','',`${futureCount} future-dated`));body.append(summary);
+  const list=node('div','budget-recent-expanded-list');
+  if(!records.length)list.append(node('p','budget-muted','No entries yet'));
+  for(const expense of records){
+    const stay=stayById.get(expense.itineraryId);const row=node('button','budget-expense-row budget-expense-row-expanded');row.type='button';
+    const copy=node('div');copy.append(node('strong','',expense.description||CATEGORY_LABELS[expense.category]||expense.category),node('small','',[formatAUDate(expense.date),CATEGORY_LABELS[expense.category]||expense.category,stay?`${stay.name} · ${formatAUDate(stay.startDate)} – ${formatAUDate(stay.endDate)}`:'Destination Budget unavailable'].filter(Boolean).join(' · ')));
+    const amounts=node('div','budget-row-amounts');amounts.append(node('strong','',signedMoney(expense.originalAmount,expense.originalCurrency)));if(expense.originalCurrency!=='AUD'||Number(expense.originalAmount)!==Number(expense.audAmount))amounts.append(node('small','',signedMoney(expense.audAmount,'AUD')));
+    row.append(copy,amounts);row.addEventListener('click',()=>openExistingExpense(expense.id,'blue'));list.append(row);
+  }
+  body.append(list);return body;
+}
+
 function renderRecentExpenses(model, openExistingExpense) {
   const panel = node('section', 'budget-panel');
   const head = node('div', 'budget-section-head');
@@ -980,24 +1054,22 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
 
   const destinationSummary=renderDestinationSummary(model), paceSummary=renderPaceSummary(model);
   const top=node('section','budget-reference-top'); top.append(destinationSummary,paceSummary); main.append(top);
-  makeExpandableCard(destinationSummary,{host:main,title:'Current Destination Budget',tone:'teal'});
-  makeExpandableCard(paceSummary,{host:main,title:'Daily & Stay Pace',tone:'blue'});
   const add=node('button','budget-add-expense-bar'); add.type='button'; add.append(createLineIcon('plus'),document.createTextNode(' ADD EXPENSE')); add.addEventListener('click',()=>openNewExpense()); main.append(add);
-  const annualSummary=renderAnnualSummary(model), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
+  const annualSummary=renderAnnualSummary(model,()=>openAnnualBudgetEditor({stateService,host:main})), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
   const planning=node('section','budget-reference-planning'); planning.append(annualSummary,destinationBudgets); main.append(planning);
-  makeExpandableCard(annualSummary,{host:main,title:'Annual Budget',tone:'magenta'});
   const categoryChart=renderCategoryChart(model), annualForecast=renderAnnualForecast(model);
   const charts=node('section','budget-reference-charts'); charts.append(categoryChart,annualForecast); main.append(charts);
   makeExpandableCard(categoryChart,{host:main,title:'Budget by Category',tone:'gold'});
   makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'sky'});
   const livingExpenses=renderLivingExpenses(model,openNewExpense); main.append(livingExpenses);
   makeExpandableCard(livingExpenses,{host:main,title:'Living Expenses',tone:'violet'});
-  const reservationsPanel=renderReservations(model,navigate), accountsPanel=renderAccounts(model);
+  const reservationsPanel=renderReservations(model,navigate), accountsPanel=renderAccounts(model,stateService,main);
   const middle=node('section','budget-two-column'); middle.append(reservationsPanel,accountsPanel); main.append(middle);
   makeExpandableCard(reservationsPanel,{host:main,title:'Reservations',tone:'indigo'});
+  makeExpandableCard(accountsPanel,{host:main,title:'Accounts',tone:'teal'});
   const recentExpenses=renderRecentExpenses(model,openExistingExpense), monthlyHistory=renderMonthlySpendHistory(model,currentDate);
   main.append(recentExpenses,monthlyHistory);
-  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'blue'});
+  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'blue',bodyBuilder:()=>recentExpensesExpandedBody(state,currentDate,openExistingExpense)});
   makeExpandableCard(monthlyHistory,{host:main,title:'Monthly Spend History',tone:'violet'});
 
   const pending = state.ui?.pendingOpen;

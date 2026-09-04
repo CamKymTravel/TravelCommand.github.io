@@ -3,6 +3,20 @@ import { TRAVEL_TYPES, RESERVATION_TYPES, RESERVATION_STATUSES, FLIGHT_SCOPES, E
 import { toISODate, validateDateOrDateTime } from './src_core_dates.js';
 import { normalizeCoordinates } from './src_core_coordinates.js';
 
+export function canonicalCountrySlug(country = '') {
+  const aliases = {
+    'türkiye':'turkey', 'turkiye':'turkey',
+    'usa':'united-states', 'u.s.a.':'united-states', 'us':'united-states', 'u.s.':'united-states', 'united states of america':'united-states',
+    'uk':'united-kingdom', 'u.k.':'united-kingdom',
+    'uae':'united-arab-emirates', 'u.a.e.':'united-arab-emirates',
+    'czech republic':'czechia'
+  };
+  const raw = String(country || '').normalize('NFC').trim().toLocaleLowerCase('en-AU');
+  if (aliases[raw]) return aliases[raw];
+  const slug = raw.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return aliases[slug] || slug;
+}
+
 function numeric(value, label, { min = 0, nullable = false } = {}) {
   if ((value == null || value === '') && nullable) return null;
   if (typeof value === 'boolean' || Array.isArray(value) || (typeof value === 'object' && value != null)) throw new Error(`${label} must be numeric`);

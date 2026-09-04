@@ -112,6 +112,27 @@ function plannedCountries(entries){
   return countries;
 }
 
+function plannedCountryDetails(entries){
+  const countries=new Map();
+  for(const entry of entries||[]){
+    const route=entry.travelType==='motorhome'||entry.travelType==='cruise'||entry.travelType==='rv';
+    const countryParts=route
+      ? String(entry.country||'').split(/\s*(?:\/|→|->|,)\s*/).map(v=>v.trim()).filter(Boolean)
+      : [String(entry.country||'').trim()].filter(Boolean);
+    const sources=[...countryParts,route?(entry.startCountry||''):''].filter(Boolean);
+    for(const source of sources){
+      const key=plannedCountryKey(source);
+      if(!key)continue;
+      if(!countries.has(key))countries.set(key,{key,label:String(source).trim(),stayIds:new Set(),stays:[]});
+      const item=countries.get(key);
+      if(!item.stayIds.has(entry.id)){item.stayIds.add(entry.id);item.stays.push({id:entry.id,name:entry.name,startDate:entry.startDate,endDate:entry.endDate,travelType:entry.travelType});}
+    }
+  }
+  return [...countries.values()]
+    .map(item=>({key:item.key,label:item.label,stays:item.stays,count:item.stays.length}))
+    .sort((a,b)=>a.label.localeCompare(b.label,'en-AU'));
+}
+
 export function buildItineraryViewModel(state, currentDate, options = {}) {
   const all=sortItinerary(state.itinerary||[]);
   const journeyStartDate=effectiveJourneyStart(state);
@@ -120,11 +141,14 @@ export function buildItineraryViewModel(state, currentDate, options = {}) {
   const yearScoped=filterByTravelYears(all,selectedYears,journeyStartDate);
   const filtered=yearScoped.filter(entry=>matchesSearch(entry,searchQuery));
   const currentAndFuture=all.filter(entry=>!isCompleted(entry,currentDate));
+  const todayDay=dayNumber(currentDate);
+  const futureOnly=all.filter(entry=>dayNumber(entry.startDate)>todayDay);
   const issues=detectForwardTimelineIssues(currentAndFuture,currentDate);
   const upcoming=filtered.filter(entry=>!isCompleted(entry,currentDate)).map(entry=>recordView(entry,state,journeyStartDate));
   const completed=filtered.filter(entry=>isCompleted(entry,currentDate)).sort((a,b)=>dayNumber(b.endDate)-dayNumber(a.endDate)).map(entry=>recordView(entry,state,journeyStartDate));
-  const routeTrips=all.filter(entry=>entry.travelType==='motorhome'||entry.travelType==='cruise');
-  const routePoints=state.routePoints||[];
+  const routeTrips=futureOnly.filter(entry=>entry.travelType==='motorhome'||entry.travelType==='cruise'||entry.travelType==='rv');
+  const futureIds=new Set(futureOnly.map(entry=>entry.id));
+  const routePoints=(state.routePoints||[]).filter(point=>futureIds.has(point.itineraryId));
   const missingStays=currentAndFuture.filter(entry=>entry.travelType==='standard'&&!isHomeAustraliaStay(entry)&&!hasAccommodation(state,entry.id));
   const current=findCurrentStay(all,currentDate);
   const next=findNextDestination(all,currentDate);
@@ -137,11 +161,30 @@ export function buildItineraryViewModel(state, currentDate, options = {}) {
   // become unreachable after those years are entirely completed.
   journeyMap.availableYears=availableTravelYears(all,journeyStartDate,{minimum:4});
 
+  const countryDetails=plannedCountryDetails(futureOnly);
+  const itineraryById=new Map(all.map(entry=>[entry.id,entry]));
+  const routeTripDetails=routeTrips.map(entry=>recordView(entry,state,journeyStartDate));
+  const stopDetails=[
+    ...futureOnly.map(entry=>({kind:'stay',id:entry.id,name:entry.name,country:entry.country||entry.startCountry||'',travelType:entry.travelType,startDate:entry.startDate,endDate:entry.endDate})),
+    ...routePoints.map(point=>({kind:'route-point',id:point.id,name:point.name,parentId:point.itineraryId,parentName:itineraryById.get(point.itineraryId)?.name||'Route trip',order:point.order}))
+  ];
+  const overlapDetails=issues.overlaps.map(issue=>{
+    const firstEntry=itineraryById.get(issue.firstId)||null;
+    const secondEntry=itineraryById.get(issue.secondId)||null;
+    const overlapStart=secondEntry?.startDate||null;
+    const overlapEnd=firstEntry&&secondEntry?(dayNumber(firstEntry.endDate)<=dayNumber(secondEntry.endDate)?firstEntry.endDate:secondEntry.endDate):null;
+    return {
+      ...issue,overlapStart,overlapEnd,
+      first:firstEntry?recordView(firstEntry,state,journeyStartDate):null,
+      second:secondEntry?recordView(secondEntry,state,journeyStartDate):null
+    };
+  });
   return {
     journeyStartDate,
     currentStay:current?recordView(current,state,journeyStartDate):null,
     nextDestination:next?recordView(next,state,journeyStartDate):null,
-    stats:{countriesPlanned:plannedCountries(all).size,routeTrips:routeTrips.length,plannedStops:all.length+routePoints.length,missingCoverage:coverageGaps.length,missingStays:missingStays.length,dateOverlaps:issues.overlaps.length},
+    stats:{countriesPlanned:countryDetails.length,routeTrips:routeTrips.length,plannedStops:futureOnly.length+routePoints.length,missingCoverage:coverageGaps.length,missingStays:missingStays.length,dateOverlaps:issues.overlaps.length},
+    statDetails:{countries:countryDetails,routes:routeTripDetails,stops:stopDetails,gaps:coverageGaps,stays:missingStays.map(entry=>recordView(entry,state,journeyStartDate)),overlaps:overlapDetails},
     issueDetails:{gaps:coverageGaps,overlaps:issues.overlaps,missingStays:missingStays.map(entry=>({id:entry.id,name:entry.name}))},
     forwardCoverage,
     upcoming,completed,

@@ -40,6 +40,7 @@ const ICONS = Object.freeze({
   streaming:[['rect',{x:'4',y:'5',width:'16',height:'14',rx:'2'}],['path',{d:'m10 9 5 3-5 3V9Z'}]],
   search:[['circle',{cx:'10.5',cy:'10.5',r:'5.5'}],['path',{d:'m15 15 4.5 4.5'}]],
   expand:[['path',{d:'M9 5H5v4M15 5h4v4M9 19H5v-4M15 19h4v-4'}]],
+  edit:[['path',{d:'M5 19h3.8L19 8.8 15.2 5 5 15.2V19Z'}],['path',{d:'m13.8 6.4 3.8 3.8M5 19l4.1-1'}]],
   plus:[['path',{d:'M12 5v14M5 12h14'}]],
   close:[['path',{d:'M6 6l12 12M18 6 6 18'}]],
   chevronLeft:[['path',{d:'m15 6-6 6 6 6'}]],

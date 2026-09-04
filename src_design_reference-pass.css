@@ -4196,3 +4196,111 @@
     min-height:44px;
   }
 }
+
+/* V55 continuation: locked Vault remains visually concealed until the approved
+   three-tap lock-emblem gesture succeeds. Protected categories never render. */
+[data-screen="vault"].vault-screen-locked {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at 50% 42%,rgba(27,58,82,.16),transparent 30%),#02050a;
+}
+[data-screen="vault"].vault-screen-locked .vault-lock-hero-concealed {
+  width:min(620px,82%);
+  min-height:430px;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:18px;
+  text-align:center;
+  border:1px solid rgba(126,221,255,.09);
+  background:linear-gradient(180deg,rgba(7,14,24,.84),rgba(1,4,8,.96));
+  box-shadow:0 30px 80px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.02);
+}
+[data-screen="vault"].vault-screen-locked .vault-lock-hero-concealed h1 { margin:0; font-size:42px; }
+[data-screen="vault"].vault-screen-locked .vault-lock-copy { max-width:360px; margin:0; color:#65778a; }
+[data-screen="vault"] .vault-lock-tap-target {
+  width:118px;height:118px;padding:0;display:grid;place-items:center;
+  border:1px solid rgba(126,221,255,.16);border-radius:50%;
+  background:radial-gradient(circle,rgba(30,73,102,.22),rgba(3,10,17,.95) 68%);
+  color:#8bdfff;box-shadow:inset 0 0 28px rgba(88,199,255,.08);cursor:pointer;
+}
+[data-screen="vault"] .vault-lock-tap-target .vault-lock-icon { width:48px;height:48px;display:grid;place-items:center; }
+[data-screen="vault"] .vault-lock-tap-target .tcc-line-icon { width:46px;height:46px; }
+[data-screen="vault"] .vault-lock-tap-target:focus-visible { outline:3px solid rgba(126,221,255,.72);outline-offset:6px; }
+
+/* A structurally healthy app is not green after saved travel data changes.
+   Only CHECK THE WHOLE APP clears this deliberate heartbeat warning. */
+[data-screen="settings"] .settings-health-dirty {
+  border-color:rgba(255,111,131,.48);
+  background:radial-gradient(circle at 86% 0%,rgba(255,111,131,.16),transparent 34%),linear-gradient(145deg,rgba(55,31,44,.94),rgba(7,18,32,.98));
+}
+
+/* V55 offline launch: compass on black, then current destination flag/city/country. */
+.tcc-launch-overlay {
+  position:fixed;inset:0;z-index:20000;display:grid;place-items:center;overflow:hidden;
+  background:#000;color:#f4fbff;opacity:1;transition:opacity .32s ease;
+}
+.tcc-launch-compass,.tcc-launch-place { grid-area:1/1;display:grid;place-items:center;text-align:center; }
+.tcc-launch-compass { gap:22px;opacity:1;transform:scale(1);transition:opacity .28s ease,transform .34s ease; }
+.tcc-launch-compass .brand-compass-ring { width:122px;height:122px; }
+.tcc-launch-compass .brand-compass-svg { width:78px;height:78px; }
+.tcc-launch-compass > strong { font-family:Georgia,'Times New Roman',serif;font-size:23px;letter-spacing:.14em; }
+.tcc-launch-place { gap:7px;opacity:0;transform:scale(.96);transition:opacity .34s ease,transform .38s ease; }
+.tcc-launch-flag { font-size:112px;line-height:1;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5)); }
+.tcc-launch-city { margin-top:13px;font-size:46px;line-height:1.04;letter-spacing:-.035em; }
+.tcc-launch-country { color:#8bdfff;font-size:24px;font-weight:820;letter-spacing:.08em;text-transform:uppercase; }
+.tcc-launch-overlay.show-destination .tcc-launch-compass { opacity:0;transform:scale(.92); }
+.tcc-launch-overlay.show-destination .tcc-launch-place { opacity:1;transform:scale(1); }
+.tcc-launch-overlay.leaving { opacity:0;pointer-events:none; }
+@media (prefers-reduced-motion: reduce) {
+  .tcc-launch-overlay,.tcc-launch-compass,.tcc-launch-place { transition:none!important; }
+}
+
+/* V55 direct quick actions retained at normal card depth. */
+[data-screen="budget"] .budget-annual-card { position:relative; }
+[data-screen="budget"] .budget-annual-edit {
+  justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:44px;margin-top:12px;padding:0 14px;
+  border:1px solid rgba(241,101,189,.42);border-radius:11px;background:rgba(241,101,189,.09);color:#ffd9f0;font-weight:850;cursor:pointer;
+}
+[data-screen="budget"] .budget-annual-edit .tcc-line-icon { width:18px;height:18px; }
+[data-screen="checklist"] .checklist-owner-head { grid-template-columns:minmax(0,1fr) auto auto; }
+[data-screen="checklist"] .checklist-owner-add {
+  min-width:72px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 10px;
+  border:1px solid currentColor;border-radius:10px;background:rgba(255,255,255,.05);color:inherit;font-weight:900;cursor:pointer;
+}
+[data-screen="checklist"] .checklist-owner-add .tcc-line-icon { width:17px;height:17px; }
+.budget-recent-expanded-summary { display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px; }
+.budget-recent-expanded-summary > * { padding:8px 10px;border:1px solid rgba(126,221,255,.16);border-radius:10px;background:rgba(7,24,40,.48); }
+.budget-recent-expanded-list { display:grid;gap:8px; }
+
+/* V55 retained depth: completed-stay spend context and local Streaming marks. */
+.journey-record-inline-context{margin:0;color:var(--text-muted,#9fb2c7);font-size:.86rem;line-height:1.35}
+.journey-record-inline-spend{display:grid;gap:.55rem;margin-top:.2rem;padding:.75rem;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(0,0,0,.14)}
+.journey-record-inline-spend-head{display:flex;justify-content:space-between;align-items:baseline;gap:.75rem}
+.journey-record-inline-spend-head small{color:var(--text-muted,#9fb2c7)}
+.journey-record-inline-spend-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.4rem .75rem}
+.journey-record-inline-spend-row{display:flex;justify-content:space-between;gap:.6rem;padding:.42rem .5rem;border-radius:9px;background:rgba(255,255,255,.035)}
+.journey-record-inline-spend-row small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted,#9fb2c7)}
+.journey-record-inline-spend-more{grid-column:1/-1;color:var(--text-muted,#9fb2c7)}
+.vault-streaming-copy{grid-template-columns:auto minmax(0,1fr);column-gap:.65rem;align-items:center}
+.vault-streaming-copy>strong,.vault-streaming-copy>small,.vault-streaming-copy>span:not(.vault-streaming-mark){grid-column:2}
+.vault-streaming-mark{grid-column:1;grid-row:1/span 3;display:grid;place-items:center;min-width:2.7rem;height:2.7rem;padding:0 .45rem;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font-size:.78rem;font-weight:900;letter-spacing:-.04em;line-height:1;color:#fff;box-shadow:inset 0 1px rgba(255,255,255,.12)}
+.vault-streaming-mark-netflix{font-size:1.55rem;font-family:Arial Black,Arial,sans-serif}
+.vault-streaming-mark-stan,.vault-streaming-mark-binge,.vault-streaming-mark-kayo,.vault-streaming-mark-max{font-size:.63rem;letter-spacing:.02em}
+.vault-streaming-mark-prime{font-size:.62rem;letter-spacing:0;text-transform:lowercase}
+.vault-streaming-mark-disney,.vault-streaming-mark-paramount,.vault-streaming-mark-apple{font-size:.82rem}
+.vault-streaming-mark-afl,.vault-streaming-mark-nfl{font-size:.72rem;font-family:Arial Black,Arial,sans-serif;letter-spacing:.02em}
+@media (max-width:760px){.journey-record-inline-spend-list{grid-template-columns:1fr}}
+
+/* V55 useful expansion surfaces. */
+.calendar-legend-expanded-row{appearance:none;width:100%;display:grid;gap:.18rem;text-align:left;padding:.72rem .78rem;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.035);color:inherit;font:inherit;cursor:pointer}
+.calendar-legend-expanded-row:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.calendar-legend-expanded-row span,.calendar-legend-expanded-row small{color:var(--text-muted,#9fb2c7)}
+.reservation-expanded-detail,.reservation-booked-expanded{display:grid;gap:.85rem}
+.reservation-expanded-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;padding:.7rem;border:1px solid rgba(255,255,255,.09);border-radius:13px;background:rgba(0,0,0,.13)}
+.reservation-expanded-summary>*{min-width:0}.reservation-expanded-summary small{grid-column:1/-1;color:var(--text-muted,#9fb2c7)}
+.reservation-booked-category-list{display:grid;gap:.45rem}
+.reservation-booked-category{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.2rem .8rem;align-items:baseline;padding:.65rem .75rem;border:1px solid rgba(255,255,255,.08);border-radius:11px;background:rgba(255,255,255,.035)}
+.reservation-booked-category small{grid-column:1/-1;color:var(--text-muted,#9fb2c7)}
+@media (max-width:760px){.reservation-expanded-summary{grid-template-columns:1fr 1fr}.reservation-expanded-summary small{grid-column:1/-1}}

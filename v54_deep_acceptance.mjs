@@ -20,7 +20,10 @@ const { buildCalendarViewModel } = await load('src_core_calendar-view-model.js')
 const { buildJourneyHistoryViewModel } = await load('src_core_journey-history-view-model.js');
 const { buildChecklistViewModel } = await load('src_core_checklist-view-model.js');
 const { APP_VERSION } = await load('src_core_schema.js');
-const { createItineraryEntry } = await load('src_core_entities.js');
+const { createItineraryEntry, canonicalCountrySlug } = await load('src_core_entities.js');
+const { StateService } = await load('src_core_state.js');
+const { MemoryStorageAdapter } = await load('src_core_storage.js');
+const { shouldInstallRuntimeFixture, stampRuntimeFixtureRevision } = await load('src_core_runtime-config.js');
 
 function migratedFixture() {
   const raw = JSON.parse(fs.readFileSync(new URL('simulation-data.json', ROOT), 'utf8'));
@@ -35,9 +38,43 @@ function midDate(stay) {
   return new Date(Math.floor((start.valueOf()+end.valueOf())/2)).toISOString().slice(0,10);
 }
 
-function commonChecks() {
+async function commonChecks() {
+  const mainSource = fs.readFileSync(new URL('src_main.js', ROOT), 'utf8');
+  assert(!mainSource.includes("runtimeConfig.mode !== 'production' || !navigator.storage?.persist"), 'Simulation still skips the persistent-storage safeguard');
+  assert(mainSource.includes("if (!navigator.storage?.persist) return;"), 'Persistent-storage safeguard is not shared by production and simulation');
+  assert(canonicalCountrySlug('Türkiye')==='turkey', 'Türkiye launch-country alias is not canonicalised to Turkey');
+  assert(canonicalCountrySlug('Czech Republic')==='czechia', 'Czech Republic launch-country alias is not canonicalised to Czechia');
+  assert(canonicalCountrySlug('U.S.A.')==='united-states', 'USA launch-country alias is not canonicalised to United States');
+  assert(mainSource.includes('const key=canonicalCountrySlug(country);'), 'Launch flag renderer is not using canonical country normalisation');
+  assert(mainSource.includes("turkey:'TR'"), 'Launch flag map no longer contains the Turkey ISO flag code');
+  assert(mainSource.includes("import { findCurrentStay } from './src_core_planning.js';"), 'Launch sequence is not importing the canonical current-stay selector');
+  assert(mainSource.includes('const stay=findCurrentStay(stateService.state.itinerary||[],today);'), 'Launch sequence is not using the same canonical current-stay selector as Home');
+
   const state = migratedFixture();
   assert(state.meta.appVersion === APP_VERSION, 'Migrated fixture did not promote to current app version');
+  const launchFlagBlock=mainSource.match(/const codes=\{([\s\S]*?)\n  \};/)?.[1] || '';
+  const launchFlagKeys=new Set([...launchFlagBlock.matchAll(/(?:'([^']+)'|([a-z][a-z0-9-]*))\s*:/g)].map(match=>match[1]||match[2]));
+  for(const stay of state.itinerary){
+    const routed=['cruise','motorhome','rv'].includes(stay.travelType);
+    const country=(routed?stay.startCountry:stay.country)||stay.country||stay.startCountry||'';
+    if(!country) continue;
+    const key=canonicalCountrySlug(country);
+    assert(launchFlagKeys.has(key),`Launch flag map does not cover ${stay.name} · ${country} (${key})`);
+  }
+
+  // Simulation fixture revision must be atomic with canonical state. A missing
+  // sidecar marker on an already-populated simulation can mean the marker write
+  // failed after the main state write succeeded; never reseed and erase user
+  // screenshot-test changes in that ambiguous case. Newly installed fixtures
+  // embed their revision so a later intentional fixture revision is still
+  // detected without relying on the sidecar localStorage key.
+  const fixtureRevision='v55-athens-greece-2029-02-24-r1';
+  assert(shouldInstallRuntimeFixture({hadStoredState:false,state:null,fixtureRevision})===true,'Fresh simulation did not request fixture install');
+  assert(shouldInstallRuntimeFixture({hadStoredState:true,state:{meta:{}},externalRevision:null,fixtureRevision})===false,'Missing sidecar marker would destructively reseed existing simulation state');
+  const stampedFixture=stampRuntimeFixtureRevision(state,fixtureRevision);
+  assert(stampedFixture.meta.simulationFixtureRevision===fixtureRevision,'Simulation fixture revision was not embedded in canonical state');
+  assert(shouldInstallRuntimeFixture({hadStoredState:true,state:stampedFixture,externalRevision:null,fixtureRevision})===false,'Matching embedded fixture revision caused a reseed');
+  assert(shouldInstallRuntimeFixture({hadStoredState:true,state:stampedFixture,externalRevision:null,fixtureRevision:'v55-athens-greece-2029-02-24-r2'})===true,'Newer fixture revision was suppressed by embedded marker');
 
   const backup = createBackupPayload(state, { exportedAt:'2031-01-13T23:00:00.000Z' });
   const parsed = parseBackupPayload(backup);
@@ -67,7 +104,8 @@ function commonChecks() {
   assert(noStayRejected, 'Expense outside all stays was silently routed');
 
   const future = structuredClone(state);
-  future.meta.appVersion = '1.2.0-v55-future';
+  const currentGeneration=Number(APP_VERSION.match(/-v(\d+)/)?.[1]);
+  future.meta.appVersion = `1.2.0-v${currentGeneration+1}-future`;
   let futureRejected=false;
   try { migrateState(future, { now:'2031-01-13T23:00:00.000Z' }); } catch { futureRejected=true; }
   assert(futureRejected, 'Newer app-generation state was accepted');
@@ -80,6 +118,51 @@ function commonChecks() {
     }, { now:()=> '2034-01-01T00:00:00.000Z' });
   } catch (error) { blankCountryRejected=String(error?.message||'').includes('Standard stays require a country'); }
   assert(blankCountryRejected, 'New Standard stay without Country was accepted');
+
+  // App Health must track user-data trust, not internal Vault byte placement.
+  // A freshly verified state stays clean when an embedded screenshot is moved
+  // into IndexedDB representation, navigation stays clean, a real mutation
+  // dirties it, and every Restore/replacement requires a fresh check even when
+  // the restored JSON is otherwise identical.
+  const healthService=new StateService(new MemoryStorageAdapter(),{now:()=> '2029-02-24T12:00:00.000Z'});
+  healthService.replaceValidated(state);
+  healthService.markAppHealthChecked();
+  assert(!healthService.isAppHealthDirty(),'Fresh App Health verification did not clear dirty state');
+  const internalAssetMove=healthService.snapshot();
+  const embeddedAttachment=internalAssetMove.attachments?.find(item=>typeof item.dataUrl==='string'&&item.dataUrl);
+  if(embeddedAttachment){
+    delete embeddedAttachment.dataUrl;
+    embeddedAttachment.assetKey=`vault:${embeddedAttachment.id}`;
+    embeddedAttachment.byteLength=68;
+    healthService.replaceValidated(internalAssetMove,{invalidateHealth:false});
+    assert(!healthService.isAppHealthDirty(),'Internal Vault screenshot migration falsely dirtied App Health');
+  }
+  healthService.commit(draft=>{draft.ui.activeScreen=draft.ui.activeScreen==='home'?'budget':'home';});
+  assert(!healthService.isAppHealthDirty(),'Navigation-only state dirtied App Health');
+  healthService.commit(draft=>{draft.settings.annualBudgetAUD=Number(draft.settings.annualBudgetAUD||0)+1;});
+  assert(healthService.isAppHealthDirty(),'Substantive saved mutation did not dirty App Health');
+  healthService.markAppHealthChecked();
+  assert(!healthService.isAppHealthDirty(),'Re-check did not clear App Health after mutation');
+  healthService.replaceValidated(healthService.snapshot());
+  assert(healthService.isAppHealthDirty(),'Identical Restore/replacement did not force a fresh App Health check');
+
+  // Protected Recovery can retain a validated pending Restore when the first
+  // localStorage write fails. If Retry iPad Storage later commits that pending
+  // Restore, it must still invalidate App Health even when the restored state
+  // is identical to the previously verified state.
+  const retryAdapter=new MemoryStorageAdapter();
+  const retryHealthService=new StateService(retryAdapter,{now:()=> '2029-02-24T12:00:00.000Z'});
+  retryHealthService.hydrate();
+  retryHealthService.replaceValidated(state);
+  retryHealthService.markAppHealthChecked();
+  const retryTarget=retryHealthService.snapshot();
+  retryHealthService.recovery={active:true,storageUnavailable:true,reason:'acceptance probe',raw:retryAdapter.value,lastGoodSerialized:retryAdapter.value};
+  retryAdapter.failNextWrite=true;
+  try { retryHealthService.replaceValidated(retryTarget); } catch {}
+  assert(Boolean(retryHealthService.recovery?.pendingRestoreSerialized),'Failed Restore did not retain its validated pending candidate');
+  const retryOk=await retryHealthService.retryStorage();
+  assert(retryOk,'Retry iPad Storage did not commit the pending Restore');
+  assert(retryHealthService.isAppHealthDirty(),'Pending Restore committed through Retry did not force a fresh App Health check');
 
   const duplicateProbe = { itinerary:[], reservations:[
     {id:'d1',type:'flight',title:'V54 Duplicate',dateTime:'2030-03-03',status:'booked',originalCurrency:'AUD',originalAmount:1,audAmount:1,itineraryId:null,needsBudgetRepair:false,notes:''},
@@ -122,5 +205,5 @@ if(args[0]==='--chunk') {
   if(!args[1]||!args[2]) throw new Error('--chunk requires START END');
   console.log(JSON.stringify(sweepChunk(args[1],args[2])));
 } else {
-  console.log(JSON.stringify(commonChecks()));
+  console.log(JSON.stringify(await commonChecks()));
 }

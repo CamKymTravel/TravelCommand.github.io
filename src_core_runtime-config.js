@@ -6,7 +6,7 @@ const DEFAULTS = Object.freeze({
   currentDate:null,
   fixtureUrl:null,
   seedIfEmpty:false,
-  serviceWorkerUrl:'./sw.js?v=54-touch-target-completion'
+  serviceWorkerUrl:'./sw.js?v=55-athens-acceptance-r13'
 });
 
 export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? null) {
@@ -26,6 +26,40 @@ export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? 
     serviceWorkerUrl,
     testingFlags:raw.testingFlags && typeof raw.testingFlags === 'object' ? structuredClone(raw.testingFlags) : {}
   };
+}
+
+
+export function resolveInstalledFixtureRevision(state, externalRevision = null) {
+  const embedded = typeof state?.meta?.simulationFixtureRevision === 'string'
+    ? state.meta.simulationFixtureRevision.trim()
+    : '';
+  if (embedded) return embedded;
+  const external = typeof externalRevision === 'string' ? externalRevision.trim() : '';
+  return external || null;
+}
+
+export function shouldInstallRuntimeFixture({ hadStoredState = false, state = null, externalRevision = null, fixtureRevision = null } = {}) {
+  const target = typeof fixtureRevision === 'string' ? fixtureRevision.trim() : '';
+  if (!target) throw new Error('Simulation fixture revision is required');
+  if (!hadStoredState) return true;
+  const installed = resolveInstalledFixtureRevision(state, externalRevision);
+  // A missing marker on an already-populated simulation is ambiguous: the
+  // marker write may have failed even though the user's travel state saved.
+  // Never overwrite existing screenshot-test changes merely because the
+  // sidecar marker is absent. Newly seeded fixtures carry the revision inside
+  // their persisted metadata, so future fixture revisions remain detectable
+  // atomically even if the sidecar localStorage marker is unavailable.
+  if (!installed) return false;
+  return installed !== target;
+}
+
+export function stampRuntimeFixtureRevision(state, fixtureRevision) {
+  const target = typeof fixtureRevision === 'string' ? fixtureRevision.trim() : '';
+  if (!target) throw new Error('Simulation fixture revision is required');
+  const next = structuredClone(state);
+  if (!next?.meta || typeof next.meta !== 'object' || Array.isArray(next.meta)) throw new Error('Simulation fixture metadata is missing');
+  next.meta.simulationFixtureRevision = target;
+  return next;
 }
 
 

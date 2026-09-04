@@ -132,7 +132,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
   function populate(savedFields, savedRoutePoints) {
     error.textContent = '';
     body.dataset.travelType = savedFields.travelType || 'standard';
-    setModalTone(modal, editorTone || (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'indigo'));
+    setModalTone(modal, existing ? (editorTone || (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'indigo')) : 'sky');
     typeTiles.replaceChildren();
     for (const [type, label] of [['standard','Standard'],['motorhome','Motorhome'],['cruise','Cruise']]) {
       const button = node('button', 'itinerary-type-tile');
@@ -152,7 +152,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
         if (startCountryField) startCountryField.hidden = type === 'standard';
         if (startCountryInput) startCountryInput.required = type !== 'standard';
         if (countryInput) countryInput.required = type === 'standard';
-        if (!editorTone) setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'indigo');
+        if (existing && !editorTone) setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'indigo');
         for (const tile of typeTiles.children) {
           const tileActive = tile.dataset.travelType === type;
           tile.dataset.active = String(tileActive);
@@ -286,7 +286,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
 
   const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'indigo') : 'indigo';
   const addingHomeVisit = !existing && originalFields.country === 'Australia' && /^home(?:\s*\/|$)/i.test(String(originalFields.name || ''));
-  modal = createModal({ title:existing ? 'Edit Destination / Trip' : addingHomeVisit ? 'Add Home Visit' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${editorTone || itineraryTone}` });
+  modal = createModal({ title:existing ? 'Edit Destination / Trip' : addingHomeVisit ? 'Add Home Visit' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${existing ? (editorTone || itineraryTone) : 'sky'}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -312,9 +312,42 @@ function renderStats(model) {
   return stats;
 }
 
+function itineraryStatExpandedBody(kind, model) {
+  const body=node('div',`itinerary-stat-expanded itinerary-stat-expanded-${kind}`);
+  const details=model.statDetails?.[kind]||[];
+  const intro=node('p','itinerary-stat-expanded-intro');
+  const labels={
+    countries:'All unique countries represented in future planned stays and route trips.',
+    routes:'All future Motorhome and Cruise route trips with their route-point coverage.',
+    stops:'Every future stay plus every detailed future route point.',
+    gaps:'Every uncovered forward-planning period in the selected coverage window.',
+    stays:'Standard future stays that do not yet have linked accommodation.',
+    overlaps:'Every current/future itinerary date overlap.'
+  };
+  intro.textContent=labels[kind]||'Planning details';body.append(intro);
+  const list=node('div','itinerary-stat-expanded-list');
+  if(!details.length){list.append(node('p','itinerary-empty',kind==='gaps'?'No unplanned gaps.':kind==='stays'?'No missing stays.':kind==='overlaps'?'No date overlaps.':'No entries yet'));body.append(list);return body;}
+  if(kind==='countries'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');row.append(node('strong','',item.label),node('span','',`${item.count} planned stay${item.count===1?'':'s'}`));list.append(row);}
+  } else if(kind==='routes'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');row.append(node('strong','',item.name),node('span','',[item.country||item.startCountry,item.travelType==='cruise'?'Cruise':'Motorhome',item.displayDates,`${item.routePointCount} route point${item.routePointCount===1?'':'s'}`].filter(Boolean).join(' · ')));list.append(row);}
+  } else if(kind==='stops'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');if(item.kind==='route-point'){row.append(node('strong','',item.name),node('span','',`${item.parentName} · route point ${item.order}`));}else{row.append(node('strong','',item.name),node('span','',[item.country,item.travelType==='standard'?'Standard':item.travelType,item.startDate&&item.endDate?`${formatAUDate(item.startDate)} – ${formatAUDate(item.endDate)}`:''].filter(Boolean).join(' · ')));}list.append(row);}
+  } else if(kind==='gaps'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-warning');row.append(node('strong','',`${item.days} unplanned day${item.days===1?'':'s'}`),node('span','',`${formatAUDate(item.startDate)} – ${formatAUDate(item.endDate)}`));list.append(row);}
+  } else if(kind==='stays'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-warning');row.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,'Accommodation not linked'].filter(Boolean).join(' · ')));list.append(row);}
+  } else if(kind==='overlaps'){
+    for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-danger');const range=item.overlapStart&&item.overlapEnd?`${formatAUDate(item.overlapStart)} – ${formatAUDate(item.overlapEnd)}`:'';row.append(node('strong','',`${item.days} overlapping day${item.days===1?'':'s'}`),node('span','',[item.first?.name&&item.second?.name?`${item.first.name} ↔ ${item.second.name}`:'',range].filter(Boolean).join(' · ')));list.append(row);}
+  }
+  body.append(list);
+  return body;
+}
+
 
 function renderMap(model, host) {
   const panel = node('section', 'itinerary-panel itinerary-map-panel');
+  panel.setAttribute('aria-label','Forward Journey Map');
   const head = node('div', 'itinerary-map-title-row');
   const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','',"Where We're Going"));
   const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode(' Expand Map'));
@@ -426,6 +459,11 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     const mapPanel = renderMap(model, main);
     main.replaceChildren();
 
+    // Cameron's physical iPad review moved the forward map to the top of the
+    // working screen. It is the primary orientation tool, then coverage/stats
+    // explain what the map represents.
+    main.append(mapPanel);
+
     const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, id=>openEditor(id,'indigo'));
     const statsPanel=renderStats(model);
     main.append(coveragePanel,statsPanel);
@@ -433,7 +471,12 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     const statTones={countries:'teal',routes:'indigo',stops:'blue',gaps:'gold',stays:'orange',overlaps:'red'};
     for(const stat of statsPanel.querySelectorAll('.itinerary-stat')){
       const kind=[...stat.classList].find(name=>name.startsWith('itinerary-stat-'))?.replace('itinerary-stat-','')||'blue';
-      makeExpandableCard(stat,{host:main,title:stat.querySelector('.itinerary-stat-copy > span')?.textContent||'Itinerary Statistic',tone:statTones[kind]||'blue'});
+      makeExpandableCard(stat,{
+        host:main,
+        title:stat.querySelector('.itinerary-stat-copy > span')?.textContent||'Itinerary Statistic',
+        tone:statTones[kind]||'blue',
+        bodyBuilder:()=>itineraryStatExpandedBody(kind,model)
+      });
     }
 
     const controls = node('section', 'itinerary-controls');
@@ -467,13 +510,6 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     upcomingPanel.append(upcomingList);
     main.append(upcomingPanel);
     makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'blue'});
-
-    // The approved iPad hierarchy keeps Forward Coverage and the six compact
-    // planning statistics directly above Add/Search/Upcoming. Keep the forward
-    // map, but place it after the primary planning list so it cannot push those
-    // locked controls out of the first working viewport.
-    main.append(mapPanel);
-    makeExpandableCard(mapPanel,{host:main,title:'Forward Journey Map',tone:'blue'});
 
     const completed = document.createElement('details');
     completed.className = 'itinerary-panel itinerary-completed';

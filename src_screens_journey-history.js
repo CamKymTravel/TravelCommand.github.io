@@ -8,7 +8,9 @@ import { makeExpandableCard, preserveLocalFocus } from './src_components_modal.j
 import { createLineIcon } from './src_components_icons.js';
 
 const TYPE_ICONS = Object.freeze({ standard:'globe', motorhome:'rv', cruise:'cruise' });
-const TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise' });
+const TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise', rv:'Motorhome' });
+const JOURNEY_EXPENSE_LABELS = Object.freeze({ groceries:'Groceries', 'eating-out':'Eating Out', transport:'Transport', entertainment:'Entertainment', shopping:'Shopping', miscellaneous:'Miscellaneous' });
+const JOURNEY_RESERVATION_LABELS = Object.freeze({ flight:'Flights', train:'Trains', cruise:'Cruises', rv:'RV Hire', accommodation:'Accommodation', ticket:'Tickets & Attractions' });
 const SUMMARY_ICONS = Object.freeze({ countries:'globe', destinations:'pin', days:'days', years:'years', spend:'spend' });
 const JOURNEY_TRANSIENT_VIEW = new WeakMap();
 
@@ -42,6 +44,33 @@ function renderSummary(model) {
     grid.append(card);
   }
   return grid;
+}
+
+function journeySummaryExpandedBody(kind, model) {
+  const body=node('div',`journey-summary-expanded journey-summary-expanded-${kind}`);
+  const list=node('div','journey-summary-expanded-list');
+  if(kind==='countries'){
+    const grouped=new Map();
+    for(const row of model.rows){const key=row.country||'Unknown';const item=grouped.get(key)||{country:key,count:0,days:0,spend:0};item.count+=1;item.days+=Number(row.days||0);item.spend+=Number(row.spendAUD||0);grouped.set(key,item);}
+    for(const item of [...grouped.values()].sort((a,b)=>a.country.localeCompare(b.country,'en-AU'))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.country),node('span','',`${item.count} stay${item.count===1?'':'s'} · ${integer(item.days)} days`),node('b','',formatMoney(item.spend,'AUD')));list.append(row);}
+  } else if(kind==='destinations'){
+    for(const item of model.rows){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,`${integer(item.days)} days`].filter(Boolean).join(' · ')),node('b','',formatMoney(item.spendAUD,'AUD')));list.append(row);}
+  } else if(kind==='days'||kind==='years'){
+    const grouped=new Map();
+    for(const item of model.rows){const key=item.travelYear||'Other';const row=grouped.get(key)||{year:key,days:0,stays:0,spend:0};row.days+=Number(item.days||0);row.stays+=1;row.spend+=Number(item.spendAUD||0);grouped.set(key,row);}
+    for(const item of [...grouped.values()].sort((a,b)=>Number(a.year)-Number(b.year))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',`Travel Year ${item.year}`),node('span','',`${integer(item.days)} days · ${item.stays} completed stay${item.stays===1?'':'s'}`),node('b','',formatMoney(item.spend,'AUD')));list.append(row);}
+  } else if(kind==='spend'){
+    for(const item of [...model.destinationTotals].sort((a,b)=>Number(b.spendAUD)-Number(a.spendAUD))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.name),node('span','',`${item.visits} stay${item.visits===1?'':'s'} · ${integer(item.days)} days`),node('b','',formatMoney(item.spendAUD,'AUD')));list.append(row);}
+  }
+  if(!list.childElementCount)list.append(node('p','journey-empty','No entries yet'));
+  body.append(list);return body;
+}
+
+function destinationTotalsExpandedBody(model){
+  const body=node('div','journey-destination-totals-expanded');
+  const list=node('div','journey-summary-expanded-list');
+  for(const total of model.destinationTotals){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',total.name),node('span','',`${total.visits} stay${total.visits===1?'':'s'} · ${total.days} days · ${kilometres(total.kilometresTravelled)}`),node('b','',formatMoney(total.spendAUD,'AUD')));list.append(row);}
+  if(!list.childElementCount)list.append(node('p','journey-empty','No entries yet'));body.append(list);return body;
 }
 
 function renderYearFilters(model, options, onChange) {
@@ -190,7 +219,21 @@ function renderRecordFilters(model, options, updateOptions) {
   return panel;
 }
 
-function renderRows(model, navigate, options, updateOptions) {
+function journeyLinkedSpendBreakdown(state, itineraryId) {
+  const groups=new Map();
+  const add=(label,amount)=>groups.set(label,(groups.get(label)||0)+Number(amount||0));
+  for(const record of state.expenses||[]){
+    if(record.itineraryId!==itineraryId||record.needsBudgetRepair)continue;
+    add(JOURNEY_EXPENSE_LABELS[record.category]||record.category||'Expense',record.audAmount);
+  }
+  for(const record of state.reservations||[]){
+    if(record.itineraryId!==itineraryId||record.status==='to-book'||record.needsBudgetRepair)continue;
+    add(JOURNEY_RESERVATION_LABELS[record.type]||record.type||'Reservation',record.audAmount);
+  }
+  return [...groups.entries()].map(([label,amountAUD])=>({label,amountAUD})).sort((a,b)=>b.amountAUD-a.amountAUD||a.label.localeCompare(b.label));
+}
+
+function renderRows(model, navigate, options, updateOptions, state) {
   const panel = node('section', 'journey-panel journey-records');
   const pageSize = Number(options.pageSize || 10);
   const pageCount = Math.max(1, Math.ceil(model.rows.length / pageSize));
@@ -206,11 +249,12 @@ function renderRows(model, navigate, options, updateOptions) {
   for (const label of ['Type','Destination','Stay','Days','Avg / Day','Destination Cost','Kilometres']) header.append(node('span', '', label));
   table.append(header);
   if (!rows.length) table.append(node('p', 'journey-empty', 'No entries yet'));
+  let openDetail=null;
   for (const row of rows) {
     const button = node('button', 'journey-row journey-record-row');
     button.type = 'button';
     button.dataset.recordId = row.id;
-    button.addEventListener('click', () => navigate?.('itinerary', { collection:'itinerary', id:row.id, editorTone:'blue' }));
+    button.setAttribute('aria-expanded','false');
     const destination = node('span', 'journey-destination');
     destination.append(node('strong', '', row.name), node('small', '', [row.country, row.travelYear ? `Year ${row.travelYear}` : ''].filter(Boolean).join(' · ')));
     button.append(
@@ -223,7 +267,7 @@ function renderRows(model, navigate, options, updateOptions) {
       node('span', '', kilometres(row.kilometresTravelled))
     );
     button.setAttribute('aria-label', [
-      'Open completed itinerary stay',
+      'Show compact stay details',
       row.name,
       row.country,
       row.displayDates,
@@ -231,7 +275,35 @@ function renderRows(model, navigate, options, updateOptions) {
       `${integer(row.days)} days`,
       formatMoney(row.spendAUD, 'AUD')
     ].filter(Boolean).join(' · '));
-    table.append(button);
+    const detail=node('div','journey-record-inline-detail');detail.hidden=true;
+    const facts=node('div','journey-record-inline-facts');
+    const fact=(label,value)=>{const item=node('span','journey-record-inline-fact');item.append(node('small','',label),node('strong','',value));return item;};
+    const routePointCount=Number(row.routePointCount||0);
+    facts.append(
+      fact('Travel type',TYPE_LABELS[row.travelType]||row.travelType||'Standard'),
+      ...(row.travelType==='motorhome'||row.travelType==='cruise'||row.travelType==='rv'?[fact('Route points',integer(routePointCount))]:[]),
+      fact('Total stay cost',formatMoney(row.spendAUD,'AUD')),
+      fact('Average / day',formatMoney(row.averageCostPerDayAUD,'AUD')),
+      fact('Duration',`${integer(row.days)} days`),
+      fact('Distance',kilometres(row.kilometresTravelled))
+    );
+    const context=node('p','journey-record-inline-context',[row.displayDates,row.travelYear?`Travel Year ${row.travelYear}`:'',row.country].filter(Boolean).join(' · '));
+    const breakdown=journeyLinkedSpendBreakdown(state,row.id);
+    const spend=node('div','journey-record-inline-spend');
+    const spendHead=node('div','journey-record-inline-spend-head');spendHead.append(node('strong','','Linked Spend Breakdown'),node('small','',`${breakdown.length} categor${breakdown.length===1?'y':'ies'}`));spend.append(spendHead);
+    const spendList=node('div','journey-record-inline-spend-list');
+    if(!breakdown.length)spendList.append(node('p','journey-empty','No linked expense or booked reservation spend.'));
+    for(const item of breakdown.slice(0,8)){const spendRow=node('span','journey-record-inline-spend-row');spendRow.append(node('small','',item.label),node('strong','',formatMoney(item.amountAUD,'AUD')));spendList.append(spendRow);}
+    if(breakdown.length>8)spendList.append(node('small','journey-record-inline-spend-more',`+ ${breakdown.length-8} more categories`));
+    spend.append(spendList);
+    const edit=node('button','journey-record-open-itinerary','Open in Itinerary');edit.type='button';edit.addEventListener('click',event=>{event.stopPropagation();navigate?.('itinerary',{collection:'itinerary',id:row.id,editorTone:'blue'});});
+    detail.append(context,facts,spend,edit);
+    button.addEventListener('click',()=>{
+      const willOpen=detail.hidden;
+      if(openDetail&&openDetail!==detail){openDetail.hidden=true;openDetail.previousElementSibling?.setAttribute('aria-expanded','false');}
+      detail.hidden=!willOpen;button.setAttribute('aria-expanded',String(willOpen));openDetail=willOpen?detail:null;
+    });
+    table.append(button,detail);
   }
   panel.append(table);
 
@@ -461,24 +533,26 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     main.append(renderMap(mapModel, mapOptions, years => updateMapOptions({ mapYears:years }), travelType => updateMapOptions({ mapTravelType:travelType })));
     const analytics=node('section','journey-analytics-two'); analytics.append(renderSpendBreakdown(state,lifetimeModel,currentDate),renderSnapshot(state,lifetimeModel)); main.append(analytics);
     const insightRow=node('section','journey-insight-three'); insightRow.append(renderMilestones(lifetimeModel),renderTopDestinations(lifetimeModel),renderTravelMix(lifetimeModel)); main.append(insightRow);
-    main.append(renderRecordFilters(recordsModel, recordOptions, updateRecordOptions), renderRows(recordsModel, navigate, recordOptions, updateRecordOptions), renderHealth(lifetimeModel));
+    main.append(renderRecordFilters(recordsModel, recordOptions, updateRecordOptions), renderRows(recordsModel, navigate, recordOptions, updateRecordOptions, state), renderHealth(lifetimeModel));
 
     const summaryTones={countries:'teal',destinations:'blue',days:'violet',years:'orange',spend:'magenta'};
     for(const card of main.querySelectorAll('.journey-summary-card')) {
       const kind=[...card.classList].find(name=>name.startsWith('journey-summary-')&&name!=='journey-summary-card')?.replace('journey-summary-','')||'blue';
       const label=card.querySelector('.journey-summary-copy > span')?.textContent||'Journey Summary';
-      makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue'});
+      makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue',bodyBuilder:()=>journeySummaryExpandedBody(kind,lifetimeModel)});
     }
     const journeyExpanders=[
       ['.journey-map-panel','Journey Map','sky'],
       ['.journey-spend-panel','Lifetime Travel Spend','blue'],
-      ['.journey-snapshot-panel','Journey Snapshot','orange'],
-      ['.journey-milestones-panel','Milestones','teal'],
       ['.journey-top-destinations','Destination Totals','gold'],
-      ['.journey-mix-panel','Travel Mix','violet'],
-      ['.journey-health','Journey Check','green']
+      ['.journey-mix-panel','Travel Mix','violet']
     ];
-    for(const [selector,title,tone] of journeyExpanders){ const card=main.querySelector(selector); if(card){ const resolvedTone=selector==='.journey-health'&&card.classList.contains('journey-health-needs-attention')?'gold':tone; makeExpandableCard(card,{host:main,title,tone:resolvedTone}); } }
+    for(const [selector,title,tone] of journeyExpanders){
+      const card=main.querySelector(selector);
+      if(!card)continue;
+      const resolvedTone=selector==='.journey-health'&&card.classList.contains('journey-health-needs-attention')?'gold':tone;
+      makeExpandableCard(card,{host:main,title,tone:resolvedTone,bodyBuilder:selector==='.journey-top-destinations'?()=>destinationTotalsExpandedBody(lifetimeModel):null});
+    }
 
     if (pending?.collection === 'journeyHistory' && pending.id) {
       queueMicrotask(() => {
