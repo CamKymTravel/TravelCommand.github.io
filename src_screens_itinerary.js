@@ -69,7 +69,7 @@ function routeValues(body) {
   }));
 }
 
-function openItineraryEditor({ stateService, host, currentDate, entryId = null, prepareRecordVisibility = null }) {
+function openItineraryEditor({ stateService, host, currentDate, entryId = null, prepareRecordVisibility = null, editorTone = null }) {
   const state = stateService.snapshot();
   const existing = entryId ? state.itinerary.find(item => item.id === entryId) : null;
   if (entryId && !existing) return;
@@ -131,7 +131,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
   function populate(savedFields, savedRoutePoints) {
     error.textContent = '';
     body.dataset.travelType = savedFields.travelType || 'standard';
-    setModalTone(modal, body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'sky');
+    setModalTone(modal, editorTone || (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'indigo'));
     typeTiles.replaceChildren();
     for (const [type, label] of [['standard','Standard'],['motorhome','Motorhome'],['cruise','Cruise']]) {
       const button = node('button', 'itinerary-type-tile', label);
@@ -148,7 +148,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
         const startCountryField = startCountryInput?.closest('label');
         if (startCountryField) startCountryField.hidden = type === 'standard';
         if (startCountryInput) startCountryInput.required = type !== 'standard';
-        setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'sky');
+        if (!editorTone) setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'indigo');
         for (const tile of typeTiles.children) {
           const tileActive = tile.dataset.travelType === type;
           tile.dataset.active = String(tileActive);
@@ -209,12 +209,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
         title:'Delete itinerary entry',
         message:`Delete ${existing.name} · ${formatAUDate(existing.startDate)} – ${formatAUDate(existing.endDate)}? This cannot be undone.${originalRoutePoints.length ? ` Its ${originalRoutePoints.length} saved route point${originalRoutePoints.length === 1 ? '' : 's'} will also be deleted.` : ''} Linked Expenses, Reservations, Checklist items and Calendar reminders/notes must be removed first.`,
         onConfirm:() => {
-          try {
-            stateService.commit(draft => deleteItineraryDraft(draft, existing.id, { now:stateService.now }));
-            if (dialog.isConnected && dialog.open) dialog.close();
-          } catch (err) {
-            error.textContent = err.message;
-          }
+          stateService.commit(draft => deleteItineraryDraft(draft, existing.id, { now:stateService.now }));
+          if (dialog.isConnected && dialog.open) dialog.close();
         }
       });
     }});
@@ -257,6 +253,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
             // changes the surrounding Itinerary even though no record changed.
             restoreRecordVisibility();
             error.textContent = err.message;
+            throw err;
           }
         };
 
@@ -281,8 +278,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     }}
   );
 
-  const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'sky') : 'sky';
-  modal = createModal({ title:existing ? 'Edit Destination / Trip' : 'Add Destination', body, actions, className:`tone-${itineraryTone}` });
+  const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'indigo') : 'indigo';
+  modal = createModal({ title:existing ? 'Edit Destination / Trip' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${editorTone || itineraryTone}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -405,7 +402,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
   };
   rememberOptions();
 
-  const openEditor = entryId => openItineraryEditor({ stateService, host:main, currentDate, entryId, prepareRecordVisibility });
+  const openEditor = (entryId, editorTone = null) => openItineraryEditor({ stateService, host:main, currentDate, entryId, prepareRecordVisibility, editorTone });
 
   function renderContent() {
     const state = stateService.snapshot();
@@ -427,11 +424,11 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     main.append(toolbar);
 
     const mapPanel=renderMap(model, main);
-    const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, openEditor);
+    const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, id=>openEditor(id,'indigo'));
     const statsPanel=renderStats(model);
     main.append(mapPanel,coveragePanel,statsPanel);
     makeExpandableCard(coveragePanel,{host:main,title:'Forward Coverage',tone:'indigo'});
-    const statTones={countries:'teal',routes:'violet',stops:'blue',gaps:'orange',stays:'gold',overlaps:'magenta'};
+    const statTones={countries:'teal',routes:'indigo',stops:'blue',gaps:'gold',stays:'orange',overlaps:'red'};
     for(const stat of statsPanel.querySelectorAll('.itinerary-stat')){
       const kind=[...stat.classList].find(name=>name.startsWith('itinerary-stat-'))?.replace('itinerary-stat-','')||'blue';
       makeExpandableCard(stat,{host:main,title:stat.querySelector('span')?.textContent||'Itinerary Statistic',tone:statTones[kind]||'blue'});
@@ -460,7 +457,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     upcomingPanel.append(upcomingHead);
     const upcomingList = node('div', 'itinerary-list');
     if (!model.upcoming.length) upcomingList.append(node('p', 'itinerary-empty', 'No entries yet'));
-    else for (const record of model.upcoming) upcomingList.append(renderEntry(record, openEditor));
+    else for (const record of model.upcoming) upcomingList.append(renderEntry(record, id=>openEditor(id,'blue')));
     upcomingPanel.append(upcomingList);
     main.append(upcomingPanel);
     makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'blue'});
@@ -497,7 +494,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
           if (target && String(target.endDate || '') < String(currentDate || '')) draft.ui.itineraryCompletedOpen = true;
         });
         const liveHost = document.querySelector('[data-screen="itinerary"]');
-        if (liveHost) openItineraryEditor({ stateService, host:liveHost, currentDate, entryId:pending.id });
+        if (liveHost) openItineraryEditor({ stateService, host:liveHost, currentDate, entryId:pending.id, editorTone:pending.editorTone || null });
       });
     }
 

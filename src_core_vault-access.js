@@ -4,7 +4,8 @@ export function createVaultAccessSession() {
     streamingOpenedSinceUnlock:false,
     hiddenEmailsRevealed:false,
     activeSection:'overview',
-    selectedRecordId:null
+    selectedRecordId:null,
+    selectedRecordTone:null
   };
 }
 
@@ -14,6 +15,7 @@ export function lockVault(ui) {
   ui.hiddenEmailsRevealed = false;
   ui.activeSection = 'overview';
   ui.selectedRecordId = null;
+  ui.selectedRecordTone = null;
 }
 
 export function unlockVault(ui) {
@@ -22,6 +24,7 @@ export function unlockVault(ui) {
   ui.hiddenEmailsRevealed = false;
   ui.activeSection = 'overview';
   ui.selectedRecordId = null;
+  ui.selectedRecordTone = null;
 }
 
 export function markStreamingOpened(ui) {
@@ -48,5 +51,6 @@ export function hideHiddenEmails(ui) {
 export function leaveStreaming(ui) {
   ui.streamingOpenedSinceUnlock = false;
   ui.hiddenEmailsRevealed = false;
+  ui.selectedRecordTone = null;
   if (ui.activeSection === 'streaming') ui.activeSection = 'overview';
 }

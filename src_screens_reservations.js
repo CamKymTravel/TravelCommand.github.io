@@ -133,7 +133,7 @@ function splitReservationDateTime(value) {
   return { date:text.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || '', time:text.match(/T(\d{2}:\d{2})/)?.[1] || '' };
 }
 
-function openReservationEditor({ stateService, host, currentDate, reservationId = null, initialType = 'flight' }) {
+function openReservationEditor({ stateService, host, currentDate, reservationId = null, initialType = 'flight', editorTone = null }) {
   const state = stateService.snapshot();
   const existing = reservationId ? state.reservations.find(record => record.id === reservationId) : null;
   if (reservationId && !existing) return;
@@ -194,7 +194,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
       if (active) button.append(node('span','reservation-selected-tick','✓'));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = type; setModalTone(modal, RESERVATION_TONES[type] || 'blue'); renderTypes(); renderFlightScope(); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = type; if (!editorTone) setModalTone(modal, RESERVATION_TONES[type] || 'blue'); renderTypes(); renderFlightScope(); }));
       typeTiles.append(button);
     }
   }
@@ -276,7 +276,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     body.dataset.currencyAuto = existing ? 'false' : 'true';
     body.dataset.type = saved.type;
     body.dataset.flightScope = saved.flightScope || '';
-    setModalTone(modal, RESERVATION_TONES[saved.type] || 'blue');
+    setModalTone(modal, editorTone || RESERVATION_TONES[saved.type] || 'blue');
     renderTypes();
     renderFlightScope();
     fields.replaceChildren(
@@ -312,12 +312,11 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       const existingAmount=formatMoney(existing.originalAmount,existing.originalCurrency || 'AUD');
       confirmDestructive({
         title:'Delete reservation',
+        tone:editorTone || RESERVATION_TONES[body.dataset.type] || 'blue',
         message:`Delete ${existing.title} · ${existingType} · ${existingWhen} · ${existingStatus} · ${existingAmount}? This cannot be undone.`,
         onConfirm:() => {
-          try {
-            stateService.commit(draft => deleteReservationDraft(draft, existing.id));
-            if (dialog.isConnected && dialog.open) dialog.close();
-          } catch (err) { error.textContent = err.message; }
+          stateService.commit(draft => deleteReservationDraft(draft, existing.id));
+          if (dialog.isConnected && dialog.open) dialog.close();
         }
       });
     }});
@@ -343,7 +342,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
   );
 
   const reservationTone = RESERVATION_TONES[existing?.type || initialType] || 'blue';
-  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tone-${reservationTone}` });
+  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tcc-editor-modal tcc-reservation-editor-modal tone-${editorTone || reservationTone}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -468,10 +467,13 @@ function renderNextFive(state,currentDate,openEditor){
 function renderBookedTotal(state){
   const panel=node('section','reservation-rail-panel reservation-booked-total');
   const booked=(state.reservations||[]).filter(r=>r.status!=='to-book');
-  const total=booked.reduce((s,r)=>s+Number(r.audAmount||0),0);
+  const trusted=booked.filter(r=>!r.needsBudgetRepair);
+  const repairExcluded=booked.length-trusted.length;
+  const total=trusted.reduce((s,r)=>s+Number(r.audAmount||0),0);
   const paid=booked.filter(r=>r.status==='paid').length;
   const open=booked.filter(r=>r.status==='unpaid'||r.status==='booked').length;
   panel.append(node('p','eyebrow','TOTAL BOOKED · AUD'),node('strong','reservation-total-value',formatMoney(total,'AUD')),node('span','reservation-booked-count',`${booked.length} bookings`));
+  if(repairExcluded) panel.append(node('small','reservation-total-repair-note',`${repairExcluded} budget-repair ${repairExcluded===1?'booking is':'bookings are'} excluded from the AUD total until repaired.`));
   const stats=node('div','reservation-booked-stats');
   const paidStat=node('span'); paidStat.append(node('small','','PAID'),node('strong','',String(paid)));
   const openStat=node('span'); openStat.append(node('small','','OPEN'),node('strong','',String(open)));
@@ -483,7 +485,7 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
   const main = node('main', 'screen-root reservations-screen');
   main.dataset.screen = 'reservations';
   let options = { activeType:stateService.snapshot().ui?.reservationType || 'flight', completedOpen:stateService.snapshot().ui?.reservationCompletedOpen === true };
-  const openEditor = reservationId => openReservationEditor({ stateService, host:main, currentDate, reservationId, initialType:options.activeType });
+  const openEditor = (reservationId, editorTone = null) => openReservationEditor({ stateService, host:main, currentDate, reservationId, initialType:options.activeType, editorTone });
 
   function renderContent() {
     const state = stateService.snapshot();
@@ -495,7 +497,7 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
 
     const toolbar = node('header', 'reservation-toolbar');
     const title = node('div');
-    title.append(node('p', 'eyebrow', 'RESERVATIONS'), node('h1', '', 'Flights & Transport'));
+    title.append(node('p', 'eyebrow', 'RESERVATIONS'), node('h1', '', 'Booked Reservations'));
     toolbar.append(title);
     main.append(toolbar);
 
@@ -522,17 +524,17 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     const left=node('div','reservation-reference-main');
     left.append(tabs);
     const addBar=node('button','reservation-add-bar','＋ ADD RESERVATION'); addBar.type='button'; addBar.addEventListener('click',()=>openReservationEditor({stateService,host:main,currentDate,initialType:options.activeType})); left.append(addBar);
-    const toBookPanel=listPanel('Future Bookings / To Book', model.toBook, 'reservation-to-book', openEditor, 'No To Book entries yet');
-    const upcomingPanel=listPanel('Upcoming', model.upcoming, 'reservation-upcoming', openEditor, 'No upcoming entries yet');
+    const toBookPanel=listPanel('Future Bookings / To Book', model.toBook, 'reservation-to-book', id=>openEditor(id,'gold'), 'No To Book entries yet');
+    const upcomingPanel=listPanel('Upcoming', model.upcoming, 'reservation-upcoming', id=>openEditor(id,'blue'), 'No upcoming entries yet');
     left.append(toBookPanel,upcomingPanel);
     makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold'});
     makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Reservations',tone:'blue'});
     const completed = document.createElement('details'); completed.className='reservation-panel reservation-completed'; completed.open=options.completedOpen; completed.addEventListener('toggle',()=>{options.completedOpen=completed.open; if(stateService.snapshot().ui?.reservationCompletedOpen===completed.open)return; stateService.commit(draft=>{draft.ui.reservationCompletedOpen=completed.open;});}); const summary=node('summary'); summary.append(node('span','','Completed'),node('span','reservation-count',String(model.completed.length))); completed.append(summary); const completedList=node('div','reservation-list'); if(!model.completed.length) completedList.append(node('p','reservation-empty','No completed entries yet')); for(const record of model.completed) completedList.append(reservationRow(record,openEditor)); completed.append(completedList);
     const health=healthPanel(model); left.append(completed,health);
-    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:'green'});
-    const nextFive=renderNextFive(state,currentDate,openEditor), bookedTotal=renderBookedTotal(state);
+    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:health.classList.contains('reservation-health-needs-attention')?'gold':'green'});
+    const nextFive=renderNextFive(state,currentDate,id=>openEditor(id,'red')), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);
-    makeExpandableCard(nextFive,{host:main,title:'Next 5 Upcoming',tone:'teal'});
+    makeExpandableCard(nextFive,{host:main,title:'Next 5 Upcoming',tone:'red'});
     makeExpandableCard(bookedTotal,{host:main,title:'Total Booked',tone:'violet'});
     contentGrid.append(left,rail); main.append(contentGrid);
 
@@ -547,7 +549,7 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
           if (target?.status !== 'to-book' && String(target?.dateTime || '').slice(0, 10) < String(currentDate || '')) draft.ui.reservationCompletedOpen = true;
         });
         const liveHost = document.querySelector('[data-screen="reservations"]');
-        if (liveHost) openReservationEditor({ stateService, host:liveHost, currentDate, reservationId:pending.id, initialType:target?.type || options.activeType });
+        if (liveHost) openReservationEditor({ stateService, host:liveHost, currentDate, reservationId:pending.id, initialType:target?.type || options.activeType, editorTone:pending.editorTone || null });
       });
     }
   }

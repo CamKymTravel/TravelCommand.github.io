@@ -1,0 +1,20 @@
+Travel Command Centre V1 — V51 package contents
+
+- Exact current PWA source/runtime files.
+- Full continuity/no-loss documentation and historical 100-item ledger.
+- REGRESSION_CONTRACT.json machine-readable rules.
+- verify_regression_guard.py executable verifier.
+- REGRESSION_PROTOCOL.md step-by-step anti-regression process.
+- VISUAL_REFERENCES.zip preserving 21 reference images, including the two approved rich destination-helper concepts and their explicit correction README.
+- header-assets.bin / header-index.json and all offline runtime assets.
+- simulation-data.json / simulation-clock.js retained.
+
+The outer package intentionally remains below 100 extracted top-level files. Visual screenshots are consolidated losslessly into one inner ZIP to prevent the file-count limit from forcing visual-authority loss.
+
+Freeze metrics:
+- Protected manifest entries: 82
+- Extracted top-level package files: 83
+- Visual screenshots preserved inside VISUAL_REFERENCES.zip: 21
+- Historical no-loss ledger items: 100
+- JavaScript ES modules checked by verifier: 62
+- CSS files structurally checked by verifier: 6

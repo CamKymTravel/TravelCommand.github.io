@@ -1,19 +1,127 @@
-# Travel Command Centre V1 — V44 iPad Visual Candidate / No-Loss Ledger
+# V52 Immediate No-Loss Carry-Forward — 04 Sep 2026
 
-**Continuity package:** V44 IPAD VISUAL CANDIDATE — 3 September 2026 AEST  
-**Purpose:** carry the exact V44 iPad visual candidate source, all protected decisions, all completed forensic fixes and the target-device acceptance state into the next chat without regression.
+## Current verified state
+- Exact V51→V52 working delta: **17 source/runtime files**, all listed in `CHANGESET_V51_TO_V52.md`, pre-freeze verified with zero unexpected drift.
+- JS parse: **62/62**. CSS structure: **6/6**. Four-year deterministic model sweep: **10,227/10,227** builds over **1,461** days.
+- Country helper datasets remain **78/78/78 exact paired** with rich 4×4 Quick Look density.
+- V52 is a continuity freeze, not Master/Gold Lock.
+
+## Active work that MUST continue
+1. Continue the evidence-based whole-app audit from the exact V52 tree. Do not redo already-proven areas merely to create activity; focus on reproducible defects.
+2. Complete physical target-iPad 1024×768 acceptance across all nine screens, both helpers, headers, scrolling, touch/focus/modal behaviour and service-worker refresh.
+3. Prove offline phrase speech on the actual target iPad. If required local voices are not reliably available offline, implement a self-contained packaged-audio fallback without online APIs.
+4. Perform practical Vault IndexedDB screenshot add/reopen/delete plus self-contained Backup/Restore/Protected-Recovery/Retry testing on target iPad.
+5. Complete final global colour-quality pass. Screenshot hues remain non-authoritative until Cameron explicitly approves the final palette.
+6. Re-run complete regression, backup/restore and offline-shell tests immediately before any Master/Gold Lock package.
+
+## Critical no-loss warning
+Do not discard the absorbed post-V51 fixes around legacy repair-cost protection, Reservation trusted totals, cross-screen material hand-offs, async modal safety, native-picker/dialog render protection, Vault asset staging/orphan/recovery/backup concurrency, stale health audits, service-worker safe refresh, Journey History iPad geometry or 44px touch targets. Those are implemented V52 baseline behaviour, not optional future work.
+
+---
+
+# Historical V51/V50 outstanding-work ledger preserved below
+
+# V51 Immediate No-Loss Carry-Forward — 04 Sep 2026
+
+## Current exact-source status
+- Predecessor V50 verified before freeze with exactly 12 intentional changed files and no unexpected drift.
+- Rich Country Quick Look + toilet helper are implemented in source and visually anchored by the two approved pictures inside `VISUAL_REFERENCES.zip`.
+- Helper datasets are **78/78/78 exact-paired**. Quick Look density is full 4×4 for every country.
+- `Current Destination Status` and `Quick Tips` are explicitly retired from these helper screens.
+- Practical Essentials and Signs to Look For are implemented.
+- Play / Slow / Repeat ×3 / Louder are implemented with local installed voice selection only. Physical-iPad offline voice proof is still outstanding.
+- Material-depth pass 5 is implemented through the paths recorded in `CONTINUITY_START_HERE.md`; global palette approval and remaining depth audit are still active.
+- Current service-worker cache: `tcc-v1-v50-global-material-depth-pass-5-2026-09-04`; production service-worker URL carries `v=50-material-depth-5`.
+
+## Active work that MUST continue
+1. Finish the remaining parent → expanded → deeper-editor/material continuity audit across all screens.
+2. Do the final global colour-quality pass only after functional/depth stability, and do not mark it approved until Cameron explicitly approves it.
+3. On the physical target iPad, compare Country Quick Look and Where’s the toilet? directly to their approved rich concept pictures, allowing the two explicitly approved replacements only. Reject any compact/watered-down result.
+4. Verify no horizontal scrolling and appropriate vertical scrolling on the two rich helper screens.
+5. Test Play / Slow / Repeat ×3 / Louder fully offline on the target iPad. If any required language has no reliable installed local voice, design a self-contained packaged-audio fallback rather than an online service.
+6. Complete the practical Vault IndexedDB add/reopen/Backup/Restore/Protected-Recovery/delete/storage-error pass.
+7. Repeat all-screen iPad acceptance and service-worker refresh testing before master/release.
+
+## V51 regression protocol summary
+1. Run `python3 verify_regression_guard.py --verify` before editing and require `PASSED — BASELINE VERIFIED`.
+2. Read the mandatory documents in `CONTINUITY_START_HERE.md` order.
+3. Work from this exact V51 tree only.
+4. During a focused batch, pass every intentionally changed path through `--allow-changes`; any unexpected file/hash drift is a stop condition.
+5. After each batch: ES-module parse, CSS structure, service-worker shell, helper pairing/density, protected markers and package-count checks. Run deeper domain probes where affected.
+6. Before the next continuity freeze: update continuity documents/contract first, regenerate hashes last, then verify with **no allow-list**.
+7. Master/Gold Lock still requires the physical-iPad and Vault tests above.
+
+---
+
+# Historical V50/V49 no-loss ledger preserved below
+
+# V50 Immediate No-Loss Carry-Forward — 03 Sep 2026
+
+This section supersedes any older wording about what remains active. Historical ledger content below is retained deliberately for regression archaeology.
+
+## Current exact-source status
+
+- The carried runtime is the V49 screenshot-repair working tree.
+- Its predecessor guard was run immediately before V50 freeze with the **20 actual V49 working changes explicitly allow-listed** and returned `PASSED — BASELINE PROTECTED; 20 ALLOW-LISTED CHANGE(S)` with no unexpected drift.
+- Current Home helper data has **28 Country Quick Look records and 28 matching toilet-language records**. That is the current checkpoint only.
+- Current toilet helper has text/pronunciation/slow breakdown but **does not yet have the newly requested polished voice/audio implementation**.
+- Current helper presentation is functional but **does not yet represent final approval of the newly generated premium Country Quick Look / Where’s-the-toilet visual concepts**.
+- Final app-wide colour layout/palette remains **unconfirmed**.
+
+## Active work that MUST continue
+
+1. Rework Country Quick Look into the highly appealing, informative premium iPad screen Cameron approved conceptually, entered by tapping the **Current Destination header/banner on Home**.
+2. Rework Where’s the toilet? into the highly appealing premium phrase-helper screen, entered by pressing the **Home compass**.
+3. Keep those two entry points separate. Do not make the compass open Country Quick Look and do not make Current Destination directly replace the compass helper.
+4. Expand quick-look + toilet-language coverage beyond the existing 28-country pair to all countries Cameron & Kym may realistically add/visit. Build a maintainable country-level offline dataset, not scattered one-off strings.
+5. For every supported country, retain/implement: canonical country/aliases, practical language selection, native toilet phrase, simple English-style pronunciation, slow syllable breakdown, quick-look Plants & Gardens, Animals & Wildlife, Food & Drink, Culture & Tips, and language/currency/time-zone context.
+6. For multilingual destinations, use a practical default and support alternatives where useful rather than guessing from a composite route label. Cruise/RV keeps **Starting Country** as the trip language/country context unless the user changes the defined model later.
+7. Add offline spoken toilet-phrase playback if feasible on target iPad. Desired controls: **Play, Slow, Repeat ×3, Louder**. Do not depend on internet speech services. If browser speech cannot be guaranteed offline, prefer packaged local audio/metadata in a low-file-count architecture.
+8. Preserve Kym-focused usability: very clear large phrase, easy pronunciation, useful visual hierarchy, and plants/gardens slightly prominent in Country Quick Look.
+9. Do the final whole-app colour pass only after functionality is stable. **Screenshots are not colour approval.** Every coloured widget must share the same perceived saturation, brightness, contrast, depth, border/highlight and restrained-glow quality; only hue should differ.
+10. Re-audit every parent widget -> expander -> deeper editor/detail path after the global colour pass so interaction depth never reverts to a generic/old-build tone.
+11. Re-test all nine screens on the target iPad, including current/no-current destination states, Standard/Cruise/RV context, helper access, language coverage, offline behaviour, service-worker refresh and no horizontal scroll.
+12. Complete practical Vault IndexedDB add/reopen/Backup/Restore/Protected-Recovery/delete testing before master/Gold Lock.
+
+## V50 deep regression protocol for the next chat
+
+1. Run `python3 verify_regression_guard.py --verify` before any edit and require `PASSED — BASELINE VERIFIED`.
+2. Read `CONTINUITY_START_HERE.md`, `LOCKED_REQUIREMENTS.md`, this file, `REGRESSION_CONTRACT.json`, then `VISUAL_REFERENCE_INDEX.md`.
+3. Continue from this exact V50 tree. Never restart from screenshots or an older package.
+4. For every implementation batch, use `--allow-changes` with the exact changed files. Unexpected drift is a stop condition.
+5. Preserve the 100-item historical no-loss ledger below. New work is additive; do not delete historical protections to shorten the package.
+6. For country-helper work, test dataset pairing and minimum coverage on every batch. A country must not be silently “supported” in one helper and absent in the other.
+7. For audio work, test **real offline behaviour**; do not accept an online-only Web Speech success as satisfying the offline PWA requirement.
+8. For colour work, compare perceived material quality across hues, not screenshot hue matching. Do not mark palette Gold Locked without Cameron approval.
+9. After source changes: parse all JS ES modules, run CSS structural checks, run relevant model/relationship/migration/restore probes, re-check service-worker shell, and keep package <=100 files.
+10. Before the next continuity freeze, regenerate hashes last and verify with no allow-list.
+11. Before master/release, complete target-iPad visual/interaction testing and Vault storage testing.
+
+---
+
+# Travel Command Centre V1 — V49 iPad Full-Screenshot Repair Candidate / No-Loss Ledger
+
+**Continuity package:** V49 IPAD FULL-SCREENSHOT REPAIR CANDIDATE — 3 September 2026 AEST  
+**Purpose:** carry the exact screenshot-repaired successor source, all protected decisions, all completed forensic fixes, the complete 3 September iPad evidence review and the corrected target-device retest state into the next chat without regression.
 
 ## Critical recovery note
 
-Unlike the earlier safety handoffs, this package contains the **actual current V44 iPad visual candidate source**. After `verify_regression_guard.py --verify` passes, V44 is the starting authority.
+Unlike the earlier safety handoffs, this package contains the **actual current V49 iPad full-screenshot repair candidate source**. After `verify_regression_guard.py --verify` passes, V49 is the starting authority.
 
 - **Do not treat V43/V42/V41/V40/V39/V38/V37/V36/V35/V34, an older ZIP, or a screenshot-only reconstruction as the current baseline.**
 - All 100 numbered items below remain protected requirements.
 - Many items that were open in V35 are now implemented in source; the status summary below records the current checkpoint.
 - Do not simplify, redesign, remove, or reinterpret a protected item to make implementation easier.
-- This is a continuity baseline and iPad visual candidate, **not a declaration that V44 is release/master complete**.
+- This is a continuity baseline and iPad visual candidate, **not a declaration that V49 is release/master complete**.
 
-## V44 implementation status carried forward
+
+## V49 full screenshot repair status carried forward
+
+The complete 3 September target-iPad screenshot set has been re-reviewed as one evidence set. V49 carries the central repairs for the observed cross-screen regressions: restored Home Current Destination / Travel Compass / “Where’s the toilet?” functions, authoritative expanded-card colour inheritance, selected-type editor continuity, Booked Reservations naming/cache protection, Vault duplicate-status concealment and category continuity, PIN password-sheet suppression, and App Health label collision repair.
+
+The next mandatory gate is a fresh V49 iPad pass. Do not spend time re-reporting defects already listed above unless they remain visible in V49; any remaining issue is then a genuine V49 defect. Practical Vault IndexedDB add/reopen/Backup/Restore/Recovery/delete validation also remains mandatory before release/master or Gold Lock.
+
+## V47 implementation status carried forward
 
 Verified/current behaviours include:
 
@@ -38,7 +146,7 @@ Verified/current behaviours include:
 - Journey History actual-spend/day/completion consistency, route continuity/date-line handling and duplicate supplement health warning.
 - Exact Vault concealment sequence, staged screenshot Save, exact record targeting and PIN/storage recovery safety.
 - Full manual/offline Schengen panel and validation.
-- Production-first boot, isolated explicit simulation mode, active service-worker cache generation (`tcc-v1-v44-ipad-visual-candidate-2026-09-03`) and hardened offline fallback behaviour.
+- Production-first boot, isolated explicit simulation mode, active service-worker cache generation (`tcc-v1-v45-ipad-visual-correction-2026-09-03`) and hardened offline fallback behaviour.
 - Protected Recovery for invalid state **and** Safari storage access denial; transactional restore/write rollback.
 - App Health simulation checkpoint remains 9/9 verified.
 - Global Search uses readable Expense category labels instead of raw schema slugs when descriptions are blank.
@@ -228,6 +336,48 @@ Verified/current behaviours include:
 99. Preserve the 1024×768 iPad-landscape rule, **zero horizontal scrolling**, Home one-screen composition, no decorative/dead controls, all working buttons, Save-only commit and delete confirmation.
 100. Preserve the under-100-file extracted package constraint. This V44 iPad visual candidate remains **99 actual files**.
 
+
+
+## V47 checkpoint — third-iPad expanded/modal continuity correction
+
+The third real-iPad screenshot set exposed two shared-system regressions that could not be safely treated as isolated colour tweaks:
+
+- Expanded Journey History widgets were being wrapped in hard-coded modal tones that disagreed with the actual parent card (for example blue Lifetime Spend inside a gold shell, orange Journey Snapshot inside an indigo shell, teal Milestones inside a magenta shell, and teal Journey Map inside a blue shell). V47 resolves expanded-modal tone from the rendered source-card border colour, so every expandable surface across the app follows the parent card automatically and the declared tone is only a fallback.
+- Reservation category focus/active treatment used a generic blue Safari ring after touch. V47 now derives that ring/glow from the category accent so Flight, Train, Cruise, RV, Accommodation and Tickets remain in their own colour family while focused/selected.
+- The live iPad still showed **Flights & Transport** even though V46 source contained **Booked Reservations**, proving an already-open page could remain on the previous service-worker module graph. V47 service-worker activation now claims and reloads controlled windows after the fresh cache is ready so a newly deployed build does not leave stale JavaScript onscreen.
+
+Verification before V47 freeze: V46 guard passes with exactly **3 intended runtime files** allow-listed before identity promotion; **62/62** JavaScript modules parse; CSS structure passes; rendered parent-card tone mapping checks pass **18/18**; migrated simulation App Health remains **9/9 verified**. No canonical model, calculation, routing, mutation, Backup/Restore or Vault storage logic is changed. **Still active:** target-iPad V47 visual/interaction re-test and practical Vault IndexedDB add/reopen/Backup/Restore/Recovery/delete validation. V47 is not release/master/Gold Locked.
+
+## V46 checkpoint — second-iPad colour-follow-through correction
+
+The second real-iPad screenshot set showed that several Add/Edit flows still fell back to old-build colour behaviour even though the surrounding V45 screens had been harmonised. V46 fixes only those evidence-backed presentation paths:
+
+- Add Expense derives its initial tone from the selected category instead of forcing sky-blue.
+- Groceries / Eating Out / Transport / Entertainment / Shopping / Miscellaneous selection tiles match teal / blue / indigo / violet / magenta / orange editor families.
+- Flights / Trains / Cruises / RV / Accommodation / Tickets & Attractions selection tiles match blue / green / teal / orange / magenta / gold editor families.
+- Safari Domestic / International controls now use the app material system instead of native white pills.
+- Standard / Motorhome / Cruise destination tiles match sky / orange / violet editor families.
+- The three Add/Edit shells use a shared deep Home-style material base, restrained colour glow/border and tone-aware action buttons.
+- Existing approved expanded-card drill-downs are not restyled by this change.
+
+Verification before V46 freeze: V45 guard passes with exactly **4 intended source files** allow-listed; **62/62** JavaScript modules parse; targeted visual mapping checks pass **20/20**; migrated simulation App Health remains **9/9 verified**. No canonical data model, calculation, routing, mutation or Vault-storage logic is changed.
+
+**Still active:** full-screen V46 iPad visual/interaction re-test and practical Vault IndexedDB add/reopen/Backup/Restore/Recovery/delete validation. V46 is not release/master/Gold Locked.
+
+## V45 freeze checkpoint — first-iPad visual correction candidate
+
+Cameron’s first real-iPad screenshot pass exposed a small set of genuine visual/naming regressions despite V44’s clean source/runtime audit. V45 absorbs those findings without changing the canonical data model, calculations or protected interaction structure.
+
+- Reservations visible heading and screen accessibility label are now **Booked Reservations**, not **Flights & Transport**.
+- The shared no-current-stay banner no longer selects the obsolete `home-hero` composite containing baked Days Remaining / Time Zone / Travel Mode copy; a clean supplied scenic banner is used so live cards never sit over old embedded UI text.
+- A final-layer material harmony pass reduces saturation on large Budget, Reservations, Journey History, Checklist, Settings and selected Itinerary/Vault surfaces. Home’s deep navy/charcoal material remains the visual authority, with category colour retained in restrained border/glow/icon/feature treatment. This does **not** flatten the approved six Itinerary statistic widgets or five Journey History headline widgets.
+- Vault category cards render a consistent current-colour SVG line-icon system instead of unrelated intrinsically coloured emoji art. Reservation category icon chips likewise inherit their parent accent.
+- The palette remains **not Gold Locked**. V45 exists specifically for a corrected real-iPad visual re-test.
+
+Verification before freeze: V44 guard passed with exactly **5 screenshot-evidenced source changes** allow-listed; **62/62** JavaScript modules parse; CSS structure passes; migrated simulation App Health is **9/9 verified**. The V44 functional baseline (**3,283/3,283**, **1,461/1,461**, **2,310** cross-screen model builds) is carried forward because V45 does not change functional model logic. Package remains **99 files**.
+
+**Still active:** corrected full-screen iPad visual/interaction re-test and practical Vault IndexedDB add/reopen/Backup/Restore/Recovery/delete validation. V45 is not release/master/Gold Locked.
+
 ## V44 freeze checkpoint — iPad visual candidate
 
 This V44 handoff freezes the exact V43 successor after the final non-visual continuation audit. Immediately before freeze, the V43 guard passed with exactly **2 intentional changed source files** allow-listed and no unexpected drift: `src_main.js` and `src_screens_settings.js`. Both changes are the same narrow iPad/WebKit download-compatibility treatment: JSON export bytes remain unchanged and filenames remain `.json`, while the downloadable Blob MIME type is `application/octet-stream`.
@@ -324,10 +474,10 @@ Additional protections frozen into V39 include:
 
 ## Regression protocol for the next chat
 
-1. Extract this V44 package without renaming/removing files.
+1. Extract this V46 package without renaming/removing files.
 2. Run `python3 verify_regression_guard.py --verify` **before touching anything**; require `PASSED — BASELINE VERIFIED`.
 3. Read `CONTINUITY_START_HERE.md`, `LOCKED_REQUIREMENTS.md`, this ledger and `VISUAL_REFERENCE_INDEX.md`.
-4. Work from this exact V44 source. Do not revert to V43/V42/V41/V40/V39/V38/V37/V36/V35/V34 to make a problem easier.
+4. Work from this exact V46 source. Do not revert to V44/V43/V42/V41/V40/V39/V38/V37/V36/V35/V34 to make a problem easier.
 5. For each focused batch, pass the exact intentionally changed files via `--allow-changes`.
 6. After each batch: ES-module parse, relevant model/relationship/migration/restore tests, affected iPad geometry review, zero-horizontal-scroll review and dead-control/exact-record checks.
 7. If runtime assets change, re-check service-worker shell coverage and bump cache generation for an installable successor when appropriate.

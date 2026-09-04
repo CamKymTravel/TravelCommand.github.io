@@ -154,7 +154,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
       if (active) button.append(node('span', 'budget-selected-tick', '✓'));
       button.addEventListener('click', () => {
         body.dataset.category = category;
-        setModalTone(modal, CATEGORY_TONES[category] || 'sky');
+        if (!editorTone) setModalTone(modal, CATEGORY_TONES[category] || 'sky');
         preserveLocalFocus(() => renderCategories());
       });
       categoryTiles.append(button);
@@ -250,7 +250,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     body.dataset.currencyAuto = existing ? 'false' : 'true';
     body.dataset.audAuto = 'false';
     body.dataset.category = saved.category;
-    setModalTone(modal, CATEGORY_TONES[saved.category] || 'sky');
+    setModalTone(modal, editorTone || CATEGORY_TONES[saved.category] || 'sky');
     renderCategories();
     fields.replaceChildren(
       inputField('Date', 'date', 'date', saved.date),
@@ -273,14 +273,11 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     actions.push({ label:'Delete', kind:'danger', onClick:dialog => {
       confirmDestructive({
         title:'Delete expense',
+        tone:resolvedTone,
         message:`Delete ${existing.description || CATEGORY_LABELS[existing.category] || 'this expense'} · ${CATEGORY_LABELS[existing.category] || 'Expense'} · ${existing.date ? formatAUDate(existing.date) : 'Date not set'} · ${formatMoney(existing.originalAmount, existing.originalCurrency || 'AUD')}? This cannot be undone.`,
         onConfirm:() => {
-          try {
-            stateService.commit(draft => deleteExpenseDraft(draft, existing.id));
-            if (dialog.isConnected && dialog.open) dialog.close();
-          } catch (err) {
-            error.textContent = err.message;
-          }
+          stateService.commit(draft => deleteExpenseDraft(draft, existing.id));
+          if (dialog.isConnected && dialog.open) dialog.close();
         }
       });
     }});
@@ -305,7 +302,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
   );
 
   const resolvedTone = editorTone || (existing ? CATEGORY_TONES[existing.category] : CATEGORY_TONES[initialCategory]) || 'sky';
-  modal = createModal({ title:existing ? 'Edit Expense' : 'Add Expense', body, actions, className:`tone-${resolvedTone}` });
+  modal = createModal({ title:existing ? 'Edit Expense' : 'Add Expense', body, actions, className:`tcc-editor-modal tcc-budget-editor-modal tone-${resolvedTone}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -465,7 +462,7 @@ function destinationHasNormalDatedCosts(state,itineraryId){
     (state.reservations||[]).some(record=>record.itineraryId===itineraryId&&!record.needsBudgetRepair);
 }
 
-function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManager}){
+function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManager,editorTone=null}){
   const state=stateService.snapshot();
   const entry=(state.itinerary||[]).find(item=>item.id===itineraryId);
   if(!entry)return;
@@ -520,7 +517,7 @@ function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManage
           if(d.isConnected&&d.open)d.close();else queueReopen();
         }catch(err){error.textContent=err.message;}
       }}
-    ],className:current>0?'tone-green':'tone-gold'
+    ],className:`tcc-editor-modal tcc-budget-destination-editor-modal tone-${editorTone || 'green'}`
   });
   host.append(dialog); dialog.showModal();
   dialog.addEventListener('close',()=>{dialog.remove(); queueReopen();},{once:true});
@@ -668,7 +665,7 @@ function renderLivingExpenses(model, openNewExpense) {
   head.append(node('h2', '', 'Living Expenses'));
   const add = node('button', 'button budget-add-expense', 'Add Expense');
   add.type = 'button';
-  add.addEventListener('click', () => openNewExpense());
+  add.addEventListener('click', () => openNewExpense('groceries', 'violet'));
   head.append(add);
   panel.append(head);
   const grid = node('div', 'budget-category-grid');
@@ -710,7 +707,7 @@ function renderReservations(model, navigate) {
     if (record.originalCurrency !== 'AUD' || Number(record.originalAmount) !== Number(record.audAmount)) amounts.append(node('small', '', signedMoney(record.audAmount, 'AUD')));
     row.append(copy, amounts);
     row.setAttribute('aria-label', ['Open reservation', record.title, formatAUDate(toISODate(record.dateTime)), typeLabel, statusLabel].join(' · '));
-    row.addEventListener('click', () => navigate('reservations', { collection:'reservations', id:record.id }));
+    row.addEventListener('click', () => navigate('reservations', { collection:'reservations', id:record.id, editorTone:'indigo' }));
     list.append(row);
   }
   panel.append(list);
@@ -914,7 +911,7 @@ function renderRecentExpenses(model, openExistingExpense) {
   for (const expense of model.recentExpenses) {
     const button = node('button', 'budget-expense-row');
     button.type = 'button';
-    button.addEventListener('click', () => openExistingExpense(expense.id));
+    button.addEventListener('click', () => openExistingExpense(expense.id, 'blue'));
     const copy = node('div');
     copy.append(node('strong', '', expense.description || CATEGORY_LABELS[expense.category] || expense.category), node('small', '', `${expense.isFuture ? 'Future · ' : ''}${expense.displayDate} · ${CATEGORY_LABELS[expense.category] || expense.category}`));
     const amounts = node('div', 'budget-row-amounts');
@@ -939,10 +936,10 @@ function renderRecentExpenses(model, openExistingExpense) {
 export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   const main = node('main', 'screen-root budget-screen');
   main.dataset.screen = 'budget';
-  const openNewExpense = (category = 'groceries', editorTone = 'sky') => {
+  const openNewExpense = (category = 'groceries', editorTone = null) => {
     openExpenseEditor({ stateService, host:main, currentDate, initialCategory:category, editorTone });
   };
-  const openExistingExpense = expenseId => openExpenseEditor({ stateService, host:main, currentDate, expenseId });
+  const openExistingExpense = (expenseId, editorTone = null) => openExpenseEditor({ stateService, host:main, currentDate, expenseId, editorTone });
   const state = stateService.snapshot();
   const model = buildBudgetViewModel(state, currentDate);
   const homeModel=buildHomeViewModel(state,currentDate,{alertLimit:0,eventLimit:0});
@@ -959,7 +956,7 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   const categoryChart=renderCategoryChart(model), annualForecast=renderAnnualForecast(model);
   const charts=node('section','budget-reference-charts'); charts.append(categoryChart,annualForecast); main.append(charts);
   makeExpandableCard(categoryChart,{host:main,title:'Budget by Category',tone:'gold'});
-  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'blue'});
+  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'sky'});
   const livingExpenses=renderLivingExpenses(model,openNewExpense); main.append(livingExpenses);
   makeExpandableCard(livingExpenses,{host:main,title:'Living Expenses',tone:'violet'});
   const reservationsPanel=renderReservations(model,navigate), accountsPanel=renderAccounts(model);
@@ -967,18 +964,18 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   makeExpandableCard(reservationsPanel,{host:main,title:'Reservations',tone:'indigo'});
   const recentExpenses=renderRecentExpenses(model,openExistingExpense), monthlyHistory=renderMonthlySpendHistory(model,currentDate);
   main.append(recentExpenses,monthlyHistory);
-  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'orange'});
-  makeExpandableCard(monthlyHistory,{host:main,title:'Monthly Spend History',tone:'teal'});
+  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'blue'});
+  makeExpandableCard(monthlyHistory,{host:main,title:'Monthly Spend History',tone:'violet'});
 
   const pending = state.ui?.pendingOpen;
   if (pending?.collection === 'expenses' && pending.id && state.expenses.some(record => record.id === pending.id)) {
-    queueMicrotask(() => { if (!main.isConnected) return; stateService.commit(draft => { draft.ui.pendingOpen = null; }); const liveHost=document.querySelector('[data-screen="budget"]'); if(liveHost) openExpenseEditor({stateService,host:liveHost,currentDate,expenseId:pending.id}); });
+    queueMicrotask(() => { if (!main.isConnected) return; stateService.commit(draft => { draft.ui.pendingOpen = null; }); const liveHost=document.querySelector('[data-screen="budget"]'); if(liveHost) openExpenseEditor({stateService,host:liveHost,currentDate,expenseId:pending.id,editorTone:pending.editorTone || null}); });
   } else if (pending?.collection === 'itinerary' && pending.id && state.itinerary.some(record => record.id === pending.id)) {
     queueMicrotask(() => {
       if (!main.isConnected) return;
       stateService.commit(draft => { draft.ui.pendingOpen = null; });
       const liveHost=document.querySelector('[data-screen="budget"]');
-      if(liveHost) openDestinationBudgetEditor({stateService,host:liveHost,itineraryId:pending.id,reopenManager:null});
+      if(liveHost) openDestinationBudgetEditor({stateService,host:liveHost,itineraryId:pending.id,reopenManager:null,editorTone:pending.editorTone || null});
     });
   }
   return main;

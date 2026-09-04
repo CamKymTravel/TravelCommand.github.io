@@ -42,6 +42,26 @@ function normalCostsLinkedTo(state, itineraryId) {
   return normalDatedCosts(state).filter(({ record }) => record.itineraryId === itineraryId);
 }
 
+function costProtectsItinerary(state, record, itineraryId, kind) {
+  if (record.itineraryId === itineraryId) return true;
+  if (!record.needsBudgetRepair) return false;
+  const raw = kind === 'Expense' ? record.date : (record.dateTime || record.date);
+  if (!raw) return false;
+  try {
+    const matches = staysCoveringDate(state.itinerary || [], recordDate(record, kind));
+    return matches.length === 1 && matches[0].id === itineraryId;
+  } catch {
+    return false;
+  }
+}
+
+function datedCostsLinkedTo(state, itineraryId) {
+  return [
+    ...(state.expenses || []).filter(record => costProtectsItinerary(state, record, itineraryId, 'Expense')),
+    ...(state.reservations || []).filter(record => costProtectsItinerary(state, record, itineraryId, 'Reservation'))
+  ];
+}
+
 function assertDatedCostsRemainRoutable(state, proposedItinerary) {
   for (const { record, kind } of normalDatedCosts(state)) {
     const date = recordDate(record, kind);
@@ -53,6 +73,29 @@ function assertDatedCostsRemainRoutable(state, proposedItinerary) {
     if (matches[0].id !== record.itineraryId) {
       throw new Error(`Cannot change stay dates: ${kind} “${recordName(record, kind)}” on ${formatAUDate(date)} would move to ${matches[0].name || 'another stay'}.`);
     }
+  }
+
+  // A repair-marked legacy cost may have a missing/stale itineraryId, but its
+  // entered date can still make it safely recoverable when exactly one stay
+  // covers that date. Do not let a stay-date edit/addition turn that uniquely
+  // recoverable record into an uncovered or ambiguous one. Unlike a normal
+  // cost, the repair record is allowed to end up under a different unique stay
+  // because its canonical itinerary link has not been repaired yet.
+  const repairs = [
+    ...(state.expenses || []).filter(record => record.needsBudgetRepair).map(record => ({ record, kind:'Expense' })),
+    ...(state.reservations || []).filter(record => record.needsBudgetRepair).map(record => ({ record, kind:'Reservation' }))
+  ];
+  for (const { record, kind } of repairs) {
+    const raw = kind === 'Expense' ? record.date : (record.dateTime || record.date);
+    if (!raw) continue;
+    let date;
+    try { date = recordDate(record, kind); } catch { continue; }
+    const beforeMatches = staysCoveringDate(state.itinerary || [], date);
+    if (beforeMatches.length !== 1) continue;
+    const afterMatches = staysCoveringDate(proposedItinerary, date);
+    if (afterMatches.length === 1) continue;
+    const reason = afterMatches.length ? 'more than one stay' : 'no stay';
+    throw new Error(`Cannot change stay dates: repair ${kind.toLowerCase()} “${recordName(record, kind)}” on ${formatAUDate(date)} would match ${reason}. Repair that cost first or keep exactly one covering stay.`);
   }
 }
 
@@ -146,7 +189,12 @@ export function itineraryDeleteBlockers(state, itineraryId) {
   ];
   const blockers = [];
   for (const [collection, label] of checks) {
-    const count = (state[collection] || []).filter(record => record.itineraryId === itineraryId).length;
+    const records = state[collection] || [];
+    const count = collection === 'expenses'
+      ? records.filter(record => costProtectsItinerary(state, record, itineraryId, 'Expense')).length
+      : collection === 'reservations'
+        ? records.filter(record => costProtectsItinerary(state, record, itineraryId, 'Reservation')).length
+        : records.filter(record => record.itineraryId === itineraryId).length;
     if (count) blockers.push({ collection, label, count });
   }
   return blockers;
@@ -182,7 +230,7 @@ export function setDestinationBudgetDraft(draft, itineraryId, budgetAUD, options
   const index = draft.itinerary.findIndex(item => item.id === itineraryId);
   if (index < 0) throw new Error('Itinerary entry not found');
   const current = draft.itinerary[index];
-  const linkedCosts = normalCostsLinkedTo(draft, itineraryId);
+  const linkedCosts = datedCostsLinkedTo(draft, itineraryId);
   if (amount <= 0 && linkedCosts.length) {
     throw new Error('This destination already has dated costs. Remove or move those costs before removing the Destination Budget.');
   }

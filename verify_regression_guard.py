@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Travel Command Centre V1 continuity / anti-regression verifier.
 
-V44 IPAD VISUAL CANDIDATE — 3 September 2026 AEST.
+V52 ACTIVE NO-LOSS CONTINUITY BASELINE — 4 September 2026 AEST.
 
-This verifier freezes the exact current 99-file V44 iPad visual candidate working tree plus the
-100-item no-loss ledger. It is a continuity baseline, not a release/master
-approval.
+This verifier freezes the exact V51 working tree after rich 78-country helpers and material-depth pass 5, while preserving the 100-item historical no-loss ledger. It is a continuity baseline, not a release/master approval.
 
 Before any edit:
     python3 verify_regression_guard.py --verify
@@ -14,8 +12,7 @@ During a focused batch:
     python3 verify_regression_guard.py --verify --allow-changes file1 file2
 
 A successful no-allow-list verification means the extracted handoff matches
-this frozen V44 baseline exactly. It does not waive the still-active final
-visual/date/accessibility forensic work in OUTSTANDING_WORK.md.
+this frozen V52 baseline exactly. It does not waive the still-active target-iPad/offline-voice/Vault/final-colour work in OUTSTANDING_WORK.md.
 """
 from __future__ import annotations
 
@@ -33,8 +30,8 @@ MANIFEST = ROOT / "BASELINE_SHA256.txt"
 CONTRACT = ROOT / "REGRESSION_CONTRACT.json"
 LEDGER = ROOT / "OUTSTANDING_WORK.md"
 IGNORED_NAMES = {".DS_Store", "Thumbs.db"}
-BASELINE_ID = "V44_IPAD_VISUAL_CANDIDATE_2026-09-03_AEST"
-CACHE_ID = "tcc-v1-v44-ipad-visual-candidate-2026-09-03"
+BASELINE_ID = "V52_ACTIVE_NO_LOSS_2026-09-04_AEST"
+CACHE_ID = "tcc-v1-v50-global-material-depth-pass-5-2026-09-04"
 EXPECTED_LEDGER_ITEMS = 100
 
 
@@ -98,11 +95,95 @@ def must_not_contain(path: str, needles: list[str], errors: list[str]) -> None:
 
 def static_continuity_checks(errors: list[str]) -> None:
     must_contain("CONTINUITY_START_HERE.md", [
-        "V44 IPAD VISUAL CANDIDATE",
+        "V52 Active No-Loss Continuity Baseline",
+        "17 verified post-V51 source/runtime changes",
+        "CHANGESET_V51_TO_V52.md",
+        "10,227 core view-model builds",
         "PASSED — BASELINE VERIFIED",
-        "This V44 package is now the authority",
-        "Active work that MUST continue",
+    ], errors)
+    must_contain("CHANGESET_V51_TO_V52.md", [
+        "Exact 17 absorbed files",
+        "src_core_itinerary-mutations.js",
+        "src_core_state.js",
+        "src_main.js",
+        "sw.js",
+        "17 allow-listed changes",
+        "10,227",
+    ], errors)
+    must_contain("LOCKED_REQUIREMENTS.md", [
+        "V52 Active No-Loss Additions / Overrides",
+        "needsBudgetRepair",
+        "background rerenders",
+        "Protected-Recovery pending restore keys",
+        "Service-worker upgrade refresh",
+    ], errors)
+    must_contain("OUTSTANDING_WORK.md", [
+        "V52 Immediate No-Loss Carry-Forward",
+        "17 source/runtime files",
+        "physical target-iPad",
+        "offline phrase speech",
+    ], errors)
+    must_contain("REGRESSION_PROTOCOL.md", [
+        "V52 Regression Protocol",
+        "17 absorbed source/runtime files",
+        "Regenerate `BASELINE_SHA256.txt` **last**",
+        "PASSED — BASELINE VERIFIED",
+    ], errors)
+    must_contain("VISUAL_REFERENCE_INDEX.md", [
+        "V52 Visual Reference Index",
+        "VISUAL_REFERENCES.zip",
+        "Forward Coverage/Journey History",
+        "44px",
+    ], errors)
+    must_contain("CONTINUITY_START_HERE.md", [
+        "V51 Active No-Loss Continuity Baseline",
+        "78/78/78 paired",
+        "4 sections × 4 useful items",
+        "Practical Essentials",
+        "Signs to Look For",
+        "12 intentional post-V50 source/runtime changes",
+        "PASSED — BASELINE VERIFIED",
+    ], errors)
+    must_contain("LOCKED_REQUIREMENTS.md", [
+        "V51 Active No-Loss Additions / Overrides",
+        "remove Current Destination Status",
+        "remove Quick Tips",
+        "78 Quick Look + 78 toilet-language + 78 helper-context records",
+        "localService===true",
+        "Home Current Destination header/banner → Country Quick Look",
+        "Home compass/logo → Where’s the toilet?",
+    ], errors)
+    must_contain("OUTSTANDING_WORK.md", [
+        "V51 Immediate No-Loss Carry-Forward",
+        "78/78/78 exact-paired",
+        "Physical-iPad offline voice proof is still outstanding",
+        "remaining parent → expanded → deeper-editor/material continuity audit",
+    ], errors)
+    must_contain("REGRESSION_PROTOCOL.md", [
+        "V51 Regression Protocol",
+        "Stop Backtracking",
+        "78/78/78 paired helper datasets",
+        "no internet speech fallback",
+        "Regenerate `BASELINE_SHA256.txt` **last**",
+    ], errors)
+    must_contain("VISUAL_REFERENCE_INDEX.md", [
+        "V51 Visual Reference Index",
+        "VISUAL_REFERENCES.zip",
+        "REF_21_COUNTRY_QUICK_LOOK_APPROVED_DIRECTION.jpeg",
+        "REF_22_TOILET_HELPER_APPROVED_DIRECTION.jpeg",
+        "replace with Practical Essentials",
+        "replace with Signs to Look For",
+    ], errors)
+    must_contain("CONTINUITY_START_HERE.md", [
+        "V50 Deep No-Loss Continuity Handoff",
+        "PASSED — BASELINE VERIFIED",
+        "V50 status matrix",
+        "Explicitly planned and locked",
+        "Deep regression protocol — V50",
         "Critical no-loss instruction",
+        "28 route-relevant countries",
+        "Play, Slow, Repeat ×3 and Louder",
+        "screenshots are layout/defect evidence only",
         "1,461",
         "62/62",
         "3,283/3,283",
@@ -114,15 +195,34 @@ def static_continuity_checks(errors: list[str]) -> None:
         "Intentional Gap is retired",
         "unlock The Vault -> open Streaming -> tap the Travel Command Centre compass/logo",
         "Manual Schengen tracker",
-        "V44 iPad visual candidate authority",
+        "V49 iPad full-screenshot repair authority",
+        "V50 final-colour implementation rule",
+        "No screenshot is colour authority unless Cameron explicitly says that specific colour is approved",
+        "Access points are distinct and locked",
+        "Play, Slow, Repeat ×3 and Louder",
+        "minimum protected checkpoint, not the final coverage target",
+        "V50 deep no-loss continuity authority",
     ], errors)
     must_contain("OUTSTANDING_WORK.md", [
-        "V44 iPad Visual Candidate / No-Loss Ledger",
+        "V50 Immediate No-Loss Carry-Forward",
+        "Active work that MUST continue",
+        "28 Country Quick Look records and 28 matching toilet-language records",
+        "does not yet have the newly requested polished voice/audio implementation",
+        "V50 deep regression protocol for the next chat",
+        "V49 iPad Full-Screenshot Repair Candidate / No-Loss Ledger",
         "Critical recovery note",
         "Still-active audit state",
         "Post‑V34 mandatory implementation ledger",
         "Permanent Checklist completion is scoped per move/destination",
         "Regression protocol for the next chat",
+    ], errors)
+
+    must_contain("VISUAL_REFERENCE_INDEX.md", [
+        "V50 colour-authority warning",
+        "None of the packaged screenshots",
+        "are automatic colour approval",
+        "Current Destination header opens Quick Look",
+        "Home compass opens the toilet helper",
     ], errors)
 
     if LEDGER.exists():
@@ -133,7 +233,7 @@ def static_continuity_checks(errors: list[str]) -> None:
         if missing:
             errors.append(f"100-item no-loss ledger incomplete; missing item(s): {missing}")
 
-    must_contain("sw.js", [CACHE_ID, "CACHE_PREFIX", "request.mode === 'navigate'"], errors)
+    must_contain("sw.js", [CACHE_ID, "CACHE_PREFIX", "request.mode === 'navigate'", "self.clients.matchAll", "client.navigate(client.url)"], errors)
     must_contain("index.html", [
         'rel="manifest"',
         "manifest.webmanifest",
@@ -164,24 +264,103 @@ def static_continuity_checks(errors: list[str]) -> None:
     must_contain("src_core_restore.js", ["Vault screenshot payload bytes are missing", "internal-only Vault screenshot storage reference"], errors)
     must_contain("src_core_migrations.js", ["assertNotNewerAppGeneration", "Protected Recovery is required", "STRICT_PERSISTED_GENERATION_MIN = 41", "isStrictPersistedGeneration"], errors)
     must_contain("src_core_restore.js", ["Backup integrity", "newer app generation", "STRICT_PERSISTED_GENERATION_MIN = 41", "strictKnownBackup"], errors)
-    must_contain("src_core_schema.js", ["1.2.0-v44-ipad-visual-candidate"], errors)
-    must_contain("src_components_sidebar.js", ["Primary navigation", "Travel Command Centre sidebar"], errors)
-    must_contain("src_components_modal.js", ["preserveLocalFocus", "restoreLocalFocus", "main[data-screen]"], errors)
+    must_contain("src_core_schema.js", ["1.2.0-v49-ipad-full-screenshot-repair"], errors)
+    must_contain("src_components_sidebar.js", ["Primary navigation", "Travel Command Centre sidebar", "brand-compass-svg", "Where's the toilet?"] , errors)
+    must_contain("src_components_modal.js", ["preserveLocalFocus", "restoreLocalFocus", "main[data-screen]", "inferExpandedTone", "dataset.expandTone", "semanticTone", "resolvedTone"], errors)
     must_contain("src_screens_calendar.js", ["day.setAttribute('role', 'group')", "Previous month from", "Next month from"], errors)
-    must_contain("src_screens_reservations.js", ["Reservation summary"], errors)
+    must_contain("src_screens_reservations.js", ["Reservation summary", "Booked Reservations", "title:'Next 5 Upcoming',tone:'red'"] , errors)
+    must_not_contain("src_screens_reservations.js", ["Flights & Transport"], errors)
+    must_contain("src_components_page-hero.js", ["if (!stay) return 'banner-indonesia';"], errors)
+    must_contain("src_screens_home.js", ["CURRENT DESTINATION", "home-compass", "WHERE'S THE TOILET?", "COUNTRY QUICK LOOK · OFFLINE", "Plants & Gardens", "Food & Drink", "Animals", "History & Culture", "Open Itinerary", "Tap to set up your itinerary"], errors)
+    must_contain("src_main.js", ["active === 'home'", "[data-screen=\"home\"] .home-compass", "canRevealHiddenEmails"], errors)
+    must_contain("src_screens_settings.js", ["autocomplete='one-time-code'", "tcc-pin-input"], errors)
+    must_contain("src_screens_vault.js", ["inputField('Vault PIN', 'pin', 'text', '')", "autocomplete = 'one-time-code'", "tcc-pin-input"], errors)
+    must_not_contain("src_screens_settings.js", ["inputField(label,name,'password'"], errors)
+    must_contain("src_screens_vault.js", ["VAULT_ICON_PATHS", "vaultCategoryIcon"], errors)
+    must_contain("src_design_reference-pass.css", ["iPad visual acceptance harmony pass", "icon-to-parent colour continuity", "editor colour continuity", "reservation interaction-state continuity", "V49 full screenshot repair / interaction continuity", "tcc-expanded-card-snapshot", "tcc-pin-input"], errors)
     must_contain("src_screens_checklist.js", ["Checklist summary"], errors)
     must_contain("src_screens_itinerary.js", ["Unplanned Gaps", "Starting Country"], errors)
-    must_contain("src_screens_budget.js", ["Year Forecast & Budget Summary"], errors)
+    must_contain("src_screens_budget.js", ["Year Forecast & Budget Summary", "editorTone = null", "tcc-budget-editor-modal"], errors)
+    must_contain("src_screens_reservations.js", ["tcc-reservation-editor-modal"], errors)
+    must_contain("src_screens_itinerary.js", ["tcc-itinerary-editor-modal"], errors)
     must_contain("src_screens_journey-history.js", ["No entries yet"], errors)
 
+    # V52 absorbed post-V51 protections.
+    must_contain("src_components_modal.js", ["dataset.actionBusy", "aria-busy", "materialToneFromContext", "tcc-header-image-ready"], errors)
+    must_contain("src_components_confirmation.js", ["materialToneFromContext", "confirmation-action-error"], errors)
+    must_contain("src_core_itinerary-mutations.js", ["costProtectsItinerary", "repair ${kind.toLowerCase()}", "datedCostsLinkedTo"], errors)
+    must_contain("src_core_state.js", ["stageVaultAsset", "removeVaultAssets", "cleanupOrphanVaultAssets", "auditVaultAssets"], errors)
+    must_contain("src_screens_settings.js", ["backupBusy", "cleanupOrphanVaultAssets"], errors)
+    must_contain("src_screens_reservations.js", ["repairExcluded", "excluded from the AUD total until repaired"], errors)
+    must_contain("src_main.js", ["TCC_SW_UPDATE_QUERY", "dialog[open], input[type=\"file\"]", "Protected Recovery"], errors)
+    must_contain("sw.js", ["clientReadyForSafeReload", "TCC_SW_UPDATE_QUERY", "allLiveWindowsSafe"], errors)
+
+
+    # V51 destination-helper continuity: 78/78/78 exact pairing and rich density are protected.
+    home_path = ROOT / "src_screens_home.js"
+    if home_path.exists():
+        home_text = home_path.read_text(encoding="utf-8", errors="replace")
+        def object_keys(const_name: str) -> set[str]:
+            match = re.search(rf"const\s+{re.escape(const_name)}=Object\.freeze\(\{{(.*?)\n\}}\);", home_text, re.S)
+            if not match:
+                return set()
+            keys = set()
+            for line in match.group(1).splitlines():
+                m = re.match(r"\s*(?:'([^']+)'|([A-Za-z][\w-]*))\s*:", line)
+                if m:
+                    keys.add(m.group(1) or m.group(2))
+            return keys
+        quick_keys = object_keys("COUNTRY_QUICK_LOOK")
+        toilet_keys = object_keys("TOILET_LANGUAGE")
+        context_keys = object_keys("COUNTRY_HELPER_CONTEXT")
+        if len(quick_keys) != 78:
+            errors.append(f"Country Quick Look coverage must remain exactly 78 at V52 baseline: {len(quick_keys)}")
+        if len(toilet_keys) != 78:
+            errors.append(f"Toilet-language coverage must remain exactly 78 at V52 baseline: {len(toilet_keys)}")
+        if len(context_keys) != 78:
+            errors.append(f"Country helper context coverage must remain exactly 78 at V52 baseline: {len(context_keys)}")
+        if quick_keys != toilet_keys or quick_keys != context_keys:
+            errors.append("Country helper datasets are no longer exactly paired across Quick Look / toilet / context")
+        for required in [
+            "const openCurrent=()=>showQuickLook(host,model.currentStay,navigate)",
+            "compass.addEventListener('click',event=>{event.stopPropagation();showToilet(host,model.currentStay,navigate);})",
+            "Plants & Gardens", "Food & Drink", "Animals", "History & Culture",
+            "No English fallback has been substituted",
+            "PRACTICAL ESSENTIALS", "SIGNS TO LOOK FOR", "POLITE EXTRA",
+            "Play", "Slow", "Repeat ×3", "Louder", "localService===true",
+        ]:
+            if required not in home_text:
+                errors.append(f"V51 Home helper access/content marker missing: {required!r}")
+        if "Current Destination Status" in home_text:
+            errors.append("retired helper panel returned: Current Destination Status")
+        if "Quick Tips" in home_text:
+            errors.append("retired helper panel returned: Quick Tips")
+        if len(re.findall(r"(?:^|[,\n]\s*)[\'\"]?[a-z][\w-]*[\'\"]?\s*:\s*r\(", home_text, re.M)) < 78:
+            errors.append("Quick Look rich-record density regressed: fewer than 78 r(...) records")
 
     refs = sorted(ROOT.glob("REF_*.jpeg"))
-    if len(refs) != 19:
-        errors.append(f"expected 19 visual reference screenshots, found {len(refs)}")
+    if refs:
+        errors.append("V51 visual references must remain consolidated in VISUAL_REFERENCES.zip")
+    visual_pack = ROOT / "VISUAL_REFERENCES.zip"
+    if not visual_pack.exists():
+        errors.append("VISUAL_REFERENCES.zip is missing")
+    else:
+        try:
+            import zipfile
+            with zipfile.ZipFile(visual_pack) as zf:
+                names=set(zf.namelist())
+            jpeg_names={n for n in names if n.lower().endswith('.jpeg')}
+            if len(jpeg_names) != 21:
+                errors.append(f"visual reference pack must contain 21 JPEGs; found {len(jpeg_names)}")
+            for req_name in ["REF_21_COUNTRY_QUICK_LOOK_APPROVED_DIRECTION.jpeg","REF_22_TOILET_HELPER_APPROVED_DIRECTION.jpeg","README_VISUAL_AUTHORITY.txt"]:
+                if req_name not in names:
+                    errors.append(f"visual reference pack missing {req_name}")
+        except Exception as exc:
+            errors.append(f"VISUAL_REFERENCES.zip invalid: {exc}")
     for req in [
         "header-assets.bin", "header-index.json", "index.html", "manifest.webmanifest",
         "simulation-data.json", "CONTINUITY_START_HERE.md", "LOCKED_REQUIREMENTS.md",
-        "OUTSTANDING_WORK.md", "REGRESSION_CONTRACT.json",
+        "OUTSTANDING_WORK.md", "REGRESSION_PROTOCOL.md", "REGRESSION_CONTRACT.json", "VISUAL_REFERENCES.zip",
     ]:
         if not (ROOT / req).exists():
             errors.append(f"required package asset missing: {req}")
@@ -270,12 +449,32 @@ def contract_checks(errors: list[str]) -> None:
     if contract.get("offline_cache_generation") != CACHE_ID:
         errors.append("REGRESSION_CONTRACT cache generation mismatch")
     status = contract.get("source_recovery_status") or {}
-    if not status.get("full_v44_ipad_visual_candidate_tree_present"):
-        errors.append("REGRESSION_CONTRACT lost V44 iPad visual candidate tree declaration")
+    if not status.get("full_v49_ipad_full_screenshot_repair_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V49 iPad full-screenshot repair tree declaration")
+    if not status.get("full_v50_deep_no_loss_handoff_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V50 deep no-loss handoff declaration")
+    if not status.get("v49_working_source_frozen_inside_v50"):
+        errors.append("REGRESSION_CONTRACT lost V49 working-source freeze declaration")
+    if not status.get("planned_work_frozen_as_requirements_not_claimed_implemented"):
+        errors.append("REGRESSION_CONTRACT lost implemented-vs-planned distinction")
+    if not status.get("full_v51_current_working_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V51 ancestry declaration")
+    if not status.get("full_v52_current_working_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V52 current working-tree declaration")
+    if not status.get("v51_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V51")
+    if int(status.get("v51_to_v52_absorbed_source_files") or 0) != 17:
+        errors.append("REGRESSION_CONTRACT V51→V52 absorbed source count must be 17")
+    if not status.get("v50_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V50")
     if not status.get("post_v34_100_item_ledger_present"):
         errors.append("REGRESSION_CONTRACT lost 100-item ledger declaration")
-    if not status.get("v43_handoff_superseded"):
-        errors.append("REGRESSION_CONTRACT does not supersede V43 handoff")
+    if not status.get("v46_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V46 handoff")
+    if not status.get("v45_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V45 handoff")
+    if not status.get("v44_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V44 handoff")
     if not status.get("v41_handoff_superseded"):
         errors.append("REGRESSION_CONTRACT does not supersede V41 handoff")
     if not status.get("v40_handoff_superseded"):
@@ -286,7 +485,23 @@ def contract_checks(errors: list[str]) -> None:
     for required in [
         "verify_before_edit",
         "read_post_v34_ledger_before_edit",
-        "continue_from_v44_exact_tree",
+        "continue_from_v49_exact_tree",
+        "continue_from_v50_exact_tree",
+        "preserve_implemented_vs_planned_status",
+        "screenshots_are_not_colour_authority",
+        "country_helper_pairing_required",
+        "offline_voice_requires_target_ipad_proof",
+        "final_colour_requires_cameron_approval",
+        "continue_from_v51_exact_tree",
+        "continue_from_v52_exact_tree",
+        "v51_to_v52_17_file_changeset_must_be_preserved",
+        "v52_no_allowlist_freeze_required",
+        "protect_open_dialogs_and_native_pickers_from_background_rerender",
+        "protect_pending_and_inflight_vault_assets",
+        "service_worker_busy_window_safe_refresh_required",
+        "rich_helper_screens_must_not_be_watered_down",
+        "helper_78_exact_pair_required",
+        "visual_reference_pack_must_be_preserved",
         "explicit_allowlist_for_changed_files",
         "javascript_must_parse_as_es_modules",
         "do_not_package_unverified_source_as_equivalent_master",
@@ -294,6 +509,34 @@ def contract_checks(errors: list[str]) -> None:
     ]:
         if rules.get(required) is not True:
             errors.append(f"REGRESSION_CONTRACT workflow rule missing/false: {required}")
+
+    helper = contract.get("country_helper_contract") or {}
+    if helper.get("home_compass_action") != "Where’s the toilet? phrase helper":
+        errors.append("REGRESSION_CONTRACT Home compass action mismatch")
+    if helper.get("current_destination_action") != "Country Quick Look":
+        errors.append("REGRESSION_CONTRACT Current Destination action mismatch")
+    if helper.get("entry_points_must_remain_distinct") is not True:
+        errors.append("REGRESSION_CONTRACT lost distinct helper entry-point rule")
+    if int(helper.get("current_minimum_paired_country_records") or 0) != 78:
+        errors.append("REGRESSION_CONTRACT helper minimum coverage must be 78 at V52")
+    if int(helper.get("helper_context_records") or 0) != 78:
+        errors.append("REGRESSION_CONTRACT helper context coverage must be 78 at V52")
+    if helper.get("retired_quick_look_panel") != "Current Destination Status":
+        errors.append("REGRESSION_CONTRACT lost retired Current Destination Status rule")
+    if helper.get("retired_toilet_panel") != "Quick Tips":
+        errors.append("REGRESSION_CONTRACT lost retired Quick Tips rule")
+    if helper.get("voice_offline_only") is not True:
+        errors.append("REGRESSION_CONTRACT lost offline-only voice requirement")
+    colour = contract.get("colour_implementation_contract") or {}
+    if colour.get("palette_approved") is not False:
+        errors.append("REGRESSION_CONTRACT incorrectly marks palette approved")
+    if colour.get("screenshots_are_palette_authority") is not False:
+        errors.append("REGRESSION_CONTRACT incorrectly treats screenshots as palette authority")
+    if colour.get("explicit_user_approval_required") is not True:
+        errors.append("REGRESSION_CONTRACT lost explicit colour approval requirement")
+    status_matrix = contract.get("implemented_vs_planned") or {}
+    if not status_matrix.get("implemented_frozen") or not status_matrix.get("planned_locked"):
+        errors.append("REGRESSION_CONTRACT implemented-vs-planned status matrix missing")
 
 
 def main() -> int:
@@ -362,7 +605,7 @@ def main() -> int:
         print("PASSED — BASELINE VERIFIED")
     print(f"Protected manifest entries: {len(entries)}")
     print(f"Package files: {len(actual_files)}")
-    print("NOTE — This is the V44 iPad visual candidate continuity baseline, not a release/master declaration. Complete the target-iPad pass before master/Gold Lock.")
+    print("NOTE — This is the V52 active no-loss continuity baseline, not a release/master declaration. All 17 post-V51 fixes plus rich 78-country helpers are frozen; target-iPad offline-voice/helper/update proof, final colour approval and practical Vault validation remain active before master/Gold Lock.")
     return 0
 
 

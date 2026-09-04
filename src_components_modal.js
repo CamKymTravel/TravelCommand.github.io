@@ -105,16 +105,43 @@ export function createModal({ title, body, actions = [], className = '' }) {
     errorRegion.setAttribute('aria-atomic', 'true');
   }
   const footer = dialog.querySelector('footer');
+  const blockBusyCancel = event => {
+    if (dialog.dataset.actionBusy !== 'true') return;
+    event.preventDefault();
+  };
+  dialog.addEventListener('cancel', blockBusyCancel);
   actions.forEach(action => {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = action.label;
     button.className = action.kind === 'danger' ? 'button button-danger' : 'button';
-    button.addEventListener('click', () => action.onClick?.(dialog));
+    button.addEventListener('click', () => {
+      if (dialog.dataset.actionBusy === 'true') return;
+      const result = action.onClick?.(dialog);
+      if (!result || typeof result.then !== 'function') return;
+      dialog.dataset.actionBusy = 'true';
+      dialog.setAttribute('aria-busy', 'true');
+      const buttons = [...footer.querySelectorAll('button')];
+      for (const control of buttons) control.disabled = true;
+      Promise.resolve(result).finally(() => {
+        if (!dialog.isConnected) return;
+        delete dialog.dataset.actionBusy;
+        dialog.removeAttribute('aria-busy');
+        for (const control of buttons) control.disabled = false;
+      });
+    });
     footer.append(button);
   });
   dialog.addEventListener('close', () => {
     queueMicrotask(() => {
+      // Some flows deliberately replace one modal with another immediately
+      // (Country Quick Look <-> Phrase Helper). Do not let the closing modal
+      // steal VoiceOver/keyboard focus back to a control behind the newly open
+      // dialog. Nested confirmations are different: if the original opener is
+      // inside another still-open dialog, restoring to that opener is correct.
+      const openDialogs = [...document.querySelectorAll('dialog[open]')];
+      const returnFocusInsideOpenDialog = Boolean(returnFocus && openDialogs.some(openDialog => openDialog.contains(returnFocus)));
+      if (openDialogs.length && !returnFocusInsideOpenDialog) return;
       if (returnFocus?.isConnected && typeof returnFocus.focus === 'function') {
         try { returnFocus.focus({ preventScroll:true }); }
         catch { returnFocus.focus(); }
@@ -146,6 +173,40 @@ const ACTION_INTERACTIVE = 'button, a, [role="button"]';
 
 function snapshotExpandedCard(source) {
   const clone = source.cloneNode(true);
+  // Vault screenshot thumbnails are hydrated from IndexedDB asynchronously. If
+  // a card is enlarged before that read completes, cloneNode() captures an img
+  // with no src and the enlarged snapshot would otherwise stay blank even after
+  // the live card finishes loading. Pair source/clone images and mirror a later
+  // successful image load into the already-open snapshot.
+  const sourceImages = [...source.querySelectorAll('img')];
+  const cloneImages = [...clone.querySelectorAll('img')];
+  sourceImages.forEach((sourceImage, index) => {
+    const cloneImage = cloneImages[index];
+    if (!(cloneImage instanceof HTMLImageElement)) return;
+    const syncLoadedImage = () => {
+      if (!cloneImage.isConnected) return;
+      const sourceValue = sourceImage.currentSrc || sourceImage.getAttribute('src') || '';
+      if (sourceValue) cloneImage.src = sourceValue;
+      const alt = sourceImage.getAttribute('alt');
+      if (alt != null) cloneImage.alt = alt;
+    };
+    if (sourceImage.currentSrc || sourceImage.getAttribute('src')) syncLoadedImage();
+    else sourceImage.addEventListener('load', syncLoadedImage, { once:true });
+  });
+  const sourceHeaders = [source, ...source.querySelectorAll('[data-header-key]')].filter(element => element.matches?.('[data-header-key]'));
+  const cloneHeaders = [clone, ...clone.querySelectorAll('[data-header-key]')].filter(element => element.matches?.('[data-header-key]'));
+  sourceHeaders.forEach((sourceHeader, index) => {
+    const cloneHeader = cloneHeaders[index];
+    if (!(cloneHeader instanceof HTMLElement)) return;
+    const syncHeaderImage = () => {
+      if (!cloneHeader.isConnected) return;
+      const heroImage = sourceHeader.style.getPropertyValue('--hero-image');
+      if (heroImage) cloneHeader.style.setProperty('--hero-image', heroImage);
+      if (sourceHeader.dataset.imageReady === 'true') cloneHeader.dataset.imageReady = 'true';
+    };
+    syncHeaderImage();
+    if (sourceHeader.dataset.imageReady !== 'true') sourceHeader.addEventListener('tcc-header-image-ready', syncHeaderImage, { once:true });
+  });
   clone.removeAttribute('id');
   clone.removeAttribute('data-expandable');
   clone.removeAttribute('data-expandable-mode');
@@ -195,16 +256,74 @@ function wireSnapshotActions(clone, source, dialog) {
   }
 }
 
+const EXPANDED_TONE_RGB = Object.freeze({
+  sky:[88,199,255],
+  blue:[93,141,255],
+  indigo:[128,109,255],
+  teal:[70,217,202],
+  green:[87,214,155],
+  magenta:[241,101,189],
+  violet:[184,109,255],
+  red:[255,111,131],
+  orange:[255,154,90],
+  gold:[255,209,91]
+});
+
+function rgbFromCssColor(value) {
+  const match = String(value || '').match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?/i);
+  if (!match) return null;
+  const alpha = match[4] == null ? 1 : Number(match[4]);
+  if (!(alpha > 0)) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function inferExpandedTone(source, fallback = 'sky') {
+  if (!(source instanceof Element) || typeof getComputedStyle !== 'function') return fallback;
+  const style = getComputedStyle(source);
+  const rgb = rgbFromCssColor(style.borderTopColor || style.borderColor);
+  if (!rgb) return fallback;
+  let best = fallback;
+  let bestDistance = Infinity;
+  for (const [name, target] of Object.entries(EXPANDED_TONE_RGB)) {
+    const distance = Math.hypot(rgb[0]-target[0], rgb[1]-target[1], rgb[2]-target[2]);
+    if (distance < bestDistance) { bestDistance = distance; best = name; }
+  }
+  // A weak/neutral border should keep the caller's semantic fallback. Strong
+  // coloured card borders are intentionally close to one of the design tones.
+  return bestDistance <= 82 ? best : fallback;
+}
+
+export function materialToneFromContext(source = null, fallback = 'sky') {
+  const safeFallback = MODAL_TONES.includes(fallback) ? fallback : 'sky';
+  const element = source instanceof Element ? source : (document.activeElement instanceof Element ? document.activeElement : null);
+  if (!element) return safeFallback;
+  const context = element.closest?.('dialog, [data-expand-tone], [data-screen]') || element;
+  const classTone = [...(context.classList || [])].map(value => String(value).match(/^tone-(sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
+  if (classTone) return classTone;
+  const expandTone = context.dataset?.expandTone;
+  if (MODAL_TONES.includes(expandTone)) return expandTone;
+  return inferExpandedTone(context, safeFallback);
+}
+
 export function openExpandedCard({ host, source, title, tone = 'sky', body = null }) {
   if (!host || !source) return;
+  const semanticTone = source?.dataset?.expandTone || tone;
+  const fallbackTone = Object.prototype.hasOwnProperty.call(EXPANDED_TONE_RGB, semanticTone)
+    ? semanticTone
+    : (Object.prototype.hasOwnProperty.call(EXPANDED_TONE_RGB, tone) ? tone : 'sky');
+  // The rendered parent card is the colour authority. This protects screens
+  // whose final material layer deliberately refines a semantic hue without
+  // forcing every caller to duplicate that visual decision. Neutral/weak
+  // borders fall back to the declared semantic tone.
+  const resolvedTone = inferExpandedTone(source, fallbackTone);
   const content = document.createElement('div');
-  content.className = `tcc-expanded-card-body tone-${tone}`;
+  content.className = `tcc-expanded-card-body tone-${resolvedTone}`;
   const snapshot = body || snapshotExpandedCard(source);
   content.append(snapshot);
   const dialog = createModal({
     title,
     body: content,
-    className: `tcc-expanded-modal tone-${tone}`,
+    className: `tcc-expanded-modal tone-${resolvedTone}`,
     actions: [{ label:'Close', onClick:d=>d.close() }]
   });
   if (!body) wireSnapshotActions(snapshot, source, dialog);
@@ -219,6 +338,7 @@ export function makeExpandableCard(element, { host, title, tone = 'sky', bodyBui
   // creates conflicting behaviour, so leave inherently interactive roots alone.
   if (element.matches(EXPAND_INTERACTIVE)) return element;
   element.dataset.expandable = 'true';
+  element.dataset.expandTone = Object.prototype.hasOwnProperty.call(EXPANDED_TONE_RGB, tone) ? tone : 'sky';
   const accessibleTitle = title || 'Widget';
   const hasNestedControls = Boolean(element.querySelector(EXPAND_INTERACTIVE));
 

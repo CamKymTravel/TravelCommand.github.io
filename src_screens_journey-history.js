@@ -207,7 +207,7 @@ function renderRows(model, navigate, options, updateOptions) {
     const button = node('button', 'journey-row journey-record-row');
     button.type = 'button';
     button.dataset.recordId = row.id;
-    button.addEventListener('click', () => navigate?.('itinerary', { collection:'itinerary', id:row.id }));
+    button.addEventListener('click', () => navigate?.('itinerary', { collection:'itinerary', id:row.id, editorTone:'blue' }));
     const destination = node('span', 'journey-destination');
     destination.append(node('strong', '', row.name), node('small', '', [row.country, row.travelYear ? `Year ${row.travelYear}` : ''].filter(Boolean).join(' · ')));
     button.append(
@@ -467,15 +467,15 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
       makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue'});
     }
     const journeyExpanders=[
-      ['.journey-map-panel','Journey Map','blue'],
-      ['.journey-spend-panel','Lifetime Travel Spend','gold'],
-      ['.journey-snapshot-panel','Journey Snapshot','indigo'],
-      ['.journey-milestones-panel','Milestones','magenta'],
-      ['.journey-top-destinations','Destination Totals','teal'],
+      ['.journey-map-panel','Journey Map','sky'],
+      ['.journey-spend-panel','Lifetime Travel Spend','blue'],
+      ['.journey-snapshot-panel','Journey Snapshot','orange'],
+      ['.journey-milestones-panel','Milestones','teal'],
+      ['.journey-top-destinations','Destination Totals','gold'],
       ['.journey-mix-panel','Travel Mix','violet'],
       ['.journey-health','Journey Check','green']
     ];
-    for(const [selector,title,tone] of journeyExpanders){ const card=main.querySelector(selector); if(card) makeExpandableCard(card,{host:main,title,tone}); }
+    for(const [selector,title,tone] of journeyExpanders){ const card=main.querySelector(selector); if(card){ const resolvedTone=selector==='.journey-health'&&card.classList.contains('journey-health-needs-attention')?'gold':tone; makeExpandableCard(card,{host:main,title,tone:resolvedTone}); } }
 
     if (pending?.collection === 'journeyHistory' && pending.id) {
       queueMicrotask(() => {

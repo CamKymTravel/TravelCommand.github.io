@@ -15,11 +15,12 @@
   <div id="app" class="app-shell"></div>
   <script type="module">
     const params = new URLSearchParams(globalThis.location?.search || '');
-    if (params.get('simulation') === '1') {
+    const simulationMode = params.get('simulation') === '1' || params.get('simulation') !== '0';
+    if (simulationMode) {
       const { installSimulationRuntime } = await import('./simulation-clock.js');
       installSimulationRuntime({ serviceWorkerUrl:'./sw.js' });
-      document.title = 'Travel Command Centre — Simulation';
-      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Simulation');
+      document.title = 'Travel Command Centre — Athens Simulation';
+      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Athens Sim');
     }
     await import('./src_main.js');
   </script>

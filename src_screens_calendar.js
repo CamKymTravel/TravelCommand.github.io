@@ -2,7 +2,7 @@ import { buildCalendarViewModel, shiftCalendarMonth } from './src_core_calendar-
 import { buildHomeViewModel } from './src_core_home-view-model.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { saveCalendarEventDraft, deleteCalendarEventDraft, PERSONAL_CALENDAR_TYPES } from './src_core_calendar-event-mutations.js';
-import { createModal, preserveLocalFocus } from './src_components_modal.js';
+import { createModal, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
@@ -78,7 +78,7 @@ function splitCalendarDateTime(value, fallbackDate='') {
   return { date:text.match(/^(\d{4}-\d{2}-\d{2})/)?.[1] || fallbackDate, time:text.match(/T(\d{2}:\d{2})/)?.[1] || '' };
 }
 
-function openPersonalEventEditor({ stateService, host, currentDate, eventId = null, initialType = 'reminder' }) {
+function openPersonalEventEditor({ stateService, host, currentDate, eventId = null, initialType = 'reminder', editorTone = null }) {
   const state = stateService.snapshot();
   const existing = eventId ? state.calendarEvents.find(item => item.id === eventId && !item.reservationId) : null;
   if (eventId && !existing) return;
@@ -116,12 +116,13 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
   function renderTypes() {
     typeTiles.replaceChildren();
     for (const eventType of PERSONAL_CALENDAR_TYPES) {
-      const button = node('button', 'calendar-type-tile', TYPE_LABELS[eventType]);
+      const button = node('button', `calendar-type-tile calendar-type-${eventType}`, TYPE_LABELS[eventType]);
       button.type = 'button';
+      button.dataset.eventType = eventType;
       const active = body.dataset.type === eventType;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; renderTypes(); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; if (!editorTone) setModalTone(modal, eventType === 'reminder' ? 'violet' : 'sky'); renderTypes(); }));
       typeTiles.append(button);
     }
   }
@@ -137,6 +138,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
       textAreaField('Notes', 'notes', saved.notes)
     );
   }
+  let modal = null;
   populate(savedValue);
 
   const existingDeleteParts = existing ? splitCalendarDateTime(existing.dateTime || existing.date) : { date:'', time:'' };
@@ -155,10 +157,8 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
         title:'Delete calendar event',
         message:`Delete ${existing.title}${existingDeleteContext ? ` · ${existingDeleteContext}` : ''}? This cannot be undone.`,
         onConfirm:() => {
-          try {
-            stateService.commit(draft => deleteCalendarEventDraft(draft, existing.id));
-            if (dialog.isConnected && dialog.open) dialog.close();
-          } catch (err) { error.textContent = err.message; }
+          stateService.commit(draft => deleteCalendarEventDraft(draft, existing.id));
+          if (dialog.isConnected && dialog.open) dialog.close();
         }
       });
     }});
@@ -180,7 +180,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     }}
   );
 
-  const modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:'tone-sky' });
+  modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:`tcc-editor-modal tone-${editorTone || (body.dataset.type === 'reminder' ? 'violet' : 'sky')}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -191,10 +191,27 @@ function setEventColour(element, event) {
   element.style.setProperty('--calendar-rgb', event.rgb);
 }
 
-function openCalendarItem(event, { navigate, openPersonal }) {
-  if (event.sourceCollection === 'calendarEvents') return openPersonal(event.sourceId);
-  if (event.sourceCollection === 'reservations') return navigate?.('reservations', { collection:'reservations', id:event.sourceId });
-  if (event.sourceCollection === 'itinerary') return navigate?.('itinerary', { collection:'itinerary', id:event.sourceId });
+const CALENDAR_MATERIAL_RGB = Object.freeze({
+  sky:[88,188,255], blue:[93,141,255], indigo:[128,109,255], teal:[70,217,202], green:[74,210,139],
+  magenta:[241,101,189], violet:[184,109,255], red:[244,101,101], orange:[255,154,90], gold:[255,209,91]
+});
+
+function calendarMaterialTone(event) {
+  const values = String(event?.rgb || '').split(',').map(Number);
+  if (values.length !== 3 || values.some(value => !Number.isFinite(value))) return 'blue';
+  let winner = 'blue'; let best = Infinity;
+  for (const [tone, rgb] of Object.entries(CALENDAR_MATERIAL_RGB)) {
+    const distance = rgb.reduce((sum, value, index) => sum + ((value - values[index]) ** 2), 0);
+    if (distance < best) { best = distance; winner = tone; }
+  }
+  return winner;
+}
+
+function openCalendarItem(event, { navigate, openPersonal, editorTone = null }) {
+  const tone = editorTone || calendarMaterialTone(event);
+  if (event.sourceCollection === 'calendarEvents') return openPersonal(event.sourceId, tone);
+  if (event.sourceCollection === 'reservations') return navigate?.('reservations', { collection:'reservations', id:event.sourceId, editorTone:tone });
+  if (event.sourceCollection === 'itinerary') return navigate?.('itinerary', { collection:'itinerary', id:event.sourceId, editorTone:tone });
 }
 
 function monthEventButton(event, handlers) {
@@ -230,7 +247,8 @@ function openCalendarDayItems(cell, handlers) {
   };
   const modalHandlers = {
     navigate:closeThen(handlers.navigate),
-    openPersonal:closeThen(handlers.openPersonal)
+    openPersonal:closeThen(handlers.openPersonal),
+    editorTone:'blue'
   };
   for (const event of cell.events) body.append(monthEventButton(event, modalHandlers));
   handlers.host?.append(dialog);
@@ -384,7 +402,7 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
     const handlers = {
       host:main,
       navigate,
-      openPersonal:eventId => openPersonalEventEditor({ stateService, host:main, currentDate, eventId })
+      openPersonal:(eventId, editorTone=null) => openPersonalEventEditor({ stateService, host:main, currentDate, eventId, editorTone })
     };
     main.append(model.view === 'agenda' ? renderAgenda(model, handlers) : renderMonth(model, handlers));
 
@@ -399,7 +417,7 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
           if (targetMonth) draft.ui.calendarMonth = targetMonth;
         });
         const liveHost = document.querySelector('[data-screen="calendar"]');
-        if (liveHost) openPersonalEventEditor({ stateService, host:liveHost, currentDate, eventId:pending.id });
+        if (liveHost) openPersonalEventEditor({ stateService, host:liveHost, currentDate, eventId:pending.id, editorTone:pending.editorTone || null });
       });
     }
   }

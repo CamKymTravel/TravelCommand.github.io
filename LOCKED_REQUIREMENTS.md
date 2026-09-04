@@ -1,3 +1,67 @@
+# V52 Active No-Loss Additions / Overrides — 04 Sep 2026
+
+These V52 rules override older “current checkpoint” wording while preserving all V51/V50/historical requirements below as ancestry.
+
+## Exact-source authority
+- Continue only from a V52 extraction that returns `PASSED — BASELINE VERIFIED` with **no allow-list**.
+- `CHANGESET_V51_TO_V52.md` is mandatory and freezes the exact 17 absorbed post-V51 source/runtime files. Reverting any of those files to V51 is a regression.
+- V51/V50 and older ZIPs are recovery evidence only, never implementation starting points once V52 verifies.
+
+## Newly frozen functional protections
+- `needsBudgetRepair` Expense/Reservation records are still real dated costs for destructive protection. If exactly one stay covers the cost date, deleting that stay, removing its Destination Budget, or editing itinerary dates so the cost becomes uncovered/ambiguous must be blocked until repaired.
+- Unresolved repair Reservation values must not enter authoritative `Total Booked · AUD`; the records remain visible and the excluded count is stated.
+- Async dialog actions are promise-busy: no double action, Escape or Cancel while Unlock/PIN/screenshot/other async modal action is unresolved.
+- Ordinary background rerenders must not tear down open dialogs or native iPad file/photo pickers. Protected Recovery is the only immediate safety override.
+- Vault physical screenshot cleanup is audited/retryable. In-flight staged keys, Protected-Recovery pending restore keys and active backup-read keys must not be swept as orphans. Late/stale asset audits must never overwrite a newer health result.
+- Export must be a point-in-time self-contained backup even if Restore or Vault deletion is attempted concurrently; screenshot bytes are pinned until readers finish. Export and Restore also share a Settings busy lock.
+- Service-worker upgrade refresh must not blindly navigate a busy/unresponsive iPad window; predecessor caches remain while an old live window may still need them offline.
+
+## Newly frozen interaction/accessibility protections
+- Material/colour depth follows the originating rendered parent into exact-record editors and destructive confirmations where that contextual hand-off is intentional. Do not revert Home/Search/Alerts/Calendar/Budget/Checklist/Journey/Vault deep-links to generic editor colours.
+- Protected Email Delete remains magenta; Vault category/screenshot destructive confirmations stay in their category/material family.
+- Quick Look ↔ Phrase Helper replacement must not restore VoiceOver focus behind the newly opened dialog. Phrase-helper result/status messages remain a polite live region.
+- High-frequency iPad controls remain at least ~44px effective touch height. Forward Coverage wraps rather than horizontally clipping, and Journey History table/spend rows fit the target 1024px width without horizontal scroll.
+
+## V52 continuity authority
+- V52 is NOT Master/Gold Lock. The final palette is still unapproved; target-iPad visual/helper/voice/Vault/update acceptance remains mandatory.
+
+---
+
+# Historical V51 additions preserved below
+
+# V51 Active No-Loss Additions / Overrides — 04 Sep 2026
+
+These V51 rules override any older “current checkpoint” wording below while preserving older sections as historical ancestry.
+
+## Destination-helper visual authority
+- `VISUAL_REFERENCES.zip` contains the approved rich Country Quick Look and toilet-helper concept pictures. Treat their **layout, density, hierarchy, photographic richness and interaction scale** as authority. Do not implement a watered-down compact substitute.
+- Country Quick Look concept correction: **remove Current Destination Status** and all fake/live current weather-temperature content; use **Practical Essentials** instead.
+- Toilet-helper concept correction: **remove Quick Tips**; use **Signs to Look For** with local Toilet/WC, Women, Men and Accessible labels where practical.
+- Screenshot sidebar wording does not override the product rule: the visible app navigation label remains **Home**, never Dashboard.
+- Screenshot audio copy does not override truthfulness: never claim “100% available” or equivalent until target-iPad offline playback is proven.
+
+## Destination-helper data / behaviour
+- V51 freezes **78 Quick Look + 78 toilet-language + 78 helper-context records**, with exact dataset pairing. Dropping below 78 or creating an unpaired country is a regression.
+- Every Quick Look record uses four substantial items in each of Plants & Gardens, Animals & Wildlife, Food & Drink, and Culture/local context. Plants & Gardens retains modest extra prominence for Kym.
+- Quick Look also carries language, currency, time zone and Practical Essentials (capital, calling code, plug/power, driving side, payments, tipping where supplied).
+- Toilet helper carries native phrase, English meaning/context, simple pronunciation, slow breakdown, Polite Extra and Signs to Look For.
+- Play / Slow / Repeat ×3 / Louder are real controls. Speech is allowed only through a genuinely installed local iPad voice (`localService===true`); no internet speech API or hidden online fallback. Target-device proof remains mandatory.
+- Access remains distinct: **Home Current Destination header/banner → Country Quick Look**; **Home compass/logo → Where’s the toilet?**. Cruise/Motorhome/RV uses Starting Country.
+
+## Material-depth continuity
+- Parent widget → expanded view → deeper editor/detail must retain one premium material family. The rendered parent surface is authoritative where available; semantic tone is fallback.
+- Status widgets must not retain a “good” colour when status changes to Needs Attention; warning colour may change the status surface without recolouring an unrelated parent flow.
+- Destination Budgets remains the green-family flow even when a missing-budget warning inside it is gold.
+- Deep-editor context already fixed in V51 must not regress: To Book gold; Upcoming reservations blue; Next 5 red; Budget reservations indigo; Recent Expenses blue; Living Expenses violet; Forward Coverage indigo; Upcoming Itinerary blue; Permanent Checklist green; Destination Checklist sky.
+- The final whole-app palette is still **not approved**. Do not infer hue approval from any screenshot.
+
+## V51 continuity authority
+- V51 is the exact implementation baseline after the 12 post-V50 changes listed in `CONTINUITY_START_HERE.md`.
+- V50 and earlier packages are historical predecessors only. Never revert to them to solve a defect.
+- Release/master/Gold Lock remains blocked on target-iPad visual/interaction proof, offline-voice proof/fallback decision, Vault IndexedDB practical testing, completion of the remaining material audit and Cameron’s final global colour approval.
+
+---
+
 # Locked Requirements — No Regression Contract
 
 ## Product / platform
@@ -31,6 +95,15 @@
 - Graph purpose/placement from approved references is protected, but chart type/presentation may improve if clearer.
 - Subtle offline animation is encouraged: chart reveals, bar growth, donut/ring sweeps, route draws, progress transitions. Never gimmicky or performance-heavy.
 
+## V50 final-colour implementation rule — NOT YET APPROVED
+
+- **No screenshot is colour authority unless Cameron explicitly says that specific colour is approved.** Current and historical screenshots are evidence for layout, hierarchy, flow, interaction depth and regressions only.
+- The final colour pass is global, not screen-by-screen. Every coloured widget must have the same premium material quality: equivalent perceived saturation, brightness, contrast, depth, border/highlight strength and restrained glow. Only the hue/colour family should materially differ.
+- Do not preserve an old hue because it happened to appear in a reference screenshot. Do not infer palette approval from a previous build.
+- Parent widget -> expanded view -> deeper detail/editor must stay in one colour/material family, but the actual final hue remains subject to the later whole-app colour pass unless separately approved.
+- Home/Vault premium material polish, the approved Itinerary compact statistics and Journey History headline summary treatment remain quality benchmarks for depth/readability, not automatic hue assignments.
+- Colour layout remains explicitly **unconfirmed** until Cameron approves the final global pass.
+
 ## Responsive / scrolling
 
 - **Horizontal scrolling is prohibited everywhere.**
@@ -53,10 +126,15 @@
 - Preserve the compact reference composition and clear scan order.
 - Do **not** add a Journey Map to Home if it makes the page scroll or duplicates map functionality elsewhere.
 - Current destination header is tappable and opens an offline Country Quick Look.
-- Country Quick Look may be rich but compact: food/drink, animals, plants/gardens, cultural/quirky facts and history/local-interest snippets.
+- Country Quick Look may be rich but compact: plants/gardens, food/drink, animals, cultural/quirky facts and history/local-interest snippets. Plants/gardens get modest extra prominence without making the panel long.
 - Plants/gardens get a little extra prominence.
 - Preserve Home compass shortcut for “Where’s the toilet?” language aid: native phrase, simple English-style pronunciation, slow syllable breakdown, no IPA.
 - Standard stay uses current destination language. Cruise/RV uses departure/start destination language for the whole trip.
+- **Access points are distinct and locked:** tapping the Home Current Destination header/banner opens Country Quick Look; pressing the Home Travel Command Centre compass opens “Where’s the toilet?”. Do not swap, merge or hide these interactions.
+- Country Quick Look must be visually appealing, useful and compact on iPad. Final content model includes Plants & Gardens (slightly extra prominence), Animals & Wildlife, Food & Drink, Culture & Tips, plus practical country context including language, currency and time-zone where available.
+- “Where’s the toilet?” must be visually appealing and immediately usable by Kym: large native phrase, English meaning/context, simple pronunciation, slow breakdown, and—if technically feasible offline on the target iPad—spoken playback controls for Play, Slow, Repeat ×3 and Louder. No online speech API or subscription may be introduced.
+- Current carried source covers 28 route-relevant countries in both quick-look and toilet datasets. This is a **minimum protected checkpoint, not the final coverage target**. Expand robustly for all countries Cameron & Kym may add/visit; do not leave the feature as a tiny hard-coded subset.
+- Country/language coverage must stay paired: a country considered supported for Quick Look must also have the toilet-language record (or an explicit documented multilingual/default handling path), and vice versa.
 
 ## Budget
 
@@ -193,3 +271,67 @@ The strict persisted-generation boundary remains deliberate: V41+ state/backups 
 This V44 package is the exact verified successor to V43. It absorbs only the two post-V43 Safari export compatibility changes in `src_main.js` and `src_screens_settings.js`, then advances the runtime/cache identity to `1.2.0-v44-ipad-visual-candidate` / `tcc-v1-v44-ipad-visual-candidate-2026-09-03`. After the V44 guard verifies, V44 is the implementation authority; V43 and older packages are historical rollback/predecessor references only.
 
 The V44 source/runtime audit is complete enough to begin Cameron's target-device acceptance pass. This does **not** make V44 a release/master or Gold Lock. The remaining mandatory gate is the real 1024×768 iPad Safari/Home-Screen visual/interaction pass plus practical Vault IndexedDB add/reopen/Backup/Restore/Recovery/delete validation. Any post-V44 change must remain evidence-backed and must not redesign, simplify, remove, recolour or weaken protected behaviour.
+
+
+
+## V46 iPad colour-continuity correction candidate authority
+
+V46 is the verified successor to V45 after the second real-iPad screenshot pass. It advances runtime/cache identity to `1.2.0-v46-ipad-colour-continuity` / `tcc-v1-v46-ipad-colour-continuity-2026-09-03` and fixes the remaining Add Expense / Add Reservation / Add Destination colour-follow-through regressions without changing canonical data or protected layouts.
+
+- Add/Edit colour must follow the selected category/type from tile -> modal shell -> focus treatment -> action surface.
+- Do not reintroduce a generic blue/sky editor fallback where a selected category/type has an established colour identity.
+- Safari must not show native white Domestic / International flight-classification pills.
+- Existing approved expanded-card colour continuity remains protected.
+- V46 still requires target-iPad re-acceptance and practical Vault IndexedDB validation before release/master or Gold Lock.
+
+## V45 iPad visual correction candidate authority
+
+V45 is the verified successor to V44 after Cameron’s first real-iPad screenshot pass. It advances runtime/cache identity to `1.2.0-v45-ipad-visual-correction` / `tcc-v1-v45-ipad-visual-correction-2026-09-03` and absorbs the screenshot-evidenced corrections without changing the canonical data model or protected screen structure.
+
+- Reservations main heading/accessibility name is **Booked Reservations**. Do not regress it to **Flights & Transport**.
+- Historical reference screenshot colours are not palette authority. The whole-app rule is the authority: large information panels use Home-style deep navy/charcoal material with category/status colour carried through restrained glow, border, icon and feature surfaces rather than flat fully saturated slabs. Stronger colour remains appropriate for approved compact headline/stat widgets, His/Hers emphasis and Future Bookings / To Book.
+- Vault category icons must use one consistent rendered icon language and inherit the parent category hue/material. Do not reintroduce intrinsically coloured emoji category art that fights the parent card.
+- The no-current-stay shared header must never use obsolete composite artwork with baked Days Remaining / Time Zone / Travel Mode copy beneath live DOM content.
+- V45 still requires target-iPad re-acceptance and practical Vault IndexedDB validation before release/master or Gold Lock.
+
+
+## V47 iPad modal/interaction continuity authority — 03 Sep 2026
+
+V47 succeeds V46 after the third real-iPad evidence pass. The following are now protected against regression:
+
+- Expanded/detail modal shells must inherit the **actual rendered parent widget colour family**. Do not hard-code a second unrelated modal colour for an expandable card. The parent card’s rendered accent/border is the authority; any declared tone is fallback only.
+- Reservation category focus/active treatment must stay in that category’s own colour family. Do not use a generic blue focus ring for Train, Cruise, RV, Accommodation or Tickets cards.
+- The visible Reservations heading/accessibility name remains **Booked Reservations**. A newly activated service-worker generation must not leave an already-open iPad page executing stale prior-build modules; activation must take control and refresh controlled app windows after the new shell cache is ready.
+- V47 is still a visual candidate, not Gold Locked or release/master approved, until Cameron completes the target-iPad re-test and Vault IndexedDB practical validation.
+
+
+## V49 iPad full-screenshot repair authority — 03 Sep 2026
+
+V49 succeeds the V47/V48 working line after Cameron asked for the **entire target-iPad screenshot set to be re-reviewed and rectified**, including the missing functional shortcuts. These are now protected rules:
+
+- Home must always expose a recognisable **Travel Compass** interaction. On Home, the sidebar Travel Command Centre compass and the compact Home compass both open the same “Where’s the toilet?” language aid. The separate Vault concealed-email compass action remains gated by the exact unlock Vault → open Streaming → tap compass sequence.
+- **Current Destination** is always a real control, never just decorative text. Active stay → offline Country Quick Look. No active stay → clear setup state with a route to Itinerary.
+- “Where’s the toilet?” must never disappear merely because no stay is active. With an active stay it shows native phrase + simple English-style pronunciation + slow syllable breakdown, no IPA. Cruise/RV uses Starting Country for the whole trip.
+- Expanded/detail widgets use one explicit audited parent colour family all the way through. A shared modal must not infer a different family from Safari/computed CSS when the card already has an established semantic tone.
+- The cloned widget inside an expanded modal must also be rendered in that same family, eliminating a coloured outer shell around an unrelated navy/other-colour inner card.
+- Add Expense, Add Reservation, Add Destination and Calendar Reminder/Note must carry the selected category/type tone from tile → shell → focus/selected treatment. Standard Destination is the indigo/violet family used by its selected tile.
+- Reservations remains **Booked Reservations** and Next 5 Upcoming remains in its established rose/red family.
+- Vault category drill-down/editor colour follows the originating category; Vault category icons remain one monochrome/currentColor SVG language. The live Vault status/action rail must fully conceal any obsolete status artwork beneath it.
+- Local PIN fields may be visually masked but must not be presented to iPad Safari as website password fields that trigger Strong Password generation.
+- App Health compact cards must keep status text readable without colliding with long card titles.
+- The no-current-stay shared banner must remain free of obsolete Time Zone / Travel Mode / Days Remaining composite copy.
+- V49 is still a target-iPad candidate, not Gold Locked or release/master approved.
+
+## V50 deep no-loss continuity authority — 03 Sep 2026
+
+V50 freezes the exact V49 screenshot-repair working source **and** the newly confirmed future work before country/language/audio/final-colour implementation continues. It is intentionally not a release/master. The next chat must preserve the distinction between **implemented current source** and **locked planned work**.
+
+Protected V50 additions:
+- screenshots are never implicit colour approval; final palette remains unconfirmed;
+- global material consistency means equal perceived saturation/brightness/depth/contrast across hues;
+- Home compass -> toilet helper; Home Current Destination header -> Country Quick Look;
+- appealing/informative design for both helper screens;
+- offline voice controls are required where target-iPad feasibility supports them, without online dependencies;
+- country/language support must expand beyond the current 28-country checkpoint to all realistic countries Cameron & Kym may visit/add;
+- plants/gardens remain slightly prominent in Country Quick Look;
+- planned items remain active until source implementation + target-iPad proof, not merely documentation.

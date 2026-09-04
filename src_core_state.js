@@ -25,6 +25,21 @@ export class StateService {
     this.adapter = adapter;
     this.vaultAssetStore = vaultAssetStore;
     this.vaultAssetIssues = [];
+    // Vault audits are async and can overlap a Restore or screenshot Save.
+    // Only the newest audit for the same canonical attachment set may publish
+    // health issues; a late audit of an older state must not overwrite the
+    // newer App Health result.
+    this.vaultAssetAuditGeneration = 0;
+    // Backup export can spend noticeable time rehydrating screenshot bytes.
+    // Keep physical Vault files alive while any export snapshot is reading
+    // them so navigation/deletion cannot invalidate a backup mid-build.
+    this.vaultAssetReaders = 0;
+    this.vaultAssetReaderWaiters = [];
+    // Keys written to IndexedDB are provisional until their matching canonical
+    // attachment metadata is committed. Orphan sweeps must protect these
+    // in-flight keys or an overlapping App Health/cleanup pass can delete a
+    // legitimate screenshot between its byte write and JSON Save.
+    this.vaultAssetStagingKeys = new Set();
     this._clock = now;
     this.state = createEmptyState(canonicalClock(this._clock()));
     this.listeners = new Set();
@@ -170,6 +185,27 @@ export class StateService {
   }
 
 
+  async stageVaultAsset(assetKey, payload) {
+    if (!this.vaultAssetStore) throw new Error('Large offline screenshot storage is unavailable on this device');
+    this.vaultAssetStagingKeys.add(assetKey);
+    try {
+      await this.vaultAssetStore.put(assetKey, payload);
+      return true;
+    } catch (error) {
+      // IndexedDB can commit a transaction and then fail its immediate
+      // verification read. Stop treating the failed write as legitimate
+      // staging before cleanup so a failed physical delete is visible to the
+      // Vault audit as an orphan rather than being masked as protected.
+      this.vaultAssetStagingKeys.delete(assetKey);
+      await this.removeVaultAssets([assetKey]);
+      throw error;
+    }
+  }
+
+  releaseStagedVaultAssets(assetKeys = []) {
+    for (const key of assetKeys || []) this.vaultAssetStagingKeys.delete(key);
+  }
+
   async attachmentDataUrl(attachment) {
     if (typeof attachment?.dataUrl === 'string' && attachment.dataUrl) return attachment.dataUrl;
     if (!this.vaultAssetStore || typeof attachment?.assetKey !== 'string' || !attachment.assetKey) return null;
@@ -180,20 +216,39 @@ export class StateService {
     return payload;
   }
 
+  beginVaultAssetRead() { this.vaultAssetReaders += 1; }
+
+  endVaultAssetRead() {
+    this.vaultAssetReaders = Math.max(0, this.vaultAssetReaders - 1);
+    if (this.vaultAssetReaders !== 0) return;
+    const waiters = this.vaultAssetReaderWaiters.splice(0);
+    for (const resolve of waiters) resolve();
+  }
+
+  async waitForVaultAssetReaders() {
+    if (this.vaultAssetReaders === 0) return;
+    await new Promise(resolve => this.vaultAssetReaderWaiters.push(resolve));
+  }
+
   async snapshotWithVaultAssets() {
     const next = this.snapshot();
-    for (const attachment of next.attachments || []) {
-      if (typeof attachment.dataUrl === 'string' && attachment.dataUrl) {
-        validateVaultScreenshotPayload(attachment.mimeType, attachment.dataUrl);
-        continue;
+    this.beginVaultAssetRead();
+    try {
+      for (const attachment of next.attachments || []) {
+        if (typeof attachment.dataUrl === 'string' && attachment.dataUrl) {
+          validateVaultScreenshotPayload(attachment.mimeType, attachment.dataUrl);
+          continue;
+        }
+        const payload = await this.attachmentDataUrl(attachment);
+        if (!payload) throw new Error(`Vault screenshot ${attachment.name || attachment.id} is missing from offline storage`);
+        attachment.dataUrl = payload;
+        delete attachment.assetKey;
       }
-      const payload = await this.attachmentDataUrl(attachment);
-      if (!payload) throw new Error(`Vault screenshot ${attachment.name || attachment.id} is missing from offline storage`);
-      attachment.dataUrl = payload;
-      delete attachment.assetKey;
+      validateState(next);
+      return next;
+    } finally {
+      this.endVaultAssetRead();
     }
-    validateState(next);
-    return next;
   }
 
   async migrateEmbeddedVaultAssets() {
@@ -215,15 +270,16 @@ export class StateService {
         if (typeof attachment.dataUrl !== 'string' || !attachment.dataUrl) continue;
         const bytes = validateVaultScreenshotPayload(attachment.mimeType, attachment.dataUrl);
         const assetKey = createVaultAssetKey(attachment.id);
-        await this.vaultAssetStore.put(assetKey, attachment.dataUrl);
+        await this.stageVaultAsset(assetKey, attachment.dataUrl);
         stagedKeys.push(assetKey);
         attachment.assetKey = assetKey;
         attachment.byteLength = bytes;
         delete attachment.dataUrl;
       }
       this.replaceValidated(next);
+      this.releaseStagedVaultAssets(stagedKeys);
     } catch (error) {
-      try { await this.vaultAssetStore.deleteMany(stagedKeys); } catch {}
+      await this.removeVaultAssets(stagedKeys);
       throw error;
     }
     await this.cleanupOrphanVaultAssets();
@@ -236,12 +292,14 @@ export class StateService {
     const next = structuredClone(nextState);
     const previousKeys = (this.state.attachments || []).map(item => item.assetKey).filter(Boolean);
     const stagedKeys = [];
+    let replaceAttempted = false;
+    let replaceSucceeded = false;
     try {
       for (const attachment of next.attachments || []) {
         if (typeof attachment.dataUrl === 'string' && attachment.dataUrl) {
           const bytes = validateVaultScreenshotPayload(attachment.mimeType, attachment.dataUrl);
           const assetKey = createVaultAssetKey(attachment.id);
-          await this.vaultAssetStore.put(assetKey, attachment.dataUrl);
+          await this.stageVaultAsset(assetKey, attachment.dataUrl);
           stagedKeys.push(assetKey);
           attachment.assetKey = assetKey;
           attachment.byteLength = bytes;
@@ -251,41 +309,81 @@ export class StateService {
           if (typeof payload !== 'string' || !payload) throw new Error(`Vault screenshot ${attachment.name || attachment.id} is missing from offline storage`);
         }
       }
+      replaceAttempted = true;
       const result = this.replaceValidated(next);
+      replaceSucceeded = true;
+      this.releaseStagedVaultAssets(stagedKeys);
       const activeKeys = new Set((this.state.attachments || []).map(item => item.assetKey).filter(Boolean));
       const staleKeys = previousKeys.filter(key => !activeKeys.has(key));
+      await this.waitForVaultAssetReaders();
       try { await this.vaultAssetStore.deleteMany(staleKeys); } catch {}
       await this.cleanupOrphanVaultAssets();
       await this.auditVaultAssets();
       return result;
     } catch (error) {
-      // When Restore is already operating inside Protected Recovery and the
-      // localStorage write fails, replaceValidated() intentionally retains a
-      // pendingRestoreSerialized candidate for Retry iPad Storage. That
-      // candidate references the staged asset keys, so keep those bytes until
-      // retry succeeds or a later orphan sweep proves they are unused.
-      if (!this.recovery?.pendingRestoreSerialized) {
-        try { await this.vaultAssetStore.deleteMany(stagedKeys); } catch {}
-      }
+      // When this Restore attempt reaches replaceValidated() inside Protected
+      // Recovery and the localStorage write fails, that call retains a
+      // pendingRestoreSerialized candidate for Retry iPad Storage. Keep this
+      // attempt's staged bytes only in that case. A pending candidate left by
+      // an earlier restore must never cause a later staging failure to leak new
+      // bytes, and a post-replace housekeeping error must never delete assets
+      // that are already canonical.
+      const pendingForThisAttempt = replaceAttempted && !replaceSucceeded && Boolean(this.recovery?.pendingRestoreSerialized);
+      if (pendingForThisAttempt) this.releaseStagedVaultAssets(stagedKeys);
+      else if (!replaceSucceeded) await this.removeVaultAssets(stagedKeys);
       throw error;
     }
   }
 
+  vaultAttachmentAuditSignature() {
+    return JSON.stringify((this.state.attachments || []).map(item => [item.id, item.vaultRecordId, item.assetKey || '', item.byteLength ?? null]));
+  }
+
+  setVaultAssetIssues(nextIssues = [], { generation = null, attachmentSignature = null } = {}) {
+    if (generation != null && generation !== this.vaultAssetAuditGeneration) return [...this.vaultAssetIssues];
+    if (attachmentSignature != null && attachmentSignature !== this.vaultAttachmentAuditSignature()) return [...this.vaultAssetIssues];
+    const next = [...nextIssues];
+    const changed = next.length !== this.vaultAssetIssues.length || next.some((value, index) => value !== this.vaultAssetIssues[index]);
+    this.vaultAssetIssues = next;
+    if (changed) this.notifyListeners();
+    return [...next];
+  }
+
+  protectedVaultAssetKeys() {
+    const keys = new Set((this.state.attachments || []).map(item => item.assetKey).filter(Boolean));
+    for (const key of this.vaultAssetStagingKeys) keys.add(key);
+    const pending = this.recovery?.pendingRestoreSerialized;
+    if (typeof pending === 'string' && pending) {
+      try {
+        const parsed = JSON.parse(pending);
+        for (const attachment of parsed?.attachments || []) {
+          if (typeof attachment?.assetKey === 'string' && attachment.assetKey) keys.add(attachment.assetKey);
+        }
+      } catch {
+        // pendingRestoreSerialized is created only from a validated canonical
+        // state. If it is unexpectedly unreadable, do not weaken current-state
+        // protection; Retry iPad Storage will remain safely blocked by parsing.
+      }
+    }
+    return keys;
+  }
+
   async auditVaultAssets() {
+    const generation = ++this.vaultAssetAuditGeneration;
+    const attachmentSignature = this.vaultAttachmentAuditSignature();
+    const publish = issues => this.setVaultAssetIssues(issues, { generation, attachmentSignature });
     const issues = [];
     const external = (this.state.attachments || []).filter(item => typeof item.assetKey === 'string' && item.assetKey);
     if (this.vaultAssetStore && typeof this.vaultAssetStore.open === 'function') {
       try { await this.vaultAssetStore.open(); }
       catch {
         issues.push('Large offline Vault screenshot storage is unavailable on this device.');
-        this.vaultAssetIssues = issues;
-        return [...issues];
+        return publish(issues);
       }
     }
     if (external.length && !this.vaultAssetStore) {
       issues.push('Offline Vault screenshot storage is unavailable.');
-      this.vaultAssetIssues = issues;
-      return [...issues];
+      return publish(issues);
     }
     for (const attachment of external) {
       try {
@@ -301,17 +399,29 @@ export class StateService {
       }
       if (issues.length >= 8) break;
     }
-    this.vaultAssetIssues = issues;
-    return [...issues];
+    if (this.vaultAssetStore && issues.length < 8) {
+      try {
+        const keys = await this.vaultAssetStore.keys();
+        const active = this.protectedVaultAssetKeys();
+        const orphaned = keys.filter(key => typeof key === 'string' && !active.has(key));
+        if (orphaned.length) issues.push(`${orphaned.length} unused Vault screenshot file${orphaned.length === 1 ? '' : 's'} remain in offline storage and need cleanup.`);
+      } catch {
+        issues.push('Offline Vault screenshot storage could not be enumerated.');
+      }
+    }
+    return publish(issues.slice(0, 8));
   }
 
   async cleanupOrphanVaultAssets() {
     if (!this.vaultAssetStore) return 0;
     try {
-      const active = new Set((this.state.attachments || []).map(item => item.assetKey).filter(Boolean));
       const keys = await this.vaultAssetStore.keys();
+      const active = this.protectedVaultAssetKeys();
       const orphaned = keys.filter(key => typeof key === 'string' && !active.has(key));
-      if (orphaned.length) await this.vaultAssetStore.deleteMany(orphaned);
+      if (orphaned.length) {
+        await this.waitForVaultAssetReaders();
+        await this.vaultAssetStore.deleteMany(orphaned);
+      }
       return orphaned.length;
     } catch {
       // Orphan cleanup is housekeeping only. Never make valid travel data or a
@@ -320,14 +430,50 @@ export class StateService {
     }
   }
 
-  retryStorage() {
+  async removeVaultAssets(assetKeys = []) {
+    const keys = [...new Set((assetKeys || []).filter(key => typeof key === 'string' && key))];
+    this.releaseStagedVaultAssets(keys);
+    if (!keys.length || !this.vaultAssetStore) return true;
+    try {
+      await this.waitForVaultAssetReaders();
+      await this.vaultAssetStore.deleteMany(keys);
+      await this.cleanupOrphanVaultAssets();
+      await this.auditVaultAssets();
+      return true;
+    } catch {
+      await this.auditVaultAssets();
+      return false;
+    }
+  }
+
+  async retryStorage() {
     if (!this.isRecoveryMode() || !this.recovery?.storageUnavailable) return false;
     this.adapter.retryAccess?.();
 
     // A valid backup selected while already in Protected Recovery is the only
     // validated replacement candidate available after a failed restore write.
-    // Otherwise the known last-good state remains authoritative.
-    const known = this.recovery.pendingRestoreSerialized || this.recovery.lastGoodSerialized || this.lastGoodSerialized;
+    // Otherwise the known last-good state remains authoritative. A pending
+    // screenshot-bearing Restore is atomic: its staged IndexedDB bytes must be
+    // re-verified immediately before Retry can make that candidate canonical.
+    // Storage pressure/eviction between the failed write and the later Retry
+    // must not produce a 'successful' Restore whose Vault attachments are
+    // already missing.
+    const pendingRestore = this.recovery.pendingRestoreSerialized || null;
+    if (pendingRestore) {
+      try {
+        const pendingState = JSON.parse(pendingRestore);
+        for (const attachment of pendingState.attachments || []) {
+          if (typeof attachment?.assetKey !== 'string' || !attachment.assetKey) continue;
+          const payload = await this.attachmentDataUrl(attachment);
+          if (!payload) throw new Error(`${attachment.name || 'Vault screenshot'} is missing from offline storage`);
+        }
+        delete this.recovery.retryError;
+      } catch (error) {
+        this.recovery.retryError = `Retry is blocked because the validated backup's Vault screenshots could not be re-verified. Re-select the backup file to stage its screenshots again. ${error?.message || ''}`.trim();
+        return false;
+      }
+    }
+    const known = pendingRestore || this.recovery.lastGoodSerialized || this.lastGoodSerialized;
     if (known) {
       if (!this.adapter.write(known)) return false;
       const readBack = this.adapter.read();
@@ -343,6 +489,7 @@ export class StateService {
       this.recovery = null;
       this.hadStoredState = true;
       this.notifyListeners();
+      void this.cleanupOrphanVaultAssets().then(() => this.auditVaultAssets()).catch(() => this.auditVaultAssets());
       return true;
     }
 
@@ -361,6 +508,7 @@ export class StateService {
       this.recovery = null;
       this.hadStoredState = raw != null;
       this.notifyListeners();
+      void this.cleanupOrphanVaultAssets().then(() => this.auditVaultAssets()).catch(() => this.auditVaultAssets());
       return true;
     } catch { return false; }
   }

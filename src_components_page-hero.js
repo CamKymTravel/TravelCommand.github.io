@@ -16,7 +16,7 @@ function normalizeCountry(country = '') {
 }
 
 function keyForStay(stay) {
-  if (!stay) return 'home-hero';
+  if (!stay) return 'banner-indonesia';
   const type = String(stay.travelType || '').toLowerCase();
   if (type === 'cruise') return 'banner-cruise-princess';
   if (type === 'motorhome' || type === 'rv') {
@@ -29,18 +29,35 @@ function keyForStay(stay) {
 }
 
 async function loadIndex() {
-  if (!indexPromise) indexPromise = fetch('./header-index.json').then(response => {
-    if (!response.ok) throw new Error('Header index unavailable');
-    return response.json();
-  });
+  if (!indexPromise) {
+    indexPromise = fetch('./header-index.json').then(response => {
+      if (!response.ok) throw new Error('Header index unavailable');
+      return response.json();
+    }).catch(error => {
+      // A transient first-read failure (for example while Safari is handing
+      // control to a freshly activated offline worker) must not poison every
+      // country/cruise/RV header for the rest of the app session. Clear only
+      // the failed shared read so the next rendered header can retry locally.
+      indexPromise = null;
+      throw error;
+    });
+  }
   return indexPromise;
 }
 
 async function loadArchive() {
-  if (!archivePromise) archivePromise = fetch('./header-assets.bin').then(response => {
-    if (!response.ok) throw new Error('Header archive unavailable');
-    return response.arrayBuffer();
-  });
+  if (!archivePromise) {
+    archivePromise = fetch('./header-assets.bin').then(response => {
+      if (!response.ok) throw new Error('Header archive unavailable');
+      return response.arrayBuffer();
+    }).catch(error => {
+      // Keep the successful 19 MiB packed archive shared, but never retain a
+      // rejected fetch forever. A later screen/header render can safely retry
+      // once the offline shell or device storage is available again.
+      archivePromise = null;
+      throw error;
+    });
+  }
   return archivePromise;
 }
 
@@ -63,11 +80,25 @@ export function applyHeaderImage(element, key, { position = 'center center' } = 
     if (!url || !element.isConnected || element.dataset.headerKey !== key) return;
     element.style.setProperty('--hero-image', `url("${url}")`);
     element.dataset.imageReady = 'true';
+    // Expanded-card snapshots may have been cloned before the packed header
+    // finished resolving. Publish one local readiness event so an already-open
+    // enlarged copy can mirror the final offline background image.
+    element.dispatchEvent(new Event('tcc-header-image-ready'));
   }).catch(() => {});
   return element;
 }
 
 export function applyStayHeaderImage(element, stay, options = {}) {
+  if (!stay) {
+    // A missing current stay must not masquerade as Indonesia (the historical
+    // keyForStay(null) fallback) and must not reuse the obsolete baked-text
+    // Home composite. Keep the established image-hero material/gradient only;
+    // the banner copy remains the truthful No current stay / next destination.
+    element.classList.add('tcc-image-hero');
+    element.dataset.headerKey = 'no-current-stay';
+    element.style.setProperty('--hero-position', options.position || 'center center');
+    return element;
+  }
   return applyHeaderImage(element, keyForStay(stay), options);
 }
 

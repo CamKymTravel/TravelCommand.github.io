@@ -50,7 +50,7 @@ const ROOT_FOCUSABLE = 'button, a[href], input, select, textarea, summary, [role
 const SCREEN_ACCESSIBLE_LABELS = Object.freeze({
   home:'Home',
   budget:'Budget',
-  reservations:'Flights & Transport',
+  reservations:'Booked Reservations',
   itinerary:'Itinerary',
   calendar:'Calendar',
   'journey-history':'Journey History',
@@ -170,9 +170,19 @@ function renderRecoveryMode() {
   const actions=node('div','recovery-actions');
   const restore=node('button','button recovery-primary','Restore Valid Backup');restore.type='button';restore.addEventListener('click',()=>chooseRecoveryBackup(error));
   const exportButton=node('button','button','Export Raw Recovery Data');exportButton.type='button';exportButton.addEventListener('click',exportRawRecoveryData);
-  const retry=node('button','button','Retry iPad Storage');retry.type='button';retry.addEventListener('click',()=>{
-    if(stateService.retryStorage()){error.textContent='';render();}
-    else error.textContent='iPad storage is still unavailable for safe read/write access. No travel data was changed.';
+  const retry=node('button','button','Retry iPad Storage');retry.type='button';retry.addEventListener('click',async()=>{
+    const recoveryButtons=[...card.querySelectorAll('button')];
+    for(const button of recoveryButtons)button.disabled=true;
+    retry.textContent='RETRYING…';
+    const recovered=await stateService.retryStorage();
+    if(recovered){
+      // retryStorage publishes the recovered canonical state, so the normal
+      // subscriber render has already replaced this recovery card.
+      return;
+    }
+    if(error.isConnected)error.textContent=stateService.recovery?.retryError || 'iPad storage is still unavailable for safe read/write access. No travel data was changed.';
+    if(retry.isConnected)retry.textContent='Retry iPad Storage';
+    for(const button of recoveryButtons)if(button.isConnected)button.disabled=false;
   });
   actions.append(restore);
   if(storageUnavailable)actions.append(retry);
@@ -185,7 +195,40 @@ function handleBrandActivate() {
   if (revealHiddenEmails(vaultAccessSession)) render();
 }
 
+let deferredPickerRenderTimer = null;
 function render() {
+  // Ordinary background notifications (for example a late Vault asset-health
+  // audit) must never replace an editor/confirmation that is holding unsaved
+  // user input. Canonical Saves also notify before their modal has closed, so
+  // defer that render until the topmost open dialog closes; if another dialog
+  // remains underneath, the next render pass will wait for that one as well.
+  // Protected Recovery is the exception: a safety-state transition must replace
+  // the stale editor immediately.
+  if (!stateService.isRecoveryMode()) {
+    const openDialogs = [...document.querySelectorAll('dialog[open]')];
+    const topDialog = openDialogs.at(-1);
+    if (topDialog) {
+      if (topDialog.dataset.stateRenderPending !== 'true') {
+        topDialog.dataset.stateRenderPending = 'true';
+        topDialog.addEventListener('close', () => queueMicrotask(render), { once:true });
+      }
+      return;
+    }
+  }
+
+  // Temporary native file/photo inputs live inside the current screen while
+  // iPad Files/Photos is open and while the selected bytes are being read. A
+  // late non-canonical notification must not replace that screen and strand the
+  // picker on a detached DOM tree.
+  if (!stateService.isRecoveryMode() && root.querySelector('input[type="file"]')) {
+    if (deferredPickerRenderTimer == null) {
+      deferredPickerRenderTimer = setTimeout(() => {
+        deferredPickerRenderTimer = null;
+        render();
+      }, 250);
+    }
+    return;
+  }
   const focusBeforeRender = rootFocusDescriptor();
   const currentDate = runtimeConfig.currentDate || localISODate();
   lastRenderedDate = currentDate;
@@ -200,14 +243,15 @@ function render() {
     return;
   }
   const active = stateService.state.ui.activeScreen;
-  // The compass is a concealed Vault action, not a decorative button. Expose
-  // it as an actual control only while the exact unlock → Streaming sequence
-  // is armed, and remove its button semantics again once the hidden manager is
-  // already visible. Locked/overview/category states keep the same brand mark
-  // visually but cannot leave a focusable control that intentionally does nothing.
-  const brandActivate = active === 'vault' && canRevealHiddenEmails(vaultAccessSession) && !vaultAccessSession.hiddenEmailsRevealed
-    ? handleBrandActivate
-    : null;
+  // The Travel Command Centre compass has two deliberately separate contexts:
+  // on Home it is the visible Where's-the-toilet shortcut; in The Vault it only
+  // becomes an action after the exact unlock → Streaming sequence is armed.
+  // Other screens keep the same brand mark visually without a dead control.
+  const brandActivate = active === 'home'
+    ? (() => root.querySelector('[data-screen="home"] .home-compass')?.click())
+    : (active === 'vault' && canRevealHiddenEmails(vaultAccessSession) && !vaultAccessSession.hiddenEmailsRevealed
+      ? handleBrandActivate
+      : null);
   const screen = renderScreen(active, { stateService, currentDate, navigate, vaultAccessSession, requestRender:render });
   if (screen instanceof HTMLElement && screen.matches('main[data-screen]') && !screen.hasAttribute('aria-label')) {
     screen.setAttribute('aria-label', SCREEN_ACCESSIBLE_LABELS[active] || 'Travel Command Centre');
@@ -235,19 +279,31 @@ function navigate(screenId, pendingOpen = null) {
 stateService.subscribe(render);
 render();
 
+let dateRefreshTimer = null;
 function refreshForDeviceDate() {
   const currentDate = runtimeConfig.currentDate || localISODate();
   if (currentDate === lastRenderedDate) return;
 
-  // Never let an automatic midnight/timezone refresh tear down an open editor
-  // or confirmation dialog and discard unsaved typing. Defer the date-driven
-  // screen refresh until the top open dialog closes; Save/navigation commits
-  // already re-render with the new date immediately when appropriate.
+  // Never let an automatic midnight/timezone refresh tear down an open editor,
+  // confirmation dialog, or native iPad file/photo picker. A hidden file input
+  // stays in the DOM while Restore/screenshot selection and its async file read
+  // are in flight; replacing its host screen can strand the returned selection
+  // on a detached node. Defer until that temporary input is actually removed.
   const openDialog = document.querySelector('dialog[open]');
   if (openDialog) {
     if (openDialog.dataset.dateRefreshPending !== 'true') {
       openDialog.dataset.dateRefreshPending = 'true';
       openDialog.addEventListener('close', refreshForDeviceDate, { once:true });
+    }
+    return;
+  }
+  const openFilePicker = document.querySelector('input[type="file"]');
+  if (openFilePicker) {
+    if (dateRefreshTimer == null) {
+      dateRefreshTimer = setTimeout(() => {
+        dateRefreshTimer = null;
+        refreshForDeviceDate();
+      }, 250);
     }
     return;
   }
@@ -265,7 +321,65 @@ window.addEventListener('pageshow', refreshForDeviceDate);
 if (!runtimeConfig.currentDate) setInterval(refreshForDeviceDate, 60_000);
 
 if ('serviceWorker' in navigator && runtimeConfig.serviceWorkerUrl) {
-  window.addEventListener('load', () => navigator.serviceWorker.register(runtimeConfig.serviceWorkerUrl).catch(console.error));
+  let reloadingForServiceWorker = false;
+  let serviceWorkerReloadPending = false;
+  let serviceWorkerReloadTimer = null;
+  let hasSeenServiceWorkerController = Boolean(navigator.serviceWorker.controller);
+
+  const reloadForServiceWorkerWhenSafe = () => {
+    if (!serviceWorkerReloadPending || reloadingForServiceWorker) return;
+    const openDialog = document.querySelector('dialog[open]');
+    if (openDialog) {
+      if (openDialog.dataset.serviceWorkerReloadPending !== 'true') {
+        openDialog.dataset.serviceWorkerReloadPending = 'true';
+        openDialog.addEventListener('close', () => queueMicrotask(reloadForServiceWorkerWhenSafe), { once:true });
+      }
+      return;
+    }
+    const openFilePicker = document.querySelector('input[type="file"]');
+    if (openFilePicker) {
+      // Native iPad pickers dispatch `change` before async file.text()/image
+      // staging has necessarily finished. Poll lightly until the temporary
+      // input is actually removed so an update cannot reload midway through
+      // Restore or screenshot processing after the picker returns.
+      if (serviceWorkerReloadTimer == null) {
+        serviceWorkerReloadTimer = setTimeout(() => {
+          serviceWorkerReloadTimer = null;
+          reloadForServiceWorkerWhenSafe();
+        }, 250);
+      }
+      return;
+    }
+    reloadingForServiceWorker = true;
+    window.location.reload();
+  };
+
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event?.data?.type !== 'TCC_SW_UPDATE_QUERY') return;
+    const ready = !document.querySelector('dialog[open], input[type="file"]');
+    try { event.ports?.[0]?.postMessage({ type:'TCC_SW_UPDATE_READY', ready }); } catch {}
+  });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const replacingExistingController = hasSeenServiceWorkerController;
+    hasSeenServiceWorkerController = true;
+    // First install/claim is not an app-version transition and must not bounce
+    // the just-opened PWA. A later controller replacement is a real update.
+    if (!replacingExistingController) return;
+    serviceWorkerReloadPending = true;
+    reloadForServiceWorkerWhenSafe();
+  });
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register(runtimeConfig.serviceWorkerUrl, { updateViaCache:'none' });
+      await registration.update();
+    } catch (error) { console.error(error); }
+  });
+
+  // A successful Save can synchronously re-render the screen and detach its
+  // dialog before that dialog dispatches a close event. Re-check a deferred
+  // update after every render as well as on ordinary Cancel/Close.
+  stateService.subscribe(() => queueMicrotask(reloadForServiceWorkerWhenSafe));
 }
 window.addEventListener('load', () => { void requestPersistentOfflineStorage(); }, { once:true });
 
