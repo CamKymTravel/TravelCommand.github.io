@@ -112,6 +112,8 @@ function crossScreenCheck(state) {
     }
   }
 
+  const standardMissingCountry=(state.itinerary||[]).filter(entry=>entry.travelType==='standard'&&!String(entry.country||'').trim());
+  if(standardMissingCountry.length) issues.push(`${standardMissingCountry.length} Standard stay${standardMissingCountry.length===1?' is':'s are'} missing a Country required for its destination header and offline language helper.`);
   const routeMissingStartCountry=(state.itinerary||[]).filter(entry=>(entry.travelType==='cruise'||entry.travelType==='motorhome'||entry.travelType==='rv')&&!String(entry.startCountry||'').trim());
   if(routeMissingStartCountry.length) issues.push(`${routeMissingStartCountry.length} Cruise/RV trip${routeMissingStartCountry.length===1?' is':'s are'} missing a Starting Country for departure-language/header context.`);
 

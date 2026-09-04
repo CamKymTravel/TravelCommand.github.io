@@ -14,14 +14,99 @@
 <body>
   <div id="app" class="app-shell"></div>
   <script type="module">
-    const params = new URLSearchParams(globalThis.location?.search || '');
-    const simulationMode = params.get('simulation') === '1' || params.get('simulation') !== '0';
-    if (simulationMode) {
-      const { installSimulationRuntime } = await import('./simulation-clock.js');
-      installSimulationRuntime({ serviceWorkerUrl:'./sw.js' });
-      document.title = 'Travel Command Centre — Athens Simulation';
-      document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Athens Sim');
+    // V54 master optional trigger lineage retained: params.get('simulation') === '1'.
+    // This dedicated screenshot build intentionally starts simulation unconditionally.
+    const { installSimulationRuntime, SIMULATION_INSTALL_MARKER } = await import('./simulation-clock.js');
+    const simulationConfig = installSimulationRuntime({ serviceWorkerUrl:'./sw.js?v=54-athens-full-simulation-r1' });
+    document.title = 'Travel Command Centre — Athens Simulation V54';
+    document.querySelector('meta[name="apple-mobile-web-app-title"]')?.setAttribute('content','TCC Athens V54');
+
+    // One-time fixture-install guard for this exact simulation generation.
+    // It clears only the dedicated Athens simulation key, never production V54.
+    // If fixture loading itself later fails, seedIfEmpty remains true so a
+    // subsequent reload retries rather than leaving a false-success marker.
+    try {
+      if (globalThis.localStorage?.getItem(SIMULATION_INSTALL_MARKER) !== '1') {
+        globalThis.localStorage?.removeItem(simulationConfig.storageKey);
+        globalThis.localStorage?.setItem(SIMULATION_INSTALL_MARKER, '1');
+      }
+    } catch {}
+
+    // Build-consistency barrier. A newly fetched index can otherwise execute
+    // beneath the previous service worker for its first load, producing a
+    // dangerous hybrid such as a new build title with old cached screen
+    // modules/icons. Before importing the app, answer the worker's safe-refresh
+    // probe and give the current build worker a chance to activate/claim.
+    const bootWorkerUrl = globalThis.__TCC_RUNTIME_CONFIG__?.serviceWorkerUrl || './sw.js?v=54-athens-full-simulation-r1';
+    if ('serviceWorker' in navigator && bootWorkerUrl) {
+      const safeBootResponder = event => {
+        if (event?.data?.type !== 'TCC_SW_UPDATE_QUERY') return;
+        try { event.ports?.[0]?.postMessage({ type:'TCC_SW_UPDATE_READY', ready:true }); } catch {}
+      };
+      navigator.serviceWorker.addEventListener('message', safeBootResponder);
+      try {
+        const expectedWorker = new URL(bootWorkerUrl, globalThis.location.href).href;
+        const registration = await navigator.serviceWorker.register(bootWorkerUrl, { updateViaCache:'none' });
+        await registration.update();
+
+        const waitForExpectedActivation = async () => {
+          const findExpected = () => [registration.installing, registration.waiting, registration.active]
+            .find(worker => worker?.scriptURL === expectedWorker) || null;
+          let worker = findExpected();
+          if (!worker || worker.state === 'activated') return worker;
+          await Promise.race([
+            new Promise(resolve => {
+              const onState = () => { if (worker.state === 'activated' || worker.state === 'redundant') { worker.removeEventListener('statechange', onState); resolve(); } };
+              worker.addEventListener('statechange', onState);
+              onState();
+            }),
+            new Promise(resolve => setTimeout(resolve, 8000))
+          ]);
+          worker = findExpected();
+          return worker;
+        };
+
+        const controller = navigator.serviceWorker.controller;
+        if (controller && controller.scriptURL !== expectedWorker) {
+          // We are a newly fetched document still running under the predecessor
+          // worker. Never import unversioned app modules in this state: the old
+          // worker could answer them from its previous cache and create a
+          // visually mixed build. This document has not started the app yet, so
+          // a controlled reload is safe and cannot discard an editor/picker.
+          const expected = await waitForExpectedActivation();
+          if (expected?.state === 'activated' || registration.active?.scriptURL === expectedWorker) {
+            globalThis.location.reload();
+            await new Promise(() => {});
+          }
+          throw new Error('Travel Command Centre update could not activate the expected offline shell. Reload before using the app.');
+        }
+
+        if (!controller) {
+          // First install: allow the new worker to claim this pristine boot page
+          // before app modules start where possible. If control is not acquired
+          // quickly, direct network module loading is still internally
+          // consistent because no predecessor worker is serving stale assets.
+          await Promise.race([
+            new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once:true })),
+            new Promise(resolve => setTimeout(resolve, 2200))
+          ]);
+        }
+      } catch (error) {
+        navigator.serviceWorker.removeEventListener('message', safeBootResponder);
+        const controller = navigator.serviceWorker.controller;
+        const expectedWorker = new URL(bootWorkerUrl, globalThis.location.href).href;
+        if (controller && controller.scriptURL !== expectedWorker) {
+          const app = document.getElementById('app');
+          if (app) app.innerHTML = '<main class="screen-root"><section class="foundation-marker"><p class="eyebrow">OFFLINE UPDATE</p><h1>Finishing app update</h1><p>The previous offline shell is still controlling this page. Reload Travel Command Centre before making changes so old and new screen files cannot be mixed.</p><button id="tcc-boot-reload" class="button" type="button">Reload App</button></section></main>';
+          document.getElementById('tcc-boot-reload')?.addEventListener('click', () => globalThis.location.reload());
+          throw error;
+        }
+        console.error(error);
+      } finally {
+        navigator.serviceWorker.removeEventListener('message', safeBootResponder);
+      }
     }
+
     await import('./src_main.js');
   </script>
 </body>

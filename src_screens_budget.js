@@ -9,6 +9,7 @@ import { buildHomeViewModel } from './src_core_home-view-model.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
+import { createLineIcon } from './src_components_icons.js';
 
 const CATEGORY_LABELS = Object.freeze({
   groceries:'Groceries',
@@ -29,6 +30,7 @@ const CATEGORY_COLOURS = Object.freeze({
 });
 
 const CATEGORY_TONES = Object.freeze({ groceries:'teal', 'eating-out':'blue', transport:'indigo', entertainment:'violet', shopping:'magenta', miscellaneous:'orange' });
+const CATEGORY_ICONS = Object.freeze({ groceries:'groceries', 'eating-out':'restaurant', transport:'transport', entertainment:'entertainment', shopping:'shopping', miscellaneous:'misc' });
 
 const RESERVATION_TYPE_LABELS = Object.freeze({ flight:'Flight', train:'Train', cruise:'Cruise', rv:'RV', accommodation:'Accommodation', ticket:'Tickets & Attractions' });
 const RESERVATION_STATUS_LABELS = Object.freeze({ paid:'Paid', unpaid:'Unpaid', booked:'Booked', 'to-book':'To Book' });
@@ -119,16 +121,26 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
 
   let modal = null;
   const body = node('div', 'budget-expense-editor');
+  const intro = node('section', 'budget-editor-intro');
+  intro.append(
+    node('strong', '', existing ? 'Edit one expense' : 'Add one expense'),
+    node('span', '', 'The transaction date automatically selects the exact Destination Budget. The same cost also rolls into the Annual Budget total once.')
+  );
   const categoryTiles = node('div', 'budget-category-tiles');
   categoryTiles.setAttribute('role', 'group');
   categoryTiles.setAttribute('aria-label', 'Expense category');
+  const categoryStep = node('section', 'budget-editor-step budget-editor-step-category');
+  const categoryHead = node('div', 'budget-editor-step-head');
+  categoryHead.append(node('b', 'budget-editor-step-number', '1'), node('div', 'budget-editor-step-copy'));
+  categoryHead.querySelector('.budget-editor-step-copy').append(node('strong', '', 'What was it for?'), node('span', '', 'Tap one category. The selected colour follows through this editor.'));
+  categoryStep.append(categoryHead, categoryTiles);
   const routingStatus = node('div', 'budget-routing-status');
-  const fields = node('div', 'budget-form-grid');
+  const fields = node('div', 'budget-editor-fields');
   const conversionHint = node('p', 'budget-conversion-hint');
   const error = node('p', 'budget-form-error');
   body.dataset.currencyAuto = existing ? 'false' : 'true';
   body.dataset.audAuto = 'false';
-  body.append(categoryTiles, routingStatus, fields, conversionHint, error);
+  body.append(intro, categoryStep, fields, error);
 
   function value(name) { return body.querySelector(`[name="${name}"]`)?.value ?? ''; }
 
@@ -146,12 +158,13 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
   function renderCategories() {
     categoryTiles.replaceChildren();
     for (const [category, label] of Object.entries(CATEGORY_LABELS)) {
-      const button = node('button', `budget-category-tile budget-category-${category}`, label);
+      const button = node('button', `budget-category-tile budget-category-${category}`);
       button.type = 'button';
+      button.append(createLineIcon(CATEGORY_ICONS[category] || 'budget', 'budget-category-choice-icon'), node('span', 'budget-category-choice-label', label));
       const active = category === body.dataset.category;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      if (active) button.append(node('span', 'budget-selected-tick', '✓'));
+      if (active) button.append(createLineIcon('check', 'budget-selected-tick'));
       button.addEventListener('click', () => {
         body.dataset.category = category;
         if (!editorTone) setModalTone(modal, CATEGORY_TONES[category] || 'sky');
@@ -252,13 +265,33 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     body.dataset.category = saved.category;
     setModalTone(modal, editorTone || CATEGORY_TONES[saved.category] || 'sky');
     renderCategories();
-    fields.replaceChildren(
-      inputField('Date', 'date', 'date', saved.date),
-      inputField('Description', 'description', 'text', saved.description),
-      inputField('Original Currency', 'originalCurrency', 'text', saved.originalCurrency),
+    const amountStep = node('section', 'budget-editor-step budget-editor-step-amount');
+    const amountHead = node('div', 'budget-editor-step-head');
+    amountHead.append(node('b', 'budget-editor-step-number', '2'), node('div', 'budget-editor-step-copy'));
+    amountHead.querySelector('.budget-editor-step-copy').append(node('strong', '', 'How much did you pay?'), node('span', '', 'Enter the original amount and currency. AUD is calculated automatically when the stay rate can be used.'));
+    const amountGrid = node('div', 'budget-editor-money-grid');
+    amountGrid.append(
       inputField('Original Amount', 'originalAmount', 'number', saved.originalAmount),
+      inputField('Original Currency', 'originalCurrency', 'text', saved.originalCurrency),
       inputField('AUD Equivalent', 'audAmount', 'number', saved.audAmount)
     );
+    amountStep.append(amountHead, amountGrid, conversionHint);
+
+    const dateStep = node('section', 'budget-editor-step budget-editor-step-date');
+    const dateHead = node('div', 'budget-editor-step-head');
+    dateHead.append(node('b', 'budget-editor-step-number', '3'), node('div', 'budget-editor-step-copy'));
+    dateHead.querySelector('.budget-editor-step-copy').append(node('strong', '', 'When?'), node('span', '', 'The date is the single source of truth for Destination Budget routing.'));
+    const dateGrid = node('div', 'budget-editor-date-grid');
+    dateGrid.append(inputField('Expense date', 'date', 'date', saved.date), routingStatus);
+    dateStep.append(dateHead, dateGrid);
+
+    const detailStep = node('section', 'budget-editor-step budget-editor-step-detail');
+    const detailHead = node('div', 'budget-editor-step-head');
+    detailHead.append(node('b', 'budget-editor-step-number', '4'), node('div', 'budget-editor-step-copy'));
+    detailHead.querySelector('.budget-editor-step-copy').append(node('strong', '', 'What was it?'), node('span', '', 'Add a short description so the entry is easy to recognise later.'));
+    detailStep.append(detailHead, inputField('Description', 'description', 'text', saved.description));
+
+    fields.replaceChildren(amountStep, dateStep, detailStep);
     fields.querySelector('[name="date"]')?.addEventListener('change', () => updateConversion({ dateChanged:true }));
     fields.querySelector('[name="originalCurrency"]')?.addEventListener('input', () => { body.dataset.currencyAuto = 'false'; updateConversion(); });
     fields.querySelector('[name="originalAmount"]')?.addEventListener('input', () => updateConversion());
@@ -949,7 +982,7 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   const top=node('section','budget-reference-top'); top.append(destinationSummary,paceSummary); main.append(top);
   makeExpandableCard(destinationSummary,{host:main,title:'Current Destination Budget',tone:'teal'});
   makeExpandableCard(paceSummary,{host:main,title:'Daily & Stay Pace',tone:'blue'});
-  const add=node('button','budget-add-expense-bar','＋ ADD EXPENSE'); add.type='button'; add.addEventListener('click',()=>openNewExpense()); main.append(add);
+  const add=node('button','budget-add-expense-bar'); add.type='button'; add.append(createLineIcon('plus'),document.createTextNode(' ADD EXPENSE')); add.addEventListener('click',()=>openNewExpense()); main.append(add);
   const annualSummary=renderAnnualSummary(model), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
   const planning=node('section','budget-reference-planning'); planning.append(annualSummary,destinationBudgets); main.append(planning);
   makeExpandableCard(annualSummary,{host:main,title:'Annual Budget',tone:'magenta'});

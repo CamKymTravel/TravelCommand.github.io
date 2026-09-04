@@ -1,3 +1,5 @@
+import { createLineIcon } from './src_components_icons.js';
+
 const MODAL_TONES = Object.freeze(['sky','blue','indigo','teal','green','magenta','violet','red','orange','gold']);
 let modalSequence = 0;
 
@@ -87,6 +89,19 @@ export function createModal({ title, body, actions = [], className = '' }) {
   dialog.setAttribute('aria-labelledby', titleId);
   dialog.innerHTML = `<form method="dialog"><header><h2 id="${titleId}"></h2></header><section class="modal-body"></section><footer></footer></form>`;
   const form = dialog.querySelector('form');
+  const header = dialog.querySelector('header');
+  if (String(className || '').split(/\s+/).includes('tcc-editor-modal')) {
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'tcc-modal-close';
+    close.setAttribute('aria-label', 'Close editor without saving');
+    close.append(createLineIcon('close'));
+    close.addEventListener('click', () => {
+      if (dialog.dataset.actionBusy === 'true') return;
+      dialog.close();
+    });
+    header.append(close);
+  }
   // Editors commit only through their explicit Save actions. In Safari/iPad,
   // pressing Return in a text field can otherwise implicitly submit a
   // method=dialog form and close the editor without Save, making typed edits
@@ -213,7 +228,7 @@ function snapshotExpandedCard(source) {
   clone.removeAttribute('tabindex');
   clone.removeAttribute('role');
   clone.removeAttribute('aria-label');
-  clone.querySelectorAll('.tcc-expand-trigger').forEach(trigger => trigger.remove());
+  clone.querySelectorAll('.tcc-expand-trigger, .tcc-expand-indicator').forEach(trigger => trigger.remove());
   clone.classList.add('tcc-expanded-card-snapshot');
   return clone;
 }
@@ -361,6 +376,7 @@ export function makeExpandableCard(element, { host, title, tone = 'sky', bodyBui
     trigger.type = 'button';
     trigger.className = 'tcc-expand-trigger';
     trigger.setAttribute('aria-label', `Enlarge ${accessibleTitle}`);
+    trigger.append(createLineIcon('expand'));
     trigger.addEventListener('click', event => {
       event.preventDefault();
       event.stopPropagation();
@@ -374,6 +390,11 @@ export function makeExpandableCard(element, { host, title, tone = 'sky', bodyBui
     // Preserve the card's real visible totals/status as its accessible name.
     // A short aria-label here would replace descendant text in VoiceOver.
     element.setAttribute('aria-description', `Tap to enlarge ${accessibleTitle}.`);
+    const indicator = document.createElement('span');
+    indicator.className = 'tcc-expand-indicator';
+    indicator.setAttribute('aria-hidden', 'true');
+    indicator.append(createLineIcon('expand'));
+    element.append(indicator);
     element.addEventListener('keydown', event => {
       if (event.target !== element) return;
       if (event.key === 'Enter' || event.key === ' ') open(event);

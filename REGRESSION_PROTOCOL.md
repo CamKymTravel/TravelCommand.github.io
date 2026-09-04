@@ -1,3 +1,35 @@
+# V54 Regression Protocol — Effective Cascade + Visual/Interaction + No-Loss
+
+Before editing: `python3 verify_regression_guard.py --verify`.
+
+For a deliberate focused batch, allow only the exact touched files. An allow-list pass is never a new baseline.
+
+Before any continuity/package freeze: `python3 verify_regression_guard.py --verify --deep`. The deep pass must include the V54 migration/routing/backup probes and the full **1,461-day / 10,227-model** sweep.
+
+The guard must pass `ACCEPTANCE_MATRIX_V54.md`. **Hash equality alone is insufficient.** An earlier correct declaration is also insufficient when the **effective final CSS cascade** is wrong. The verifier must fail if the protected Reservations flight-scope tiles or Itinerary Forward Coverage switches finish below 44px. It must also protect the indexed duplicate semantics and the Standard-stay Country requirement/legacy App Health warning.
+
+Regenerate `BASELINE_SHA256.txt` **last**, verify without an allow-list in the source tree, package, extract the final ZIP fresh and verify the extracted copy again without an allow-list.
+
+Never package V53/V52 over V54. Do not call V54 Gold/Master while target-iPad visual, offline voice and practical Vault acceptance remain outstanding.
+
+---
+
+# V53 Regression Protocol — Visual/Interaction + No-Loss
+
+Before editing: `python3 verify_regression_guard.py --verify`.
+
+For a deliberate focused batch, explicitly allow only the touched files. Do not treat an allow-list pass as a new baseline.
+
+Before a continuity/package freeze: `python3 verify_regression_guard.py --verify --deep`. The deep pass must include the V53 migration/routing/backup probes and the full **1,461-day / 10,227-model** continuous sweep.
+
+The guard must also pass `ACCEPTANCE_MATRIX_V53.md`: locked screen hierarchy, deterministic icon treatment, helper entry points and retired-feature checks are now executable acceptance rules. **Hash equality alone is insufficient.**
+
+When freezing a new baseline, regenerate `BASELINE_SHA256.txt` **last**, then run the guard with no allow-list from the source tree and again from a fresh extraction of the final ZIP.
+
+Never package an older/pristine V52 tree over the V53 working source. Do not call a build Gold/Master while target-iPad visual, offline voice and practical Vault acceptance remain outstanding.
+
+---
+
 # V52 Regression Protocol — Stop Backtracking
 
 This is the mandatory protocol for every continuation from V52.

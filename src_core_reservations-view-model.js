@@ -1,5 +1,5 @@
 import { formatAUDate, toISODate } from './src_core_dates.js';
-import { reservationsConflict } from './src_core_reservation-mutations.js';
+import { reservationDuplicateKey } from './src_core_reservation-mutations.js';
 
 export const RESERVATION_TABS = Object.freeze([
   ['flight','Flights'],
@@ -65,20 +65,38 @@ function presentRecord(record, itineraryById) {
 }
 
 function duplicateGroups(records) {
-  const source = records || [];
-  // Duplicate matching has an intentional wildcard when one copy has no time,
-  // so a simple string-key group is not sufficient. Build connected groups:
-  // date-only A can connect 09:00 and 10:00 copies even though those two timed
-  // records would be legitimate if A did not exist.
-  const parent = source.map((_, index) => index);
-  const find = index => parent[index] === index ? index : (parent[index] = find(parent[index]));
-  const join = (a, b) => { const ra=find(a), rb=find(b); if (ra!==rb) parent[rb]=ra; };
-  for (let a=0; a<source.length; a+=1) for (let b=a+1; b<source.length; b+=1) {
-    if (reservationsConflict(source[a], source[b])) join(a,b);
+  // Duplicate semantics are grouped by normalized type + title + date. An
+  // entered time narrows the match, while one date-only copy is intentionally
+  // a wildcard that connects every reservation in that same base group. This
+  // produces the exact same connected groups as the old all-pairs scan without
+  // O(n²) work as a long-running travel history grows.
+  const bases = new Map();
+  for (const record of records || []) {
+    const key = reservationDuplicateKey(record);
+    if (!key) continue;
+    const split = key.lastIndexOf('|');
+    const base = key.slice(0, split);
+    const time = key.slice(split + 1);
+    const list = bases.get(base) || [];
+    list.push({ id:record.id, time });
+    bases.set(base, list);
   }
-  const groups = new Map();
-  source.forEach((record,index)=>{const root=find(index);const ids=groups.get(root)||[];ids.push(record.id);groups.set(root,ids);});
-  return [...groups.values()].filter(ids => ids.length > 1);
+  const groups = [];
+  for (const list of bases.values()) {
+    if (list.length < 2) continue;
+    if (list.some(item => !item.time)) {
+      groups.push(list.map(item => item.id));
+      continue;
+    }
+    const times = new Map();
+    for (const item of list) {
+      const ids = times.get(item.time) || [];
+      ids.push(item.id);
+      times.set(item.time, ids);
+    }
+    for (const ids of times.values()) if (ids.length > 1) groups.push(ids);
+  }
+  return groups;
 }
 
 export function buildReservationsViewModel(state, currentDate, options = {}) {

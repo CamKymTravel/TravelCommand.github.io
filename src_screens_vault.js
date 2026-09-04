@@ -13,6 +13,7 @@ import { formatAUDate } from './src_core_dates.js';
 import { verifyPin, upgradedPinHashAfterSuccessfulVerify } from './src_core_pin.js';
 import { makeExpandableCard } from './src_components_modal.js';
 import { createId } from './src_core_ids.js';
+import { createLineIcon } from './src_components_icons.js';
 
 const OWNER_OPTIONS = VAULT_OWNERS.map(owner => [owner, owner]);
 const CATEGORY_OPTIONS = VAULT_CATEGORIES.map(category => [category, VAULT_CATEGORY_LABELS[category]]);
@@ -282,7 +283,9 @@ function openEmailEditor({ stateService, host, recordId = null }) {
 function renderLocked(main, stateService, access, requestRender) {
   const state=stateService.snapshot(); const model=buildVaultViewModel(state,{unlocked:false});
   main.append(createPageHero({ key:'header-vault', eyebrow:'PROTECTED LOCAL STORAGE', title:'The Vault', subtitle:'Secure your important travel documents and essential information.', className:'vault-reference-hero', position:'center center' }));
-  const hero=node('section','vault-lock-hero'); hero.append(node('p','vault-lock-copy','Passports, visas, insurance, accommodation details and emergency information remain concealed until The Vault is unlocked on this device.'));
+  const hero=node('section','vault-lock-hero');
+  const lockIcon=node('span','vault-lock-icon'); lockIcon.append(createLineIcon('vault'));
+  hero.append(lockIcon,node('p','vault-lock-copy','Passports, visas, insurance, accommodation details and emergency information remain concealed until The Vault is unlocked on this device.'));
   const unlock=node('button','button vault-unlock','Unlock The Vault'); unlock.type='button'; unlock.addEventListener('click',()=>openUnlockDialog({stateService,host:main,access,requestRender})); hero.append(unlock); main.append(hero);
   const grid=node('section','vault-category-grid vault-category-grid-locked');
   for(const card of model.categoryCards){const item=node('article',`vault-category-card vault-category-${card.id}`);item.append(vaultCategoryIcon(card.id),node('strong','',card.label),node('small','','Protected'));grid.append(item);} main.append(grid);
@@ -299,7 +302,7 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const lower=node('div','vault-overview-lower');
   const emergency=node('section','vault-emergency-card'); emergency.append(node('h2','','Emergency Travel Card')); const emergencyRecords=state.vault.filter(r=>r.category==='emergency').slice(0,3); if(!emergencyRecords.length)emergency.append(node('p','vault-empty','No emergency contacts stored')); for(const r of emergencyRecords){const row=node('button','vault-emergency-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection='emergency';access.selectedRecordId=r.id;access.selectedRecordTone='red';requestRender();});emergency.append(row);} lower.append(emergency);
   const activity=node('section','vault-activity');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'indigo'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection=target.category;access.selectedRecordId=target.id;access.selectedRecordTone='indigo';requestRender();});}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);lower.append(activity);main.append(lower);
-  const streaming=node('button','vault-streaming-card');streaming.type='button';streaming.append(node('span','vault-category-icon','▶'),node('strong','','Streaming'),node('small','',`${model.streaming.length} stored services`));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});main.append(streaming);
+  const streaming=node('button','vault-streaming-card');streaming.type='button';const streamingIcon=node('span','vault-category-icon');streamingIcon.append(createLineIcon('streaming'));streaming.append(streamingIcon,node('strong','','Streaming'),node('small','',`${model.streaming.length} stored services`));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});main.append(streaming);
   makeExpandableCard(summary,{host:main,title:'Document Summary',tone:'green'});
   makeExpandableCard(expiry,{host:main,title:'Expiry Reminders',tone:'gold'});
   makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red'});
@@ -333,7 +336,7 @@ export function renderVaultScreen({ stateService, vaultAccessSession:access, req
   if(!access?.vaultUnlocked){renderLocked(main,stateService,access,requestRender);return main;}
   const unlockedState=stateService.snapshot();
   const heroActions=node('div','vault-hero-actions');
-  const streaming=node('button','vault-hero-streaming','▣  STREAMING');streaming.type='button';streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});
+  const streaming=node('button','vault-hero-streaming');streaming.type='button';streaming.append(createLineIcon('streaming'),document.createTextNode(' STREAMING'));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});
   const status=node('div','vault-hero-status');status.append(node('small','','VAULT STATUS'),node('strong','',String(unlockedState.vault.length)),node('span','',`RECORD${unlockedState.vault.length===1?'':'S'} SECURED`),node('em','','LOCAL ONLY · STORED ON THIS IPAD'));
   const lock=node('button','vault-hero-lock','Lock Vault');lock.type='button';lock.addEventListener('click',()=>{lockVault(access);requestRender();});
   heroActions.append(streaming,status,lock);

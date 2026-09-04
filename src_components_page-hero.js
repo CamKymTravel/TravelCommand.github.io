@@ -1,4 +1,5 @@
 import { formatAUDate } from './src_core_dates.js';
+import { createLineIcon } from './src_components_icons.js';
 let indexPromise = null;
 let archivePromise = null;
 const objectUrls = new Map();
@@ -16,7 +17,7 @@ function normalizeCountry(country = '') {
 }
 
 function keyForStay(stay) {
-  if (!stay) return 'banner-indonesia';
+  if (!stay) return null;
   const type = String(stay.travelType || '').toLowerCase();
   if (type === 'cruise') return 'banner-cruise-princess';
   if (type === 'motorhome' || type === 'rv') {
@@ -131,7 +132,7 @@ export function createStayBanner({ currentStay = null, nextDestination = null, n
     const dates=document.createElement('span'); dates.textContent=currentStay.dates || (currentStay.startDate&&currentStay.endDate?`${formatAUDate(currentStay.startDate)} – ${formatAUDate(currentStay.endDate)}`:'');
     current.append(name,dates);
     if (Number.isFinite(Number(currentStay.remainingDays))) { const remaining=document.createElement('span'); remaining.className='tcc-stay-banner-detail'; remaining.textContent=`${Number(currentStay.remainingDays)} day${Number(currentStay.remainingDays)===1?'':'s'} remaining`; current.append(remaining); }
-    if(currentStay.travelType==='cruise'||currentStay.travelType==='motorhome'||currentStay.travelType==='rv'){ const mode=document.createElement('span'); mode.className='tcc-stay-mode-marker'; mode.textContent=currentStay.travelType==='cruise'?'⚓ Cruise':'▣ Motorhome'; current.append(mode); }
+    if(currentStay.travelType==='cruise'||currentStay.travelType==='motorhome'||currentStay.travelType==='rv'){ const mode=document.createElement('span'); mode.className='tcc-stay-mode-marker'; mode.append(createLineIcon(currentStay.travelType==='cruise'?'cruise':'rv'),document.createTextNode(currentStay.travelType==='cruise'?' Cruise':' Motorhome')); current.append(mode); }
     if (Number.isFinite(Number(currentStay.progress))) { const p=document.createElement('progress'); const progress=Math.max(0,Math.min(100,Number(currentStay.progress))); p.max=100; p.value=progress; p.setAttribute('aria-label','Days in current stay'); p.setAttribute('aria-valuetext',`${Math.round(progress)}% of current stay elapsed`); current.append(p); }
   } else { const empty=document.createElement('strong'); empty.textContent='No current stay'; current.append(empty); }
   const next=card('next','NEXT DESTINATION');

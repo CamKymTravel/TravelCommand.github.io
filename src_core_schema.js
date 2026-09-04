@@ -1,5 +1,5 @@
 export const SCHEMA_VERSION = 2;
-export const APP_VERSION = '1.2.0-v49-ipad-full-screenshot-repair';
+export const APP_VERSION = '1.2.0-v54-touch-target-completion';
 
 export const TRAVEL_TYPES = Object.freeze(['standard', 'motorhome', 'cruise']);
 export const RESERVATION_TYPES = Object.freeze(['flight', 'train', 'cruise', 'rv', 'accommodation', 'ticket']);

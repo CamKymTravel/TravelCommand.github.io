@@ -1,3 +1,22 @@
+# V54 Visual Acceptance Authority
+
+The late V54 data-integrity/performance repairs (indexed Reservations duplicate health and Standard-stay Country requirement) do not change visual colour authority. The Country field requirement supports the already-locked country-header/helper behaviour.
+
+
+`VISUAL_REFERENCES.zip` remains the unchanged screenshot/layout evidence pack. V54 carries forward `ACCEPTANCE_MATRIX_V53.md` and adds `ACCEPTANCE_MATRIX_V54.md`, which protects the effective final iPad touch cascade in addition to the V53 hierarchy/icon/helper rules.
+
+Screenshots remain **structure, density, hierarchy, crop and defect evidence** and are not automatic colour authority unless Cameron explicitly approves a specific colour. The V54 touch-target repair changes control hit geometry only; it does not authorise palette or layout redesign.
+
+---
+
+# V53 Visual Acceptance Authority
+
+The existing `VISUAL_REFERENCES.zip` remains the packaged screenshot/layout authority. V53 adds `ACCEPTANCE_MATRIX_V53.md`, which converts the approved hierarchy/interaction requirements into regression checks. Screenshots remain **structure, density, hierarchy, crop and defect evidence**; they are not automatic colour authority unless Cameron explicitly approves a specific colour.
+
+The repaired source must not be simplified merely because an older V52 screenshot or hash matches. Home, Budget, Reservations, Itinerary, Calendar, Journey History, Checklist, Vault, Settings, Add Expense, Add Reservation, Country Quick Look and toilet helper acceptance rules are listed in the matrix.
+
+---
+
 # V52 Visual Reference Index — No-Loss Authority
 
 `VISUAL_REFERENCES.zip` is carried unchanged from V51 and remains the visual evidence pack. Its 21 JPEGs and authority README are protected.

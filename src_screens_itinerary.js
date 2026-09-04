@@ -1,16 +1,16 @@
 import { buildItineraryViewModel } from './src_core_itinerary-view-model.js';
-import { buildHomeViewModel } from './src_core_home-view-model.js';
-import { createStayBanner } from './src_components_page-hero.js';
 import { saveItineraryDraft, deleteItineraryDraft } from './src_core_itinerary-mutations.js';
-import { renderOfflineMap } from './src_components_offline-map.js';
 import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { formatMoney } from './src_core_currency.js';
 import { isTravelYearSelected, toggleTravelYear } from './src_core_year-filters.js';
 import { formatAUDate } from './src_core_dates.js';
+import { createLineIcon } from './src_components_icons.js';
+import { renderOfflineMap } from './src_components_offline-map.js';
 
 const TRAVEL_TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise' });
+const TRAVEL_TYPE_ICONS = Object.freeze({ standard:'globe', motorhome:'rv', cruise:'cruise' });
 const ITINERARY_TRANSIENT_VIEW = new WeakMap();
 
 function node(tag, className, text) {
@@ -69,12 +69,13 @@ function routeValues(body) {
   }));
 }
 
-function openItineraryEditor({ stateService, host, currentDate, entryId = null, prepareRecordVisibility = null, editorTone = null }) {
+function openItineraryEditor({ stateService, host, currentDate, entryId = null, prepareRecordVisibility = null, editorTone = null, initialFields = null }) {
   const state = stateService.snapshot();
   const existing = entryId ? state.itinerary.find(item => item.id === entryId) : null;
   if (entryId && !existing) return;
   const originalFields = existing ? structuredClone(existing) : {
-    name:'', country:'', travelType:'standard', startDate:'', endDate:'', startCity:'', startCountry:'', localCurrency:'', fixedLocalPerAUD:null, destinationBudgetAUD:0, lat:null, long:null
+    name:'', country:'', travelType:'standard', startDate:'', endDate:'', startCity:'', startCountry:'', localCurrency:'', fixedLocalPerAUD:null, destinationBudgetAUD:0, lat:null, long:null,
+    ...(initialFields && typeof initialFields === 'object' ? initialFields : {})
   };
   const originalRoutePoints = existing
     ? state.routePoints.filter(point => point.itineraryId === existing.id).sort((a, b) => Number(a.order || 0) - Number(b.order || 0)).map(point => structuredClone(point))
@@ -134,27 +135,30 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     setModalTone(modal, editorTone || (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'indigo'));
     typeTiles.replaceChildren();
     for (const [type, label] of [['standard','Standard'],['motorhome','Motorhome'],['cruise','Cruise']]) {
-      const button = node('button', 'itinerary-type-tile', label);
+      const button = node('button', 'itinerary-type-tile');
       button.type = 'button';
       button.dataset.travelType = type;
+      button.append(createLineIcon(TRAVEL_TYPE_ICONS[type] || 'globe', 'itinerary-type-choice-icon'), node('span', 'itinerary-type-choice-label', label));
       const active = type === body.dataset.travelType;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      if (active) button.append(node('span', 'itinerary-selected-tick', '✓'));
+      if (active) button.append(createLineIcon('check', 'itinerary-selected-tick'));
       button.addEventListener('click', () => {
         if (body.dataset.travelType !== 'standard') routeDraft = routeValues(body);
         body.dataset.travelType = type;
         const startCountryInput = fields.querySelector('[name="startCountry"]');
         const startCountryField = startCountryInput?.closest('label');
+        const countryInput = fields.querySelector('[name="country"]');
         if (startCountryField) startCountryField.hidden = type === 'standard';
         if (startCountryInput) startCountryInput.required = type !== 'standard';
+        if (countryInput) countryInput.required = type === 'standard';
         if (!editorTone) setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'indigo');
         for (const tile of typeTiles.children) {
           const tileActive = tile.dataset.travelType === type;
           tile.dataset.active = String(tileActive);
           tile.setAttribute('aria-pressed', String(tileActive));
           tile.querySelector('.itinerary-selected-tick')?.remove();
-          if (tileActive) tile.append(node('span', 'itinerary-selected-tick', '✓'));
+          if (tileActive) tile.append(createLineIcon('check', 'itinerary-selected-tick'));
         }
         renderRouteRows(routeDraft);
       });
@@ -191,6 +195,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
       inputField('Map Latitude', 'lat', 'number', savedFields.lat ?? ''),
       inputField('Map Longitude', 'long', 'number', savedFields.long ?? '')
     );
+    const countryInput = fields.querySelector('[name="country"]');
+    if (countryInput) countryInput.required = body.dataset.travelType === 'standard';
     if (normalDatedCostsExist) {
       const note = node('p', 'itinerary-field-lock-note', 'Local currency and fixed exchange rate are locked because this stay already has dated costs. Stay dates can still be changed when every dated cost remains safely linked to this exact stay.');
       fields.append(note);
@@ -279,7 +285,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
   );
 
   const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'indigo') : 'indigo';
-  modal = createModal({ title:existing ? 'Edit Destination / Trip' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${editorTone || itineraryTone}` });
+  const addingHomeVisit = !existing && originalFields.country === 'Australia' && /^home(?:\s*\/|$)/i.test(String(originalFields.name || ''));
+  modal = createModal({ title:existing ? 'Edit Destination / Trip' : addingHomeVisit ? 'Add Home Visit' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${editorTone || itineraryTone}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -288,32 +295,36 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
 function renderStats(model) {
   const stats = node('section', 'itinerary-stats');
   const items = [
-    ['countries','Countries Planned',model.stats.countriesPlanned],
-    ['routes','Route Trips',model.stats.routeTrips],
-    ['stops','Planned Stops',model.stats.plannedStops],
-    ['gaps','Unplanned Gaps',model.stats.missingCoverage],
-    ['stays','Missing Stays',model.stats.missingStays],
-    ['overlaps','Date Overlaps',model.stats.dateOverlaps]
+    ['countries','Countries Planned',model.stats.countriesPlanned,'globe'],
+    ['routes','Route Trips',model.stats.routeTrips,'rv'],
+    ['stops','Planned Stops',model.stats.plannedStops,'pin'],
+    ['gaps','Unplanned Gaps',model.stats.missingCoverage,'warning'],
+    ['stays','Missing Stays',model.stats.missingStays,'accommodation'],
+    ['overlaps','Date Overlaps',model.stats.dateOverlaps,'calendar']
   ];
-  for (const [key,label,value] of items) {
+  for (const [key,label,value,iconName] of items) {
     const card = node('article', `itinerary-stat itinerary-stat-${key}`);
-    card.append(node('strong', '', String(value)), node('span', '', label));
+    const icon=node('span','itinerary-stat-icon'); icon.append(createLineIcon(iconName));
+    const copy=node('span','itinerary-stat-copy'); copy.append(node('strong','',String(value)),node('span','',label));
+    card.append(icon,copy);
     stats.append(card);
   }
   return stats;
 }
 
+
 function renderMap(model, host) {
   const panel = node('section', 'itinerary-panel itinerary-map-panel');
   const head = node('div', 'itinerary-map-title-row');
-  const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','','Where We\'re Going'));
-  const expand=node('button','button itinerary-expand-map','Expand Map'); expand.type='button';
+  const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','',"Where We're Going"));
+  const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode(' Expand Map'));
   expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key'})); const modal=createModal({title:'Forward Journey Plan',body,actions:[{label:'Close / Return to Itinerary',onClick:d=>d.close()}],className:'tone-blue'}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
   head.append(copy,expand); panel.append(head);
-  const first=model.currentStay||null, next=model.nextDestination||null; const routePoints=model.upcoming.reduce((s,r)=>s+Number(r.routePointCount||0),0);
-  const metrics=node('div','itinerary-map-metrics'); const data=[['Current',first?.name||'—'],['Next',next?.name||'—'],['Planned Stops',String(model.stats.plannedStops)],['Detailed Route Points',String(routePoints)],['Route Trips',String(model.stats.routeTrips)],['Missing Coverage',String(model.stats.missingCoverage)]]; for(const [label,value] of data){const m=node('article','itinerary-map-metric');m.append(node('span','',label),node('strong','',value));metrics.append(m);} panel.append(metrics);
+  const first=model.currentStay||null, next=model.nextDestination||null; const routePoints=model.upcoming.reduce((sum,record)=>sum+Number(record.routePointCount||0),0);
+  const metrics=node('div','itinerary-map-metrics'); const data=[['Current',first?.name||'—'],['Next',next?.name||'—'],['Planned Stops',String(model.stats.plannedStops)],['Detailed Route Points',String(routePoints)],['Route Trips',String(model.stats.routeTrips)],['Missing Coverage',String(model.stats.missingCoverage)]]; for(const [label,value] of data){const metric=node('article','itinerary-map-metric');metric.append(node('span','',label),node('strong','',value));metrics.append(metric);} panel.append(metrics);
   const stage = node('div', 'itinerary-map-stage'); stage.append(renderOfflineMap(model.journeyMap, { ariaLabel:'Itinerary forward planning map', fitToPoints:true, labelMode:'key' })); panel.append(stage);
-  const legend=node('div','itinerary-map-legend'); for(const [cls,label] of [['standard','Flight / Standard'],['motorhome','Motorhome'],['cruise','Cruise']]){const item=node('span','');item.append(node('i',`itinerary-legend-line itinerary-legend-${cls}`),node('b','',label));legend.append(item);} panel.append(legend); return panel;
+  const legend=node('div','itinerary-map-legend'); for(const [cls,label] of [['standard','Flight / Standard'],['motorhome','Motorhome'],['cruise','Cruise']]){const item=node('span','');item.append(node('i',`itinerary-legend-line itinerary-legend-${cls}`),node('b','',label));legend.append(item);} panel.append(legend);
+  return panel;
 }
 
 function renderYearFilters(model, options, onChange) {
@@ -340,13 +351,11 @@ function renderCoverage(model, months = 6, onMonthsChange = null, openEditor = n
   panel.append(head);
   if(!hasCoverage){panel.append(node('p','itinerary-empty','Set Journey Start in Settings or add your first destination to begin Forward Coverage.'));return panel;}
   const summary=node('div','itinerary-coverage-summary');
-  const gapTone=model.forwardCoverage.gapDays?'warn':'clear';
-  const coverageTone=model.forwardCoverage.coveragePercent>=100?'complete':model.forwardCoverage.coveragePercent>=80?'progress':'warn';
+  const nextGap=(model.forwardCoverage.segments||[]).find(segment=>segment.type==='gap')||null;
   summary.append(
     paceCoverage(`${model.forwardCoverage.plannedDays}`,'days planned','planned'),
-    paceCoverage(`${model.forwardCoverage.gapDays}`,'uncovered days',gapTone),
-    paceCoverage(`${model.forwardCoverage.overlapDays}`,'overlap days',model.forwardCoverage.overlapDays?'warn':'clear'),
-    paceCoverage(`${model.forwardCoverage.coveragePercent}%`,'covered',coverageTone)
+    paceCoverage(`${model.forwardCoverage.gapDays}`,'days unplanned',model.forwardCoverage.gapDays?'warn':'clear'),
+    paceCoverage(nextGap ? formatAUDate(nextGap.startDate) : 'NONE','next gap',nextGap?'warn':'clear')
   );
   panel.append(summary);
   const timeline=node('div','itinerary-coverage-timeline');
@@ -363,7 +372,9 @@ function paceCoverage(value,label,tone=''){const m=node('article',`itinerary-cov
 function renderEntry(record, openEditor) {
   const button = node('button', `itinerary-entry itinerary-entry-${record.travelType}`); button.type='button'; button.addEventListener('click',()=>openEditor(record.id));
   const dates=node('span','itinerary-entry-dates'); dates.append(node('strong','',record.displayDates.split(' – ')[0]||''),node('small','','TO'),node('strong','',record.displayDates.split(' – ')[1]||''),node('em','',`${record.days} days`));
-  const copy=node('span','itinerary-entry-copy'); copy.append(node('strong','',record.name),node('small','',[record.country,TRAVEL_TYPE_LABELS[record.travelType] || record.travelType].filter(Boolean).join(' · '))); const badges=node('span','itinerary-entry-badges'); if(record.hasAccommodation)badges.append(node('i','','ACCOMMODATION LINKED')); if(record.travelType!=='standard')badges.append(node('i','',`${record.routePointCount} ROUTE POINTS`)); copy.append(badges);
+  const copy=node('span','itinerary-entry-copy');
+  const identity=node('span','itinerary-entry-identity'); const identityIcon=node('span','itinerary-entry-icon'); identityIcon.append(createLineIcon(TRAVEL_TYPE_ICONS[record.travelType]||'globe')); const identityCopy=node('span','itinerary-entry-identity-copy'); identityCopy.append(node('strong','',record.name),node('small','',[record.country,TRAVEL_TYPE_LABELS[record.travelType] || record.travelType].filter(Boolean).join(' · '))); identity.append(identityIcon,identityCopy); copy.append(identity);
+  const badges=node('span','itinerary-entry-badges'); if(record.hasAccommodation)badges.append(node('i','','ACCOMMODATION LINKED')); if(record.travelType!=='standard')badges.append(node('i','',`${record.routePointCount} ROUTE POINTS`)); copy.append(badges);
   const plan=node('span','itinerary-entry-plan'); plan.append(node('small','','TRAVEL PLAN'),node('strong','',record.travelType==='motorhome'?'Motorhome':record.travelType==='cruise'?'Cruise':'Standard'));
   const budget=node('span','itinerary-entry-budget'); budget.append(node('small','','DESTINATION BUDGET'),node('strong','',formatMoney(record.destinationBudgetAUD,'AUD')));
   button.append(dates,copy,plan,budget);
@@ -402,7 +413,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
   };
   rememberOptions();
 
-  const openEditor = (entryId, editorTone = null) => openItineraryEditor({ stateService, host:main, currentDate, entryId, prepareRecordVisibility, editorTone });
+  const openEditor = (entryId, editorTone = null, initialFields = null) => openItineraryEditor({ stateService, host:main, currentDate, entryId, prepareRecordVisibility, editorTone, initialFields });
 
   function renderContent() {
     const state = stateService.snapshot();
@@ -412,26 +423,17 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     // horizon and other screen state are retained.
     if (pending?.collection === 'itinerary' && pending.id && state.itinerary.some(record => record.id === pending.id)) prepareRecordVisibility();
     const model = buildItineraryViewModel(state, currentDate, options);
+    const mapPanel = renderMap(model, main);
     main.replaceChildren();
 
-    const homeModel = buildHomeViewModel(state, currentDate, { alertLimit:0, eventLimit:0 });
-    main.append(createStayBanner({ currentStay:homeModel.currentStay, nextDestination:homeModel.nextDestination, navigate, className:'itinerary-stay-banner' }));
-
-    const toolbar = node('header', 'itinerary-toolbar');
-    const title = node('div');
-    title.append(node('p', 'eyebrow', 'TRAVEL PLANNING'), node('h1', '', 'Itinerary'));
-    toolbar.append(title);
-    main.append(toolbar);
-
-    const mapPanel=renderMap(model, main);
     const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, id=>openEditor(id,'indigo'));
     const statsPanel=renderStats(model);
-    main.append(mapPanel,coveragePanel,statsPanel);
+    main.append(coveragePanel,statsPanel);
     makeExpandableCard(coveragePanel,{host:main,title:'Forward Coverage',tone:'indigo'});
     const statTones={countries:'teal',routes:'indigo',stops:'blue',gaps:'gold',stays:'orange',overlaps:'red'};
     for(const stat of statsPanel.querySelectorAll('.itinerary-stat')){
       const kind=[...stat.classList].find(name=>name.startsWith('itinerary-stat-'))?.replace('itinerary-stat-','')||'blue';
-      makeExpandableCard(stat,{host:main,title:stat.querySelector('span')?.textContent||'Itinerary Statistic',tone:statTones[kind]||'blue'});
+      makeExpandableCard(stat,{host:main,title:stat.querySelector('.itinerary-stat-copy > span')?.textContent||'Itinerary Statistic',tone:statTones[kind]||'blue'});
     }
 
     const controls = node('section', 'itinerary-controls');
@@ -446,8 +448,12 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
       rememberOptions();
       renderContent();
     });
-    const addBar=node('button','itinerary-add-bar','＋ ADD DESTINATION'); addBar.type='button'; addBar.addEventListener('click',()=>openEditor(null));
-    main.append(addBar);
+    const actionRow=node('section','itinerary-action-row');
+    const addBar=node('button','itinerary-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode(' ADD DESTINATION')); addBar.addEventListener('click',()=>openEditor(null));
+    const addHome=node('button','itinerary-add-home'); addHome.type='button'; addHome.append(createLineIcon('home'),document.createTextNode(' ADD HOME VISIT'));
+    addHome.addEventListener('click',()=>openEditor(null,'violet',{name:'Home / Australia',country:'Australia',travelType:'standard',startCity:'',startCountry:'Australia',localCurrency:'AUD',fixedLocalPerAUD:1}));
+    actionRow.append(addBar,addHome);
+    main.append(actionRow);
     controls.append(search, years);
     main.append(controls);
 
@@ -461,6 +467,13 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     upcomingPanel.append(upcomingList);
     main.append(upcomingPanel);
     makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'blue'});
+
+    // The approved iPad hierarchy keeps Forward Coverage and the six compact
+    // planning statistics directly above Add/Search/Upcoming. Keep the forward
+    // map, but place it after the primary planning list so it cannot push those
+    // locked controls out of the first working viewport.
+    main.append(mapPanel);
+    makeExpandableCard(mapPanel,{host:main,title:'Forward Journey Map',tone:'blue'});
 
     const completed = document.createElement('details');
     completed.className = 'itinerary-panel itinerary-completed';

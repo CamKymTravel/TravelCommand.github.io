@@ -1,3 +1,41 @@
+# V54 Touch-Target Completion Candidate — START HERE
+
+**4 September 2026 AEST**
+
+Continue from this exact V54 tree. It directly absorbs the frozen V53 acceptance-repair build, the post-freeze touch-target completion, the proven Reservations duplicate-scan performance repair, and Standard-stay Country integrity hardening. **Do not restart from V53, V52 or screenshots.**
+
+Current identity: `1.2.0-v54-touch-target-completion` / cache `tcc-v1-v54-touch-target-completion-2026-09-04`.
+
+The V54 guard protects file identity, the V53 screen/interaction hierarchy, the **effective final CSS cascade** for the two controls that were proven to regress after earlier 44px hardening, the semantics-identical indexed Reservations duplicate grouping, and the rule that new/edited Standard stays require a Country so their header and offline destination helpers remain resolvable.
+
+A successful V54 deep check is:
+`python3 verify_regression_guard.py --verify --deep`
+
+The deep gate still requires the full **1,461-day / 10,227/10,227 view-model builds** plus migration/routing/backup probes, Standard-stay Country rejection, and protected duplicate-group semantics. Physical target-iPad screenshot/offline-voice/Vault practical acceptance remains outstanding; V54 is not Gold/Master Lock.
+
+Read `CHANGESET_V53_TO_V54.md` and `ACCEPTANCE_MATRIX_V54.md` before the V53 ancestry documents. Athens simulation remains blocked and, when rebuilt, must branch only from accepted V54.
+
+---
+
+# V53 Acceptance Repair Candidate — START HERE
+
+**4 September 2026 AEST**
+
+Continue from this exact V53 tree. It directly absorbs V52 and the complete post-V52 acceptance repair. **Do not restart from pristine V52.** The regression protocol now protects both file identity and the locked screen/interaction hierarchy in `ACCEPTANCE_MATRIX_V53.md`.
+
+Current identity: `1.2.0-v53-acceptance-repair` / cache `tcc-v1-v53-acceptance-repair-2026-09-04`.
+
+Verified before freeze: 63/63 JS modules parse; CSS structure passes; V49 state migration and V49 backup compatibility pass; future V54 state is rejected; exact date-driven Destination Budget routing passes; 1,461/1,461 journey days build successfully across seven core screens for **10,227/10,227 view-model builds**.
+
+A successful V53 deep check is:
+`python3 verify_regression_guard.py --verify --deep`
+
+The package remains an iPad acceptance candidate until real-device screenshot/offline-voice/Vault practical acceptance. Do not build Athens from an older baseline.
+
+See `CHANGESET_V52_TO_V53.md` and `ACCEPTANCE_MATRIX_V53.md`.
+
+---
+
 # Travel Command Centre V1 — V52 Active No-Loss Continuity Baseline
 
 **Continuity package:** V52 ACTIVE NO-LOSS — 4 September 2026 AEST  

@@ -1954,8 +1954,7 @@
       linear-gradient(145deg,rgba(35,31,68,.96),rgba(12,19,39,.985));
     box-shadow:0 16px 34px rgba(0,0,0,.22),0 0 24px rgba(184,109,255,.05),inset 0 1px rgba(255,255,255,.045);
   }
-  [data-screen="vault"] .vault-lock-hero::before {
-    content:"🔒";
+  [data-screen="vault"] .vault-lock-icon {
     width:54px;
     height:54px;
     display:grid;
@@ -1963,9 +1962,9 @@
     border:1px solid rgba(199,152,255,.38);
     border-radius:15px;
     background:linear-gradient(145deg,rgba(184,109,255,.16),rgba(8,23,42,.52));
-    font-size:27px;
     box-shadow:inset 0 1px rgba(255,255,255,.09),0 0 19px rgba(184,109,255,.09);
   }
+  [data-screen="vault"] .vault-lock-icon .tcc-line-icon { width:28px; height:28px; }
   [data-screen="vault"] .vault-lock-hero::after {
     content:"";
     position:absolute;
@@ -2609,19 +2608,18 @@
     color:rgba(239,248,255,.78);
     cursor:zoom-in;
   }
-  .tcc-expand-trigger::before {
-    content:'⤢';
+  .tcc-expand-trigger .tcc-line-icon {
     width:25px;
     height:25px;
     display:grid;
     place-items:center;
+    padding:4px;
     border:1px solid rgba(205,231,255,.24);
     border-radius:9px;
     background:rgba(4,13,25,.42);
     box-shadow:inset 0 0 14px rgba(255,255,255,.03);
-    font-size:14px;
-    line-height:1;
   }
+  .tcc-expand-trigger .tcc-line-icon svg { width:100%; height:100%; }
   .tcc-expand-trigger:focus-visible {
     outline:3px solid rgba(88,199,255,.55);
     outline-offset:1px;
@@ -3256,6 +3254,35 @@
     border-color:rgba(var(--tcc-editor-rgb),.60);
     box-shadow:0 0 0 3px rgba(var(--tcc-editor-rgb),.10);
   }
+  /* Reference-authority icon-led Add/Edit choice tiles. Inline SVG keeps iPad Safari fully offline/deterministic. */
+  [data-screen="budget"] .budget-category-tile,
+  [data-screen="reservations"] .reservation-type-tile,
+  [data-screen="itinerary"] .itinerary-type-tile {
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+  }
+  [data-screen="budget"] .budget-category-choice-icon,
+  [data-screen="reservations"] .reservation-type-choice-icon,
+  [data-screen="itinerary"] .itinerary-type-choice-icon {
+    width:25px; height:25px; flex:0 0 25px; color:rgba(230,242,255,.88);
+  }
+  [data-screen="budget"] .budget-category-choice-label,
+  [data-screen="reservations"] .reservation-type-choice-label,
+  [data-screen="itinerary"] .itinerary-type-choice-label {
+    display:block; font-weight:800; line-height:1.05; text-align:center;
+  }
+  [data-screen="budget"] .budget-category-tile[data-active="true"] .budget-category-choice-icon,
+  [data-screen="reservations"] .reservation-type-tile[data-active="true"] .reservation-type-choice-icon,
+  [data-screen="itinerary"] .itinerary-type-tile[data-active="true"] .itinerary-type-choice-icon { color:rgb(var(--choice-rgb)); filter:drop-shadow(0 0 8px rgba(var(--choice-rgb),.24)); }
+  [data-screen="budget"] .budget-selected-tick,
+  [data-screen="reservations"] .reservation-selected-tick,
+  [data-screen="itinerary"] .itinerary-selected-tick {
+    position:absolute; top:6px; right:7px; width:15px; height:15px; color:rgb(var(--choice-rgb));
+  }
   /* Expense category: each selected tile matches the same tone applied to the form. */
   [data-screen="budget"] .budget-category-groceries { --choice-rgb:70,217,202; }
   [data-screen="budget"] .budget-category-eating-out { --choice-rgb:93,141,255; }
@@ -3289,7 +3316,7 @@
   [data-screen="reservations"] .reservation-flight-scope-tile {
     appearance:none;
     -webkit-appearance:none;
-    min-height:38px;
+    min-height:44px;
     padding:7px 15px;
     border:1px solid rgba(93,141,255,.24);
     border-radius:12px;
@@ -3806,4 +3833,366 @@
   color: #ffd7de;
   font-weight: 750;
   line-height: 1.35;
+}
+
+/* 04 Sep 2026 — deterministic inline-SVG icon layer.
+   Avoid symbol-font/emoji rendering gaps on iPad Safari while preserving each
+   parent card's existing material colour and icon-chip geometry. */
+@layer screens {
+  .tcc-line-icon { display:inline-grid; place-items:center; width:1em; height:1em; flex:0 0 auto; line-height:1; }
+  .tcc-line-icon > svg { width:100%; height:100%; display:block; overflow:visible; }
+  .nav-icon .tcc-line-icon { width:20px; height:20px; }
+  [data-screen="reservations"] .reservation-tab-icon .tcc-line-icon { width:20px; height:20px; }
+  [data-screen="journey-history"] .journey-summary-icon .tcc-line-icon { width:22px; height:22px; }
+  [data-screen="checklist"] .checklist-column-icon .tcc-line-icon,
+  [data-screen="checklist"] .checklist-next-icon .tcc-line-icon { width:18px; height:18px; }
+  [data-screen="home"] .home-timeline-icon .tcc-line-icon { width:15px; height:15px; }
+  [data-screen="home"] .home-helper-chip-icon .tcc-line-icon { width:20px; height:20px; }
+}
+@layer screens {
+  [data-screen="itinerary"] .itinerary-stat {
+    display:grid; grid-template-columns:38px minmax(0,1fr); align-items:center; gap:10px;
+  }
+  [data-screen="itinerary"] .itinerary-stat-icon {
+    width:36px; height:36px; display:grid; place-items:center; border:1px solid currentColor;
+    border-radius:11px; background:rgba(3,15,28,.24); color:#dff7ff;
+    box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px rgba(88,199,255,.08);
+  }
+  [data-screen="itinerary"] .itinerary-stat-icon .tcc-line-icon { width:20px; height:20px; }
+  [data-screen="itinerary"] .itinerary-stat-copy { min-width:0; display:grid; gap:5px; color:inherit; }
+  [data-screen="itinerary"] .itinerary-stat-copy > strong { font-size:30px; line-height:.95; }
+  [data-screen="itinerary"] .itinerary-stat-copy > span { color:var(--text-secondary); font-size:10px; font-weight:780; line-height:1.12; }
+}
+
+/* 04 Sep 2026 — Itinerary acceptance repair against REF_06/REF_07.
+   Forward Coverage and the six compact planning stats are the top-level
+   planning authority; the unapproved large forward map must not precede them. */
+[data-screen="itinerary"].itinerary-screen { gap: 12px; }
+[data-screen="itinerary"] .itinerary-toolbar { margin-bottom: -2px; }
+[data-screen="itinerary"] .itinerary-coverage-reference { padding: 14px 16px; }
+[data-screen="itinerary"] .itinerary-coverage-reference .itinerary-section-head { margin-bottom: 10px; }
+[data-screen="itinerary"] .itinerary-coverage-reference .itinerary-section-head h2 { font-size: 20px; letter-spacing: .035em; text-transform: uppercase; }
+[data-screen="itinerary"] .itinerary-coverage-reference .itinerary-section-head small { color: var(--text-secondary); font-size: 12px; }
+[data-screen="itinerary"] .itinerary-coverage-switches { display:flex; gap:6px; padding:4px; border:1px solid rgba(150,196,255,.12); border-radius:13px; background:rgba(2,11,23,.34); }
+[data-screen="itinerary"] .itinerary-coverage-switch { min-height:44px; padding:0 13px; border:1px solid transparent; border-radius:10px; background:transparent; color:var(--text-secondary); font-weight:800; cursor:pointer; }
+[data-screen="itinerary"] .itinerary-coverage-switch[data-active="true"] { border-color:rgba(88,199,255,.48); background:linear-gradient(180deg,rgba(32,169,244,.85),rgba(14,121,199,.82)); color:white; box-shadow:inset 0 1px rgba(255,255,255,.2),0 0 18px rgba(88,199,255,.12); }
+[data-screen="itinerary"] .itinerary-coverage-summary { display:grid; grid-template-columns:1fr 1fr minmax(190px,1.25fr); gap:8px; margin-bottom:10px; }
+[data-screen="itinerary"] .itinerary-coverage-box { min-height:54px; display:grid; grid-template-columns:auto 1fr; align-items:center; gap:8px; padding:8px 12px; border:1px solid rgba(88,199,255,.13); border-radius:12px; background:rgba(4,15,29,.43); }
+[data-screen="itinerary"] .itinerary-coverage-box strong { font-size:22px; line-height:1; }
+[data-screen="itinerary"] .itinerary-coverage-box span { color:var(--text-secondary); font-size:11px; font-weight:760; text-transform:lowercase; }
+[data-screen="itinerary"] .itinerary-coverage-box.warn { border-color:rgba(255,111,131,.34); background:linear-gradient(145deg,rgba(81,30,48,.34),rgba(16,20,34,.5)); }
+[data-screen="itinerary"] .itinerary-coverage-box.clear strong { color:var(--success); }
+[data-screen="itinerary"] .itinerary-coverage-timeline { min-height:66px; display:flex; gap:2px; overflow:hidden; border:1px solid rgba(150,196,255,.12); border-radius:13px; background:rgba(2,10,20,.38); }
+[data-screen="itinerary"] .itinerary-coverage-segment { min-width:64px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:7px 8px; border:0; border-top:4px solid rgba(88,199,255,.6); background:rgba(11,33,53,.72); color:var(--text-primary); text-align:center; cursor:pointer; }
+[data-screen="itinerary"] .itinerary-coverage-segment strong { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+[data-screen="itinerary"] .itinerary-coverage-segment small { color:var(--text-secondary); font-size:10px; }
+[data-screen="itinerary"] .itinerary-segment-motorhome { border-top-color:var(--feature-orange); }
+[data-screen="itinerary"] .itinerary-segment-cruise { border-top-color:var(--feature-violet); }
+[data-screen="itinerary"] .itinerary-segment-gap { border-top-color:var(--danger); background:repeating-linear-gradient(135deg,rgba(122,31,55,.48) 0 10px,rgba(80,24,44,.48) 10px 20px); }
+[data-screen="itinerary"] .itinerary-stats { grid-template-columns:repeat(6,minmax(0,1fr)) !important; gap:8px; }
+[data-screen="itinerary"] .itinerary-stat { min-height:88px; display:grid; grid-template-columns:38px 1fr; align-items:center; gap:8px; padding:10px 11px; border-radius:15px; }
+[data-screen="itinerary"] .itinerary-stat-icon { width:38px; height:38px; display:grid; place-items:center; border:1px solid currentColor; border-radius:11px; opacity:.95; }
+[data-screen="itinerary"] .itinerary-stat-icon .tcc-line-icon { width:22px; height:22px; }
+[data-screen="itinerary"] .itinerary-stat-copy { display:grid; gap:3px; min-width:0; }
+[data-screen="itinerary"] .itinerary-stat-copy strong { font-size:26px; }
+[data-screen="itinerary"] .itinerary-stat-copy span { font-size:10px; line-height:1.1; }
+[data-screen="itinerary"] .itinerary-action-row { display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:10px; }
+[data-screen="itinerary"] .itinerary-add-bar,
+[data-screen="itinerary"] .itinerary-add-home { min-height:52px; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:14px; color:white; cursor:pointer; font-weight:900; letter-spacing:.06em; }
+[data-screen="itinerary"] .itinerary-add-bar { border:1px solid rgba(88,199,255,.55); background:linear-gradient(180deg,rgba(32,169,244,.94),rgba(12,128,205,.92)); box-shadow:inset 0 1px rgba(255,255,255,.24),0 9px 22px rgba(5,93,160,.18); }
+[data-screen="itinerary"] .itinerary-add-home { border:1px solid rgba(165,106,255,.52); background:linear-gradient(180deg,rgba(124,72,198,.9),rgba(87,50,151,.92)); box-shadow:inset 0 1px rgba(255,255,255,.18),0 9px 22px rgba(75,38,129,.18); }
+[data-screen="itinerary"] .itinerary-add-bar .tcc-line-icon,
+[data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { width:20px; height:20px; }
+[data-screen="itinerary"] .itinerary-controls { grid-template-columns:minmax(0,1fr) auto; gap:10px; }
+[data-screen="itinerary"] .itinerary-search { min-height:48px; }
+@media (max-width: 900px) {
+  [data-screen="itinerary"] .itinerary-stat { grid-template-columns:30px 1fr; padding:9px 8px; }
+  [data-screen="itinerary"] .itinerary-stat-icon { width:30px; height:30px; }
+  [data-screen="itinerary"] .itinerary-stat-copy strong { font-size:22px; }
+  [data-screen="itinerary"] .itinerary-action-row { grid-template-columns:minmax(0,1fr) 160px; }
+}
+
+/* 04 Sep 2026 — Home acceptance repair: restore the locked next-destination
+   header information and the current-stay progress line without increasing the
+   one-screen Home height. */
+[data-screen="home"] .home-reference-hero { display:grid; grid-template-columns:minmax(310px,1.3fr) minmax(235px,.78fr); justify-content:space-between; gap:14px; }
+[data-screen="home"] .home-destination-hero-wrap { width:100%; min-width:0; }
+[data-screen="home"] .home-destination-hero-wrap .home-destination-hero-card { width:100%; }
+[data-screen="home"] .home-stay-progress-wrap { display:grid; gap:4px; margin-top:1px; }
+[data-screen="home"] .home-stay-progress-wrap progress { width:100%; height:7px; border:0; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.08); }
+[data-screen="home"] .home-stay-progress-wrap progress::-webkit-progress-bar { background:rgba(255,255,255,.08); border-radius:999px; }
+[data-screen="home"] .home-stay-progress-wrap progress::-webkit-progress-value { background:linear-gradient(90deg,#65dbff,#d4ef64); border-radius:999px; }
+[data-screen="home"] .home-next-destination-card { min-height:136px; width:100%; align-self:center; padding:13px 15px; border-color:rgba(147,214,255,.24); background:linear-gradient(145deg,rgba(5,28,49,.92),rgba(7,22,39,.88)); box-shadow:0 15px 34px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.04); }
+[data-screen="home"] .home-next-card-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+[data-screen="home"] .home-next-mode-icon { width:30px; height:30px; display:grid; place-items:center; border:1px solid rgba(88,199,255,.28); border-radius:9px; color:#9de7ff; background:rgba(7,40,62,.42); }
+[data-screen="home"] .home-next-mode-icon .tcc-line-icon { width:18px; height:18px; }
+[data-screen="home"] .home-next-name { font-family:Georgia,'Times New Roman',serif; font-size:24px; line-height:1; }
+[data-screen="home"] .home-next-mode { display:flex; justify-content:space-between; gap:8px; margin-top:4px; padding-top:7px; border-top:1px solid rgba(255,255,255,.08); color:var(--text-secondary); font-size:9px; }
+[data-screen="home"] .home-next-mode strong { color:#d8f36b; font-size:9px; text-transform:uppercase; }
+[data-screen="home"] .home-next-destination-card:disabled { cursor:default; opacity:.82; }
+@media (max-height:850px) {
+  [data-screen="home"] .home-reference-hero { grid-template-columns:minmax(285px,1.3fr) minmax(210px,.76fr); }
+  [data-screen="home"] .home-destination-hero-wrap { min-height:136px; }
+  [data-screen="home"] .home-next-destination-card { min-height:118px; padding:10px 12px; }
+  [data-screen="home"] .home-next-name { font-size:20px; }
+}
+[data-screen="itinerary"] .itinerary-entry-identity { min-width:0; display:flex; align-items:center; gap:10px; }
+[data-screen="itinerary"] .itinerary-entry-icon { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border:1px solid rgba(127,205,245,.24); border-radius:11px; background:rgba(10,36,57,.48); color:#ccefff; }
+[data-screen="itinerary"] .itinerary-entry-icon .tcc-line-icon { width:21px; height:21px; }
+[data-screen="itinerary"] .itinerary-entry-identity-copy { min-width:0; display:grid; gap:2px; }
+[data-screen="itinerary"] .itinerary-entry-identity-copy strong,
+[data-screen="itinerary"] .itinerary-entry-identity-copy small { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* 04 Sep 2026 — acceptance icon hardening.
+   Interactive/status iconography uses deterministic inline SVG rather than
+   font/emoji glyphs so iPad Safari cannot render empty-square controls. */
+@layer screens {
+  [data-screen="budget"] .budget-add-expense-bar,
+  [data-screen="reservations"] .reservation-add-bar,
+  [data-screen="settings"] .settings-health-run {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+  }
+  [data-screen="budget"] .budget-add-expense-bar .tcc-line-icon,
+  [data-screen="reservations"] .reservation-add-bar .tcc-line-icon,
+  [data-screen="settings"] .settings-health-run .tcc-line-icon { width:23px; height:23px; }
+  [data-screen="checklist"] .checklist-column-add .tcc-line-icon { width:18px; height:18px; }
+  [data-screen="checklist"] .checklist-toggle .tcc-line-icon { width:18px; height:18px; }
+  [data-screen="checklist"] .checklist-ready-icon .tcc-line-icon { width:28px; height:28px; }
+  [data-screen="checklist"] .checklist-history-tick .tcc-line-icon { width:15px; height:15px; }
+  [data-screen="reservations"] .reservation-selected-tick .tcc-line-icon { width:100%; height:100%; }
+  [data-screen="calendar"] .calendar-legend-swatch .tcc-line-icon { width:16px; height:16px; }
+  [data-screen="home"] .home-helper-offline-icon .tcc-line-icon { width:15px; height:15px; }
+  [data-screen="itinerary"] .itinerary-expand-map { display:inline-flex; align-items:center; gap:7px; }
+  [data-screen="itinerary"] .itinerary-expand-map .tcc-line-icon { width:17px; height:17px; }
+}
+
+/* 04 Sep 2026 — acceptance repair: restore the approved Add/Edit information
+   hierarchy without reviving the obsolete Annual-vs-Destination allocation
+   picker. Date remains the one source of truth for Destination Budget routing. */
+@layer components {
+  .tcc-modal.tcc-editor-modal {
+    max-height:calc(100dvh - 24px);
+    overflow:hidden;
+  }
+  .tcc-modal.tcc-editor-modal > form {
+    max-height:calc(100dvh - 58px);
+    grid-template-rows:auto minmax(0,1fr) auto;
+  }
+  .tcc-modal.tcc-editor-modal > form > .modal-body {
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    padding-right:3px;
+  }
+  .tcc-modal.tcc-editor-modal > form > footer {
+    padding-top:12px;
+    border-top:1px solid rgba(var(--tcc-editor-rgb),.16);
+  }
+}
+
+@layer screens {
+  [data-screen="budget"] .budget-expense-editor,
+  [data-screen="reservations"] .reservation-editor { gap:11px; }
+
+  [data-screen="budget"] .budget-editor-intro,
+  [data-screen="reservations"] .reservation-editor-intro {
+    display:grid;
+    gap:3px;
+    padding:11px 13px;
+    border:1px solid rgba(var(--tcc-editor-rgb),.42);
+    border-left:6px solid rgba(var(--tcc-editor-rgb),.86);
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(var(--tcc-editor-rgb),.13),rgba(4,18,31,.58));
+    box-shadow:inset 0 1px rgba(255,255,255,.04);
+  }
+  [data-screen="budget"] .budget-editor-intro strong,
+  [data-screen="reservations"] .reservation-editor-intro strong {
+    color:#f3f9ff;
+    font-size:15px;
+    font-weight:900;
+  }
+  [data-screen="budget"] .budget-editor-intro span,
+  [data-screen="reservations"] .reservation-editor-intro span {
+    color:rgba(218,233,246,.78);
+    font-size:11px;
+    line-height:1.35;
+  }
+
+  [data-screen="budget"] .budget-editor-fields,
+  [data-screen="reservations"] .reservation-editor-fields { display:grid; gap:9px; }
+
+  [data-screen="budget"] .budget-editor-step,
+  [data-screen="reservations"] .reservation-editor-step {
+    display:grid;
+    gap:9px;
+    padding:11px 12px;
+    border:1px solid rgba(var(--tcc-editor-rgb),.26);
+    border-left:5px solid rgba(var(--tcc-editor-rgb),.72);
+    border-radius:14px;
+    background:linear-gradient(145deg,rgba(var(--tcc-editor-rgb),.065),rgba(3,17,30,.48));
+    box-shadow:inset 0 1px rgba(255,255,255,.035),0 8px 24px rgba(0,0,0,.12);
+  }
+  [data-screen="budget"] .budget-editor-step-head,
+  [data-screen="reservations"] .reservation-editor-step-head {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  [data-screen="budget"] .budget-editor-step-number,
+  [data-screen="reservations"] .reservation-editor-step-number {
+    flex:0 0 30px;
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    border:1px solid rgba(var(--tcc-editor-rgb),.72);
+    border-radius:50%;
+    background:linear-gradient(180deg,rgba(var(--tcc-editor-rgb),.54),rgba(var(--tcc-editor-rgb),.24));
+    color:#fff;
+    font-size:14px;
+    font-weight:950;
+    box-shadow:0 0 18px rgba(var(--tcc-editor-rgb),.13),inset 0 1px rgba(255,255,255,.14);
+  }
+  [data-screen="budget"] .budget-editor-step-copy,
+  [data-screen="reservations"] .reservation-editor-step-copy { display:grid; gap:1px; min-width:0; }
+  [data-screen="budget"] .budget-editor-step-copy strong,
+  [data-screen="reservations"] .reservation-editor-step-copy strong { color:#f4f9ff; font-size:14px; font-weight:900; }
+  [data-screen="budget"] .budget-editor-step-copy span,
+  [data-screen="reservations"] .reservation-editor-step-copy span { color:rgba(207,226,241,.7); font-size:10px; line-height:1.25; }
+
+  [data-screen="budget"] .budget-category-tile { min-height:64px; }
+  [data-screen="budget"] .budget-editor-money-grid {
+    display:grid;
+    grid-template-columns:1.05fr .72fr 1fr;
+    gap:9px;
+    align-items:end;
+  }
+  [data-screen="budget"] .budget-editor-date-grid {
+    display:grid;
+    grid-template-columns:minmax(180px,.52fr) minmax(0,1.48fr);
+    gap:10px;
+    align-items:stretch;
+  }
+  [data-screen="budget"] .budget-editor-date-grid .budget-routing-status { min-height:58px; align-content:center; }
+  [data-screen="budget"] .budget-editor-step-detail > .budget-field { margin-left:40px; }
+  [data-screen="budget"] .budget-conversion-hint { margin:0 0 0 40px; font-size:11px; }
+
+  [data-screen="reservations"] .reservation-type-tiles {
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:7px;
+  }
+  [data-screen="reservations"] .reservation-type-tile { min-height:66px; padding:6px 5px; font-size:12px; }
+  [data-screen="reservations"] .reservation-editor-step-type .reservation-flight-scope-tiles { margin-left:40px; }
+  [data-screen="reservations"] .reservation-editor-essentials-grid {
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(150px,.72fr) minmax(140px,.62fr);
+    gap:9px;
+    align-items:end;
+  }
+  [data-screen="reservations"] .reservation-editor-cost-grid {
+    display:grid;
+    grid-template-columns:1fr .72fr 1fr;
+    gap:9px;
+    align-items:end;
+  }
+  [data-screen="reservations"] .reservation-editor-auto-route {
+    display:grid;
+    grid-template-columns:22px max-content minmax(0,1fr);
+    align-items:center;
+    gap:7px;
+    padding:8px 10px;
+    border:1px solid rgba(87,214,155,.27);
+    border-radius:11px;
+    background:linear-gradient(145deg,rgba(87,214,155,.10),rgba(5,33,28,.42));
+  }
+  [data-screen="reservations"] .reservation-editor-auto-route .tcc-line-icon { width:19px; height:19px; color:#8be8b9; }
+  [data-screen="reservations"] .reservation-editor-auto-route span { color:#b7f4d4; font-size:9px; font-weight:950; letter-spacing:.08em; }
+  [data-screen="reservations"] .reservation-editor-auto-route small { color:rgba(210,237,225,.68); font-size:9px; text-align:right; }
+  [data-screen="reservations"] .reservation-editor-tracking-grid {
+    display:grid;
+    grid-template-columns:190px minmax(0,1fr);
+    gap:9px;
+    align-items:start;
+  }
+  [data-screen="reservations"] .reservation-editor-tracking-grid .reservation-field-wide { grid-column:auto; }
+  [data-screen="reservations"] .reservation-editor-tracking-grid textarea { min-height:72px; }
+  [data-screen="reservations"] .reservation-conversion-hint { margin:0 0 0 40px; font-size:11px; }
+  [data-screen="reservations"] .reservation-destination-preview-host { margin-top:1px; }
+
+  @media (max-width:900px) {
+    [data-screen="reservations"] .reservation-type-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); }
+    [data-screen="budget"] .budget-editor-money-grid,
+    [data-screen="reservations"] .reservation-editor-cost-grid { grid-template-columns:1fr 1fr; }
+    [data-screen="budget"] .budget-editor-money-grid > :last-child,
+    [data-screen="reservations"] .reservation-editor-cost-grid > :last-child { grid-column:1 / -1; }
+    [data-screen="budget"] .budget-editor-date-grid { grid-template-columns:1fr; }
+    [data-screen="reservations"] .reservation-editor-essentials-grid { grid-template-columns:1fr 1fr; }
+    [data-screen="reservations"] .reservation-editor-essentials-grid > :first-child { grid-column:1 / -1; }
+  }
+}
+
+/* 04 Sep 2026 — sidebar status marks are CSS geometry, not font glyphs. */
+@layer screens {
+  .sidebar-status-row { display:flex !important; align-items:center; gap:6px; }
+  .sidebar-status-dot { width:6px; height:6px; flex:0 0 6px; border-radius:50%; background:#77ddb0; box-shadow:0 0 8px rgba(119,221,176,.32); }
+}
+
+
+/* 4 Sep 2026 — deterministic action arrows. Keep labels as real text while
+   rendering the directional cue with the shared inline SVG set so Safari font
+   fallback cannot turn an action icon into a missing-glyph square. */
+@layer screens {
+  [data-screen="checklist"] .checklist-ready-action,
+  [data-screen="home"] .home-helper-switch {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+  }
+  [data-screen="checklist"] .checklist-ready-action-icon,
+  [data-screen="home"] .home-helper-switch-icon {
+    width:14px;
+    height:14px;
+    flex:0 0 auto;
+  }
+}
+
+
+/* 4 Sep 2026 — Home section markers use the deterministic SVG icon system. */
+@layer screens {
+  [data-screen="home"] .home-budget-diamond,
+  [data-screen="home"] .home-mini-diamond {
+    width:12px;
+    height:12px;
+    display:inline-grid;
+    place-items:center;
+    flex:0 0 12px;
+  }
+  [data-screen="home"] .home-budget-diamond .tcc-line-icon,
+  [data-screen="home"] .home-mini-diamond .tcc-line-icon {
+    width:10px;
+    height:10px;
+  }
+}
+
+/* V53 acceptance: deterministic informational/control icons (no font glyph dependency). */
+.checklist-stage-info { display:flex; align-items:flex-start; gap:8px; }
+.checklist-stage-info .tcc-line-icon { flex:0 0 auto; width:18px; height:18px; margin-top:1px; }
+.calendar-add .tcc-line-icon { width:18px; height:18px; }
+
+/* 04 Sep 2026 — V54 final iPad touch-target cascade guard.
+   V53 deep audit proved that later acceptance rules could override an earlier
+   44px hardening rule while the hash/marker verifier still passed. Keep these
+   final declarations at the end of the screen layer and protect their final
+   cascade position in verify_regression_guard.py. */
+@layer screens {
+  [data-screen="reservations"] .reservation-flight-scope-tile,
+  [data-screen="itinerary"] .itinerary-coverage-switch {
+    min-height:44px;
+  }
 }

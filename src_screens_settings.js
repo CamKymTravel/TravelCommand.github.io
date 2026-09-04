@@ -9,6 +9,7 @@ import { saveGeneralSettingsDraft, saveSchengenSettingsDraft, enablePinDraft, di
 import { hashPin, verifyPin } from './src_core_pin.js';
 import { lockVault } from './src_core_vault-access.js';
 import { formatAUDate } from './src_core_dates.js';
+import { createLineIcon } from './src_components_icons.js';
 
 function node(tag, className, text) {
   const element=document.createElement(tag);
@@ -102,23 +103,23 @@ function chooseRestoreFile({stateService,host,vaultAccessSession,onBusyChange=nu
 function statusLabel(status){if(status==='verified')return'Verified';if(status==='needs-setup'||status==='not-configured')return'Needs Setup';return'Needs Attention';}
 
 const HEALTH_ICONS=Object.freeze({
-  'Data Integrity':'▣',
-  'Budget':'$',
-  'Reservations':'✈',
-  'Calendar':'▦',
-  'Journey History':'↗',
-  'Checklist':'✓',
-  'The Vault':'◆',
-  'Backup & Restore':'↥',
-  'Cross-Screen Routing':'⇄'
+  'Data Integrity':'check',
+  'Budget':'budget',
+  'Reservations':'flight',
+  'Calendar':'calendar',
+  'Journey History':'history',
+  'Checklist':'checklist',
+  'The Vault':'vault',
+  'Backup & Restore':'repeat',
+  'Cross-Screen Routing':'itinerary'
 });
 
 function renderHealth(stateService,currentDate,host){
   const model=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});const panel=node('section',`settings-health settings-health-${model.status}`);const hero=node('div','settings-health-hero');const copy=node('div');copy.append(node('p','eyebrow','APP HEALTH'),node('h2','',statusLabel(model.status)),node('p','',model.status==='verified'?'All central integrity checks are clear.':model.status==='needs-setup'?'Core integrity is clear; one or more setup items remain.':`${model.issueCount} integrity issue${model.issueCount===1?'':'s'} need attention.`));const score=node('div','settings-health-score');score.append(node('strong','',`${model.verifiedCount}/${model.checks.length}`),node('small','','verified'));hero.append(copy,score);panel.append(hero);
-  const run=node('button',`settings-health-run settings-health-run-${model.status}`,model.status==='verified'?'✓ APP HEALTH VERIFIED':'＋ CHECK THE WHOLE APP'); run.type='button'; run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
+  const run=node('button',`settings-health-run settings-health-run-${model.status}`); run.type='button'; run.append(createLineIcon(model.status==='verified'?'check':'plus'),document.createTextNode(model.status==='verified'?' APP HEALTH VERIFIED':' CHECK THE WHOLE APP')); run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
   const grid=node('div','settings-health-grid');for(const item of model.checks){
     const card=node('article',`settings-health-card settings-health-card-${item.status}`);
-    const icon=node('span','settings-health-icon',HEALTH_ICONS[item.label]||'•');
+    const icon=node('span','settings-health-icon'); icon.append(createLineIcon(HEALTH_ICONS[item.label]||'check'));
     const cardCopy=node('div','settings-health-card-copy');cardCopy.append(node('strong','',item.label),node('p','',item.summary));
     const status=node('div','settings-health-card-status');status.append(node('span','settings-health-dot',''),node('small','',statusLabel(item.status)));
     card.append(icon,cardCopy,status);

@@ -1,11 +1,11 @@
 {
-  "name": "Travel Command Centre — Athens Simulation",
-  "short_name": "TCC Athens Sim",
+  "name": "Travel Command Centre \u2014 Athens Simulation V54",
+  "short_name": "TCC Athens V54",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Full-data Athens, Greece screenshot simulation for Travel Command Centre."
+  "description": "Offline V54 full-data Athens, Greece simulation for Cameron & Kym."
 }

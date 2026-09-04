@@ -9,8 +9,10 @@ export const VAULT_CATEGORY_LABELS = Object.freeze({
   emergency:'Emergency Contacts'
 });
 
+// Semantic icon keys only. The screen renders deterministic inline SVG assets;
+// never reintroduce platform-font emoji/glyphs for Vault category controls.
 export const VAULT_CATEGORY_ICONS = Object.freeze({
-  passport:'🛂', visa:'🎫', insurance:'🛡', accommodation:'🏨', emergency:'✚'
+  passport:'passport', visa:'visa', insurance:'insurance', accommodation:'accommodation', emergency:'emergency'
 });
 
 function newestFirst(a, b) { return String(b.modifiedAt || '').localeCompare(String(a.modifiedAt || '')); }

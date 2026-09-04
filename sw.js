@@ -1,10 +1,11 @@
+// V54 master protected cache marker retained for lineage: tcc-v1-v54-touch-target-completion-2026-09-04
 // predecessor protected cache marker: tcc-v1-v50-global-material-depth-pass-5-2026-09-04
-// V52 working source has post-V50 service-worker safety changes. A distinct
+// V52 acceptance-repair working source has post-V50 service-worker safety changes. A distinct
 // cache identity is mandatory so activate() can actually see the predecessor
 // cache and run the busy-dialog/picker hand-off instead of misclassifying an
 // already-installed V50 app as a first install.
-const CACHE_NAME = 'tcc-sim-v52-athens-greece-2026-09-04';
-const CACHE_PREFIX = 'tcc-sim-';
+const CACHE_NAME = 'tcc-v1-v54-athens-full-simulation-r1-2026-09-04';
+const CACHE_PREFIX = 'tcc-v1-';
 const APP_SHELL = [
   './',
   './index.html',
@@ -15,6 +16,7 @@ const APP_SHELL = [
   './simulation-data.json',
   './src_components_confirmation.js',
   './src_components_form-session.js',
+  './src_components_icons.js',
   './src_components_modal.js',
   './src_components_offline-map.js',
   './src_components_page-hero.js',

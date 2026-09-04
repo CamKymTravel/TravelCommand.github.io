@@ -1,3 +1,36 @@
+# V54 Touch-Target Completion Additions / Overrides
+
+### V54 late integrity/performance additions
+- Reservations duplicate-health grouping must retain exact existing wildcard-time semantics but must not regress to an O(n²) all-pairs scan. The indexed `reservationDuplicateKey` grouping is now protected.
+- A newly created or edited **Standard** stay must have a Country. This is required to resolve its country header, Country Quick Look and toilet-language helper correctly.
+- Existing/legacy Standard stays with blank Country stay loadable; App Health flags them for repair. Do not invent Indonesia or another fallback country.
+- Cruise/Motorhome/RV keeps the separate Starting Country requirement and dedicated header rules.
+
+
+- V54 absorbs V53 in full; all V53/V52 no-loss, helper, routing, recovery, icon, header and visual-hierarchy rules remain active.
+- A protected touch target is judged by the **effective final cascade**, not by whether an earlier `min-height:44px` marker exists somewhere in CSS.
+- `Reservations` flight-scope selector tiles must finish at **44px minimum height**.
+- `Itinerary` Forward Coverage switches must finish at **44px minimum height**.
+- `ACCEPTANCE_MATRIX_V54.md` and the V54 final-cascade verifier are mandatory. A later equal/higher-priority rule shrinking either control below 44px is a regression.
+- V54 app/cache identity must remain separate from V53 so Safari cannot reuse the predecessor shell as the current build.
+- Home, Budget, Reservations, Itinerary, Calendar, Journey History, Checklist, Vault, Settings and the Add/Edit/helper structures locked in V53 must not be redesigned, simplified, recoloured or removed by this focused repair.
+- Physical 1024×768 iPad acceptance remains mandatory before Gold/Master Lock.
+
+---
+
+# V53 Acceptance Repair Additions / Overrides
+
+- `ACCEPTANCE_MATRIX_V53.md` is now a locked acceptance authority. A hash-correct package that fails the matrix is a regression.
+- Deterministic inline SVG is required for sidebar and interactive icon treatment; do not restore Unicode/emoji control glyphs.
+- Home must retain Current Destination, exact Next Destination, Days in current stay progress, three budget summaries, four compact panels and global search.
+- Itinerary primary order is locked: Forward Coverage → six planning stats → Add/Home controls → Search/Year filters → Upcoming Itinerary → forward map → Completed Itinerary.
+- Add Expense / Add Reservation keep the approved numbered hierarchy and date-driven Destination Budget routing; do not restore an Annual/Destination picker.
+- No-current-stay header selection must return no country header, never Indonesia.
+- V53 app/cache identity must remain separate from predecessor caches to prevent mixed-version first-load behaviour.
+- The V52 and earlier no-loss, recovery, Vault, helper, colour-authority, route-mode and hidden-email rules remain in force unless explicitly superseded here.
+
+---
+
 # V52 Active No-Loss Additions / Overrides — 04 Sep 2026
 
 These V52 rules override older “current checkpoint” wording while preserving all V51/V50/historical requirements below as ancestry.

@@ -13,13 +13,14 @@ import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate } from './src_core_dates.js';
 import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
+import { createLineIcon } from './src_components_icons.js';
 
 const LIST_LABELS = Object.freeze({ permanent:'Permanent', destination:'Destination' });
 const STAGE_META = Object.freeze({
-  'current-stay':{ label:'Current Stay', icon:'⌂' },
-  'before-leave':{ label:'Before You Leave', icon:'☷' },
-  'travel-day':{ label:'Travel Day', icon:'✈' },
-  arrival:{ label:'Arrival & Settle In', icon:'▣' }
+  'current-stay':{ label:'Current Stay', icon:'current' },
+  'before-leave':{ label:'Before You Leave', icon:'beforeLeave' },
+  'travel-day':{ label:'Travel Day', icon:'travelDay' },
+  arrival:{ label:'Arrival & Settle In', icon:'arrival' }
 });
 const OWNER_LABELS = Object.freeze({ both:'Both', cameron:'Cameron', kym:'Kym' });
 
@@ -269,8 +270,9 @@ function renderChecklistRow(item, stateService, openEditor, compact = false, sco
   const ownerLabel = OWNER_LABELS[item.owner] || item.owner || '';
   const listLabel = LIST_LABELS[item.listType] || item.listType || '';
   const exactContext = [listLabel, stageLabel, ownerLabel, item.displayDueDate ? `Due ${item.displayDueDate}` : ''].filter(Boolean).join(' · ');
-  const toggle = node('button', 'checklist-toggle', item.completed ? '✓' : '');
+  const toggle = node('button', 'checklist-toggle');
   toggle.type = 'button';
+  if (item.completed) toggle.append(createLineIcon('check'));
   toggle.setAttribute('aria-label', [`${item.completed ? 'Mark incomplete' : 'Mark complete'}: ${item.title}`, exactContext].filter(Boolean).join(' · '));
   toggle.setAttribute('aria-pressed', String(item.completed));
   toggle.addEventListener('click', () => stateService.commit(draft => toggleChecklistItemDraft(draft, item.id, !item.completed, { now:stateService.now, scopeItineraryId })));
@@ -295,7 +297,7 @@ function paceMini(label,value,tone){
 
 function renderReadyBanner(model, onStageChange, navigate) {
   const panel=node('section',`checklist-ready-banner checklist-ready-${model.ready.status}`);
-  const icon=node('span','checklist-ready-icon',model.ready.status==='ready'?'✓':'!');
+  const icon=node('span','checklist-ready-icon'); icon.append(createLineIcon(model.ready.status==='ready'?'check':'warning'));
   const copy=node('div','checklist-ready-copy');
   const destination=model.nextDestination?.name || 'the next move';
   const noNext=model.ready.status==='no-next-destination';
@@ -308,9 +310,10 @@ function renderReadyBanner(model, onStageChange, navigate) {
       : 'Add required checklist items to begin readiness tracking.';
   copy.append(node('p','eyebrow','READY TO MOVE'),node('strong','',readyLabel(model.ready.status)),node('span','',message));
   const stageIndex=CHECKLIST_STAGES.indexOf(model.activeStage);
-  const actionLabel=noNext?'PLAN DESTINATION →':stageIndex < CHECKLIST_STAGES.length-1 ? 'NEXT STAGE →' : 'VIEW DESTINATION →';
-  const action=node('button','checklist-ready-action',actionLabel);
+  const actionLabel=noNext?'PLAN DESTINATION':stageIndex < CHECKLIST_STAGES.length-1 ? 'NEXT STAGE' : 'VIEW DESTINATION';
+  const action=node('button','checklist-ready-action');
   action.type='button';
+  action.append(node('span','',actionLabel),createLineIcon('arrowRight','checklist-ready-action-icon'));
   action.addEventListener('click',()=>{
     if(noNext) navigate?.('itinerary');
     else if(stageIndex < CHECKLIST_STAGES.length-1) onStageChange?.(CHECKLIST_STAGES[stageIndex+1]);
@@ -342,13 +345,14 @@ function renderStageNavigation(model, onStageChange) {
     const stageModel=model.stages.find(item=>item.stage===stage);
     const button=node('button','checklist-stage-tab'); button.type='button';
     const active=stage===model.activeStage; button.dataset.active=String(active); button.setAttribute('aria-pressed',String(active));
-    const icon=node('span','checklist-stage-icon',meta.icon);
+    const icon=node('span','checklist-stage-icon'); icon.append(createLineIcon(meta.icon));
     const copy=node('span','checklist-stage-copy'); copy.append(node('strong','',meta.label),node('small','',stageModel?.requiredRemaining ? `${stageModel.requiredRemaining} required` : 'Clear'));
     button.append(icon,copy);
     button.addEventListener('click',()=>onStageChange?.(stage));
     tabs.append(button);
   }
-  const info=node('p','checklist-stage-info','ⓘ Complete all required checklist tasks before travel. Optional His/Hers items do not block Ready to Move.');
+  const info=node('p','checklist-stage-info');
+  info.append(createLineIcon('info'), document.createTextNode(' Complete all required checklist tasks before travel. Optional His/Hers items do not block Ready to Move.'));
   wrap.append(tabs,info);
   return wrap;
 }
@@ -383,9 +387,9 @@ function renderOwnerPanels(model,stateService,openEditor){
 function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress,listType,stateService,openEditor,addItem,scopeItineraryId,{ disabled=false, disabledReason='' }={}){
   const panel=node('section',`checklist-column checklist-column-${listType}`);
   const head=node('div','checklist-column-head');
-  const heading=node('div','checklist-column-title'); heading.append(node('span','checklist-column-icon',listType==='permanent'?'☷':'⌖'));
+  const heading=node('div','checklist-column-title'); const columnIcon=node('span','checklist-column-icon'); columnIcon.append(createLineIcon(listType==='permanent'?'permanent':'destination')); heading.append(columnIcon);
   const copy=node('div'); copy.append(node('h2','',title),node('p','',subtitle)); heading.append(copy);
-  const add=node('button','checklist-column-add','＋'); add.type='button'; add.setAttribute('aria-label',`Add ${title} item`); add.disabled=Boolean(disabled); add.title=add.disabled?disabledReason:''; if(!add.disabled) add.addEventListener('click',addItem); head.append(heading,add); panel.append(head);
+  const add=node('button','checklist-column-add'); add.type='button'; add.append(createLineIcon('plus')); add.setAttribute('aria-label',`Add ${title} item`); add.disabled=Boolean(disabled); add.title=add.disabled?disabledReason:''; if(!add.disabled) add.addEventListener('click',addItem); head.append(heading,add); panel.append(head);
 
   const progressCopy=node('div','checklist-progress-copy');
   progressCopy.append(node('strong','',`${stageProgress.completed} of ${stageProgress.total} this stage`),node('span','',`${overallProgress.completed} of ${overallProgress.total} overall · ${overallProgress.percent}%`));
@@ -409,10 +413,10 @@ function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress
 
 function renderNextDestinationCard(model,navigate){
   const panel=node('section','checklist-next-card');
-  const head=node('div','checklist-next-head'); head.append(node('span','checklist-next-icon','⌖'),node('p','eyebrow','NEXT DESTINATION')); panel.append(head);
+  const head=node('div','checklist-next-head'); const nextIcon=node('span','checklist-next-icon'); nextIcon.append(createLineIcon('destination')); head.append(nextIcon,node('p','eyebrow','NEXT DESTINATION')); panel.append(head);
   if(!model.nextDestination){
     panel.append(node('strong','','Not planned'),node('span','','Add the next destination in Itinerary.'));
-    const plan=node('button','checklist-next-action','PLAN DESTINATION →'); plan.type='button'; plan.addEventListener('click',()=>navigate?.('itinerary')); panel.append(plan); return panel;
+    const plan=node('button','checklist-next-action'); plan.type='button'; plan.append(document.createTextNode('PLAN DESTINATION '),createLineIcon('arrowRight')); plan.addEventListener('click',()=>navigate?.('itinerary')); panel.append(plan); return panel;
   }
   panel.append(node('strong','',model.nextDestination.name),node('span','',[model.nextDestination.country,`${model.nextDestination.displayStartDate} – ${model.nextDestination.displayEndDate}`].filter(Boolean).join(' · ')));
   const visual=node('div','checklist-next-visual');
@@ -424,7 +428,7 @@ function renderNextDestinationCard(model,navigate){
   const dateFact=node('span'); dateFact.append(node('small','','TRAVEL DAY'),node('strong','',model.nextDestination.displayStartDate||'—'));
   const durationFact=node('span'); durationFact.append(node('small','','STAY DURATION'),node('strong','',`${model.nextDestination.durationDays} days`));
   facts.append(dateFact,durationFact); panel.append(facts,node('p','checklist-next-note','Destination task state is saved per destination and switches automatically when the next destination changes.'));
-  const action=node('button','checklist-next-action','VIEW DESTINATION →'); action.type='button'; action.addEventListener('click',()=>navigate?.('itinerary',{collection:'itinerary',id:model.nextDestination.id,editorTone:'indigo'})); panel.append(action); return panel;
+  const action=node('button','checklist-next-action'); action.type='button'; action.append(document.createTextNode('VIEW DESTINATION '),createLineIcon('arrowRight')); action.addEventListener('click',()=>navigate?.('itinerary',{collection:'itinerary',id:model.nextDestination.id,editorTone:'indigo'})); panel.append(action); return panel;
 }
 
 function renderHistory(model, openEditor) {
@@ -450,7 +454,7 @@ function renderHistory(model, openEditor) {
       const row = node('button', 'checklist-history-item');
       row.type = 'button';
       row.dataset.itemId = item.id;
-      row.append(node('span', 'checklist-history-tick', item.completed ? '✓' : '—'), node('strong', '', item.title));
+      const historyTick=node('span','checklist-history-tick'); if(item.completed) historyTick.append(createLineIcon('check')); else historyTick.textContent='—'; row.append(historyTick, node('strong', '', item.title));
       if (item.displayDueDate) row.append(node('small', '', `Due ${item.displayDueDate}`));
       row.setAttribute('aria-label', ['Edit historical checklist item', item.title, group.name, group.displayDates, item.displayDueDate ? `Due ${item.displayDueDate}` : ''].filter(Boolean).join(' · '));
       row.addEventListener('click', () => openEditor?.(item.id));

@@ -6,6 +6,8 @@ import { createModal, preserveLocalFocus, setModalTone } from './src_components_
 import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
+import { createLineIcon } from './src_components_icons.js';
+
 
 const TYPE_LABELS = Object.freeze({ reminder:'Reminder', note:'Note' });
 
@@ -352,12 +354,12 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
 
     const controls = node('section', 'calendar-controls');
     const monthNav = node('div', 'calendar-month-nav');
-    const previous = node('button', 'button calendar-nav-button', '‹');
+    const previous = node('button', 'button calendar-nav-button'); previous.append(createLineIcon('chevronLeft'));
     previous.type = 'button';
     previous.setAttribute('aria-label', `Previous month from ${model.monthLabel}`);
     previous.addEventListener('click', () => setUI({ calendarMonth:shiftCalendarMonth(model.selectedMonth, -1) }));
     const label = node('strong', 'calendar-month-label', model.monthLabel);
-    const next = node('button', 'button calendar-nav-button', '›');
+    const next = node('button', 'button calendar-nav-button'); next.append(createLineIcon('chevronRight'));
     next.type = 'button';
     next.setAttribute('aria-label', `Next month from ${model.monthLabel}`);
     next.addEventListener('click', () => setUI({ calendarMonth:shiftCalendarMonth(model.selectedMonth, 1) }));
@@ -369,7 +371,8 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
 
     const inlineActions = node('div', 'calendar-inline-actions');
     const local = node('span', 'calendar-local-status', 'Sync Check · Local Only');
-    const add = node('button', 'button calendar-add', '+ Note');
+    const add = node('button', 'button calendar-add');
+    add.append(createLineIcon('plus'), document.createTextNode(' NOTE'));
     add.type = 'button';
     add.setAttribute('aria-label', 'Add reminder or note');
     add.addEventListener('click', () => openPersonalEventEditor({ stateService, host:main, currentDate }));
@@ -392,11 +395,11 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
 
     const legend=node('section','calendar-reference-legend');
     const legendItems=[
-      ['periods','Destination / Travel Periods',model.counts.itinerary,'↔'],
-      ['reservations','Reservations',model.counts.reservations,'✈'],
-      ['personal','Reminders & Notes',model.counts.personal,'✎']
+      ['periods','Destination / Travel Periods',model.counts.itinerary,'itinerary'],
+      ['reservations','Reservations',model.counts.reservations,'flight'],
+      ['personal','Reminders & Notes',model.counts.personal,'calendar']
     ];
-    for(const [kind,labelText,value,icon] of legendItems){ const item=node('div',`calendar-legend-item calendar-legend-${kind}`); item.append(node('span','calendar-legend-swatch',icon),node('strong','',labelText),node('small','',String(value))); legend.append(item); }
+    for(const [kind,labelText,value,iconName] of legendItems){ const item=node('div',`calendar-legend-item calendar-legend-${kind}`); const swatch=node('span','calendar-legend-swatch'); swatch.append(createLineIcon(iconName)); item.append(swatch,node('strong','',labelText),node('small','',String(value))); legend.append(item); }
     main.append(legend);
 
     const handlers = {

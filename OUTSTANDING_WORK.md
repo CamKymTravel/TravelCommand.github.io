@@ -1,3 +1,36 @@
+# V54 Immediate Carry-Forward / Remaining Acceptance
+
+V54 source candidate now also includes the proven indexed Reservations duplicate-health repair and Standard-stay Country integrity guard. These are implemented/protected work, not outstanding items.
+
+
+V54 source/model acceptance and final-cascade touch-target completion are the active implementation baseline. Remaining work before Gold/Master Lock is **physical target-iPad acceptance**, not a return to an older package:
+
+- install the exact V54 candidate and capture current screenshots across all main and Add/Edit screens;
+- confirm no stale/mixed-version V53/V52 shell remains after update;
+- confirm final 1024×768 layout, recognisable header crops, zero horizontal scrolling and effective touch targets on the actual iPad;
+- confirm offline local speech voice availability and helper controls on the target iPad;
+- perform practical Vault screenshot add/view/delete, Backup/Restore and Protected Recovery on the target iPad;
+- complete final colour approval only from Cameron’s explicit decisions; screenshots alone remain non-authoritative for colour.
+
+Athens simulation remains blocked until the real V54 candidate is installed and accepted. When rebuilt, it must branch only from this frozen V54 source and use a one-time simulation-fixture install marker so stale simulation storage cannot suppress Athens seeding.
+
+---
+
+# V53 Immediate Carry-Forward / Remaining Acceptance
+
+V53 source/model acceptance repair is implemented and deeply verified. Remaining work before Gold/Master Lock is **physical target-iPad acceptance**, not a return to older source:
+
+- install the exact V53 acceptance candidate and capture current screenshots across all main and Add/Edit screens;
+- confirm no stale/mixed-version shell remains after update;
+- confirm header crops are recognisable on the actual iPad;
+- confirm offline local speech voice availability and helper controls on the target iPad;
+- perform practical Vault screenshot add/view/delete, backup and restore on the target iPad;
+- perform final colour approval only from Cameron’s explicit decisions; screenshots alone remain non-authoritative for colour.
+
+Athens simulation remains blocked until the real V53 acceptance candidate is installed and accepted. When rebuilt, it must branch only from this frozen V53 source and must use a one-time simulation-fixture install marker so stale simulation storage cannot suppress Athens seeding.
+
+---
+
 # V52 Immediate No-Loss Carry-Forward — 04 Sep 2026
 
 ## Current verified state

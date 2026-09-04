@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Travel Command Centre V1 continuity / anti-regression verifier.
 
-V52 ACTIVE NO-LOSS CONTINUITY BASELINE — 4 September 2026 AEST.
+V54 TOUCH-TARGET COMPLETION CANDIDATE — 4 September 2026 AEST.
 
 This verifier freezes the exact V51 working tree after rich 78-country helpers and material-depth pass 5, while preserving the 100-item historical no-loss ledger. It is a continuity baseline, not a release/master approval.
 
@@ -12,7 +12,7 @@ During a focused batch:
     python3 verify_regression_guard.py --verify --allow-changes file1 file2
 
 A successful no-allow-list verification means the extracted handoff matches
-this frozen V52 baseline exactly. It does not waive the still-active target-iPad/offline-voice/Vault/final-colour work in OUTSTANDING_WORK.md.
+this frozen V54 touch-target-completion baseline exactly. It does not waive the still-active target-iPad/offline-voice/Vault/final-colour work in OUTSTANDING_WORK.md.
 """
 from __future__ import annotations
 
@@ -23,6 +23,8 @@ import re
 import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -30,8 +32,8 @@ MANIFEST = ROOT / "BASELINE_SHA256.txt"
 CONTRACT = ROOT / "REGRESSION_CONTRACT.json"
 LEDGER = ROOT / "OUTSTANDING_WORK.md"
 IGNORED_NAMES = {".DS_Store", "Thumbs.db"}
-BASELINE_ID = "V52_ACTIVE_NO_LOSS_2026-09-04_AEST"
-CACHE_ID = "tcc-v1-v50-global-material-depth-pass-5-2026-09-04"
+BASELINE_ID = "V54_TOUCH_TARGET_COMPLETION_2026-09-04_AEST"
+CACHE_ID = "tcc-v1-v54-touch-target-completion-2026-09-04"
 EXPECTED_LEDGER_ITEMS = 100
 
 
@@ -94,6 +96,35 @@ def must_not_contain(path: str, needles: list[str], errors: list[str]) -> None:
 
 
 def static_continuity_checks(errors: list[str]) -> None:
+    must_contain("CONTINUITY_START_HERE.md", [
+        "V54 Touch-Target Completion Candidate", "1.2.0-v54-touch-target-completion", "10,227/10,227 view-model builds",
+        "CHANGESET_V53_TO_V54.md", "ACCEPTANCE_MATRIX_V54.md",
+    ], errors)
+    must_contain("CHANGESET_V52_TO_V53.md", [
+        "Changeset V52 → V53 Acceptance Repair", "Twenty application source/runtime files",
+        "1,461/1,461 days; 10,227/10,227 core view-model builds", "package could match V52",
+    ], errors)
+    must_contain("CHANGESET_V53_TO_V54.md", [
+        "Changeset V53 → V54 Touch-Target Completion", "Two real late-cascade defects",
+        "reservation-flight-scope-tile", "itinerary-coverage-switch",
+        "1.2.0-v54-touch-target-completion", "effective final cascade",
+        "indexed grouping algorithm", "Standard stays now require", "9 files",
+    ], errors)
+    must_contain("LOCKED_REQUIREMENTS.md", [
+        "V54 Touch-Target Completion Additions / Overrides", "effective final cascade",
+        "Forward Coverage → six planning stats", "No-current-stay header selection",
+    ], errors)
+    must_contain("OUTSTANDING_WORK.md", [
+        "V54 Immediate Carry-Forward / Remaining Acceptance", "physical target-iPad acceptance",
+        "Athens simulation remains blocked", "one-time simulation-fixture install marker",
+    ], errors)
+    must_contain("REGRESSION_PROTOCOL.md", [
+        "V54 Regression Protocol", "--verify --deep", "Hash equality alone is insufficient",
+        "1,461-day / 10,227-model", "effective final CSS cascade",
+    ], errors)
+    must_contain("VISUAL_REFERENCE_INDEX.md", [
+        "V54 Visual Acceptance Authority", "ACCEPTANCE_MATRIX_V54.md", "not automatic colour authority",
+    ], errors)
     must_contain("CONTINUITY_START_HERE.md", [
         "V52 Active No-Loss Continuity Baseline",
         "17 verified post-V51 source/runtime changes",
@@ -264,13 +295,29 @@ def static_continuity_checks(errors: list[str]) -> None:
     must_contain("src_core_restore.js", ["Vault screenshot payload bytes are missing", "internal-only Vault screenshot storage reference"], errors)
     must_contain("src_core_migrations.js", ["assertNotNewerAppGeneration", "Protected Recovery is required", "STRICT_PERSISTED_GENERATION_MIN = 41", "isStrictPersistedGeneration"], errors)
     must_contain("src_core_restore.js", ["Backup integrity", "newer app generation", "STRICT_PERSISTED_GENERATION_MIN = 41", "strictKnownBackup"], errors)
-    must_contain("src_core_schema.js", ["1.2.0-v49-ipad-full-screenshot-repair"], errors)
+    must_contain("src_core_schema.js", ["1.2.0-v54-touch-target-completion"], errors)
+    # V54 late deep-audit protections: scalable duplicate health + destination context integrity.
+    must_contain("src_core_reservations-view-model.js", [
+        "reservationDuplicateKey", "const bases = new Map()", "list.some(item => !item.time)",
+    ], errors)
+    must_not_contain("src_core_reservations-view-model.js", [
+        "for (let a=0; a<source.length; a+=1) for (let b=a+1; b<source.length; b+=1)",
+    ], errors)
+    must_contain("src_core_entities.js", [
+        "Standard stays require a country", "if (!routeTrip && !country)",
+    ], errors)
+    must_contain("src_screens_itinerary.js", [
+        "countryInput.required = type === 'standard'", "countryInput.required = body.dataset.travelType === 'standard'",
+    ], errors)
+    must_contain("src_core_app-health.js", [
+        "standardMissingCountry", "missing a Country required for its destination header and offline language helper",
+    ], errors)
     must_contain("src_components_sidebar.js", ["Primary navigation", "Travel Command Centre sidebar", "brand-compass-svg", "Where's the toilet?"] , errors)
     must_contain("src_components_modal.js", ["preserveLocalFocus", "restoreLocalFocus", "main[data-screen]", "inferExpandedTone", "dataset.expandTone", "semanticTone", "resolvedTone"], errors)
     must_contain("src_screens_calendar.js", ["day.setAttribute('role', 'group')", "Previous month from", "Next month from"], errors)
     must_contain("src_screens_reservations.js", ["Reservation summary", "Booked Reservations", "title:'Next 5 Upcoming',tone:'red'"] , errors)
     must_not_contain("src_screens_reservations.js", ["Flights & Transport"], errors)
-    must_contain("src_components_page-hero.js", ["if (!stay) return 'banner-indonesia';"], errors)
+    must_contain("src_components_page-hero.js", ["if (!stay) return null;", "no-current-stay"], errors)
     must_contain("src_screens_home.js", ["CURRENT DESTINATION", "home-compass", "WHERE'S THE TOILET?", "COUNTRY QUICK LOOK · OFFLINE", "Plants & Gardens", "Food & Drink", "Animals", "History & Culture", "Open Itinerary", "Tap to set up your itinerary"], errors)
     must_contain("src_main.js", ["active === 'home'", "[data-screen=\"home\"] .home-compass", "canRevealHiddenEmails"], errors)
     must_contain("src_screens_settings.js", ["autocomplete='one-time-code'", "tcc-pin-input"], errors)
@@ -361,6 +408,8 @@ def static_continuity_checks(errors: list[str]) -> None:
         "header-assets.bin", "header-index.json", "index.html", "manifest.webmanifest",
         "simulation-data.json", "CONTINUITY_START_HERE.md", "LOCKED_REQUIREMENTS.md",
         "OUTSTANDING_WORK.md", "REGRESSION_PROTOCOL.md", "REGRESSION_CONTRACT.json", "VISUAL_REFERENCES.zip",
+        "CHANGESET_V52_TO_V53.md", "ACCEPTANCE_MATRIX_V53.md", "v53_deep_acceptance.mjs",
+        "CHANGESET_V53_TO_V54.md", "ACCEPTANCE_MATRIX_V54.md", "v54_deep_acceptance.mjs",
     ]:
         if not (ROOT / req).exists():
             errors.append(f"required package asset missing: {req}")
@@ -461,6 +510,26 @@ def contract_checks(errors: list[str]) -> None:
         errors.append("REGRESSION_CONTRACT lost V51 ancestry declaration")
     if not status.get("full_v52_current_working_tree_present"):
         errors.append("REGRESSION_CONTRACT lost V52 current working-tree declaration")
+    if not status.get("full_v53_acceptance_repair_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V53 acceptance-repair tree declaration")
+    if not status.get("full_v54_touch_target_completion_tree_present"):
+        errors.append("REGRESSION_CONTRACT lost V54 touch-target-completion tree declaration")
+    if not status.get("verified_v53_predecessor_preserved"):
+        errors.append("REGRESSION_CONTRACT lost verified V53 predecessor declaration")
+    if not status.get("v53_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V53")
+    if int(status.get("v53_to_v54_app_source_runtime_files") or 0) != 9:
+        errors.append("REGRESSION_CONTRACT V53→V54 app source/runtime repair count must be 9")
+    if not status.get("v54_effective_touch_cascade_protected"):
+        errors.append("REGRESSION_CONTRACT lost V54 effective touch-cascade protection")
+    if not status.get("verified_v52_predecessor_preserved"):
+        errors.append("REGRESSION_CONTRACT lost verified V52 predecessor declaration")
+    if not status.get("v52_handoff_superseded"):
+        errors.append("REGRESSION_CONTRACT does not supersede V52")
+    if int(status.get("v52_to_v53_app_source_runtime_files") or 0) != 20:
+        errors.append("REGRESSION_CONTRACT V52→V53 app source/runtime repair count must be 20")
+    if not status.get("v53_visual_interaction_matrix_protected"):
+        errors.append("REGRESSION_CONTRACT lost V53 visual/interaction matrix protection")
     if not status.get("v51_handoff_superseded"):
         errors.append("REGRESSION_CONTRACT does not supersede V51")
     if int(status.get("v51_to_v52_absorbed_source_files") or 0) != 17:
@@ -506,6 +575,19 @@ def contract_checks(errors: list[str]) -> None:
         "javascript_must_parse_as_es_modules",
         "do_not_package_unverified_source_as_equivalent_master",
         "do_not_declare_master_while_active_audit_remains",
+        "continue_from_v53_exact_tree",
+        "v53_acceptance_matrix_required",
+        "hash_equality_alone_is_not_acceptance",
+        "deterministic_svg_interactive_icons_required",
+        "v53_deep_1461_day_sweep_required_before_freeze",
+        "v53_cache_identity_must_not_reuse_predecessor",
+        "athens_simulation_must_branch_from_accepted_v53",
+        "continue_from_v54_exact_tree",
+        "v54_acceptance_matrix_required",
+        "v54_effective_final_css_cascade_required",
+        "v54_deep_1461_day_sweep_required_before_freeze",
+        "v54_cache_identity_must_not_reuse_predecessor",
+        "athens_simulation_must_branch_from_accepted_v54",
     ]:
         if rules.get(required) is not True:
             errors.append(f"REGRESSION_CONTRACT workflow rule missing/false: {required}")
@@ -539,10 +621,273 @@ def contract_checks(errors: list[str]) -> None:
         errors.append("REGRESSION_CONTRACT implemented-vs-planned status matrix missing")
 
 
+
+def source_order(path: str, needles: list[str], errors: list[str], label: str) -> None:
+    p = ROOT / path
+    if not p.exists():
+        errors.append(f"acceptance source missing: {path}")
+        return
+    text = p.read_text(encoding="utf-8", errors="replace")
+    positions=[]
+    cursor=0
+    for needle in needles:
+        pos=text.find(needle,cursor)
+        if pos < 0:
+            errors.append(f"{label} acceptance marker missing from {path}: {needle!r}")
+            return
+        positions.append(pos)
+        cursor=pos+len(needle)
+    if positions != sorted(positions):
+        errors.append(f"{label} acceptance hierarchy regressed in {path}")
+
+
+def visual_interaction_acceptance_checks(errors: list[str]) -> None:
+    """Protect locked screen hierarchy/interaction semantics, not only hashes."""
+    matrix=ROOT / "ACCEPTANCE_MATRIX_V54.md"
+    if not matrix.exists():
+        errors.append("V54 acceptance matrix is missing")
+    else:
+        text=matrix.read_text(encoding="utf-8", errors="replace")
+        for marker in [
+            "file identity alone is not acceptance", "## Home", "## Budget", "## Reservations",
+            "## Itinerary", "## Calendar", "## Journey History", "## Checklist", "## The Vault",
+            "## Settings", "10,227 successful builds", "Generate baseline SHA-256 manifest **last**",
+            "## V54 final-cascade touch-target protection",
+        ]:
+            if marker not in text:
+                errors.append(f"V54 acceptance matrix marker missing: {marker!r}")
+
+    # Deterministic app-shell icon contract.
+    must_contain("src_components_sidebar.js", [
+        "createLineIcon(icon)", "['home', 'Home', 'home']", "['budget', 'Budget', 'budget']",
+        "['reservations', 'Reservations', 'reservations']", "['itinerary', 'Itinerary', 'itinerary']",
+        "['calendar', 'Calendar', 'calendar']", "['journey-history', 'Journey History', 'history']",
+        "['checklist', 'Checklist', 'checklist']", "['vault', 'The Vault', 'vault']",
+        "['settings', 'Settings', 'settings']", "Save button commits changes",
+    ], errors)
+    must_not_contain("src_components_sidebar.js", ["⌂", "◉", "✈", "▦", "◆"], errors)
+    must_contain("src_components_icons.js", ["export function createLineIcon", "info:", "expand:", "plus:", "diamond:"], errors)
+
+    # A missing stay must never imply Indonesia at the source-selection layer.
+    must_contain("src_components_page-hero.js", ["if (!stay) return null;", "no-current-stay"], errors)
+    must_not_contain("src_components_page-hero.js", ["if (!stay) return 'banner-indonesia';"], errors)
+
+    # Home: exact current/next/progress + compact primary screen + distinct helpers.
+    must_contain("src_screens_home.js", [
+        "CURRENT DESTINATION", "home-stay-progress", "model.nextDestination", "Open Itinerary",
+        "home-ref-stats", "home-ref-minis", "Global search", "showQuickLook", "showToilet",
+        "PRACTICAL ESSENTIALS", "SIGNS TO LOOK FOR", "Repeat ×3", "localService===true",
+    ], errors)
+    source_order("src_screens_home.js", [
+        "main.append(renderHero(model,state,main,navigate));",
+        "main.append(stats);",
+        "main.append(minis);",
+        "main.append(search);",
+    ], errors, "Home")
+
+    # Budget locked hierarchy and date-routed editor. Do not reintroduce allocation pickers.
+    source_order("src_screens_budget.js", [
+        "main.append(createStayBanner",
+        "main.append(top);",
+        "main.append(add);",
+        "main.append(planning);",
+        "main.append(charts);",
+        "main.append(livingExpenses);",
+        "main.append(middle);",
+        "main.append(recentExpenses,monthlyHistory);",
+    ], errors, "Budget")
+    must_contain("src_screens_budget.js", [
+        "Current Destination Budget", "Daily & Stay Pace", "ADD EXPENSE", "Destination Budgets",
+        "Budget by Category", "Year Forecast & Budget Summary", "Living Expenses", "Recent Expense Entries",
+        "Monthly Spend History", "What was it for?", "How much did you pay?", "When?", "What was it?",
+    ], errors)
+    must_not_contain("src_screens_budget.js", ["Annual Budget allocation", "Destination Budget allocation", "allocation picker"], errors)
+
+    # Reservations: dashboard tabs + primary/rail hierarchy.
+    must_contain("src_screens_reservations.js", [
+        "Booked Reservations", "reservation-dashboard-tabs", "createLineIcon(tab.type)", "ADD RESERVATION",
+        "Future Bookings / To Book", "Upcoming Reservations", "Completed", "Reservation Health Check",
+        "Next 5 Upcoming", "Total Booked",
+    ], errors)
+    must_not_contain("src_screens_reservations.js", ["Flights & Transport"], errors)
+    source_order("src_screens_reservations.js", [
+        "main.append(createStayBanner",
+        "main.append(toolbar);",
+        "left.append(tabs);",
+        "left.append(addBar);",
+        "left.append(toBookPanel,upcomingPanel);",
+        "left.append(completed,health);",
+        "rail.append(nextFive,bookedTotal);",
+        "contentGrid.append(left,rail); main.append(contentGrid);",
+    ], errors, "Reservations")
+
+    # Itinerary order is the specific regression observed on the iPad.
+    must_contain("src_screens_itinerary.js", [
+        "Forward Coverage", "Countries Planned", "Route Trips", "Planned Stops", "Unplanned Gaps",
+        "Missing Stays", "Date Overlaps", "ADD DESTINATION", "Search itinerary", "Upcoming Itinerary",
+        "Forward Journey Map", "Completed Itinerary", "Starting Country",
+    ], errors)
+    source_order("src_screens_itinerary.js", [
+        "main.append(coveragePanel,statsPanel);",
+        "main.append(actionRow);",
+        "main.append(controls);",
+        "main.append(upcomingPanel);",
+        "main.append(mapPanel);",
+        "main.append(completed);",
+    ], errors, "Itinerary")
+    must_not_contain("src_screens_itinerary.js", ["Intentional Gap"], errors)
+
+    # Calendar controls/icons and canonical two-view shell.
+    must_contain("src_screens_calendar.js", [
+        "createStayBanner", "Month", "Agenda", "createLineIcon('chevronLeft')", "createLineIcon('chevronRight')",
+        "createLineIcon('plus')", "calendar-legend", "renderAgenda", "renderMonth",
+    ], errors)
+    must_not_contain("src_screens_calendar.js", ["'+ Note'", "\"+ Note\""], errors)
+    source_order("src_screens_calendar.js", [
+        "main.append(createStayBanner",
+        "main.append(controls);",
+        "main.append(legend);",
+        "main.append(model.view === 'agenda' ? renderAgenda(model, handlers) : renderMonth(model, handlers));",
+    ], errors, "Calendar")
+
+    # Journey History strong reference hierarchy.
+    must_contain("src_screens_journey-history.js", [
+        "Countries Visited", "Destinations Completed", "Days Travelled", "Years on the Road", "Lifetime Travel Spend",
+        "Journey Map", "Journey Snapshot", "Milestones", "Destination Totals", "Travel Mix", "No entries yet",
+    ], errors)
+    source_order("src_screens_journey-history.js", [
+        "main.append(createPageHero",
+        "main.append(renderSummary(lifetimeModel));",
+        "main.append(renderMap",
+        "main.append(analytics);",
+        "main.append(insightRow);",
+        "main.append(renderRecordFilters",
+    ], errors, "Journey History")
+
+    # Checklist locked hierarchy and deterministic informational icon.
+    must_contain("src_screens_checklist.js", [
+        "Ready to Move", "Hers · Needs & Wants", "His · Needs & Wants", "Permanent Checklist",
+        "Destination Checklist", "Checklist Overview", "Next Destination", "Checklist History", "createLineIcon('info')",
+    ], errors)
+    must_not_contain("src_screens_checklist.js", ["ⓘ"], errors)
+    source_order("src_screens_checklist.js", [
+        "primary.append(ready,stages,owners);",
+        "primary.append(requiredGrid);",
+        "rail.append(overview,nextDestination);",
+        "main.append(layout,renderHistory(model,openAny));",
+    ], errors, "Checklist")
+
+    # Vault must not fall back to platform emoji category icons.
+    must_contain("src_screens_vault.js", [
+        "VAULT_ICON_PATHS", "vaultCategoryIcon", "Passports", "Emergency Travel Card", "Recent Activity", "Streaming",
+        "openAttachmentPicker", "renderHiddenEmails",
+    ], errors)
+    must_contain("src_core_vault-view-model.js", [
+        "passport:'passport'", "visa:'visa'", "insurance:'insurance'", "accommodation:'accommodation'", "emergency:'emergency'",
+    ], errors)
+    must_not_contain("src_core_vault-view-model.js", ["🛂", "🎫", "🛡", "🏨", "✚"], errors)
+    must_contain("src_main.js", ["canRevealHiddenEmails", "revealHiddenEmails"], errors)
+    must_contain("src_core_vault-access.js", ["streamingOpenedSinceUnlock", "ui.activeSection === 'streaming'"], errors)
+
+    # Settings core acceptance structure.
+    must_contain("src_screens_settings.js", [
+        "App Health", "Travel & Budget Defaults", "Schengen Status", "Manual · Offline", "Security",
+        "Backup & Restore", "Restore validates the entire backup before replacing current data", "Application",
+    ], errors)
+
+    # Explicitly prevent the exact font-glyph regressions observed in the bad build.
+    for path in ["src_screens_home.js", "src_screens_calendar.js", "src_screens_checklist.js"]:
+        text=(ROOT/path).read_text(encoding="utf-8", errors="replace") if (ROOT/path).exists() else ""
+        for glyph in ["⌂", "◉", "✈", "▦", "ⓘ"]:
+            if glyph in text:
+                errors.append(f"font-dependent interactive glyph regressed in {path}: {glyph!r}")
+
+
+
+def final_touch_target_cascade_checks(errors: list[str]) -> None:
+    """Protect the *effective final* 44px iPad control size, not a stale earlier marker."""
+    p = ROOT / "src_design_reference-pass.css"
+    if not p.exists():
+        errors.append("V54 final touch-target stylesheet is missing")
+        return
+    text = p.read_text(encoding="utf-8", errors="replace")
+    marker = "V54 final iPad touch-target cascade guard"
+    if marker not in text:
+        errors.append("V54 final touch-target cascade guard marker is missing")
+        return
+    clean = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    protected = [
+        '[data-screen="reservations"] .reservation-flight-scope-tile',
+        '[data-screen="itinerary"] .itinerary-coverage-switch',
+    ]
+    rules = list(re.finditer(r"([^{}]+)\{([^{}]*)\}", clean, flags=re.S))
+    for selector in protected:
+        seen=[]
+        for match in rules:
+            selector_text=" ".join(match.group(1).split())
+            if selector not in selector_text:
+                continue
+            heights=[float(value) for value in re.findall(r"\bmin-height\s*:\s*(\d+(?:\.\d+)?)px", match.group(2))]
+            if heights:
+                seen.append((match.start(), heights[-1], selector_text))
+        if not seen:
+            errors.append(f"V54 protected touch target has no min-height rule: {selector}")
+            continue
+        _, final_height, final_selector = max(seen, key=lambda item:item[0])
+        if final_height < 44:
+            errors.append(f"V54 effective final touch target regressed below 44px: {selector} -> {final_height:g}px via {final_selector}")
+
+
+def deep_acceptance_checks(errors: list[str]) -> None:
+    node=shutil.which("node")
+    script=ROOT / "v54_deep_acceptance.mjs"
+    if not node:
+        errors.append("V54 deep acceptance requires Node.js")
+        return
+    if not script.exists():
+        errors.append("V54 deep acceptance script is missing")
+        return
+    common=subprocess.run([node,str(script)],cwd=ROOT,capture_output=True,text=True)
+    if common.returncode != 0:
+        errors.append("V54 deep migration/routing/backup acceptance failed: " + ((common.stderr or common.stdout).strip().splitlines()[-1] if (common.stderr or common.stdout).strip() else "unknown error"))
+        return
+
+    start=date(2027,1,14); end=date(2031,1,13)
+    total_days=(end-start).days+1
+    workers=8
+    base,extra=divmod(total_days,workers)
+    chunks=[]; cur=start
+    for i in range(workers):
+        size=base+(1 if i<extra else 0)
+        chunk_end=cur+timedelta(days=size-1)
+        chunks.append((cur.isoformat(),chunk_end.isoformat()))
+        cur=chunk_end+timedelta(days=1)
+
+    def run_chunk(pair):
+        a,b=pair
+        proc=subprocess.run([node,str(script),"--chunk",a,b],cwd=ROOT,capture_output=True,text=True)
+        if proc.returncode != 0:
+            raise RuntimeError((proc.stderr or proc.stdout).strip() or f"chunk {a}..{b} failed")
+        return json.loads(proc.stdout.strip().splitlines()[-1])
+
+    results=[]
+    try:
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            futures=[pool.submit(run_chunk,pair) for pair in chunks]
+            for future in as_completed(futures): results.append(future.result())
+    except Exception as exc:
+        errors.append(f"V54 continuous model sweep failed: {exc}")
+        return
+    days=sum(int(r.get("days",0)) for r in results)
+    builds=sum(int(r.get("builds",0)) for r in results)
+    if days != 1461 or builds != 10227:
+        errors.append(f"V54 continuous model sweep count mismatch: {days} days / {builds} builds")
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--verify", action="store_true", help="verify frozen baseline/working copy")
     ap.add_argument("--allow-changes", nargs="*", default=[], metavar="PATH", help="explicitly intentional changed files")
+    ap.add_argument("--deep", action="store_true", help="run V54 migration/routing/backup probes plus the full 1,461-day / 10,227-model sweep")
     args = ap.parse_args()
     if not args.verify:
         ap.error("use --verify")
@@ -587,6 +932,10 @@ def main() -> int:
     css_structure_checks(errors)
     service_worker_shell_checks(errors)
     contract_checks(errors)
+    visual_interaction_acceptance_checks(errors)
+    final_touch_target_cascade_checks(errors)
+    if args.deep:
+        deep_acceptance_checks(errors)
 
     if warnings:
         print("WARNINGS:")
@@ -605,7 +954,7 @@ def main() -> int:
         print("PASSED — BASELINE VERIFIED")
     print(f"Protected manifest entries: {len(entries)}")
     print(f"Package files: {len(actual_files)}")
-    print("NOTE — This is the V52 active no-loss continuity baseline, not a release/master declaration. All 17 post-V51 fixes plus rich 78-country helpers are frozen; target-iPad offline-voice/helper/update proof, final colour approval and practical Vault validation remain active before master/Gold Lock.")
+    print("NOTE — This is the V54 touch-target-completion candidate, not Gold/Master Lock. File identity, locked screen hierarchy and deep migrated-state behaviour are protected; physical target-iPad visual/offline-voice/practical-Vault/final-colour acceptance remains outstanding.")
     return 0
 
 

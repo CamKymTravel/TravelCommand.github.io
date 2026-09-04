@@ -22,6 +22,8 @@ export function createItineraryEntry(fields, options) {
   if (endDate < startDate) throw new Error('End date precedes start date');
   const startCity = typeof fields.startCity === 'string' ? fields.startCity.trim() : '';
   const routeTrip = fields.travelType === 'motorhome' || fields.travelType === 'cruise';
+  const country = typeof fields.country === 'string' ? fields.country.trim() : '';
+  if (!routeTrip && !country) throw new Error('Standard stays require a country');
   const startCountry = routeTrip && typeof fields.startCountry === 'string' ? fields.startCountry.trim() : '';
   if (routeTrip && /\s*(?:\/|→|->)\s*/.test(startCountry)) throw new Error('Itinerary starting country must name one explicit country, not a composite route');
   const localCurrency = fields.localCurrency == null || fields.localCurrency === '' ? null : String(fields.localCurrency).trim().toUpperCase();
@@ -38,7 +40,7 @@ export function createItineraryEntry(fields, options) {
     endDate,
     startCity,
     startCountry,
-    country: typeof fields.country === 'string' ? fields.country.trim() : '',
+    country,
     localCurrency,
     fixedLocalPerAUD,
     destinationBudgetAUD,

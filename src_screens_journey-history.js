@@ -5,10 +5,11 @@ import { renderOfflineMap, buildMapGeometry } from './src_components_offline-map
 import { toggleTravelYear, isTravelYearSelected } from './src_core_year-filters.js';
 import { formatAUDate } from './src_core_dates.js';
 import { makeExpandableCard, preserveLocalFocus } from './src_components_modal.js';
+import { createLineIcon } from './src_components_icons.js';
 
-const TYPE_ICONS = Object.freeze({ standard:'🌐', motorhome:'🚐', cruise:'🚢' });
+const TYPE_ICONS = Object.freeze({ standard:'globe', motorhome:'rv', cruise:'cruise' });
 const TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise' });
-const SUMMARY_ICONS = Object.freeze({ countries:'◎', destinations:'⌖', days:'▣', years:'⌛', spend:'$' });
+const SUMMARY_ICONS = Object.freeze({ countries:'globe', destinations:'pin', days:'days', years:'years', spend:'spend' });
 const JOURNEY_TRANSIENT_VIEW = new WeakMap();
 
 function node(tag, className, text) {
@@ -32,7 +33,8 @@ function renderSummary(model) {
   ];
   for (const [kind, value, label] of cards) {
     const card = node('article', `journey-summary-card journey-summary-${kind}`);
-    const icon = node('span', 'journey-summary-icon', SUMMARY_ICONS[kind] || '•');
+    const icon = node('span', 'journey-summary-icon');
+    icon.append(createLineIcon(SUMMARY_ICONS[kind] || 'pin'));
     icon.setAttribute('aria-hidden', 'true');
     const copy = node('span', 'journey-summary-copy');
     copy.append(node('strong', '', value), node('span', '', label));
@@ -116,7 +118,8 @@ function renderMap(model, options, updateYears, updateType) {
 }
 
 function typeIcon(row) {
-  const icon = node('span', 'journey-type-icon', TYPE_ICONS[row.travelType] || '🌐');
+  const icon = node('span', 'journey-type-icon');
+  icon.append(createLineIcon(TYPE_ICONS[row.travelType] || 'globe'));
   icon.setAttribute('role', 'img');
   icon.setAttribute('aria-label', TYPE_LABELS[row.travelType] || 'Standard');
   icon.title = TYPE_LABELS[row.travelType] || 'Standard';
@@ -127,7 +130,7 @@ function renderRecordFilters(model, options, updateOptions) {
   const panel = node('section', 'journey-record-filter-panel');
   const top = node('div', 'journey-record-filter-row');
   const searchWrap = node('label', 'journey-search-wrap');
-  searchWrap.append(node('span', 'journey-search-icon', '⌕'));
+  const searchIcon=node('span','journey-search-icon'); searchIcon.append(createLineIcon('search')); searchWrap.append(searchIcon);
   const search = document.createElement('input');
   search.type = 'search';
   search.className = 'journey-search';

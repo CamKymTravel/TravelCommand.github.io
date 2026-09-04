@@ -8,11 +8,10 @@ import { staysCoveringDate, isDestinationBudgetUsable } from './src_core_budget.
 import { formatAUDate } from './src_core_dates.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
+import { createLineIcon } from './src_components_icons.js';
 
-const RESERVATION_ICONS = Object.freeze({
-  flight:'✈', train:'▰', cruise:'⚓', rv:'▣', accommodation:'⌂', ticket:'✦'
-});
 const RESERVATION_TONES = Object.freeze({ flight:'blue', train:'green', cruise:'teal', rv:'orange', accommodation:'magenta', ticket:'gold' });
+const RESERVATION_EDITOR_ICONS = Object.freeze({ flight:'flight', train:'train', cruise:'cruise', rv:'rv', accommodation:'accommodation', ticket:'ticket' });
 const RESERVATION_MONTHS = Object.freeze(['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']);
 
 const STATUS_OPTIONS = Object.freeze([
@@ -157,17 +156,27 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
   const body = node('div', 'reservation-editor');
   body.dataset.audAuto = 'false';
   body.dataset.currencyAuto = existing ? 'false' : 'true';
+  const intro = node('section', 'reservation-editor-intro');
+  intro.append(
+    node('strong', '', existing ? 'Edit the essentials and save' : 'Enter the essentials and save'),
+    node('span', '', 'The reservation date automatically matches the exact Destination Budget. The same cost also rolls into Annual Budget totals once.')
+  );
   const typeTiles = node('div', 'reservation-type-tiles');
   typeTiles.setAttribute('role', 'group');
   typeTiles.setAttribute('aria-label', 'Reservation type');
   const flightScopeTiles = node('div', 'reservation-flight-scope-tiles');
   flightScopeTiles.setAttribute('role', 'group');
   flightScopeTiles.setAttribute('aria-label', 'Flight scope');
+  const typeStep = node('section', 'reservation-editor-step reservation-editor-step-type');
+  const typeHead = node('div', 'reservation-editor-step-head');
+  typeHead.append(node('b', 'reservation-editor-step-number', '1'), node('div', 'reservation-editor-step-copy'));
+  typeHead.querySelector('.reservation-editor-step-copy').append(node('strong', '', 'Choose reservation type'), node('span', '', 'Tap one type. The selected colour follows through this editor.'));
+  typeStep.append(typeHead, typeTiles, flightScopeTiles);
   const destinationPreview = node('div', 'reservation-destination-preview-host');
-  const fields = node('div', 'reservation-form-grid');
+  const fields = node('div', 'reservation-editor-fields');
   const conversionHint = node('p', 'reservation-conversion-hint');
   const error = node('p', 'reservation-form-error');
-  body.append(typeTiles, flightScopeTiles, destinationPreview, fields, conversionHint, error);
+  body.append(intro, typeStep, fields, error);
 
   const value = name => body.querySelector(`[name="${name}"]`)?.value ?? '';
 
@@ -188,12 +197,13 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
   function renderTypes() {
     typeTiles.replaceChildren();
     for (const [type, label] of RESERVATION_TABS) {
-      const button = node('button', `reservation-type-tile reservation-type-${type}`, label);
+      const button = node('button', `reservation-type-tile reservation-type-${type}`);
       button.type = 'button';
+      button.append(createLineIcon(RESERVATION_EDITOR_ICONS[type] || 'reservations', 'reservation-type-choice-icon'), node('span', 'reservation-type-choice-label', label));
       const active = body.dataset.type === type;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      if (active) button.append(node('span','reservation-selected-tick','✓'));
+      if (active) button.append(createLineIcon('check', 'reservation-selected-tick'));
       button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = type; if (!editorTone) setModalTone(modal, RESERVATION_TONES[type] || 'blue'); renderTypes(); renderFlightScope(); }));
       typeTiles.append(button);
     }
@@ -211,7 +221,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       const active = body.dataset.flightScope === scope;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      if (active) button.append(node('span','reservation-selected-tick','✓'));
+      if (active) { const tick=node('span','reservation-selected-tick'); tick.append(createLineIcon('check')); button.append(tick); }
       button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.flightScope = active ? '' : scope; renderFlightScope(); }));
       grid.append(button);
     }
@@ -279,16 +289,41 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     setModalTone(modal, editorTone || RESERVATION_TONES[saved.type] || 'blue');
     renderTypes();
     renderFlightScope();
-    fields.replaceChildren(
-      inputField('Title', 'title', 'text', saved.title),
+    const essentialsStep = node('section', 'reservation-editor-step reservation-editor-step-essentials');
+    const essentialsHead = node('div', 'reservation-editor-step-head');
+    essentialsHead.append(node('b', 'reservation-editor-step-number', '2'), node('div', 'reservation-editor-step-copy'));
+    essentialsHead.querySelector('.reservation-editor-step-copy').append(node('strong', '', 'Reservation details'), node('span', '', 'Name the booking and enter the calendar date. Time is optional.'));
+    const essentialsGrid = node('div', 'reservation-editor-essentials-grid');
+    essentialsGrid.append(
+      inputField('Reservation name', 'title', 'text', saved.title),
       inputField('Date', 'date', 'date', saved.date),
-      inputField('Time (optional)', 'time', 'time', saved.time),
-      selectField('Status', 'status', STATUS_OPTIONS, saved.status),
-      inputField('Original Currency', 'originalCurrency', 'text', saved.originalCurrency),
-      inputField('Original Amount', 'originalAmount', 'number', saved.originalAmount),
-      inputField('AUD Equivalent', 'audAmount', 'number', saved.audAmount),
-      textAreaField('Notes', 'notes', saved.notes)
+      inputField('Time (optional)', 'time', 'time', saved.time)
     );
+    essentialsStep.append(essentialsHead, essentialsGrid, destinationPreview);
+
+    const costStep = node('section', 'reservation-editor-step reservation-editor-step-cost');
+    const costHead = node('div', 'reservation-editor-step-head');
+    costHead.append(node('b', 'reservation-editor-step-number', '3'), node('div', 'reservation-editor-step-copy'));
+    costHead.querySelector('.reservation-editor-step-copy').append(node('strong', '', 'Cost & Destination Budget'), node('span', '', 'The dated stay controls the budget. Enter the booking currency and amount.'));
+    const costGrid = node('div', 'reservation-editor-cost-grid');
+    costGrid.append(
+      inputField('Original Amount', 'originalAmount', 'number', saved.originalAmount),
+      inputField('Original Currency', 'originalCurrency', 'text', saved.originalCurrency),
+      inputField('AUD Equivalent', 'audAmount', 'number', saved.audAmount)
+    );
+    const autoRoute = node('div', 'reservation-editor-auto-route');
+    autoRoute.append(createLineIcon('check'), node('span', '', 'AUTOMATIC DESTINATION BUDGET'), node('small', '', 'Matched automatically from the reservation date.'));
+    costStep.append(costHead, costGrid, autoRoute, conversionHint);
+
+    const trackingStep = node('section', 'reservation-editor-step reservation-editor-step-tracking');
+    const trackingHead = node('div', 'reservation-editor-step-head');
+    trackingHead.append(node('b', 'reservation-editor-step-number', '4'), node('div', 'reservation-editor-step-copy'));
+    trackingHead.querySelector('.reservation-editor-step-copy').append(node('strong', '', 'Booking status & notes'), node('span', '', 'Track whether it is Paid, Unpaid, Booked or still To Book.'));
+    const trackingGrid = node('div', 'reservation-editor-tracking-grid');
+    trackingGrid.append(selectField('Status', 'status', STATUS_OPTIONS, saved.status), textAreaField('Notes', 'notes', saved.notes));
+    trackingStep.append(trackingHead, trackingGrid);
+
+    fields.replaceChildren(essentialsStep, costStep, trackingStep);
     for (const name of ['date','time','originalAmount','audAmount']) {
       fields.querySelector(`[name="${name}"]`)?.addEventListener('input', updateRoutingPreview);
       fields.querySelector(`[name="${name}"]`)?.addEventListener('change', updateRoutingPreview);
@@ -456,7 +491,7 @@ function renderNextFive(state,currentDate,openEditor){
     const time=String(r.dateTime||'').match(/T(\d{2}:\d{2})/)?.[1]||'';
     copy.append(node('strong','',r.title),node('small','',[typeLabel,itinerary?.name,time].filter(Boolean).join(' · ')));
     if(r.needsBudgetRepair) copy.append(node('small','reservation-rail-repair','BUDGET REPAIR REQUIRED'));
-    const chevron=node('span','reservation-rail-chevron','›');
+    const chevron=node('span','reservation-rail-chevron'); chevron.append(createLineIcon('chevronRight'));
     row.append(badge,copy,chevron);
     row.setAttribute('aria-label', ['Open reservation', r.title, formatAUDate(date), time, typeLabel, itinerary?.name, r.needsBudgetRepair ? 'Destination Budget repair required' : ''].filter(Boolean).join(' · '));
     row.addEventListener('click',()=>openEditor(r.id)); list.append(row);
@@ -511,7 +546,8 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
       button.setAttribute('aria-pressed', String(active));
       const meta=reservationTabMeta(state,currentDate,tab.type);
       const top=node('span','reservation-tab-top');
-      top.append(node('span','reservation-tab-icon',RESERVATION_ICONS[tab.type]||'•'),node('span','reservation-tab-label',tab.label));
+      const tabIcon=node('span','reservation-tab-icon'); tabIcon.append(createLineIcon(tab.type));
+      top.append(tabIcon,node('span','reservation-tab-label',tab.label));
       const count=node('span','reservation-tab-count'); count.append(node('strong','',String(tab.count)),node('small','',tab.count===1?'booking':'bookings'));
       const support=node('span','reservation-tab-support');
       support.append(node('strong','reservation-support-primary',meta.primary),node('small','reservation-support-secondary',meta.secondary));
@@ -523,7 +559,7 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     const contentGrid=node('section','reservation-reference-grid');
     const left=node('div','reservation-reference-main');
     left.append(tabs);
-    const addBar=node('button','reservation-add-bar','＋ ADD RESERVATION'); addBar.type='button'; addBar.addEventListener('click',()=>openReservationEditor({stateService,host:main,currentDate,initialType:options.activeType})); left.append(addBar);
+    const addBar=node('button','reservation-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode(' ADD RESERVATION')); addBar.addEventListener('click',()=>openReservationEditor({stateService,host:main,currentDate,initialType:options.activeType})); left.append(addBar);
     const toBookPanel=listPanel('Future Bookings / To Book', model.toBook, 'reservation-to-book', id=>openEditor(id,'gold'), 'No To Book entries yet');
     const upcomingPanel=listPanel('Upcoming', model.upcoming, 'reservation-upcoming', id=>openEditor(id,'blue'), 'No upcoming entries yet');
     left.append(toBookPanel,upcomingPanel);
