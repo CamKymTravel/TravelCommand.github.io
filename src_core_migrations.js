@@ -222,7 +222,7 @@ function normalizeOwner(value, fallback = 'Both') {
 }
 
 function validCurrency(value) {
-  return typeof value === 'string' && /^[A-Z]{3}$/.test(value.trim().toUpperCase());
+  return typeof value === 'string' && value.trim().toUpperCase() !== 'XXX' && /^[A-Z]{3}$/.test(value.trim().toUpperCase());
 }
 function normalizeCurrencyText(value, fallback = null) {
   if (value == null || value === '') return fallback;
@@ -378,17 +378,31 @@ function normalizeLegacyCost(state, record, kind) {
 
   next.itineraryId = normalizeRelationshipId(next.itineraryId);
   next.needsBudgetRepair = normalizeBoolean(next.needsBudgetRepair, next.needsBudgetRepair == null ? false : next.needsBudgetRepair);
-  if (kind === 'expense') next.date = canonicalLegacyDate(next.date, { optional:true });
-  else {
+  if (kind === 'expense') {
+    next.date = canonicalLegacyDate(next.date, { optional:true });
+    // An unusable legacy text date cannot be trusted for automatic routing, but
+    // it also should not destroy an otherwise recoverable cost record. Clear
+    // only malformed text into the explicit repair state; non-text corruption
+    // remains intact so strict validation still rejects it.
+    if (typeof next.date === 'string' && !routeDate(next, 'expense')) next.date = null;
+  } else {
     if ((next.dateTime == null || next.dateTime === '') && next.date != null && next.date !== '') next.dateTime = canonicalDateOrDateTime(next.date, { optional:true });
     else next.dateTime = canonicalDateOrDateTime(next.dateTime, { optional:true });
     delete next.date;
+    if (typeof next.dateTime === 'string' && !routeDate(next, 'reservation')) next.dateTime = null;
   }
 
   next.originalAmount = normalizeNumber(next.originalAmount, { min:0, missing:0 });
   next.audAmount = normalizeNumber(next.audAmount, { min:0, missing:0 });
   if (validCurrency(next.originalCurrency)) next.originalCurrency = String(next.originalCurrency).trim().toUpperCase();
-  else if (next.originalCurrency == null || next.originalCurrency === '') next.originalCurrency = 'XXX';
+  else if (next.originalCurrency == null || typeof next.originalCurrency === 'string') {
+    // Genuine legacy cost records already enter explicit Destination Budget
+    // repair when their currency cannot be trusted. Preserve recoverability by
+    // canonicalising unusable text (including old labels such as "US dollars")
+    // to the repair-only XXX sentinel. Non-text corruption (objects/arrays/
+    // booleans) remains untouched so strict validation rejects it.
+    next.originalCurrency = 'XXX';
+  }
   if (kind === 'expense') next.description = textOr(next.description, '');
   if (kind === 'reservation') {
     next.title = textOr(next.title, '');

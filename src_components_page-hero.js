@@ -1,5 +1,6 @@
 import { formatAUDate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
+import { countryFlagEmoji } from './src_components_country.js';
 let indexPromise = null;
 let archivePromise = null;
 const objectUrls = new Map();
@@ -21,10 +22,14 @@ function keyForStay(stay) {
   const type = String(stay.travelType || '').toLowerCase();
   if (type === 'cruise') return 'banner-cruise-princess';
   if (type === 'motorhome' || type === 'rv') {
-    const explicit=normalizeCountry(stay.startCountry);
-    if(explicit) return explicit === 'united-states' ? 'banner-motorhome-usa' : 'banner-motorhome-europe';
+    // Header authority is trip geography, not a small city allow-list. Older
+    // records may omit startCountry but still carry the trip country, so check
+    // both before falling back to a conservative city hint.
+    const tripCountry=normalizeCountry(stay.startCountry || stay.country);
+    if(tripCountry) return tripCountry === 'united-states' ? 'banner-motorhome-usa' : 'banner-motorhome-europe';
     const startCity=String(stay.startCity||'').trim().toLocaleLowerCase('en-AU');
-    return ['miami','nashville','dallas','los angeles','new york'].includes(startCity) ? 'banner-motorhome-usa' : 'banner-motorhome-europe';
+    const usaCityHints=['miami','nashville','dallas','los angeles','new york','chicago','phoenix','seattle','san francisco','las vegas','denver','boston','washington','orlando'];
+    return usaCityHints.includes(startCity) ? 'banner-motorhome-usa' : 'banner-motorhome-europe';
   }
   return `banner-${normalizeCountry(stay.country)}`;
 }
@@ -121,27 +126,39 @@ export function createPageHero({ key, eyebrow = '', title = '', subtitle = '', c
 
 export { keyForStay };
 
+function flagCountryForStay(stay = null) {
+  if (!stay) return '';
+  const type = String(stay.travelType || '').toLowerCase();
+  if (type === 'cruise' || type === 'motorhome' || type === 'rv') return stay.startCountry || stay.country || '';
+  return stay.country || stay.startCountry || '';
+}
+
 export function createStayBanner({ currentStay = null, nextDestination = null, navigate = null, className = '' } = {}) {
   const section = document.createElement('section');
   section.className = `tcc-stay-banner ${className}`.trim();
   applyStayHeaderImage(section, currentStay, { position:'center center' });
-  const card = (kind, label) => { const el=document.createElement(kind === 'next' && nextDestination && navigate ? 'button' : 'div'); el.className=`tcc-stay-banner-card tcc-stay-banner-${kind}`; if(el.tagName==='BUTTON') el.type='button'; const k=document.createElement('p'); k.className='eyebrow'; k.textContent=label; el.append(k); return el; };
+  const card = (kind, label) => { const el=document.createElement('div'); el.className=`tcc-stay-banner-card tcc-stay-banner-${kind}`; const k=document.createElement('p'); k.className='eyebrow'; k.textContent=label; el.append(k); return el; };
   const current=card('current','CURRENT STAY');
   if (currentStay) {
+    const identity=document.createElement('div'); identity.className='tcc-stay-banner-identity';
+    const flag=document.createElement('span'); flag.className='tcc-stay-banner-flag'; flag.textContent=countryFlagEmoji(flagCountryForStay(currentStay)); flag.setAttribute('aria-hidden','true');
     const name=document.createElement('strong'); name.className='tcc-stay-banner-name'; name.textContent=`${currentStay.name || currentStay.title}${currentStay.country ? `, ${currentStay.country}` : ''}`;
+    identity.append(flag,name);
     const dates=document.createElement('span'); dates.textContent=currentStay.dates || (currentStay.startDate&&currentStay.endDate?`${formatAUDate(currentStay.startDate)} – ${formatAUDate(currentStay.endDate)}`:'');
-    current.append(name,dates);
+    current.append(identity,dates);
     if (Number.isFinite(Number(currentStay.remainingDays))) { const remaining=document.createElement('span'); remaining.className='tcc-stay-banner-detail'; remaining.textContent=`${Number(currentStay.remainingDays)} day${Number(currentStay.remainingDays)===1?'':'s'} remaining`; current.append(remaining); }
     if(currentStay.travelType==='cruise'||currentStay.travelType==='motorhome'||currentStay.travelType==='rv'){ const mode=document.createElement('span'); mode.className='tcc-stay-mode-marker'; mode.append(createLineIcon(currentStay.travelType==='cruise'?'cruise':'rv'),document.createTextNode(currentStay.travelType==='cruise'?' Cruise':' Motorhome')); current.append(mode); }
     if (Number.isFinite(Number(currentStay.progress))) { const p=document.createElement('progress'); const progress=Math.max(0,Math.min(100,Number(currentStay.progress))); p.max=100; p.value=progress; p.setAttribute('aria-label','Days in current stay'); p.setAttribute('aria-valuetext',`${Math.round(progress)}% of current stay elapsed`); current.append(p); }
   } else { const empty=document.createElement('strong'); empty.textContent='No current stay'; current.append(empty); }
   const next=card('next','NEXT DESTINATION');
   if (nextDestination) {
+    const identity=document.createElement('div'); identity.className='tcc-stay-banner-identity';
+    const flag=document.createElement('span'); flag.className='tcc-stay-banner-flag'; flag.textContent=countryFlagEmoji(flagCountryForStay(nextDestination)); flag.setAttribute('aria-hidden','true');
     const name=document.createElement('strong'); name.className='tcc-stay-banner-name'; name.textContent=nextDestination.title || nextDestination.name || '';
+    identity.append(flag,name);
     const date=document.createElement('span'); date.textContent=nextDestination.startDate ? `${formatAUDate(nextDestination.startDate)}${nextDestination.endDate ? ` – ${formatAUDate(nextDestination.endDate)}` : ''}` : (nextDestination.dates || '');
-    next.append(name,date);
+    next.append(identity,date);
     if (Number.isFinite(Number(nextDestination.durationDays))) { const duration=document.createElement('span'); duration.className='tcc-stay-banner-detail'; duration.textContent=`${Number(nextDestination.durationDays)} day${Number(nextDestination.durationDays)===1?'':'s'} planned`; next.append(duration); }
-    if (navigate && next.tagName === 'BUTTON') next.addEventListener('click',()=>navigate('itinerary',{collection:'itinerary',id:nextDestination.id}));
   } else { const empty=document.createElement('strong'); empty.textContent='Nothing planned'; next.append(empty); }
   section.append(current,next);
   return section;

@@ -7,6 +7,7 @@ import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
+import { countryFlagEmoji } from './src_components_country.js';
 
 
 const TYPE_LABELS = Object.freeze({ reminder:'Reminder', note:'Note' });
@@ -209,11 +210,31 @@ function calendarMaterialTone(event) {
   return winner;
 }
 
-function openCalendarItem(event, { navigate, openPersonal, editorTone = null }) {
+function openCalendarItem(event, { host, openPersonal, editorTone = null }) {
   const tone = editorTone || calendarMaterialTone(event);
-  if (event.sourceCollection === 'calendarEvents') return openPersonal(event.sourceId, tone);
-  if (event.sourceCollection === 'reservations') return navigate?.('reservations', { collection:'reservations', id:event.sourceId, editorTone:tone });
-  if (event.sourceCollection === 'itinerary') return navigate?.('itinerary', { collection:'itinerary', id:event.sourceId, editorTone:tone });
+  const body=node('section','calendar-source-detail');
+  const hero=node('div','calendar-source-detail-hero');
+  if(event.country){const flag=node('span','calendar-source-detail-flag',countryFlagEmoji(event.flagCountry||event.country));flag.setAttribute('aria-hidden','true');hero.append(flag);}
+  const heroCopy=node('div','calendar-source-detail-hero-copy');
+  heroCopy.append(node('p','eyebrow','CALENDAR ITEM'),node('h2','',event.title||'Calendar item'));
+  if(event.country)heroCopy.append(node('strong','',event.country));
+  hero.append(heroCopy);
+  const facts=node('div','calendar-source-detail-facts');
+  const fact=(label,value)=>{const item=node('div','calendar-source-detail-fact');item.append(node('small','',label),node('strong','',value||'—'));return item;};
+  facts.append(
+    fact('Type',event.subtitle||event.kind||'Calendar item'),
+    fact('Dates',event.kind==='destination-period'||event.kind==='travel-period'?`${formatAUDate(event.startDate)} – ${formatAUDate(event.endDate)}`:formatAUDate(event.cellDate||event.startDate)),
+    fact('Time',event.dateTime?splitCalendarDateTime(event.dateTime).time:'—')
+  );
+  body.append(hero,facts);
+  if(event.notes)body.append(node('p','calendar-source-detail-note',event.notes));
+  const isPersonal=event.sourceCollection==='calendarEvents';
+  body.append(node('p','calendar-source-detail-menu-note',isPersonal?'This opens read-only first. Use Edit below only when you deliberately want to change this reminder or note.':'Use the left menu if you want to open the source screen. Calendar items never change screens by themselves.'));
+  const actions=[];
+  if(isPersonal)actions.push({label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openPersonal(event.sourceId,tone));}});
+  actions.push({label:'Close',onClick:d=>d.close()});
+  const dialog=createModal({title:event.title||'Calendar Details',body,className:`tcc-expanded-modal calendar-source-detail-modal tone-${tone}`,actions});
+  host?.append(dialog);dialog?.addEventListener('close',()=>dialog.remove(),{once:true});dialog?.showModal();
 }
 
 function monthEventButton(event, handlers) {
@@ -262,9 +283,8 @@ function openCalendarDayItems(cell, handlers) {
     queueMicrotask(() => action?.(...args));
   };
   const modalHandlers = {
-    navigate:closeThen(handlers.navigate),
-    openPersonal:closeThen(handlers.openPersonal),
-    editorTone:'blue'
+    host:handlers.host,
+    openPersonal:closeThen(handlers.openPersonal)
   };
   for (const event of cell.events) body.append(monthEventButton(event, modalHandlers));
   handlers.host?.append(dialog);
@@ -302,7 +322,12 @@ function renderMonth(model, handlers) {
     // reach. Keep the approved compact reference treatment: two exact items,
     // then one explicit “+ more on this day” control that exposes the complete
     // dated list in a modal.
-    const visible = cell.events.length > 3 ? cell.events.slice(0, 2) : cell.events;
+    // R67: 44px month controls changed the available geometry. Two direct
+    // entries plus a third 44px "+ more" control cannot fit safely inside a
+    // landscape day cell without spilling into the next calendar row. Keep
+    // both direct entries when there are exactly two; on denser days show one
+    // direct recognition item plus the complete-day affordance.
+    const visible = cell.events.length > 2 ? cell.events.slice(0, 1) : cell.events;
     for (const event of visible) events.append(monthEventButton(event, handlers));
     if (visible.length < cell.events.length) {
       const hiddenCount = cell.events.length - visible.length;
@@ -325,6 +350,8 @@ function agendaRow(event, handlers) {
   button.dataset.kind = event.kind;
   setEventColour(button, event);
   const marker = node('span', 'calendar-agenda-marker');
+  const flag = event.country ? node('span','calendar-agenda-flag',countryFlagEmoji(event.flagCountry||event.country)) : null;
+  if(flag)flag.setAttribute('aria-hidden','true');
   const copy = node('span', 'calendar-agenda-copy');
   copy.append(node('strong', '', event.title));
   if (event.subtitle) copy.append(node('small', '', event.subtitle));
@@ -332,7 +359,7 @@ function agendaRow(event, handlers) {
   const date = node('span', 'calendar-agenda-date');
   date.append(node('strong', '', event.displayDate));
   if (event.displayTime) date.append(node('small', '', event.displayTime));
-  button.append(marker, copy, date);
+  button.append(marker); if(flag)button.append(flag); button.append(copy, date);
   button.setAttribute('aria-label', ['Open calendar item', event.title, event.subtitle, event.displayDate, event.displayTime].filter(Boolean).join(' · '));
   button.addEventListener('click', () => openCalendarItem(event, handlers));
   return button;
@@ -358,7 +385,7 @@ function calendarLegendExpandedBody(model, kind, handlers) {
     return event.kind==='personal';
   });
   const heading={periods:'Destination & Travel Periods',reservations:'Reservations',personal:'Reminders & Notes'}[kind]||'Calendar items';
-  body.append(node('p','calendar-legend-expanded-copy',`${heading} in ${model.monthLabel}. Tap any row below to open its source record.`));
+  body.append(node('p','calendar-legend-expanded-copy',`${heading} in ${model.monthLabel}. Tap any row below to open its calendar details here.`));
   const list=node('div','calendar-legend-expanded-list');
   if(!records.length)list.append(node('p','calendar-empty','No entries yet'));
   for(const event of records){
@@ -434,7 +461,6 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
 
     const handlers = {
       host:main,
-      navigate,
       openPersonal:(eventId, editorTone=null) => openPersonalEventEditor({ stateService, host:main, currentDate, eventId, editorTone })
     };
 

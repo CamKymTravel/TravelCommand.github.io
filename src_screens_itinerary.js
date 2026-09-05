@@ -1,13 +1,20 @@
 import { buildItineraryViewModel } from './src_core_itinerary-view-model.js';
 import { saveItineraryDraft, deleteItineraryDraft } from './src_core_itinerary-mutations.js';
-import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
+import { createModal, makeExpandableCard, materialToneFromRenderedSurface, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { formatMoney } from './src_core_currency.js';
 import { isTravelYearSelected, toggleTravelYear } from './src_core_year-filters.js';
 import { formatAUDate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
+import { countryFlagEmoji } from './src_components_country.js';
 import { renderOfflineMap } from './src_components_offline-map.js';
+import { createStayBanner } from './src_components_page-hero.js';
+
+function itineraryFlagCountry(record = {}) {
+  const route=['cruise','motorhome','rv'].includes(String(record.travelType||'').toLowerCase());
+  return (route ? record.startCountry : record.country) || record.country || record.startCountry || '';
+}
 
 const TRAVEL_TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise' });
 const TRAVEL_TYPE_ICONS = Object.freeze({ standard:'globe', motorhome:'rv', cruise:'cruise' });
@@ -85,12 +92,37 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
   let modal = null;
   const body = node('div', 'itinerary-editor');
   const error = node('p', 'itinerary-form-error');
+  const orientation = node('section', 'itinerary-editor-orientation');
   const typeTiles = node('div', 'itinerary-type-tiles');
   typeTiles.setAttribute('role', 'group');
   typeTiles.setAttribute('aria-label', 'Travel type');
   const fields = node('div', 'itinerary-form-grid');
   const routeSection = node('section', 'itinerary-route-editor');
   let routeDraft = originalRoutePoints.map(point => structuredClone(point));
+
+  function renderOrientation() {
+    const type=body.dataset.travelType||'standard';
+    const typeLabel=type==='motorhome'?'Motorhome':type==='cruise'?'Cruise':'Standard';
+    const name=String(fields.querySelector('[name="name"]')?.value||'').trim() || (existing?.name || 'New destination');
+    const countryField=type==='standard'?'country':'startCountry';
+    const country=String(fields.querySelector(`[name="${countryField}"]`)?.value||'').trim() || (type==='standard'?existing?.country:existing?.startCountry) || '';
+    const start=String(fields.querySelector('[name="startDate"]')?.value||'').trim();
+    const end=String(fields.querySelector('[name="endDate"]')?.value||'').trim();
+    orientation.replaceChildren();
+    const flag=node('span','itinerary-editor-orientation-flag',countryFlagEmoji(country));flag.setAttribute('aria-hidden','true');
+    const copy=node('div','itinerary-editor-orientation-copy');
+    copy.append(
+      node('small','',existing?'EDITING DESTINATION / TRIP':'NEW DESTINATION / TRIP'),
+      node('strong','',name),
+      node('span','',[country||'Country not set',typeLabel].join(' · '))
+    );
+    const dates=node('div','itinerary-editor-orientation-dates');
+    dates.append(
+      node('small','','STAY / TRIP DATES'),
+      node('strong','',start&&end?`${formatAUDate(start)} → ${formatAUDate(end)}`:(start?`${formatAUDate(start)} → set end date`:(end?`set start date → ${formatAUDate(end)}`:'Set start and end dates')))
+    );
+    orientation.append(flag,copy,dates);
+  }
 
   function renderRouteRows(points = routeDraft) {
     routeDraft = points.map(point => structuredClone(point));
@@ -161,6 +193,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
           if (tileActive) tile.append(createLineIcon('check', 'itinerary-selected-tick'));
         }
         renderRouteRows(routeDraft);
+        renderOrientation();
       });
       typeTiles.append(button);
     }
@@ -197,15 +230,20 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     );
     const countryInput = fields.querySelector('[name="country"]');
     if (countryInput) countryInput.required = body.dataset.travelType === 'standard';
+    fields.querySelectorAll('input').forEach(input=>{
+      input.addEventListener('input',renderOrientation);
+      input.addEventListener('change',renderOrientation);
+    });
     if (normalDatedCostsExist) {
       const note = node('p', 'itinerary-field-lock-note', 'Local currency and fixed exchange rate are locked because this stay already has dated costs. Stay dates can still be changed when every dated cost remains safely linked to this exact stay.');
       fields.append(note);
     }
     routeDraft = savedRoutePoints.map(point => structuredClone(point));
     renderRouteRows(routeDraft);
+    renderOrientation();
   }
 
-  body.append(typeTiles, fields, routeSection, error);
+  body.append(orientation, typeTiles, fields, routeSection, error);
   populate(originalFields, originalRoutePoints);
 
   const actions = [];
@@ -328,15 +366,15 @@ function itineraryStatExpandedBody(kind, model) {
   const list=node('div','itinerary-stat-expanded-list');
   if(!details.length){list.append(node('p','itinerary-empty',kind==='gaps'?'No unplanned gaps.':kind==='stays'?'No missing stays.':kind==='overlaps'?'No date overlaps.':'No entries yet'));body.append(list);return body;}
   if(kind==='countries'){
-    for(const item of details){const row=node('article','itinerary-stat-detail-row');row.append(node('strong','',item.label),node('span','',`${item.count} planned stay${item.count===1?'':'s'}`));list.append(row);}
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');const flag=node('span','itinerary-stat-detail-flag',countryFlagEmoji(item.label));flag.setAttribute('aria-hidden','true');const copy=node('span','itinerary-stat-detail-copy');copy.append(node('strong','',item.label),node('span','',`${item.count} planned stay${item.count===1?'':'s'}`));row.append(flag,copy);list.append(row);}
   } else if(kind==='routes'){
-    for(const item of details){const row=node('article','itinerary-stat-detail-row');row.append(node('strong','',item.name),node('span','',[item.country||item.startCountry,item.travelType==='cruise'?'Cruise':'Motorhome',item.displayDates,`${item.routePointCount} route point${item.routePointCount===1?'':'s'}`].filter(Boolean).join(' · ')));list.append(row);}
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');const flag=node('span','itinerary-stat-detail-flag',countryFlagEmoji(itineraryFlagCountry(item)));flag.setAttribute('aria-hidden','true');const copy=node('span','itinerary-stat-detail-copy');copy.append(node('strong','',item.name),node('span','',[item.country||item.startCountry,item.travelType==='cruise'?'Cruise':'Motorhome',item.displayDates,`${item.routePointCount} route point${item.routePointCount===1?'':'s'}`].filter(Boolean).join(' · ')));row.append(flag,copy);list.append(row);}
   } else if(kind==='stops'){
-    for(const item of details){const row=node('article','itinerary-stat-detail-row');if(item.kind==='route-point'){row.append(node('strong','',item.name),node('span','',`${item.parentName} · route point ${item.order}`));}else{row.append(node('strong','',item.name),node('span','',[item.country,item.travelType==='standard'?'Standard':item.travelType,item.startDate&&item.endDate?`${formatAUDate(item.startDate)} – ${formatAUDate(item.endDate)}`:''].filter(Boolean).join(' · ')));}list.append(row);}
+    for(const item of details){const row=node('article','itinerary-stat-detail-row');if(item.kind==='route-point'){row.append(node('strong','',item.name),node('span','',`${item.parentName} · route point ${item.order}`));}else{const flag=node('span','itinerary-stat-detail-flag',countryFlagEmoji(itineraryFlagCountry(item)));flag.setAttribute('aria-hidden','true');const copy=node('span','itinerary-stat-detail-copy');copy.append(node('strong','',item.name),node('span','',[item.country,item.travelType==='standard'?'Standard':item.travelType,item.startDate&&item.endDate?`${formatAUDate(item.startDate)} – ${formatAUDate(item.endDate)}`:''].filter(Boolean).join(' · ')));row.append(flag,copy);}list.append(row);}
   } else if(kind==='gaps'){
     for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-warning');row.append(node('strong','',`${item.days} unplanned day${item.days===1?'':'s'}`),node('span','',`${formatAUDate(item.startDate)} – ${formatAUDate(item.endDate)}`));list.append(row);}
   } else if(kind==='stays'){
-    for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-warning');row.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,'Accommodation not linked'].filter(Boolean).join(' · ')));list.append(row);}
+    for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-warning');const flag=node('span','itinerary-stat-detail-flag',countryFlagEmoji(itineraryFlagCountry(item)));flag.setAttribute('aria-hidden','true');const copy=node('span','itinerary-stat-detail-copy');copy.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,'Accommodation not linked'].filter(Boolean).join(' · ')));row.append(flag,copy);list.append(row);}
   } else if(kind==='overlaps'){
     for(const item of details){const row=node('article','itinerary-stat-detail-row itinerary-stat-detail-danger');const range=item.overlapStart&&item.overlapEnd?`${formatAUDate(item.overlapStart)} – ${formatAUDate(item.overlapEnd)}`:'';row.append(node('strong','',`${item.days} overlapping day${item.days===1?'':'s'}`),node('span','',[item.first?.name&&item.second?.name?`${item.first.name} ↔ ${item.second.name}`:'',range].filter(Boolean).join(' · ')));list.append(row);}
   }
@@ -351,7 +389,7 @@ function renderMap(model, host) {
   const head = node('div', 'itinerary-map-title-row');
   const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','',"Where We're Going"));
   const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode(' Expand Map'));
-  expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key'})); const modal=createModal({title:'Forward Journey Plan',body,actions:[{label:'Close / Return to Itinerary',onClick:d=>d.close()}],className:'tone-blue'}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
+  expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key'})); const mapTone=materialToneFromRenderedSurface(panel,'teal'); const modal=createModal({title:'Forward Journey Plan',body,actions:[],className:`tcc-expanded-modal itinerary-map-expanded-modal tone-${mapTone}`}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
   head.append(copy,expand); panel.append(head);
   const first=model.currentStay||null, next=model.nextDestination||null; const routePoints=model.upcoming.reduce((sum,record)=>sum+Number(record.routePointCount||0),0);
   const metrics=node('div','itinerary-map-metrics'); const data=[['Current',first?.name||'—'],['Next',next?.name||'—'],['Planned Stops',String(model.stats.plannedStops)],['Detailed Route Points',String(routePoints)],['Route Trips',String(model.stats.routeTrips)],['Missing Coverage',String(model.stats.missingCoverage)]]; for(const [label,value] of data){const metric=node('article','itinerary-map-metric');metric.append(node('span','',label),node('strong','',value));metrics.append(metric);} panel.append(metrics);
@@ -376,7 +414,18 @@ function renderYearFilters(model, options, onChange) {
   return filters;
 }
 
-function renderCoverage(model, months = 6, onMonthsChange = null, openEditor = null) {
+function itineraryCoverageExpandedBody(state, currentDate, initialMonths = 6, openDetail = null) {
+  const body = node('div', 'itinerary-coverage-expanded-body');
+  let months = [3,6,12].includes(Number(initialMonths)) ? Number(initialMonths) : 6;
+  const rerender = () => {
+    const model = buildItineraryViewModel(state, currentDate, { coverageMonths:months });
+    body.replaceChildren(renderCoverage(model, months, value => { months = value; rerender(); }, openDetail));
+  };
+  rerender();
+  return body;
+}
+
+function renderCoverage(model, months = 6, onMonthsChange = null, openDetail = null) {
   const panel = node('section', 'itinerary-panel itinerary-coverage itinerary-coverage-reference');
   const hasCoverage=Number(model.forwardCoverage.horizonDays)>0;
   const head = node('div', 'itinerary-section-head'); const title=node('div'); title.append(node('h2','','Forward Coverage'),node('small','',hasCoverage?`${formatAUDate(model.forwardCoverage.startDate)} – ${formatAUDate(model.forwardCoverage.endDate)}`:'Planning not started'));
@@ -396,23 +445,83 @@ function renderCoverage(model, months = 6, onMonthsChange = null, openEditor = n
     if(segment.type==='gap'){
       const gap=node('div','itinerary-coverage-segment itinerary-segment-gap');gap.style.flexGrow=String(Math.max(1,segment.days));gap.append(node('strong','','UNCOVERED'),node('small','',`${segment.days}d`));gap.setAttribute('role','img');gap.setAttribute('aria-label',`Uncovered itinerary dates · ${formatAUDate(segment.startDate)} – ${formatAUDate(segment.endDate)} · ${segment.days} day${segment.days===1?'':'s'}`);timeline.append(gap);continue;
     }
-    const seg=node('button',`itinerary-coverage-segment itinerary-segment-${segment.travelType}`);seg.type='button';seg.style.flexGrow=String(Math.max(1,segment.days));seg.append(node('strong','',segment.name),node('small','',`${segment.days}d`));seg.setAttribute('aria-label',`Open ${segment.name} itinerary · ${formatAUDate(segment.startDate)} – ${formatAUDate(segment.endDate)}`);seg.addEventListener('click',()=>openEditor?.(segment.id));timeline.append(seg);
+    const seg=node('button',`itinerary-coverage-segment itinerary-segment-${segment.travelType}`);seg.type='button';seg.style.flexGrow=String(Math.max(1,segment.days));seg.append(node('strong','',segment.name),node('small','',`${segment.days}d`));seg.setAttribute('aria-label',`Enlarge ${segment.name} itinerary details · ${formatAUDate(segment.startDate)} – ${formatAUDate(segment.endDate)}`);seg.addEventListener('click',()=>openDetail?.(segment.id));timeline.append(seg);
   }
  panel.append(timeline); return panel;
 }
 function paceCoverage(value,label,tone=''){const m=node('article',`itinerary-coverage-box ${tone}`);m.append(node('strong','',value),node('span','',label));return m;}
 
-function renderEntry(record, openEditor) {
-  const button = node('button', `itinerary-entry itinerary-entry-${record.travelType}`); button.type='button'; button.addEventListener('click',()=>openEditor(record.id));
+function itineraryDetailTone(record) {
+  if(record?.travelType==='motorhome'||record?.travelType==='rv') return 'orange';
+  if(record?.travelType==='cruise') return 'violet';
+  return 'blue';
+}
+
+function openItineraryEntryDetail({ host, stateService, record, openEditor }) {
+  const body=node('section',`itinerary-entry-detail itinerary-entry-detail-${record.travelType||'standard'}`);
+  const hero=node('div','itinerary-entry-detail-hero');
+  const flag=node('span','itinerary-entry-detail-flag',countryFlagEmoji(itineraryFlagCountry(record)));
+  flag.setAttribute('aria-hidden','true');
+  const heroCopy=node('div','itinerary-entry-detail-hero-copy');
+  heroCopy.append(
+    node('p','eyebrow','DESTINATION / TRIP'),
+    node('h2','',record.name||'Destination'),
+    node('strong','itinerary-entry-detail-country',record.country||record.startCountry||'—'),
+    node('span','itinerary-entry-detail-dates',record.displayDates||'—')
+  );
+  hero.append(flag,heroCopy);
+  const facts=node('div','itinerary-entry-detail-facts');
+  const fact=(label,value)=>{const item=node('div','itinerary-entry-detail-fact');item.append(node('small','',label),node('strong','',value||'—'));return item;};
+  facts.append(
+    fact('Travel type',TRAVEL_TYPE_LABELS[record.travelType]||record.travelType||'Standard'),
+    fact('Duration',`${record.days} days`),
+    fact('Destination Budget',formatMoney(record.destinationBudgetAUD,'AUD')),
+    fact('Accommodation',record.hasAccommodation?'Linked':'Not linked')
+  );
+  if(record.startCity) facts.append(fact('Starting city',record.startCity));
+  if(record.localCurrency) facts.append(fact('Local currency',record.localCurrency));
+  if(record.travelType!=='standard') {
+    const routePoints=(stateService.snapshot().routePoints||[]).filter(point=>point.itineraryId===record.id).sort((a,b)=>Number(a.order||0)-Number(b.order||0));
+    facts.append(fact('Route points',String(routePoints.length)));
+    if(routePoints.length){
+      const route=node('div','itinerary-entry-detail-route');
+      route.append(node('h3','','Route Points'));
+      const list=node('div','itinerary-entry-detail-route-list');
+      routePoints.forEach((point,index)=>{const row=node('div','itinerary-entry-detail-route-row');row.append(node('span','',String(index+1).padStart(2,'0')),node('strong','',point.name||`Stop ${index+1}`));list.append(row);});
+      route.append(list); body.append(hero,facts,route);
+    } else body.append(hero,facts);
+  } else body.append(hero,facts);
+  body.append(node('p','itinerary-entry-detail-help','This is a read-only enlargement. Use Edit below only when you deliberately want to change this stay or trip.'));
+  const tone=itineraryDetailTone(record);
+  const dialog=createModal({
+    title:`${record.name||'Destination'} · Details`,
+    body,
+    className:`tcc-expanded-modal itinerary-entry-detail-modal tone-${tone}`,
+    actions:[
+      {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openEditor(record.id,tone));}},
+      {label:'Close',onClick:d=>d.close()}
+    ]
+  });
+  host.append(dialog);
+  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  dialog.showModal();
+}
+
+function renderEntry(record, openDetail) {
+  const button = node('button', `itinerary-entry itinerary-entry-${record.travelType}`); button.type='button'; button.addEventListener('click',()=>openDetail(record));
   const dates=node('span','itinerary-entry-dates'); dates.append(node('strong','',record.displayDates.split(' – ')[0]||''),node('small','','TO'),node('strong','',record.displayDates.split(' – ')[1]||''),node('em','',`${record.days} days`));
   const copy=node('span','itinerary-entry-copy');
-  const identity=node('span','itinerary-entry-identity'); const identityIcon=node('span','itinerary-entry-icon'); identityIcon.append(createLineIcon(TRAVEL_TYPE_ICONS[record.travelType]||'globe')); const identityCopy=node('span','itinerary-entry-identity-copy'); identityCopy.append(node('strong','',record.name),node('small','',[record.country,TRAVEL_TYPE_LABELS[record.travelType] || record.travelType].filter(Boolean).join(' · '))); identity.append(identityIcon,identityCopy); copy.append(identity);
+  const identity=node('span','itinerary-entry-identity');
+  const identityIcon=node('span','itinerary-entry-icon'); identityIcon.append(createLineIcon(TRAVEL_TYPE_ICONS[record.travelType]||'globe'));
+  const identityFlag=node('span','itinerary-entry-flag',countryFlagEmoji(itineraryFlagCountry(record))); identityFlag.setAttribute('aria-hidden','true');
+  const identityCopy=node('span','itinerary-entry-identity-copy'); identityCopy.append(node('strong','',record.name),node('small','',[record.country,TRAVEL_TYPE_LABELS[record.travelType] || record.travelType].filter(Boolean).join(' · ')));
+  identity.append(identityIcon,identityFlag,identityCopy); copy.append(identity);
   const badges=node('span','itinerary-entry-badges'); if(record.hasAccommodation)badges.append(node('i','','ACCOMMODATION LINKED')); if(record.travelType!=='standard')badges.append(node('i','',`${record.routePointCount} ROUTE POINTS`)); copy.append(badges);
   const plan=node('span','itinerary-entry-plan'); plan.append(node('small','','TRAVEL PLAN'),node('strong','',record.travelType==='motorhome'?'Motorhome':record.travelType==='cruise'?'Cruise':'Standard'));
   const budget=node('span','itinerary-entry-budget'); budget.append(node('small','','DESTINATION BUDGET'),node('strong','',formatMoney(record.destinationBudgetAUD,'AUD')));
   button.append(dates,copy,plan,budget);
   button.setAttribute('aria-label',[
-    'Open itinerary stay',
+    'Enlarge itinerary stay details',
     record.name,
     record.country,
     record.displayDates,
@@ -459,15 +568,25 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     const mapPanel = renderMap(model, main);
     main.replaceChildren();
 
+    // R31: restore the shared destination/header orientation above the planning
+    // map. This is read-only on Itinerary: the left menu remains the only way
+    // to change screens.
+    const itineraryBanner=createStayBanner({
+      currentStay:model.currentStay?{...model.currentStay,title:model.currentStay.name,dates:model.currentStay.displayDates}:null,
+      nextDestination:model.nextDestination?{...model.nextDestination,title:model.nextDestination.name,durationDays:model.nextDestination.days}:null,
+      className:'itinerary-stay-banner'
+    });
+    main.append(itineraryBanner);
+
     // Cameron's physical iPad review moved the forward map to the top of the
-    // working screen. It is the primary orientation tool, then coverage/stats
-    // explain what the map represents.
+    // working screen. It remains the primary planning tool directly beneath
+    // the destination orientation header.
     main.append(mapPanel);
 
-    const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, id=>openEditor(id,'indigo'));
+    const coveragePanel=renderCoverage(model, options.coverageMonths, months => { options={...options,coverageMonths:months}; rememberOptions(); renderContent(); }, id=>{const item=[...model.upcoming,...model.completed].find(record=>record.id===id);if(item)openItineraryEntryDetail({host:main,stateService,record:item,openEditor});});
     const statsPanel=renderStats(model);
     main.append(coveragePanel,statsPanel);
-    makeExpandableCard(coveragePanel,{host:main,title:'Forward Coverage',tone:'indigo'});
+    makeExpandableCard(coveragePanel,{host:main,title:'Forward Coverage',tone:'indigo',bodyBuilder:()=>itineraryCoverageExpandedBody(state,currentDate,options.coverageMonths,id=>{const item=[...model.upcoming,...model.completed].find(record=>record.id===id);if(item)openItineraryEntryDetail({host:main,stateService,record:item,openEditor});})});
     const statTones={countries:'teal',routes:'indigo',stops:'blue',gaps:'gold',stays:'orange',overlaps:'red'};
     for(const stat of statsPanel.querySelectorAll('.itinerary-stat')){
       const kind=[...stat.classList].find(name=>name.startsWith('itinerary-stat-'))?.replace('itinerary-stat-','')||'blue';
@@ -500,13 +619,13 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     controls.append(search, years);
     main.append(controls);
 
-    const upcomingPanel = node('section', 'itinerary-panel');
+    const upcomingPanel = node('section', 'itinerary-panel itinerary-upcoming-panel');
     const upcomingHead = node('div', 'itinerary-section-head');
     upcomingHead.append(node('h2', '', 'Upcoming Itinerary'), node('span', 'itinerary-count', String(model.upcoming.length)));
     upcomingPanel.append(upcomingHead);
     const upcomingList = node('div', 'itinerary-list');
     if (!model.upcoming.length) upcomingList.append(node('p', 'itinerary-empty', 'No entries yet'));
-    else for (const record of model.upcoming) upcomingList.append(renderEntry(record, id=>openEditor(id,'blue')));
+    else for (const record of model.upcoming) upcomingList.append(renderEntry(record, item=>openItineraryEntryDetail({host:main,stateService,record:item,openEditor})));
     upcomingPanel.append(upcomingList);
     main.append(upcomingPanel);
     makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'blue'});
@@ -518,7 +637,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     completed.append(summary);
     const completedList = node('div', 'itinerary-list');
     if (!model.completed.length) completedList.append(node('p', 'itinerary-empty', 'No entries yet'));
-    else for (const record of model.completed) completedList.append(renderEntry(record, openEditor));
+    else for (const record of model.completed) completedList.append(renderEntry(record, item=>openItineraryEntryDetail({host:main,stateService,record:item,openEditor})));
     completed.append(completedList);
     completed.addEventListener('toggle', () => { options = { ...options, completedOpen:completed.open }; rememberOptions(); if (stateService.snapshot().ui?.itineraryCompletedOpen === completed.open) return; stateService.commit(draft => { draft.ui.itineraryCompletedOpen = completed.open; }); });
     main.append(completed);

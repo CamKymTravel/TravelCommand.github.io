@@ -41,7 +41,7 @@ export function createItineraryEntry(fields, options) {
   const startCountry = routeTrip && typeof fields.startCountry === 'string' ? fields.startCountry.trim() : '';
   if (routeTrip && /\s*(?:\/|→|->)\s*/.test(startCountry)) throw new Error('Itinerary starting country must name one explicit country, not a composite route');
   const localCurrency = fields.localCurrency == null || fields.localCurrency === '' ? null : String(fields.localCurrency).trim().toUpperCase();
-  if (localCurrency != null && !/^[A-Z]{3}$/.test(localCurrency)) throw new Error('Destination currency must be a 3-letter code');
+  if (localCurrency != null && (localCurrency === 'XXX' || !/^[A-Z]{3}$/.test(localCurrency))) throw new Error('Destination currency must be a real 3-letter code');
   let fixedLocalPerAUD = fields.fixedLocalPerAUD == null || fields.fixedLocalPerAUD === '' ? null : numeric(fields.fixedLocalPerAUD, 'Exchange rate', { min:Number.EPSILON });
   if (localCurrency === 'AUD') fixedLocalPerAUD = 1;
   const destinationBudgetAUD = numeric(fields.destinationBudgetAUD ?? 0, 'Destination budget');
@@ -70,7 +70,7 @@ export function createExpense(fields, options) {
   const originalCurrencyInput = fields.originalCurrency == null || fields.originalCurrency === '' ? 'AUD' : fields.originalCurrency;
   if (typeof originalCurrencyInput !== 'string') throw new Error('Currency must be a valid 3-letter code');
   const originalCurrency = originalCurrencyInput.trim().toUpperCase();
-  if (!/^[A-Z]{3}$/.test(originalCurrency)) throw new Error('Currency must be a valid 3-letter code');
+  if (originalCurrency === 'XXX' || !/^[A-Z]{3}$/.test(originalCurrency)) throw new Error('Choose a real 3-letter currency code');
   const originalAmount = numeric(fields.originalAmount ?? 0, 'Expense original amount');
   const audAmount = numeric(fields.audAmount ?? 0, 'Expense AUD amount');
   if (originalAmount > 0 && audAmount <= 0) throw new Error('Expense AUD equivalent is required');
@@ -98,7 +98,7 @@ export function createReservation(fields, options) {
   const originalCurrencyInput = fields.originalCurrency == null || fields.originalCurrency === '' ? 'AUD' : fields.originalCurrency;
   if (typeof originalCurrencyInput !== 'string') throw new Error('Currency must be a valid 3-letter code');
   const originalCurrency = originalCurrencyInput.trim().toUpperCase();
-  if (!/^[A-Z]{3}$/.test(originalCurrency)) throw new Error('Currency must be a valid 3-letter code');
+  if (originalCurrency === 'XXX' || !/^[A-Z]{3}$/.test(originalCurrency)) throw new Error('Choose a real 3-letter currency code');
   const originalAmount = numeric(fields.originalAmount ?? 0, 'Reservation original amount');
   const audAmount = numeric(fields.audAmount ?? 0, 'Reservation AUD amount');
   if (originalAmount > 0 && audAmount <= 0) throw new Error('Reservation AUD equivalent is required');

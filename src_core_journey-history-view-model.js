@@ -103,6 +103,7 @@ function completedRows(state, currentDate, journeyStartDate) {
       sourceCollection:'itinerary',
       name:entry.name,
       country:entry.country || '',
+      flagCountry:(entry.travelType === 'cruise' || entry.travelType === 'motorhome' || entry.travelType === 'rv') ? (departureCountry(entry) || entry.country || '') : (entry.country || entry.startCountry || ''),
       travelType:entry.travelType,
       startDate:entry.startDate,
       endDate:entry.endDate,
@@ -145,7 +146,7 @@ function routeCountryParts(value) {
   return String(value || '').split(/\s*(?:\/|→|->|,)\s*/).map(countryKey).filter(Boolean);
 }
 
-function uniqueCountries(entries, currentDate) {
+function visitedCountryKeys(entries, currentDate) {
   const visited=new Set();
   for(const entry of entries || []){
     const start=toISODate(entry.startDate), end=toISODate(entry.endDate);
@@ -162,22 +163,50 @@ function uniqueCountries(entries, currentDate) {
       : [countryKey(entry.country)].filter(Boolean);
     for(const country of credited){ const key=countryKey(country); if(key) visited.add(key); }
   }
-  return visited.size;
+  return visited;
 }
 
-function travelledDays(state, journeyStartDate, currentDate) {
-  if (!journeyStartDate || journeyStartDate > currentDate) return 0;
+function countryDisplayName(key) {
+  return String(key || '').split(/\s+/).filter(Boolean).map(part=>part.charAt(0).toLocaleUpperCase('en-AU')+part.slice(1)).join(' ');
+}
+
+function uniqueCountries(entries, currentDate) {
+  return visitedCountryKeys(entries,currentDate).size;
+}
+
+function mergedTravelSpans(state, journeyStartDate, currentDate) {
+  if (!journeyStartDate || journeyStartDate > currentDate) return [];
   const DAY=86400000;
   const ms=value=>Date.parse(`${toISODate(value)}T00:00:00Z`);
   const floor=ms(journeyStartDate), ceiling=ms(currentDate);
   const spans=(state.itinerary || []).map(entry=>[Math.max(floor,ms(entry.startDate)),Math.min(ceiling,ms(entry.endDate))]).filter(([a,b])=>a<=b).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
-  if(!spans.length) return 0;
-  let total=0,[start,end]=spans[0];
+  if(!spans.length) return [];
+  const merged=[];
+  let [start,end]=spans[0];
   for(const [a,b] of spans.slice(1)){
     if(a<=end+DAY){ end=Math.max(end,b); continue; }
-    total+=Math.floor((end-start)/DAY)+1; [start,end]=[a,b];
+    merged.push([start,end]); [start,end]=[a,b];
   }
-  return total+Math.floor((end-start)/DAY)+1;
+  merged.push([start,end]);
+  return merged;
+}
+
+function travelledDays(state, journeyStartDate, currentDate) {
+  const DAY=86400000;
+  return mergedTravelSpans(state,journeyStartDate,currentDate).reduce((total,[start,end])=>total+Math.floor((end-start)/DAY)+1,0);
+}
+
+function travelledDaysByYear(state, journeyStartDate, currentDate) {
+  const DAY=86400000;
+  const counts=new Map();
+  for(const [start,end] of mergedTravelSpans(state,journeyStartDate,currentDate)){
+    for(let cursor=start;cursor<=end;cursor+=DAY){
+      const date=new Date(cursor).toISOString().slice(0,10);
+      const year=travelYearForDate(date,journeyStartDate);
+      if(year&&year>0)counts.set(year,(counts.get(year)||0)+1);
+    }
+  }
+  return [...counts.entries()].sort((a,b)=>a[0]-b[0]).map(([year,days])=>({year,days}));
 }
 
 function aggregateDestinations(rows) {
@@ -189,6 +218,7 @@ function aggregateDestinations(rows) {
       key,
       name:row.name,
       country:row.country,
+      flagCountry:row.flagCountry || row.country,
       visits:0,
       days:0,
       spendAUD:0,
@@ -255,7 +285,10 @@ export function buildJourneyHistoryViewModel(state, currentDate, options = {}) {
     itinerary:(state.itinerary || []).filter(entry => mapAllowedIds.has(entry.id)),
     routePoints:(state.routePoints || []).filter(point => mapAllowedIds.has(point.itineraryId))
   };
-  const journeyMap = buildJourneyMapModel(completedState, selectedYears);
+  const completedIds = new Set(allRows.map(row => row.id));
+  const journeyMap = buildJourneyMapModel(completedState, selectedYears, {
+    continuityItinerary:(state.itinerary || []).filter(entry => completedIds.has(entry.id))
+  });
   journeyMap.availableYears = availableTravelYears(allRows, journeyStartDate, { minimum:4 });
 
   const days = travelledDays(state, journeyStartDate, today);
@@ -271,6 +304,8 @@ export function buildJourneyHistoryViewModel(state, currentDate, options = {}) {
       yearsOnRoad:days ? Math.round((days / 365.2425) * 10) / 10 : 0,
       lifetimeTravelSpendAUD:lifetimeSpend(state, today)
     },
+    visitedCountries:[...visitedCountryKeys(state.itinerary || [], today)].map(key=>({key,name:countryDisplayName(key)})).sort((a,b)=>a.name.localeCompare(b.name,'en-AU')),
+    travelledDaysByYear:travelledDaysByYear(state,journeyStartDate,today),
     rows:filteredRows,
     destinationTotals:aggregateDestinations(filteredRows),
     totalSpendAUD:filteredRows.reduce((sum, row) => sum + row.spendAUD, 0),

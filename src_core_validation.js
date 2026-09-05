@@ -52,9 +52,9 @@ function validateCanonicalTimestamp(value, label) {
   if (Number.isNaN(parsed.valueOf()) || parsed.toISOString() !== value) throw new Error(`${label} is invalid`);
   return value;
 }
-function validateCurrency(value, label, { nullable = false } = {}) {
+function validateCurrency(value, label, { nullable = false, allowRepairPlaceholder = false } = {}) {
   if (value == null && nullable) return null;
-  if (typeof value !== 'string' || !/^[A-Z]{3}$/.test(value)) throw new Error(`${label} must be a 3-letter currency code`);
+  if (typeof value !== 'string' || !/^[A-Z]{3}$/.test(value) || (value === 'XXX' && !allowRepairPlaceholder)) throw new Error(`${label} must be a real 3-letter currency code`);
   return value;
 }
 function validateStartingCountry(value) {
@@ -171,7 +171,7 @@ export function validateExpense(expense) {
   if (!expense.needsBudgetRepair && !expense.date) throw new Error('Expense date is required');
   if (expense.date != null) validateCanonicalDateOnly(expense.date, 'Expense date');
   optionalText(expense.description, 'Expense description');
-  validateCurrency(expense.originalCurrency, 'Expense currency');
+  validateCurrency(expense.originalCurrency, 'Expense currency', { allowRepairPlaceholder:expense.needsBudgetRepair === true });
   strictNumber(expense.originalAmount, 'Expense original amount', { min:0 });
   strictNumber(expense.audAmount, 'Expense AUD amount', { min:0 });
   if (!expense.needsBudgetRepair && expense.originalAmount > 0 && expense.audAmount <= 0) throw new Error('Expense AUD equivalent is required');
@@ -193,7 +193,7 @@ export function validateReservation(reservation) {
   if (!reservation.needsBudgetRepair && !reservation.itineraryId) throw new Error('Destination reservation requires an itinerary');
   if (!reservation.needsBudgetRepair && !reservation.dateTime) throw new Error('Reservation date is required');
   if (reservation.dateTime != null) validateCanonicalDateOrDateTime(reservation.dateTime, 'Reservation date/time');
-  validateCurrency(reservation.originalCurrency, 'Reservation currency');
+  validateCurrency(reservation.originalCurrency, 'Reservation currency', { allowRepairPlaceholder:reservation.needsBudgetRepair === true });
   strictNumber(reservation.originalAmount, 'Reservation original amount', { min:0 });
   strictNumber(reservation.audAmount, 'Reservation AUD amount', { min:0 });
   if (!reservation.needsBudgetRepair && reservation.originalAmount > 0 && reservation.audAmount <= 0) throw new Error('Reservation AUD equivalent is required');

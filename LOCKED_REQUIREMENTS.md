@@ -1,3 +1,41 @@
+# R72 CURRENT AUTHORITY OVERLAY — LOCKED REQUIREMENTS
+
+R72 absorbs all valid R71 locks plus the post-R71 forensic fixes listed in `CURRENT_R72_STATUS.md`. Read that file first. Historical R71 sections below remain protected unless the R72 overlay explicitly supersedes them. Old/original screenshots remain structure/readability/defect evidence only, never colour authority.
+
+---
+
+# R71 CURRENT AUTHORITY — LOCKED REQUIREMENTS
+
+R71 is the only current checkpoint. Read `CURRENT_R71_STATUS.md` first. Historical sections below preserve regression evidence only and may not override R71. Old/original screenshots are structure/layout/readability/defect evidence only, **never widget-colour authority** unless Cameron explicitly approves a colour. Home is the app-wide material-quality authority; use varied semantic colours with strong comfortable contrast and restrained large-surface brightness for light-sensitive eyes.
+
+---
+
+# R36 ACTIVE LOCK — DO NOT REGRESS
+
+This section supersedes any conflicting historical wording below. Preserve all functionality/data/security rules in the existing file and apply these current interaction/visual requirements on top.
+
+- **Navigation:** only sidebar/menu changes primary screens. Card/row/item taps stay local.
+- **Read before edit:** itinerary/reservation/history/calendar/checklist/budget information opens readable/enlarged first where applicable; editing/creation requires explicit control.
+- **Expansion:** compact widgets may expand solely for accessibility. Expanded means full-screen or near-full-screen with materially larger content.
+- **Kym readability:** large dates, large flags, large destination/country text and clear selected states. Avoid operational micro-text.
+- **Headers:** recognisable supplied scene, minimal crop, more photo visible than overlays; Home may be larger. Current/Next flags and dates prominent. Cruise/RV specialist headers protected.
+- **Home:** Current Destination has country outline/silhouette; compass = toilet helper; Current Destination banner = Quick Look. Primary budget cards outweigh lower secondary row.
+- **Colours:** current premium semantic palette only. Home is material benchmark, not one-colour template. Historical/first-build colours prohibited. Feature colour continues through expanded/detail views.
+- **Streaming:** large recognition-first service tile grid.
+- **Vault:** vault-door locked presentation + concealed three-tap unlock; hidden-email sequence remains unlock → Streaming → compass only.
+- **Checklist:** no tiny Add boxes on main His/Hers or Permanent/Destination widgets; add occurs inside enlarged view.
+- **App Health:** unchecked/dirty/update = red attention + visible heartbeat; successful whole-app check = green and still. R36 physical-iPad acceptance must confirm the whole panel visibly pulses, not only the check button.
+- **Add/Edit:** large labels/inputs/date controls/actions; automatic dated Destination Budget preview is prominent and unambiguous.
+- **Budget allocation:** transaction/reservation dates remain source of truth; no silent fallback.
+- **PWA:** fully offline, local-only, one JSON backup, validated replacement restore, safe service-worker update.
+
+---
+
+# PREVIOUS LOCKED REQUIREMENTS (preserved)
+
+## 05 Sep 2026 — R30 global colour/accessibility continuation
+
+R30 extends the current approved premium semantic palette across remaining visually generic dashboard panels without importing first-build colours. Home remains the material benchmark, not a single-colour template. Compact widgets may expand purely for Kym’s readability, and expanded dialogs are required to use essentially the full iPad landscape viewport. App Health dirty/unchecked state is explicitly red with a visible restrained heartbeat; a successful whole-app check is green and still. This pass is presentation-only and must not change travel data, routing, budgeting, Vault security, storage or calculation rules.
 # V54 Touch-Target Completion Additions / Overrides
 
 ### V54 late integrity/performance additions
@@ -83,6 +121,8 @@ These V51 rules override any older “current checkpoint” wording below while 
 
 ## Material-depth continuity
 - Parent widget → expanded view → deeper editor/detail must retain one premium material family. The rendered parent surface is authoritative where available; semantic tone is fallback.
+- **Navigation authority (05 Sep 2026): the left sidebar/menu is the only control that changes primary screens.** Tapping a widget or a row inside a widget must stay on the current screen: enlarge/read first, then use an explicit Edit/Add action if editing is allowed. Do not deep-link a card/row to Budget, Reservations, Itinerary, Calendar, Journey History, Checklist or Vault.
+- **Accessibility expansion authority (05 Sep 2026): readability alone is a valid reason to expand a compact widget.** Small statistic/status cards should be expandable when enlargement helps Kym read them, even if no new data is added. “Expand” means a genuine full-screen or near-full-screen iPad landscape view with materially larger text/dates/numbers; token slightly-larger modals are a regression. Maps must use the available viewport rather than merely growing a little.
 - Status widgets must not retain a “good” colour when status changes to Needs Attention; warning colour may change the status surface without recolouring an unrelated parent flow.
 - Destination Budgets remains the green-family flow even when a missing-budget warning inside it is gold.
 - Deep-editor context already fixed in V51 must not regress: To Book gold; Upcoming reservations blue; Next 5 red; Budget reservations indigo; Recent Expenses blue; Living Expenses violet; Forward Coverage indigo; Upcoming Itinerary blue; Permanent Checklist green; Destination Checklist sky.
@@ -121,7 +161,7 @@ These V51 rules override any older “current checkpoint” wording below while 
 - Every screen must feel like one application, not independently designed pages.
 - Shared typography, wording hierarchy, spacing rhythm, card proportions, icon treatment, controls, selected states, borders, material depth, glow and animation behavior.
 - No screen-specific typography/component inventions unless functionally required.
-- New colour palette is **not yet locked**.
+- **Material system is locked:** Home is the primary app-wide authority for perceived saturation, brightness, depth, borders/highlights, restrained glow, spacing and typography hierarchy. Individual semantic hues may still be tuned globally, but no screen may read as a separate theme.
 - Use a broad coordinated palette with many related hue/tonal variations; do not recycle only a few blues/reds/greens.
 - Same functional concept normally keeps the same colour family across screens. Closely related variations are allowed when strict reuse would overload a screen with one colour.
 - Special emphasis may be stronger for His/Hers and Future Bookings / To Book.
@@ -134,8 +174,10 @@ These V51 rules override any older “current checkpoint” wording below while 
 - The final colour pass is global, not screen-by-screen. Every coloured widget must have the same premium material quality: equivalent perceived saturation, brightness, contrast, depth, border/highlight strength and restrained glow. Only the hue/colour family should materially differ.
 - Do not preserve an old hue because it happened to appear in a reference screenshot. Do not infer palette approval from a previous build.
 - Parent widget -> expanded view -> deeper detail/editor must stay in one colour/material family, but the actual final hue remains subject to the later whole-app colour pass unless separately approved.
-- Home/Vault premium material polish, the approved Itinerary compact statistics and Journey History headline summary treatment remain quality benchmarks for depth/readability, not automatic hue assignments.
-- Colour layout remains explicitly **unconfirmed** until Cameron approves the final global pass.
+- Home is the primary material authority. The approved Itinerary compact statistics and Journey History headline summary treatment remain secondary quality benchmarks for depth/readability, not automatic hue assignments. Legacy/original Vault colours are explicitly **not** a benchmark and are not protected.
+- Exact individual hue placement remains reviewable, but the **one-build / one-material-system rule is locked** and may not regress.
+- The layered design CSS is the single visual authority. Do not add a post-render JavaScript/MutationObserver recolouring system or other second theme engine; semantic colour assignment belongs in normal screen classes/CSS and must remain inspectable and deterministic.
+- For light-sensitive eyes, preserve strong text/meaning contrast without glare: large surfaces stay dark and restrained, ordinary glow is subtle, and bright semantic colour is concentrated in compact cards, icons, borders, graphs, status cues and selected controls rather than full-screen slabs. A useful mixture of colours across the app is required; comfort must not become monochrome.
 
 ## Responsive / scrolling
 
@@ -169,6 +211,11 @@ These V51 rules override any older “current checkpoint” wording below while 
 - Current carried source covers 28 route-relevant countries in both quick-look and toilet datasets. This is a **minimum protected checkpoint, not the final coverage target**. Expand robustly for all countries Cameron & Kym may add/visit; do not leave the feature as a tiny hard-coded subset.
 - Country/language coverage must stay paired: a country considered supported for Quick Look must also have the toilet-language record (or an explicit documented multilingual/default handling path), and vice versa.
 
+### Accessibility / expansion
+- Small or compact operational widgets may expand purely for readability even when the expanded view does not add new data.
+- Expanded views must use the available iPad landscape viewport as fully as practical and materially enlarge text, numbers, dates, labels and controls; token/slightly-larger expansions are not acceptable.
+- Itinerary stay/trip rows follow the same interaction rule: tapping blank row space enlarges the stay/trip; the explicit Edit button is the only row edit action.
+
 ## Budget
 
 - Reference layout is authoritative for density/flow.
@@ -178,7 +225,7 @@ These V51 rules override any older “current checkpoint” wording below while 
 
 - Destination Budgets workflow authority: itinerary destinations/trips are created first in Itinerary. Destination Budgets is then the dedicated place to create/edit the budget for those itinerary entries. Its top-level widget prioritises current destination remaining budget plus itinerary count, budgets created, budgets needed and coverage percentage. Expenses and reservations are routed automatically by their entered date to the one Destination Budget covering that date. Removing a destination budget is blocked while dated costs are linked to it.
 - Budget screen retains destination budget status, daily/stay pace, Annual Budget, Budget by Category, Year Forecast & Budget Summary, expense-entry area, Reservations, Accounts, Recent Expense Entries and Monthly Spend History/graphs as applicable. Restored Account currency codes are canonical uppercase so AUD accounts cannot disappear from the AUD total because of legacy casing.
-- Budget Reservations remains a read-only summary panel, but each saved reservation row is a real exact-record control that opens that reservation prefilled on the Reservations screen.
+- Budget Reservations remains a read-only summary panel. Tapping a saved reservation row opens a large same-screen read-only reservation detail; editing that booking is performed from the Reservations screen reached explicitly through the sidebar/menu.
 - Local currency first; AUD beneath where applicable; fixed rate per stay. **AUD stays are always canonical 1:1**; no stored AUD Destination Budget may carry a contradictory fixed exchange rate.
 - Current visual colours in old references are not locked.
 
@@ -275,7 +322,7 @@ These V51 rules override any older “current checkpoint” wording below while 
 
 ## V41 active continuity authority
 
-This V41 continuity package contains the exact verified working tree carried forward from the V40 active baseline plus the 14 post-V40 forensic source changes absorbed into this handoff. The protected offline/runtime generation is the V41 active continuity generation recorded in `CONTINUITY_START_HERE.md` and `REGRESSION_CONTRACT.json`; older V40/V39/V38/V37/V36 cache-generation ancestry must never be treated as the current runtime. `OUTSTANDING_WORK.md` remains part of the no-regression contract: all 100 numbered items are protected requirements, while its V41 status section records implemented fixes and the remaining active forensic work.
+This V41 continuity package contains the exact verified working tree carried forward from the V40 active baseline plus the 14 post-V40 forensic source changes absorbed into this handoff. The protected offline/runtime generation is the V41 active continuity generation recorded in `CONTINUITY_START_HERE.md` and historical regression-contract reference (not part of the active R71 package); older V40/V39/V38/V37/V36 cache-generation ancestry must never be treated as the current runtime. `OUTSTANDING_WORK.md` remains part of the no-regression contract: all 100 numbered items are protected requirements, while its V41 status section records implemented fixes and the remaining active forensic work.
 
 Do not restart from V40/V39/V38/V37/V36/V35/V34 or treat an older code path as permission to undo a V41-protected behaviour. A successor continuity baseline must be verified against this exact V41 package first. A release/master must not be declared until the still-active final visual/date/accessibility forensic work is complete.
 
@@ -311,7 +358,7 @@ The V44 source/runtime audit is complete enough to begin Cameron's target-device
 
 V46 is the verified successor to V45 after the second real-iPad screenshot pass. It advances runtime/cache identity to `1.2.0-v46-ipad-colour-continuity` / `tcc-v1-v46-ipad-colour-continuity-2026-09-03` and fixes the remaining Add Expense / Add Reservation / Add Destination colour-follow-through regressions without changing canonical data or protected layouts.
 
-- Add/Edit colour must follow the selected category/type from tile -> modal shell -> focus treatment -> action surface.
+- **Add/Edit colour rule (latest authority):** generic new Add flows use the stable calm command-blue editor shell; the selected category/type tile must remain unmistakably coloured. Existing Edit/detail flows inherit the originating saved record/widget colour where useful. Vault category editors remain the explicit category-colour continuity exception.
 - Do not reintroduce a generic blue/sky editor fallback where a selected category/type has an established colour identity.
 - Safari must not show native white Domestic / International flight-classification pills.
 - Existing approved expanded-card colour continuity remains protected.
@@ -343,11 +390,11 @@ V47 succeeds V46 after the third real-iPad evidence pass. The following are now 
 V49 succeeds the V47/V48 working line after Cameron asked for the **entire target-iPad screenshot set to be re-reviewed and rectified**, including the missing functional shortcuts. These are now protected rules:
 
 - Home must always expose a recognisable **Travel Compass** interaction. On Home, the sidebar Travel Command Centre compass and the compact Home compass both open the same “Where’s the toilet?” language aid. The separate Vault concealed-email compass action remains gated by the exact unlock Vault → open Streaming → tap compass sequence.
-- **Current Destination** is always a real control, never just decorative text. Active stay → offline Country Quick Look. No active stay → clear setup state with a route to Itinerary.
+- **Current Destination** is always a real control, never just decorative text. Active stay → offline Country Quick Look. No active stay → clear setup guidance telling Kym to use Itinerary in the left sidebar; Home must not cross-navigate screens because sidebar/menu remains the only primary navigation path.
 - “Where’s the toilet?” must never disappear merely because no stay is active. With an active stay it shows native phrase + simple English-style pronunciation + slow syllable breakdown, no IPA. Cruise/RV uses Starting Country for the whole trip.
 - Expanded/detail widgets use one explicit audited parent colour family all the way through. A shared modal must not infer a different family from Safari/computed CSS when the card already has an established semantic tone.
 - The cloned widget inside an expanded modal must also be rendered in that same family, eliminating a coloured outer shell around an unrelated navy/other-colour inner card.
-- Add Expense, Add Reservation, Add Destination and Calendar Reminder/Note must carry the selected category/type tone from tile → shell → focus/selected treatment. Standard Destination is the indigo/violet family used by its selected tile.
+- **Superseded colour-depth note:** Add Expense, Add Reservation, Add Destination and Calendar Reminder/Note keep the calm command-blue shell for a new record; selected tiles use their semantic colour. Existing Edit/detail flows inherit the originating colour. Do not restore the older rule that recoloured the entire new-Add shell from the selected tile.
 - Reservations remains **Booked Reservations** and Next 5 Upcoming remains in its established rose/red family.
 - Vault category drill-down/editor colour follows the originating category; Vault category icons remain one monochrome/currentColor SVG language. The live Vault status/action rail must fully conceal any obsolete status artwork beneath it.
 - Local PIN fields may be visually masked but must not be presented to iPad Safari as website password fields that trigger Strong Password generation.
@@ -368,3 +415,186 @@ Protected V50 additions:
 - country/language support must expand beyond the current 28-country checkpoint to all realistic countries Cameron & Kym may visit/add;
 - plants/gardens remain slightly prominent in Country Quick Look;
 - planned items remain active until source implementation + target-iPad proof, not merely documentation.
+
+### Kym readability / operational typography authority — 05 Sep 2026
+- Because Kym has poor eyesight, operational information must not be compressed into micro-text simply to preserve density. Destination names, country identity, dates, money, task names, status text and action labels must be comfortably readable at normal iPad landscape viewing distance.
+- Decorative eyebrows/secondary micro-labels may remain compact where they are not required to understand or operate the screen. Important information must not rely on 6–9px text.
+- Where readability and vertical density conflict outside Home's deliberate one-screen composition, allow vertical scrolling/growth rather than shrinking important text.
+- On Home, keep the three primary budget cards visually dominant over the four secondary widgets, but the secondary widgets must still contain readable operational text.
+
+### Residual operational typography / cache-coherence lock — V55 R22 · 05 Sep 2026
+- The Kym-readability rule applies to compact analytics and warning states as well as primary cards: Itinerary badges, Journey History milestone/map statistics, Budget chart labels, Reservation booking/repair status, Checklist task support text, Calendar day/event labels and sidebar Data Status may not regress to 6–9px operational text merely to save space. Prefer vertical growth or full-screen expansion.
+- Relationship/repair warnings are priority information and must be at least as readable as surrounding secondary copy; never render a routing or recovery warning as micro-text.
+- Any release/continuity pass that changes live shell assets (CSS/JS/HTML) must keep the service-worker registration generation and `CACHE_NAME` generation coherent so an installed iPad cannot remain pinned to an older presentation because of a stale registration identity.
+
+## R24 expanded-map readability lock — 05 Sep 2026
+- An expanded map must materially enlarge the map itself, not merely the surrounding modal. Compact-card SVG `max-height` limits must not constrain Journey History, Itinerary or any future full-screen map expansion.
+- Current/next destination travel-mode/duration text, Country Quick Look / Phrase Helper supporting facts, automatic Reservation Destination Budget routing, Vault secure-state text and sidebar Data Status are operational readability cues and must not regress to micro-text.
+
+
+## V55 R26 editor orientation / mistake-prevention lock
+- Add Expense must keep transaction date as the only Destination Budget router, but the matched stay must be shown as a large unmistakable identity block with country flag, destination/country and prominent FROM→TO dates.
+- Add Reservation must keep reservation date as the automatic Destination Budget router and show the exact matched dated stay with country flag and prominent date ticket. Do not reintroduce a manual Annual/Destination allocation chooser.
+- Add/Edit Destination must show a live large destination/trip orientation strip while editing: flag (or mode icon before a country is chosen), destination/trip name, country, travel type and prominent start/end dates. This is a readability/mistake-prevention aid only and must not create a second source of truth.
+- Shared current/next destination header overlays must leave enough supplied country artwork visible to recognise the scene while preserving large flag, city/country and dates. Do not solve photo visibility by shrinking important destination text.
+- Home secondary cards remain subordinate to the three primary budget cards, but their operational date/status text must remain readable for Kym rather than reverting to micro-type.
+
+## V55 R28 semantic widget-colour / App Health build-state lock — 05 Sep 2026
+- First-build screenshots remain layout/readability references only and must never be used as palette authority. Current Home-style premium dark material is the material benchmark, with the broader approved semantic palette used to distinguish widgets.
+- Major widgets on every screen should carry a clear colour family through restrained surface tint, border, glow, icon and feature detail; do not let entire screens collapse back into identical navy slabs.
+- App Health must begin each newly installed/updated build in a red heartbeat-pulsing re-check state. Only CHECK THE WHOLE APP may clear that state after a successful check; verified state is green and has no pulse.
+- Expanded views must preserve the originating widget colour family rather than reverting to a generic navy modal.
+
+
+### V55 R29 App Health + widget-colour authority
+- App Health must be visually unmistakable after an install/update or any dirty/unverified state: the App Health panel and CHECK THE WHOLE APP action are red and use the deliberate restrained heartbeat animation.
+- After a successful whole-app verification, App Health must become green and all App Health heartbeat animation must stop. A clean verified state must never remain blue.
+- Current approved Travel Command Centre premium colours/materials are the only colour authority. First-build screenshots remain structure, scale, hierarchy and readability references only.
+- Major and compact widgets should use distinct semantic colour families where this improves peripheral recognition for Kym; do not flatten every screen back to identical navy cards. Colour stays integrated through the whole premium dark-material surface rather than becoming a flat bright fill.
+- Home secondary widgets remain subordinate in size/weight to Daily Budget, Destination Budget and Annual Position even though Alerts, Upcoming Events, Schengen and Trip Timeline now have their own colour identities.
+- Vault category **identity** is protected, not its legacy hue/saturation/brightness. Passport/Visa/Insurance/Accommodation/Emergency must remain clearly differentiated and carry their current semantic family into category/editor depth, while Home remains the material-quality authority.
+
+### V55 R31 menu-only navigation / header / checklist lock — 05 Sep 2026
+- The left sidebar is the only mechanism that changes main screens. A widget, row, calendar item, Home alert/event/timeline/search result, Budget reservation row, Checklist destination card/action or Journey History item must never switch to another main screen.
+- Tapping information may enlarge it or open a same-screen/read-only detail. Editing/creation remains explicit through dedicated Edit/Add controls in the appropriate screen context.
+- Itinerary carries the shared Current Stay / Next Destination photographic orientation header above the Forward Planning Map. Shared stay headers include a large country flag, large destination name and prominent dates while preserving recognisable header artwork.
+- Home Next Destination is information/expansion, not navigation. Daily Budget, Destination Budget, Annual Position, Schengen Status and Trip Timeline are expandable where enlargement improves Kym's readability.
+- His/Hers Needs & Wants and Permanent/Destination Checklist cards do not show small dashboard Add boxes. Their Add Item actions live inside the full-screen/near-full-screen expanded view.
+- Every newly installed/updated build must invalidate App Health once using a build marker. Dirty/unverified is red + heartbeat; only CHECK THE WHOLE APP can make it green/still. Reloading the same verified build must not make it dirty again unless data changed.
+
+## V55 R32 Vault recognition lock
+- Locked Vault must present the supplied offline vault-door artwork as a strong recognisable hero with **VAULT LOCKED / PROTECTED ACCESS** before the three-tap unlock. Do not regress to a sparse generic black card.
+- Streaming/TV & Movies uses a large visual service-tile grid. Saved tiles open large same-screen read-only details with explicit Show/Edit; unsaved catalogue tiles may prefill Add Streaming but must not create data until Save.
+- First-build screenshots are structural/readability references only; do not use their app palette as colour authority.
+
+
+## V55 R33 recognition / safe-information-tap lock
+- Home Current Destination must retain a visible country outline/silhouette beside the large country flag and destination identity. The outline is packaged offline; it is a recognition cue, not live map data.
+- Itinerary stay/trip rows and Forward Coverage destination segments are information surfaces first. Tapping them enlarges a read-only detail; they must not open Edit directly. The explicit Edit action inside the enlarged detail is the deliberate edit path.
+- Itinerary rows and itinerary-stat detail lists use country flags as peripheral-recognition cues where a country is known.
+- Journey History completed rows open a true near-full-screen read-only detail with large flag, destination, dates, duration, total cost, average/day, distance and linked-spend breakdown. Journey History never edits itinerary data.
+- Calendar item taps enlarge read-only first. Personal Reminder/Note records may expose an explicit Edit button from the detail; destination/reservation items remain read-only and never change screens. Linked Agenda rows show the destination-country flag where available.
+- Country-recognition assets/helpers must be included in the offline service-worker shell.
+- First-build screenshots remain structural/readability authority only; R33 country flags/outlines do not authorise importing first-build widget colours.
+
+
+## 05 Sep 2026 — R35 Add/Edit + large-date readability lock
+- Add/Edit screens are deliberate error-prevention surfaces for Kym: field labels, entered values, selected tiles and Save/Cancel actions must remain comfortably readable at iPad landscape distance.
+- Date and datetime inputs must be materially larger than ordinary micro-copy, with prominent tabular date text. Destination Budget date tickets must show readable FROM/TO, day, month and year context; repeated destination stays may never be distinguished by tiny date text.
+- Automatic dated Destination Budget routing confirmation in Add Expense/Add Reservation is operational information and must not regress to fine print.
+- These presentation rules do not authorise changing date-driven routing, budget allocation, calculations, mutations, storage, Vault security, sidebar-only navigation or the current premium colour authority.
+
+## 05 Sep 2026 — R36 compact-widget enlargement completion
+- Accessibility enlargement is a functional requirement, not decoration. Journey Snapshot, Milestones, Journey Check, individual App Health checks and Settings information groups must remain expandable even when enlargement itself is the main benefit.
+- These expansions use the true near-full-screen iPad landscape modal contract and must materially increase text/numbers/statuses; a token small size increase is a regression.
+- Settings enlargement stays on Settings. Explicit Edit/Backup/Restore/PIN actions remain explicit controls; tapping information must not create hidden cross-screen navigation.
+
+
+## V55 R50 — whole-app colour comfort lock
+- Home is the primary visual/material authority for the entire build.
+- The app must use a **mixture of semantic colours** for recognition and scanning; do not collapse the interface into one blue theme.
+- Large panels must use Home-style deep navy/charcoal material with restrained hue tint, border and glow. Do not use highly saturated full-panel slabs.
+- Compact statistic/status cards may remain more colourful where colour improves differentiation.
+- Maintain strong readable foreground/background contrast while avoiding glare-heavy near-white expanses, neon bloom, brightness filters and unnecessarily luminous large buttons.
+- Old/original-build screenshots are structure/layout/hierarchy/readability evidence only. They are **not colour, saturation or brightness authority** unless Cameron explicitly approves a specific colour.
+- The old Vault palette is explicitly not protected; Vault must feel like Home and the rest of the app while retaining distinct category hues.
+
+
+## V55 R56 — residual operational readability lock
+- For Kym-facing operational/status/date/routing/analysis copy, 7–10px legacy text is not acceptable. Use an 11px minimum generally and 12px for mistake-sensitive destination/date/routing cues where space permits.
+- Use a comfortable high-contrast secondary tone for small neutral copy rather than forcing bright white; semantic warning/success/selected colours remain intact.
+- Explicit compact actions must retain practical iPad touch targets (~44px).
+- This accessibility rule does not authorise matching colours from old screenshots. Home remains the primary app-wide material authority and the build must retain a varied but restrained semantic palette suitable for light-sensitive eyes.
+
+
+## V55 R57 — selected-state comfort lock
+- Active/selected state must be unmistakable without relying on whole-card brightness amplification.
+- Reservation category tabs use semantic border/inset/glow structure and accessible pressed state; `filter:brightness(...)` is prohibited on their active state.
+- This comfort rule is additive to the R56 readability floor and the app-wide light-sensitive-eye material rules; it does not reduce colour variety or selected-state clarity.
+
+
+## V55 R58 — single App Health heartbeat authority
+- App Health is the deliberate continuous-motion exception, but it must have one implementation authority only. The critical whole-panel/button heartbeat in `index.html` owns that behaviour.
+- Do not restore older layered `appHealthPulse` / `appHealthPanelHeartbeat` engines. Dirty/needs-attention = restrained red heartbeat; verified = green/still; reduced-motion = no pulse.
+- Other charts may use subtle one-shot easing only; no distracting continuous decorative motion.
+
+
+## V55 R59 — Vault depth-material continuity
+- Old/original Vault drill-down colour slabs are not protected and must not be restored from screenshots.
+- Passports, Visas, Insurance, Accommodation Details, Emergency Contacts and Streaming drill-downs retain distinct semantic hues for recognition, but their large heroes/record surfaces must use the same deep Home-derived material brightness, saturation, borders, depth and restrained glow as the rest of the app.
+- Parent category → drill-down → editor/detail colour family stays continuous without turning the full iPad surface into a bright saturated slab.
+- High-frequency Home year filters and Checklist history rows retain a minimum 44px tap height.
+
+## V55 R60 — Editor form-control parity
+- Every Checklist editor select must match the enlarged dark Checklist input/textarea treatment and remain at least 54px high.
+- Settings Schengen Status select and Notes textarea must match the enlarged dark Settings editor controls; the select must never fall back to a bright Safari default surface.
+- Settings editor labels remain readable at the same hierarchy as other deliberate Add/Edit forms.
+- This is presentation/accessibility only; Schengen, Checklist and persistence behaviour is unchanged.
+
+
+
+## V55 R61 — Vault route-colour + low-vision checkbox lock
+- A Vault document record must keep the colour family of its actual category across every route that opens it: category screen, Expiry Reminders, Recent Activity, All Vault Records, alerts/global search/pending-open. Route/context colours must never override the document category.
+- Streaming remains a dedicated violet/purple family and is not a Vault document-category colour.
+- Checklist Required/Optional is operational and must present a clearly visible enlarged native checkbox (30px in the R61 implementation) inside a generous >=56px row/tap region.
+- Do not use brightness amplification to indicate Reservation selection; structure/border/inset/accent carry selection.
+
+
+## V55 R62 — Safari native-control material lock
+- Keep native Safari/iPad date, time and select controls for reliability and familiarity.
+- Their native chrome must explicitly use dark colour-scheme treatment inside the app; bright/light default picker affordances must not leak into dark Add/Edit screens or filter controls.
+- This is a material-consistency rule only: do not replace native controls with fragile custom pickers.
+
+
+## V55 R63 — Expanded-view continuity / unique-id lock
+- Parent widget -> expanded/detail colour continuity is mandatory. Enlargement may darken/restrain the material for comfort, but must remain in the originating rendered colour family.
+- The Itinerary Forward Journey Map must not switch from its teal map family to hard-coded blue when enlarged; derive the modal tone from the rendered parent map.
+- Generic expanded-card snapshots must never duplicate DOM ids from the live card behind the modal. Clone ids and internal label/ARIA/hash references must be remapped together so Safari/VoiceOver resolves relationships inside the enlarged snapshot only.
+- Preserve R62 Safari-native dark chrome, R61 Vault route-colour continuity, Home material authority, varied semantic colours and light-sensitive-eye comfort.
+- iPad touch/selected states must not use CSS brightness amplification; use border/inset/semantic-colour emphasis so sticky Safari hover cannot create a sudden luminance jump.
+- Runtime/cache/App Health identity is R63.
+
+
+## V55 R64 — App Health reduced-motion exception lock
+- App Health dirty/unverified is the deliberate continuous-motion exception. `prefers-reduced-motion: reduce` must not make the whole warning completely static.
+- Under Reduce Motion, keep a slower restrained whole-panel red heartbeat and remove button scale animation. Successful verification remains green and fully still.
+- This exception must not reintroduce strong brightness amplification, flashing, or continuous motion elsewhere.
+- Preserve all R63 parent->expanded colour continuity, snapshot unique-id remapping and low-glare interaction rules.
+- Runtime/cache/App Health identity is R64.
+
+
+## V55 R65 — Calendar month interaction accessibility lock
+- R65 is historical and fully absorbed by R71; preserve all R13–R64 protections.
+- Calendar month destination/travel strips and event chips are real controls and must retain a true 44px painted iPad target with readable 12px text.
+- Show at most two month-cell entries directly; a third or later item must use the existing working `+ more on this day` full-size overflow/detail path.
+- Do not restore cramped 24–27px month controls in order to increase density. Vertical page scrolling is acceptable; horizontal scrolling is not.
+- Preserve Home material authority, varied low-glare semantic colours, read-only-first Calendar detail flow and sidebar-only screen navigation. Runtime/cache/App Health identity is R65.
+
+
+## V55 R66 — Specialist motorhome/cruise header routing lock
+- R66 is historical and fully absorbed by R67; preserve all R13–R65 protections.
+- Cruise trips always use the dedicated packaged Princess cruise header.
+- Motorhome/RV header selection must use `startCountry` or the trip `country` before any city fallback: United States -> dedicated USA motorhome artwork; all other countries -> Europe/other motorhome artwork.
+- Do not infer a Europe motorhome header merely because a US start city is not in a short allow-list.
+- Header artwork colours are not widget-colour authority; Home remains the app-wide material authority. Runtime/cache/App Health identity is R66.
+
+## V55 R67 — Calendar 44px density integrity lock
+- R67 is historical and fully absorbed by R68; preserve all R13–R66 protections.
+- Calendar Month view keeps the R65 44px interaction floor without allowing controls to spill into adjacent week rows. Days with one or two items show them directly; days with more than two show one full-size item plus a full-size `+N more on this day` control that opens the complete dated list.
+- Calendar day cells retain enough height for two 44px controls and no nested month-cell scrolling. Vertical page scrolling remains acceptable; horizontal scrolling remains forbidden.
+- Calendar data, semantic colours, read-only-first detail flow and Home-derived material authority are unchanged. Runtime/cache/App Health identity is R67.
+
+## V55 R68 — Calendar overflow colour-continuity lock
+- R68 is historical and fully absorbed by R71; preserve all R13–R67 protections.
+- The mixed `+N more on this day` list may use calm command-blue material, but selecting a specific Calendar item from that list must derive that item's own Calendar material colour for the read-only detail and any subsequent Edit path.
+- Do not force destination periods, travel periods, reservations, reminders or notes to generic blue merely because they were opened from a busy-day overflow list.
+- R67 Calendar 44px density geometry remains unchanged. Runtime/cache/App Health identity is R68.
+
+## V55 R71 — Drill-down colour-continuity correction lock
+- R71 is the current working checkpoint; preserve all R13–R68 protections. R69/R70 semantic-record hand-off experiments were rejected during the same audit because they contradicted the already-locked parent-widget → deeper-view continuity rule; they are not valid baselines.
+- Parent widget → expanded view → deeper detail/editor keeps the originating material family where an explicit context tone is provided. Blue → blue → blue; gold/yellow → gold → gold; red → red → red.
+- The V51 deep-editor contexts remain authoritative: To Book gold; Upcoming Reservations blue; Next Upcoming red; Budget Reservations indigo; Recent Expenses blue; Living Expenses violet; Forward Coverage indigo; Upcoming Itinerary blue; Permanent Checklist green; Destination Checklist sky.
+- Category/type tiles remain strongly differentiated inside editors, but they do not silently repaint an explicitly inherited drill-down context. New Add Expense / Add Reservation / Add Destination shells remain calm command-blue/sky.
+- Old/original screenshot colours remain non-authoritative; this rule concerns colour continuity through an interaction path, not legacy hue matching.
+- Runtime/cache/App Health identity is R71.
+

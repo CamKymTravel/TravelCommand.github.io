@@ -1,3 +1,9 @@
+# R71 CURRENT AUTHORITY — VISUAL REFERENCES
+
+R71 is the only current checkpoint. Read `CURRENT_R71_STATUS.md` first. Historical sections below preserve regression evidence only and may not override R71. Old/original screenshots are structure/layout/readability/defect evidence only, **never widget-colour authority** unless Cameron explicitly approves a colour. Home is the app-wide material-quality authority; use varied semantic colours with strong comfortable contrast and restrained large-surface brightness for light-sensitive eyes.
+
+---
+
 # V54 Visual Acceptance Authority
 
 The late V54 data-integrity/performance repairs (indexed Reservations duplicate health and Standard-stay Country requirement) do not change visual colour authority. The Country field requirement supports the already-locked country-header/helper behaviour.

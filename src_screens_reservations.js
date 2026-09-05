@@ -9,6 +9,7 @@ import { formatAUDate } from './src_core_dates.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { createLineIcon } from './src_components_icons.js';
+import { countryFlagEmoji } from './src_components_country.js';
 
 const RESERVATION_TONES = Object.freeze({ flight:'blue', train:'green', cruise:'teal', rv:'orange', accommodation:'magenta', ticket:'gold' });
 const RESERVATION_EDITOR_ICONS = Object.freeze({ flight:'flight', train:'train', cruise:'cruise', rv:'rv', accommodation:'accommodation', ticket:'ticket' });
@@ -114,6 +115,10 @@ function reservationStayPreview(stay,state,{budgetUsable=isDestinationBudgetUsab
   const start=reservationDateParts(stay.startDate), end=reservationDateParts(stay.endDate);
   const copy=node('div','reservation-destination-preview-copy');
   copy.append(node('span','reservation-destination-preview-label','DATE-MATCHED DESTINATION BUDGET'),node('strong','',stay.name),node('small','',[stay.country,same.length>1?`${stay.name} ${occurrence} of ${same.length}`:''].filter(Boolean).join(' · ')));
+  const identity=node('div','reservation-destination-preview-identity');
+  const flag=node('span','reservation-destination-preview-flag',countryFlagEmoji((['cruise','motorhome','rv'].includes(String(stay.travelType||'').toLowerCase()) ? stay.startCountry : stay.country) || stay.country || stay.startCountry || ''));
+  flag.setAttribute('aria-hidden','true');
+  identity.append(flag,copy);
   const dates=node('div','reservation-destination-date-ticket');
   const side=(parts,label)=>{ const el=node('span','reservation-destination-date-side'); el.append(node('small','',label),node('strong','',parts.day),node('b','',parts.month),node('em','',parts.year)); return el; };
   dates.append(side(start,'FROM'),node('span','reservation-destination-date-arrow','→'),side(end,'TO'));
@@ -123,7 +128,7 @@ function reservationStayPreview(stay,state,{budgetUsable=isDestinationBudgetUsab
     node('span','',budgetUsable?'BUDGET LOCKED':'BUDGET NEEDS SETUP'),
     node('strong','',Number(stay.destinationBudgetAUD)>0?formatMoney(Number(stay.destinationBudgetAUD),'AUD'):'NOT LOCKED')
   );
-  preview.append(copy,dates,budget);
+  preview.append(identity,dates,budget);
   return preview;
 }
 
@@ -385,6 +390,10 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
 
 function amountBlock(record) {
   const wrap = node('span', 'reservation-amounts');
+  if (record.needsBudgetRepair) {
+    wrap.append(node('strong', 'reservation-repair-amount', 'REPAIR REQUIRED'), node('small', '', formatMoney(record.originalAmount, record.originalCurrency)));
+    return wrap;
+  }
   wrap.append(node('strong', '', formatMoney(record.originalAmount, record.originalCurrency)));
   if (record.originalCurrency !== 'AUD' || Number(record.originalAmount) !== Number(record.audAmount)) wrap.append(node('small', '', formatMoney(record.audAmount, 'AUD')));
   return wrap;
@@ -541,7 +550,7 @@ function renderNextFive(state,currentDate,openEditor){
     const date=String(r.dateTime||'').slice(0,10); const [,m,d]=date.split('-');
     const badge=node('span','reservation-date-badge'); badge.append(node('strong','',d||'—'),node('small','',new Date(`${date}T00:00:00Z`).toLocaleString('en-AU',{month:'short',timeZone:'UTC'}).toUpperCase()));
     const copy=node('span','reservation-rail-copy');
-    const itinerary=itineraryById.get(r.itineraryId);
+    const itinerary=r.needsBudgetRepair ? null : itineraryById.get(r.itineraryId);
     const typeLabel=RESERVATION_TABS.find(([type])=>type===r.type)?.[1]||r.type;
     const time=String(r.dateTime||'').match(/T(\d{2}:\d{2})/)?.[1]||'';
     copy.append(node('strong','',r.title),node('small','',[typeLabel,itinerary?.name,time].filter(Boolean).join(' · ')));

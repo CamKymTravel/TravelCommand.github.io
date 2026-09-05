@@ -43,8 +43,10 @@ function normalCostsLinkedTo(state, itineraryId) {
 }
 
 function costProtectsItinerary(state, record, itineraryId, kind) {
-  if (record.itineraryId === itineraryId) return true;
-  if (!record.needsBudgetRepair) return false;
+  if (!record.needsBudgetRepair) return record.itineraryId === itineraryId;
+  // A repair record's persisted itineraryId is explicitly untrusted legacy
+  // data. Destructive protection follows the dated stay that can actually be
+  // resolved uniquely, never the stale relationship pointer.
   const raw = kind === 'Expense' ? record.date : (record.dateTime || record.date);
   if (!raw) return false;
   try {
@@ -144,6 +146,12 @@ function assertCurrencyRateUnlocked(state, current, next) {
 export function saveItineraryDraft(draft, { entryId = null, fields, routePoints = [] }, options = {}) {
   const validated = createItineraryEntry(fields, options);
   assertNotBeforeJourneyStart(draft, validated.startDate);
+  // Validate every proposed route point before changing the itinerary draft.
+  // Otherwise an RV/Cruise edit can update the parent stay and only then throw
+  // on an invalid stop, leaving callers that inspect the rejected draft with a
+  // partially applied Save. Standard stays deliberately discard route points.
+  const targetItineraryId = entryId || validated.id;
+  const validatedPoints = validated.travelType === 'standard' ? [] : validateRoutePoints(targetItineraryId, routePoints, options);
   let entry;
 
   if (entryId) {
@@ -169,7 +177,6 @@ export function saveItineraryDraft(draft, { entryId = null, fields, routePoints 
   }
 
   const existing = new Map(draft.routePoints.filter(point => point.itineraryId === entry.id).map(point => [point.id, point]));
-  const validatedPoints = validateRoutePoints(entry.id, routePoints, options);
   const replacements = validatedPoints.map((point, index) => {
     const requestedId = routePoints[index]?.id;
     const saved = requestedId ? existing.get(requestedId) : null;
@@ -242,7 +249,7 @@ export function setDestinationBudgetDraft(draft, itineraryId, budgetAUD, options
   let fixedLocalPerAUD = options.fixedLocalPerAUD !== undefined ? normalizedRate(options.fixedLocalPerAUD) : normalizedRate(current.fixedLocalPerAUD);
   if(localCurrency === 'AUD') fixedLocalPerAUD = 1;
   assertNotBeforeJourneyStart(draft, startDate);
-  if (amount > 0 && !/^[A-Z]{3}$/.test(String(localCurrency || ''))) throw new Error('A 3-letter local currency is required before this Destination Budget can be Locked In.');
+  if (amount > 0 && (String(localCurrency || '') === 'XXX' || !/^[A-Z]{3}$/.test(String(localCurrency || '')))) throw new Error('A real 3-letter local currency is required before this Destination Budget can be Locked In.');
   if (amount > 0 && (!Number.isFinite(fixedLocalPerAUD) || fixedLocalPerAUD <= 0)) throw new Error('A fixed local-per-AUD exchange rate greater than zero is required before this Destination Budget can be Locked In.');
   if (fixedLocalPerAUD != null && Math.abs(fixedLocalPerAUD) > Number.MAX_SAFE_INTEGER) throw new Error('Exchange rate exceeds the safe numeric range');
 

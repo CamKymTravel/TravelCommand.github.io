@@ -7,6 +7,7 @@ export function isDestinationBudgetUsable(stay) {
   return Boolean(
     stay &&
     Number(stay.destinationBudgetAUD) > 0 &&
+    String(stay.localCurrency || '').trim().toUpperCase() !== 'XXX' &&
     /^[A-Z]{3}$/.test(String(stay.localCurrency || '').trim().toUpperCase()) &&
     Number.isFinite(Number(stay.fixedLocalPerAUD)) &&
     Number(stay.fixedLocalPerAUD) > 0 &&
@@ -34,7 +35,7 @@ export function resolveDestinationBudgetForDate(itinerary, value) {
 
 export function deriveAUDForStay({ originalCurrency = 'AUD', originalAmount = 0, audAmount = 0 }, stay) {
   const currency = String(originalCurrency || '').trim().toUpperCase();
-  if (!/^[A-Z]{3}$/.test(currency)) throw new Error('Currency must be a valid 3-letter code');
+  if (currency === 'XXX' || !/^[A-Z]{3}$/.test(currency)) throw new Error('Choose a real 3-letter currency code');
   const original = Number(originalAmount ?? 0);
   if (!Number.isFinite(original) || original < 0) throw new Error('Original amount must be zero or greater');
   if (currency === 'AUD') return roundMoney(original);

@@ -101,6 +101,12 @@ function enteredTime(value) {
   return match ? `${match[1]}:${match[2]}` : '';
 }
 
+function itineraryFlagCountry(entry = null) {
+  if (!entry) return '';
+  const route=['cruise','motorhome','rv'].includes(String(entry.travelType||'').toLowerCase());
+  return (route ? entry.startCountry : entry.country) || entry.country || entry.startCountry || '';
+}
+
 function itineraryEvent(entry, resolvedColour = null) {
   const colour = resolvedColour || itineraryCalendarColour(entry);
   return {
@@ -113,13 +119,17 @@ function itineraryEvent(entry, resolvedColour = null) {
     startDate:toISODate(entry.startDate),
     endDate:toISODate(entry.endDate),
     travelType:entry.travelType,
+    country:entry.country || entry.startCountry || '',
+    flagCountry:itineraryFlagCountry(entry),
     itineraryId:entry.id,
     ...colour
   };
 }
 
 function reservationEvent(record, itineraryById, colourByItineraryId) {
-  const linked = record.itineraryId ? itineraryById.get(record.itineraryId) : null;
+  // A repair record may carry a stale legacy itineraryId. Until it is re-saved
+  // by date, that destination identity and its colour are not authoritative.
+  const linked = !record.needsBudgetRepair && record.itineraryId ? itineraryById.get(record.itineraryId) : null;
   const colour = linked ? (colourByItineraryId.get(linked.id) || itineraryCalendarColour(linked)) : (RESERVATION_COLOURS[record.type] || RESERVATION_COLOURS.flight);
   const date = record.dateTime ? toISODate(record.dateTime) : null;
   return {
@@ -128,13 +138,16 @@ function reservationEvent(record, itineraryById, colourByItineraryId) {
     sourceCollection:'reservations',
     kind:'reservation',
     title:record.title,
-    subtitle:[RESERVATION_TYPE_LABELS[record.type] || 'Reservation', linked?.name, enteredTime(record.dateTime)].filter(Boolean).join(' · '),
+    subtitle:[RESERVATION_TYPE_LABELS[record.type] || 'Reservation', record.needsBudgetRepair ? 'Destination Budget repair required' : linked?.name, enteredTime(record.dateTime)].filter(Boolean).join(' · '),
     startDate:date,
     endDate:date,
     dateTime:record.dateTime || null,
-    itineraryId:record.itineraryId || null,
+    itineraryId:record.needsBudgetRepair ? null : (record.itineraryId || null),
+    country:linked?.country || linked?.startCountry || '',
+    flagCountry:itineraryFlagCountry(linked),
     status:record.status,
     reservationType:record.type,
+    needsBudgetRepair:record.needsBudgetRepair === true,
     ...colour
   };
 }
@@ -158,6 +171,8 @@ function personalEvent(record, itineraryById, colourByItineraryId) {
     dateTime:rawDate || null,
     notes:record.notes || record.note || '',
     itineraryId:record.itineraryId || null,
+    country:linked?.country || linked?.startCountry || '',
+    flagCountry:itineraryFlagCountry(linked),
     ...colour
   };
 }

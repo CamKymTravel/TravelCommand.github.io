@@ -44,7 +44,7 @@ function isPast(record, currentDate) {
 }
 
 function presentRecord(record, itineraryById) {
-  const itinerary = record.itineraryId ? itineraryById.get(record.itineraryId) : null;
+  const itinerary = !record.needsBudgetRepair && record.itineraryId ? itineraryById.get(record.itineraryId) : null;
   return {
     id:record.id,
     type:record.type,
@@ -58,7 +58,7 @@ function presentRecord(record, itineraryById) {
     status:record.status,
     statusLabel:STATUS_LABELS[record.status] || record.status,
     notes:record.notes || '',
-    itineraryId:record.itineraryId || null,
+    itineraryId:record.needsBudgetRepair ? null : (record.itineraryId || null),
     itineraryName:itinerary?.name || null,
     needsBudgetRepair:record.needsBudgetRepair === true
   };

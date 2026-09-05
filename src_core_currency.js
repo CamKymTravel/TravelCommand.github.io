@@ -18,6 +18,11 @@ export function formatMoney(amount, currency = 'AUD') {
   const raw=String(currency||'').trim().toUpperCase();
   const safeCurrency=/^[A-Z]{3}$/.test(raw)?raw:'XXX';
   const value=Number(amount);
-  try { return new Intl.NumberFormat('en-AU', { style:'currency', currency:safeCurrency, maximumFractionDigits:2 }).format(Number.isFinite(value)?value:0); }
-  catch { return `${safeCurrency} ${(Number.isFinite(value)?value:0).toFixed(2)}`; }
+  const safeValue=Number.isFinite(value)?value:0;
+  // XXX is the explicit legacy-repair/unknown-currency sentinel. Intl formats
+  // it as the generic currency sign (¤), which is too ambiguous for a repair
+  // surface. Keep the unknown code visible; real currencies still use Intl.
+  if(safeCurrency==='XXX')return `XXX ${safeValue.toFixed(2)}`;
+  try { return new Intl.NumberFormat('en-AU', { style:'currency', currency:safeCurrency, maximumFractionDigits:2 }).format(safeValue); }
+  catch { return `${safeCurrency} ${safeValue.toFixed(2)}`; }
 }

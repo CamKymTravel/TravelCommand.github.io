@@ -4,8 +4,9 @@ import { formatMoney } from './src_core_currency.js';
 import { renderOfflineMap, buildMapGeometry } from './src_components_offline-map.js';
 import { toggleTravelYear, isTravelYearSelected } from './src_core_year-filters.js';
 import { formatAUDate } from './src_core_dates.js';
-import { makeExpandableCard, preserveLocalFocus } from './src_components_modal.js';
+import { createModal, makeExpandableCard, preserveLocalFocus } from './src_components_modal.js';
 import { createLineIcon } from './src_components_icons.js';
+import { countryFlagEmoji } from './src_components_country.js';
 
 const TYPE_ICONS = Object.freeze({ standard:'globe', motorhome:'rv', cruise:'cruise' });
 const TYPE_LABELS = Object.freeze({ standard:'Standard', motorhome:'Motorhome', cruise:'Cruise', rv:'Motorhome' });
@@ -46,21 +47,48 @@ function renderSummary(model) {
   return grid;
 }
 
-function journeySummaryExpandedBody(kind, model) {
+function journeySummaryExpandedBody(kind, model, state, currentDate) {
   const body=node('div',`journey-summary-expanded journey-summary-expanded-${kind}`);
   const list=node('div','journey-summary-expanded-list');
   if(kind==='countries'){
-    const grouped=new Map();
-    for(const row of model.rows){const key=row.country||'Unknown';const item=grouped.get(key)||{country:key,count:0,days:0,spend:0};item.count+=1;item.days+=Number(row.days||0);item.spend+=Number(row.spendAUD||0);grouped.set(key,item);}
-    for(const item of [...grouped.values()].sort((a,b)=>a.country.localeCompare(b.country,'en-AU'))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.country),node('span','',`${item.count} stay${item.count===1?'':'s'} · ${integer(item.days)} days`),node('b','',formatMoney(item.spend,'AUD')));list.append(row);}
+    body.append(node('p','journey-summary-expanded-intro',`${integer(model.summary.countriesVisited)} countries visited to date · ${integer(model.summary.destinationsCompleted)} completed stays & trips.`));
+    for(const item of model.visitedCountries||[]){
+      const row=node('article','journey-summary-expanded-row journey-country-visited-row');
+      const flag=node('span','journey-summary-expanded-flag',countryFlagEmoji(item.name));flag.setAttribute('aria-hidden','true');
+      const copy=node('span','journey-summary-expanded-copy');copy.append(node('strong','',item.name),node('span','','Visited on the journey to date'));
+      const status=node('b','journey-country-visited-status','Visited');
+      row.append(flag,copy,status);list.append(row);
+    }
   } else if(kind==='destinations'){
-    for(const item of model.rows){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,`${integer(item.days)} days`].filter(Boolean).join(' · ')),node('b','',formatMoney(item.spendAUD,'AUD')));list.append(row);}
+    for(const item of model.rows){const row=node('article','journey-summary-expanded-row');const flag=node('span','journey-summary-expanded-flag',countryFlagEmoji(item.flagCountry||item.country||''));flag.setAttribute('aria-hidden','true');const copy=node('span','journey-summary-expanded-copy');copy.append(node('strong','',item.name),node('span','',[item.country,item.displayDates,`${integer(item.days)} days`].filter(Boolean).join(' · ')));row.append(flag,copy,node('b','',formatMoney(item.spendAUD,'AUD')));list.append(row);}
   } else if(kind==='days'||kind==='years'){
-    const grouped=new Map();
-    for(const item of model.rows){const key=item.travelYear||'Other';const row=grouped.get(key)||{year:key,days:0,stays:0,spend:0};row.days+=Number(item.days||0);row.stays+=1;row.spend+=Number(item.spendAUD||0);grouped.set(key,row);}
-    for(const item of [...grouped.values()].sort((a,b)=>Number(a.year)-Number(b.year))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',`Travel Year ${item.year}`),node('span','',`${integer(item.days)} days · ${item.stays} completed stay${item.stays===1?'':'s'}`),node('b','',formatMoney(item.spend,'AUD')));list.append(row);}
+    const completedByYear=new Map();
+    for(const item of model.rows){const key=Number(item.travelYear)||0;const row=completedByYear.get(key)||{stays:0,spend:0};row.stays+=1;row.spend+=Number(item.spendAUD||0);completedByYear.set(key,row);}
+    const intro=kind==='years'
+      ? `${model.summary.yearsOnRoad} years on the road to date · ${integer(model.summary.daysTravelled)} travelled days including the current stay.`
+      : `${integer(model.summary.daysTravelled)} travelled days to date, including the current stay.`;
+    body.append(node('p','journey-summary-expanded-intro',intro));
+    for(const item of model.travelledDaysByYear||[]){
+      const completed=completedByYear.get(Number(item.year))||{stays:0,spend:0};
+      const row=node('article','journey-summary-expanded-row');
+      row.append(node('strong','',`Travel Year ${item.year}`),node('span','',`${integer(item.days)} travelled days · ${completed.stays} completed stay${completed.stays===1?'':'s'}`),node('b','',formatMoney(completed.spend,'AUD')));list.append(row);
+    }
   } else if(kind==='spend'){
-    for(const item of [...model.destinationTotals].sort((a,b)=>Number(b.spendAUD)-Number(a.spendAUD))){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',item.name),node('span','',`${item.visits} stay${item.visits===1?'':'s'} · ${integer(item.days)} days`),node('b','',formatMoney(item.spendAUD,'AUD')));list.append(row);}
+    const totals=spendingBreakdown(state,model,currentDate);
+    const labels={accommodation:'Accommodation',travel:'Travel between destinations',food:'Food',transport:'Local Transport',entertainment:'Entertainment',shopping:'Shopping',other:'Other'};
+    const exactTotal=Object.values(totals).reduce((sum,value)=>sum+Number(value||0),0);
+    body.append(node('p','journey-summary-expanded-intro',`${formatMoney(model.summary.lifetimeTravelSpendAUD,'AUD')} spent to date across completed travel and the current stay.`));
+    const maxValue=Math.max(0,...Object.values(totals).map(value=>Number(value||0)));
+    for(const [key,label] of Object.entries(labels)){
+      const value=Number(totals[key]||0);
+      const row=node('article',`journey-summary-expanded-row journey-lifetime-spend-row journey-lifetime-spend-${key}`);
+      const copy=node('span','journey-summary-expanded-copy');copy.append(node('strong','',label),node('span','',exactTotal>0?`${Math.round(value/exactTotal*100)}% of lifetime travel spend`:'No spend recorded'));
+      const amount=node('b','',formatMoney(value,'AUD'));
+      const bar=node('span','journey-lifetime-spend-bar');
+      const fill=node('i','journey-lifetime-spend-bar-fill');
+      fill.style.setProperty('--journey-lifetime-share',`${maxValue>0?Math.max(value>0?3:0,(value/maxValue)*100):0}%`);
+      bar.append(fill);row.append(copy,amount,bar);list.append(row);
+    }
   }
   if(!list.childElementCount)list.append(node('p','journey-empty','No entries yet'));
   body.append(list);return body;
@@ -68,9 +96,36 @@ function journeySummaryExpandedBody(kind, model) {
 
 function destinationTotalsExpandedBody(model){
   const body=node('div','journey-destination-totals-expanded');
-  const list=node('div','journey-summary-expanded-list');
-  for(const total of model.destinationTotals){const row=node('article','journey-summary-expanded-row');row.append(node('strong','',total.name),node('span','',`${total.visits} stay${total.visits===1?'':'s'} · ${total.days} days · ${kilometres(total.kilometresTravelled)}`),node('b','',formatMoney(total.spendAUD,'AUD')));list.append(row);}
-  if(!list.childElementCount)list.append(node('p','journey-empty','No entries yet'));body.append(list);return body;
+  const totals=[...(model.destinationTotals||[])];
+  const totalSpend=totals.reduce((sum,item)=>sum+Number(item.spendAUD||0),0);
+  const intro=node('section','journey-destination-totals-summary');
+  intro.append(
+    node('strong','',`${totals.length} destination${totals.length===1?'':'s'}`),
+    node('span','',`${formatMoney(totalSpend,'AUD')} completed travel spend`)
+  );
+  body.append(intro);
+  const list=node('div','journey-summary-expanded-list journey-destination-totals-list');
+  const maxSpend=Math.max(0,...totals.map(item=>Number(item.spendAUD||0)));
+  for(const total of totals){
+    const spend=Number(total.spendAUD||0);
+    const row=node('article','journey-summary-expanded-row journey-destination-total-row');
+    const flag=node('span','journey-summary-expanded-flag',countryFlagEmoji(total.flagCountry||total.country||''));flag.setAttribute('aria-hidden','true');
+    const copy=node('span','journey-summary-expanded-copy');
+    copy.append(
+      node('strong','',total.name),
+      node('span','',`${total.visits} stay${total.visits===1?'':'s'} · ${total.days} days · ${kilometres(total.kilometresTravelled)}`),
+      node('small','journey-destination-average',`${formatMoney(total.averageCostPerDayAUD,'AUD')} average / day`)
+    );
+    const amount=node('b','',formatMoney(spend,'AUD'));
+    const bar=node('span','journey-destination-total-bar');
+    const fill=node('i','journey-destination-total-bar-fill');
+    fill.style.setProperty('--journey-total-share',`${maxSpend>0?Math.max(3,(spend/maxSpend)*100):0}%`);
+    bar.append(fill);
+    row.append(flag,copy,amount,bar);
+    list.append(row);
+  }
+  if(!list.childElementCount)list.append(node('p','journey-empty','No entries yet'));
+  body.append(list);return body;
 }
 
 function renderYearFilters(model, options, onChange) {
@@ -104,6 +159,26 @@ function renderTypeFilters(options, onChange, className = 'journey-type-filters'
     filters.append(button);
   }
   return filters;
+}
+
+function journeyMapExpandedBody(state, currentDate, initialOptions = {}) {
+  const body = node('div', 'journey-map-expanded-body');
+  let localOptions = {
+    years:Array.isArray(initialOptions.years) && initialOptions.years.length ? [...initialOptions.years] : ['all'],
+    travelType:['all','standard','motorhome','cruise'].includes(initialOptions.travelType) ? initialOptions.travelType : 'all'
+  };
+  const rerender = () => {
+    const model = buildJourneyHistoryViewModel(state, currentDate, localOptions);
+    const map = renderMap(
+      model,
+      localOptions,
+      years => { localOptions = { ...localOptions, years:[...years] }; rerender(); },
+      travelType => { localOptions = { ...localOptions, travelType }; rerender(); }
+    );
+    body.replaceChildren(map);
+  };
+  rerender();
+  return body;
 }
 
 function renderMap(model, options, updateYears, updateType) {
@@ -233,6 +308,43 @@ function journeyLinkedSpendBreakdown(state, itineraryId) {
   return [...groups.entries()].map(([label,amountAUD])=>({label,amountAUD})).sort((a,b)=>b.amountAUD-a.amountAUD||a.label.localeCompare(b.label));
 }
 
+function journeyRecordTone(row){
+  if(row?.travelType==='motorhome'||row?.travelType==='rv') return 'orange';
+  if(row?.travelType==='cruise') return 'violet';
+  return 'blue';
+}
+
+function openJourneyRecordDetail(host,row,state){
+  const body=node('section','journey-record-detail');
+  const hero=node('div','journey-record-detail-hero');
+  const flag=node('span','journey-record-detail-flag',countryFlagEmoji(row.flagCountry||row.country||''));
+  flag.setAttribute('aria-hidden','true');
+  const copy=node('div','journey-record-detail-hero-copy');
+  copy.append(node('p','eyebrow','COMPLETED STAY / TRIP'),node('h2','',row.name),node('strong','',row.country||'—'),node('span','',row.displayDates));
+  hero.append(flag,copy);
+  const facts=node('div','journey-record-detail-facts');
+  const fact=(label,value)=>{const item=node('div','journey-record-detail-fact');item.append(node('small','',label),node('strong','',value));return item;};
+  facts.append(
+    fact('Travel type',TYPE_LABELS[row.travelType]||row.travelType||'Standard'),
+    fact('Duration',`${integer(row.days)} days`),
+    fact('Total cost',formatMoney(row.spendAUD,'AUD')),
+    fact('Average / day',formatMoney(row.averageCostPerDayAUD,'AUD')),
+    fact('Distance',kilometres(row.kilometresTravelled)),
+    fact('Travel year',row.travelYear?`Year ${row.travelYear}`:'—')
+  );
+  if(row.travelType==='motorhome'||row.travelType==='cruise'||row.travelType==='rv')facts.append(fact('Route points',integer(Number(row.routePointCount||0))));
+  const breakdown=journeyLinkedSpendBreakdown(state,row.id);
+  const spend=node('section','journey-record-detail-spend');
+  spend.append(node('h3','','Linked Spend Breakdown'));
+  const spendList=node('div','journey-record-detail-spend-list');
+  if(!breakdown.length)spendList.append(node('p','journey-empty','No linked expense or booked reservation spend.'));
+  for(const item of breakdown){const spendRow=node('div','journey-record-detail-spend-row');spendRow.append(node('strong','',item.label),node('b','',formatMoney(item.amountAUD,'AUD')));spendList.append(spendRow);}
+  spend.append(spendList);
+  body.append(hero,facts,spend,node('p','journey-record-menu-note','Journey History is read-only. Use Itinerary from the left menu if you deliberately want to edit the original stay or trip.'));
+  const dialog=createModal({title:`${row.name} · Journey Detail`,body,className:`tcc-expanded-modal journey-record-detail-modal tone-${journeyRecordTone(row)}`,actions:[{label:'Close',onClick:d=>d.close()}]});
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+
 function renderRows(model, navigate, options, updateOptions, state) {
   const panel = node('section', 'journey-panel journey-records');
   const pageSize = Number(options.pageSize || 10);
@@ -249,14 +361,14 @@ function renderRows(model, navigate, options, updateOptions, state) {
   for (const label of ['Type','Destination','Stay','Days','Avg / Day','Destination Cost','Kilometres']) header.append(node('span', '', label));
   table.append(header);
   if (!rows.length) table.append(node('p', 'journey-empty', 'No entries yet'));
-  let openDetail=null;
   for (const row of rows) {
     const button = node('button', 'journey-row journey-record-row');
     button.type = 'button';
     button.dataset.recordId = row.id;
-    button.setAttribute('aria-expanded','false');
     const destination = node('span', 'journey-destination');
-    destination.append(node('strong', '', row.name), node('small', '', [row.country, row.travelYear ? `Year ${row.travelYear}` : ''].filter(Boolean).join(' · ')));
+    const destinationFlag=node('span','journey-destination-flag',countryFlagEmoji(row.flagCountry||row.country||'')); destinationFlag.setAttribute('aria-hidden','true');
+    const destinationCopy=node('span','journey-destination-copy'); destinationCopy.append(node('strong', '', row.name), node('small', '', [row.country, row.travelYear ? `Year ${row.travelYear}` : ''].filter(Boolean).join(' · ')));
+    destination.append(destinationFlag,destinationCopy);
     button.append(
       typeIcon(row),
       destination,
@@ -267,7 +379,7 @@ function renderRows(model, navigate, options, updateOptions, state) {
       node('span', '', kilometres(row.kilometresTravelled))
     );
     button.setAttribute('aria-label', [
-      'Show compact stay details',
+      'Enlarge completed stay details',
       row.name,
       row.country,
       row.displayDates,
@@ -275,35 +387,8 @@ function renderRows(model, navigate, options, updateOptions, state) {
       `${integer(row.days)} days`,
       formatMoney(row.spendAUD, 'AUD')
     ].filter(Boolean).join(' · '));
-    const detail=node('div','journey-record-inline-detail');detail.hidden=true;
-    const facts=node('div','journey-record-inline-facts');
-    const fact=(label,value)=>{const item=node('span','journey-record-inline-fact');item.append(node('small','',label),node('strong','',value));return item;};
-    const routePointCount=Number(row.routePointCount||0);
-    facts.append(
-      fact('Travel type',TYPE_LABELS[row.travelType]||row.travelType||'Standard'),
-      ...(row.travelType==='motorhome'||row.travelType==='cruise'||row.travelType==='rv'?[fact('Route points',integer(routePointCount))]:[]),
-      fact('Total stay cost',formatMoney(row.spendAUD,'AUD')),
-      fact('Average / day',formatMoney(row.averageCostPerDayAUD,'AUD')),
-      fact('Duration',`${integer(row.days)} days`),
-      fact('Distance',kilometres(row.kilometresTravelled))
-    );
-    const context=node('p','journey-record-inline-context',[row.displayDates,row.travelYear?`Travel Year ${row.travelYear}`:'',row.country].filter(Boolean).join(' · '));
-    const breakdown=journeyLinkedSpendBreakdown(state,row.id);
-    const spend=node('div','journey-record-inline-spend');
-    const spendHead=node('div','journey-record-inline-spend-head');spendHead.append(node('strong','','Linked Spend Breakdown'),node('small','',`${breakdown.length} categor${breakdown.length===1?'y':'ies'}`));spend.append(spendHead);
-    const spendList=node('div','journey-record-inline-spend-list');
-    if(!breakdown.length)spendList.append(node('p','journey-empty','No linked expense or booked reservation spend.'));
-    for(const item of breakdown.slice(0,8)){const spendRow=node('span','journey-record-inline-spend-row');spendRow.append(node('small','',item.label),node('strong','',formatMoney(item.amountAUD,'AUD')));spendList.append(spendRow);}
-    if(breakdown.length>8)spendList.append(node('small','journey-record-inline-spend-more',`+ ${breakdown.length-8} more categories`));
-    spend.append(spendList);
-    const edit=node('button','journey-record-open-itinerary','Open in Itinerary');edit.type='button';edit.addEventListener('click',event=>{event.stopPropagation();navigate?.('itinerary',{collection:'itinerary',id:row.id,editorTone:'blue'});});
-    detail.append(context,facts,spend,edit);
-    button.addEventListener('click',()=>{
-      const willOpen=detail.hidden;
-      if(openDetail&&openDetail!==detail){openDetail.hidden=true;openDetail.previousElementSibling?.setAttribute('aria-expanded','false');}
-      detail.hidden=!willOpen;button.setAttribute('aria-expanded',String(willOpen));openDetail=willOpen?detail:null;
-    });
-    table.append(button,detail);
+    button.addEventListener('click',()=>openJourneyRecordDetail(panel,row,state));
+    table.append(button);
   }
   panel.append(table);
 
@@ -337,7 +422,9 @@ function renderDestinationTotals(model) {
   for (const total of model.destinationTotals) {
     const row = node('article', 'journey-destination-total');
     const copy = node('span', 'journey-destination');
-    copy.append(node('strong', '', total.name), node('small', '', [total.country, `${total.visits} ${total.visits === 1 ? 'visit' : 'visits'}`].filter(Boolean).join(' · ')));
+    const totalFlag=node('span','journey-destination-flag',countryFlagEmoji(total.flagCountry||total.country||'')); totalFlag.setAttribute('aria-hidden','true');
+    const totalCopy=node('span','journey-destination-copy'); totalCopy.append(node('strong', '', total.name), node('small', '', [total.country, `${total.visits} ${total.visits === 1 ? 'visit' : 'visits'}`].filter(Boolean).join(' · ')));
+    copy.append(totalFlag,totalCopy);
     const metrics = node('span', 'journey-destination-metrics');
     metrics.append(
       node('span', '', `${integer(total.days)} days`),
@@ -539,19 +626,22 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     for(const card of main.querySelectorAll('.journey-summary-card')) {
       const kind=[...card.classList].find(name=>name.startsWith('journey-summary-')&&name!=='journey-summary-card')?.replace('journey-summary-','')||'blue';
       const label=card.querySelector('.journey-summary-copy > span')?.textContent||'Journey Summary';
-      makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue',bodyBuilder:()=>journeySummaryExpandedBody(kind,lifetimeModel)});
+      makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue',bodyBuilder:()=>journeySummaryExpandedBody(kind,lifetimeModel,state,currentDate)});
     }
     const journeyExpanders=[
       ['.journey-map-panel','Journey Map','sky'],
       ['.journey-spend-panel','Lifetime Travel Spend','blue'],
+      ['.journey-snapshot-panel','Journey Snapshot','orange'],
+      ['.journey-milestones-panel','Milestones','teal'],
       ['.journey-top-destinations','Destination Totals','gold'],
-      ['.journey-mix-panel','Travel Mix','violet']
+      ['.journey-mix-panel','Travel Mix','violet'],
+      ['.journey-health','Journey Check','green']
     ];
     for(const [selector,title,tone] of journeyExpanders){
       const card=main.querySelector(selector);
       if(!card)continue;
       const resolvedTone=selector==='.journey-health'&&card.classList.contains('journey-health-needs-attention')?'gold':tone;
-      makeExpandableCard(card,{host:main,title,tone:resolvedTone,bodyBuilder:selector==='.journey-top-destinations'?()=>destinationTotalsExpandedBody(lifetimeModel):null});
+      makeExpandableCard(card,{host:main,title,tone:resolvedTone,bodyBuilder:selector==='.journey-top-destinations'?()=>destinationTotalsExpandedBody(lifetimeModel):selector==='.journey-map-panel'?()=>journeyMapExpandedBody(state,currentDate,mapOptions):null});
     }
 
     if (pending?.collection === 'journeyHistory' && pending.id) {

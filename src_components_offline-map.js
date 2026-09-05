@@ -89,6 +89,7 @@ export function buildMapGeometry(model) {
   let previousStandardAnchor = null;
 
   for (const stay of model.stays || []) {
+    if (stay.breakBefore) previousStandardAnchor = null;
     const detailed = routeByItinerary.get(stay.id) || [];
     const stayAnchor = validPoint(stay) ? { ...stay, kind:'stay' } : null;
     const pathPoints = [];

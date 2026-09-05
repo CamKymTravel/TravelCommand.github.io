@@ -6,6 +6,7 @@ import { applyStayHeaderImage } from './src_components_page-hero.js';
 import { createModal } from './src_components_modal.js';
 import { makeExpandableCard } from './src_components_modal.js';
 import { createLineIcon } from './src_components_icons.js';
+import { createCountryOutline } from './src_components_country.js';
 
 // V50 protected continuity markers: COUNTRY QUICK LOOK · OFFLINE | History & Culture
 const COLLECTION_TO_SCREEN = Object.freeze({ itinerary:'itinerary', reservations:'reservations', calendarEvents:'calendar', journeyHistory:'journey-history', checklists:'checklist', vault:'vault', expenses:'budget' });
@@ -298,7 +299,7 @@ function showQuickLook(host, stay, navigate = null) {
     const body=node('div','home-quick-look home-quick-look-empty');
     body.append(node('p','eyebrow','CURRENT DESTINATION · OFFLINE'),node('h3','','No current destination'),node('p','','Add a dated destination in Itinerary. Once its dates include today, this card becomes your Current Destination and opens its offline Country Quick Look.'));
     const actions=[{label:'Close',onClick:d=>d.close()}];
-    if (navigate) actions.unshift({label:'Open Itinerary',onClick:d=>{d.close();navigate('itinerary');}});
+    actions.unshift({label:'Use Itinerary from the left menu',onClick:d=>d.close()});
     const dialog=createModal({title:'Current Destination',body,actions,className:'tone-teal'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
     return;
   }
@@ -317,7 +318,7 @@ function showQuickLook(host, stay, navigate = null) {
 
 function showToilet(host, stay, navigate = null){
   const country=departureCountry(stay||{}); const key=slug(country); const item=TOILET_LANGUAGE[key]; const context=helperContext(country); const body=node('div','home-toilet home-helper-rich'); let dialog=null;
-  if(!stay){ body.append(node('p','home-toilet-label',"WHERE'S THE TOILET?"),node('strong','home-toilet-phrase','No current destination'),node('p','home-toilet-language','Add a dated destination in Itinerary and the compass will automatically use that destination’s language.')); const actions=[{label:'Close',onClick:d=>d.close()}]; if(navigate)actions.unshift({label:'Open Itinerary',onClick:d=>{d.close();navigate('itinerary');}}); dialog=createModal({title:'Quick language aid',body,actions,className:'tone-sky'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); return; }
+  if(!stay){ body.append(node('p','home-toilet-label',"WHERE'S THE TOILET?"),node('strong','home-toilet-phrase','No current destination'),node('p','home-toilet-language','Add a dated destination in Itinerary and the compass will automatically use that destination’s language.')); const actions=[{label:'Close',onClick:d=>d.close()}]; actions.unshift({label:'Use Itinerary from the left menu',onClick:d=>d.close()}); dialog=createModal({title:'Quick language aid',body,actions,className:'tone-sky'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); return; }
   body.append(helperHero(stay,country,context,{kind:'toilet',onSwitch:()=>{dialog?.close();showQuickLook(host,stay,navigate);}}));
   if(!item){ const missing=node('section','home-helper-phrase-stage'); missing.append(node('p','eyebrow','SAY THIS PHRASE'),node('strong','home-toilet-phrase','Language aid unavailable'),node('p','home-toilet-language',`${country||'This destination'} does not yet have an offline toilet phrase. No English fallback has been substituted.`)); body.append(missing); }
   else {
@@ -356,6 +357,19 @@ function monthLabel(index){ return ['JAN','FEB','MAR','APR','MAY','JUN','JUL','A
 function eventDateParts(displayDate=''){ const m=String(displayDate).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if(!m) return {day:'—',month:''}; return {day:String(m[1]).padStart(2,'0'),month:monthLabel(Number(m[2])-1)}; }
 function upcomingEventTypeLabel(event){ if(event?.kind==='reservation') return ({flight:'Flight',train:'Train',cruise:'Cruise',rv:'RV',accommodation:'Accommodation',ticket:'Tickets & Attractions'})[event.type]||'Reservation'; return event?.type==='reminder'?'Reminder':event?.type==='note'?'Note':'Personal'; }
 
+function showHomeDetail(host,{title,tone='blue',items=[]}={}){
+  const body=node('section','home-local-detail');
+  const list=node('div','home-local-detail-list');
+  for(const item of items.filter(Boolean)){
+    const row=node('div','home-local-detail-row');
+    row.append(node('small','',item.label||''),node('strong','',item.value||'—'));
+    list.append(row);
+  }
+  body.append(list);
+  const dialog=createModal({title:title||'Details',body,className:`tcc-expanded-modal tone-${tone}`,actions:[{label:'Close',onClick:d=>d.close()}]});
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+
 function renderHero(model, state, host, navigate){
   const hero=node('section','home-reference-hero'); applyStayHeaderImage(hero,model.currentStay,{position:'center center'});
   const currentWrap=node('div','home-destination-hero-wrap');
@@ -365,12 +379,13 @@ function renderHero(model, state, host, navigate){
   if(model.currentStay){
     const top=node('div','home-destination-hero-top'); top.append(node('span','home-destination-flag',flagEmoji(departureCountry(model.currentStay))),node('p','home-ref-kicker','CURRENT DESTINATION')); if(model.currentStay.travelType==='cruise'||model.currentStay.travelType==='motorhome'||model.currentStay.travelType==='rv'){ const mode=node('span','home-route-mode'); mode.append(createLineIcon(model.currentStay.travelType==='cruise'?'cruise':'rv'),node('span','',model.currentStay.travelType==='cruise'?'Cruise':'Motorhome')); top.append(mode); }
     const title=node('div','home-destination-title'); title.append(node('strong','home-stay-name',model.currentStay.title),node('span','home-destination-country',model.currentStay.country));
+    const outline=createCountryOutline(departureCountry(model.currentStay),'home-destination-country-outline');
     const meta=node('div','home-destination-meta'); meta.append(node('span','',model.currentStay.dates),node('span','',`${model.currentStay.remainingDays} days remaining`));
     const progressWrap=node('div','home-stay-progress-wrap');
     const progressLine=node('div','home-stay-progress-line'); progressLine.append(node('span','',`DAY ${model.currentStay.currentDay} OF ${model.currentStay.totalDays}`),node('span','',`${Math.round(model.currentStay.progress)}%`));
     const progress=document.createElement('progress'); progress.max=100; progress.value=Math.max(0,Math.min(100,Number(model.currentStay.progress)||0)); progress.setAttribute('aria-label','Days in current stay'); progress.setAttribute('aria-valuetext',`${model.currentStay.currentDay} of ${model.currentStay.totalDays} days`);
     progressWrap.append(progressLine,progress);
-    current.append(top,title,meta,progressWrap);
+    current.append(top,title,meta,progressWrap,outline);
   } else current.append(node('p','home-ref-kicker','CURRENT DESTINATION'),node('strong','home-stay-name','No current stay'),node('span','home-destination-country','Tap to set up your itinerary'));
   const openCurrent=()=>showQuickLook(host,model.currentStay,navigate);
   current.addEventListener('click',openCurrent);
@@ -379,17 +394,16 @@ function renderHero(model, state, host, navigate){
   const compass=node('button','home-compass'); compass.type='button'; compass.setAttribute('aria-label',"Where's the toilet language aid"); compass.title="Where's the toilet?"; compass.innerHTML='<span class="home-compass-svg" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="m14.8 9.2-1.8 4.1-4.1 1.8 1.8-4.1 4.1-1.8Z"></path><path d="M12 2.5v2M21.5 12h-2M12 21.5v-2M2.5 12h2"></path></svg></span>'; compass.addEventListener('click',event=>{event.stopPropagation();showToilet(host,model.currentStay,navigate);}); currentWrap.append(compass);
   hero.append(currentWrap);
 
-  const next=node('button','home-next-card home-next-destination-card'); next.type='button';
+  const next=node('section','home-next-card home-next-destination-card');
   if(model.nextDestination){
     const nextMode=model.nextDestination.travelType==='cruise'?'Cruise':(model.nextDestination.travelType==='motorhome'||model.nextDestination.travelType==='rv')?'Motorhome':'Standard stay';
     const nextIcon=node('span','home-next-mode-icon'); nextIcon.append(createLineIcon(model.nextDestination.travelType==='cruise'?'cruise':(model.nextDestination.travelType==='motorhome'||model.nextDestination.travelType==='rv')?'rv':'itinerary'));
-    const nextHead=node('div','home-next-card-head'); nextHead.append(node('p','home-ref-kicker','NEXT DESTINATION'),nextIcon);
+    const nextHead=node('div','home-next-card-head'); const nextIdentity=node('div','home-next-identity'); nextIdentity.append(node('span','home-next-flag',flagEmoji(departureCountry(model.nextDestination))),node('p','home-ref-kicker','NEXT DESTINATION')); nextHead.append(nextIdentity,nextIcon);
     next.append(nextHead,node('strong','home-next-name',model.nextDestination.title),node('span','home-next-card-country',model.nextDestination.country),node('span','home-next-card-date',`${formatAUDate(model.nextDestination.startDate)} – ${formatAUDate(model.nextDestination.endDate)}`));
     const mode=node('span','home-next-mode'); mode.append(node('span','',nextMode),node('strong','',`${model.nextDestination.durationDays} days planned`)); next.append(mode);
-    next.setAttribute('aria-label',`Open next destination · ${model.nextDestination.title} · ${formatAUDate(model.nextDestination.startDate)} – ${formatAUDate(model.nextDestination.endDate)} · ${nextMode}`);
-    next.addEventListener('click',()=>navigate('itinerary',{collection:'itinerary',id:model.nextDestination.id,editorTone:'violet'}));
+    next.setAttribute('aria-label',`Next destination · ${model.nextDestination.title} · ${formatAUDate(model.nextDestination.startDate)} – ${formatAUDate(model.nextDestination.endDate)} · ${nextMode}`);
   } else {
-    next.disabled=true; next.setAttribute('aria-disabled','true'); next.append(node('p','home-ref-kicker','NEXT DESTINATION'),node('strong','home-next-name','None planned'),node('span','home-next-card-country','Add your next stay in Itinerary'));
+    next.setAttribute('aria-disabled','true'); next.append(node('p','home-ref-kicker','NEXT DESTINATION'),node('strong','home-next-name','None planned'),node('span','home-next-card-country','Use Itinerary in the left menu to add the next stay'));
   }
   hero.append(next);
   return hero;
@@ -450,16 +464,16 @@ function renderAnnual(model,currentDate,state){
   const lower=node('div','home-annual-progress'); lower.append(progressLine('YEAR ELAPSED',elapsed/days*100,'year-elapsed'),progressLine('SPEND VS PACE',pace?spent/pace*100:0,'spend-pace')); card.append(lower); return card;
 }
 
-function compactAlerts(model,navigate){
+function compactAlerts(model,host){
   const panel=node('section','home-mini-panel home-mini-alerts'); const head=node('div','home-mini-head'); const title=node('h2','','Alerts'); if(model.alerts.length) title.append(node('span','home-alert-count',String(model.alerts.length))); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,title); panel.append(head);
   const list=node('div','home-mini-list'); if(!model.alerts.length) list.append(node('p','home-mini-empty','No alerts'));
-  model.alerts.forEach((alert,index)=>{ const item=node(alert.target?.screen?'button':'article',`home-mini-row home-alert-row home-alert-priority-${alert.priority}${index>=3?' home-mini-extra':''}`); if(item.tagName==='BUTTON'){item.type='button';item.setAttribute('aria-label',['Open alert',alert.title,alert.message,alert.displayDueDate].filter(Boolean).join(' · '));item.addEventListener('click',()=>navigate(alert.target.screen,alert.target.collection&&alert.target.id?{collection:alert.target.collection,id:alert.target.id,editorTone:'orange'}:null));} item.append(node('span','home-alert-dot',''),node('strong','',alert.message||alert.title)); list.append(item); });
+  model.alerts.forEach((alert,index)=>{ const item=node('button',`home-mini-row home-alert-row home-alert-priority-${alert.priority}${index>=3?' home-mini-extra':''}`); item.type='button';item.setAttribute('aria-label',['View alert',alert.title,alert.message,alert.displayDueDate].filter(Boolean).join(' · '));item.addEventListener('click',()=>showHomeDetail(host,{title:'Alert',tone:'orange',items:[{label:'Alert',value:alert.message||alert.title},{label:'Due',value:alert.displayDueDate||'No due date'},{label:'Priority',value:String(alert.priority||'').replace(/^./,c=>c.toUpperCase())}]})); item.append(node('span','home-alert-dot',''),node('strong','',alert.message||alert.title)); list.append(item); });
   if(model.alerts.length>3) list.append(node('div','home-mini-more',`+${model.alerts.length-3} more · tap Alerts to view all`)); panel.append(list); return panel;
 }
-function compactUpcoming(model,navigate){
+function compactUpcoming(model,host){
   const panel=node('section','home-mini-panel home-mini-upcoming'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Upcoming Events')); panel.append(head); const list=node('div','home-mini-list');
   if(!model.upcomingEvents.length) list.append(node('p','home-mini-empty','No upcoming events'));
-  model.upcomingEvents.forEach((event,index)=>{ const d=eventDateParts(event.displayDate); const item=node('button',`home-mini-row home-event-row${index>=3?' home-mini-extra':''}`); item.type='button'; const badge=node('span','home-date-badge'); badge.append(node('strong','',d.day),node('small','',d.month)); const copy=node('span','home-event-copy'); const typeLabel=upcomingEventTypeLabel(event); copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · '))); item.append(badge,copy); item.setAttribute('aria-label',['Open upcoming event',event.title,event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · ')); item.addEventListener('click',()=>navigate(event.kind==='reservation'?'reservations':'calendar',{collection:event.kind==='reservation'?'reservations':'calendarEvents',id:event.sourceId,editorTone:'blue'})); list.append(item); });
+  model.upcomingEvents.forEach((event,index)=>{ const d=eventDateParts(event.displayDate); const item=node('button',`home-mini-row home-event-row${index>=3?' home-mini-extra':''}${event.needsBudgetRepair?' is-repair':''}`); item.type='button'; const badge=node('span','home-date-badge'); badge.append(node('strong','',d.day),node('small','',d.month)); const copy=node('span','home-event-copy'); const typeLabel=upcomingEventTypeLabel(event); copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · '))); if(event.needsBudgetRepair)copy.append(node('small','home-event-repair','DESTINATION BUDGET REPAIR REQUIRED')); item.append(badge,copy); item.setAttribute('aria-label',['View upcoming event',event.title,event.displayDate,event.displayTime,typeLabel,event.needsBudgetRepair?'Destination Budget repair required':''].filter(Boolean).join(' · ')); item.addEventListener('click',()=>showHomeDetail(host,{title:event.title,tone:event.needsBudgetRepair?'gold':'blue',items:[{label:'Type',value:typeLabel},{label:'Date',value:event.displayDate||'—'},{label:'Time',value:event.displayTime||'—'},...(event.needsBudgetRepair?[{label:'Budget status',value:'Destination Budget repair required. Amount/currency are not trusted until this booking is repaired.'}]:[])]})); list.append(item); });
   if(model.upcomingEvents.length>3) list.append(node('div','home-mini-more',`+${model.upcomingEvents.length-3} more · tap Upcoming Events to view all`)); panel.append(list); return panel;
 }
 function compactSchengen(model){
@@ -483,15 +497,15 @@ function compactSchengen(model){
   const status=node('div',`home-schengen-status schengen-${model.schengen.status}`,(model.schengen.status==='allowed'?'SAFE':model.schengen.status==='not-allowed'?'NOT ALLOWED':'NOT CHECKED')); content.append(status);
   panel.append(content); return panel;
 }
-function compactTimeline(state,currentDate,navigate){
+function compactTimeline(state,currentDate,host){
   const panel=node('section','home-mini-panel home-mini-timeline'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Trip Timeline')); panel.append(head);
   const entries=[...(state.itinerary||[])].filter(e=>String(e.endDate)>=String(currentDate)).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))).slice(0,3); const list=node('div','home-mini-list');
   if(!entries.length) list.append(node('p','home-mini-empty','No entries yet'));
-  for(const e of entries){ const row=node('button','home-mini-row home-timeline-row'); row.type='button'; const icon=node('span','home-timeline-icon'); icon.append(createLineIcon(e.travelType==='cruise'?'cruise':e.travelType==='motorhome'?'rv':'history')); const copy=node('span','home-timeline-copy'); copy.append(node('strong','',e.name),node('small','',`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)}`)); const status=String(e.startDate)<=String(currentDate)&&String(e.endDate)>=String(currentDate)?'In progress':'Upcoming'; row.append(icon,copy,node('span',`home-timeline-status ${status==='In progress'?'is-current':''}`,status)); row.setAttribute('aria-label',`Open itinerary · ${e.name} · ${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)} · ${status}`); row.addEventListener('click',()=>navigate('itinerary',{collection:'itinerary',id:e.id,editorTone:'violet'})); list.append(row); }
+  for(const e of entries){ const row=node('button','home-mini-row home-timeline-row'); row.type='button'; const icon=node('span','home-timeline-icon'); icon.append(createLineIcon(e.travelType==='cruise'?'cruise':e.travelType==='motorhome'?'rv':'history')); const copy=node('span','home-timeline-copy'); copy.append(node('strong','',e.name),node('small','',`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)}`)); const status=String(e.startDate)<=String(currentDate)&&String(e.endDate)>=String(currentDate)?'In progress':'Upcoming'; row.append(icon,copy,node('span',`home-timeline-status ${status==='In progress'?'is-current':''}`,status)); row.setAttribute('aria-label',`View trip timeline · ${e.name} · ${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)} · ${status}`); row.addEventListener('click',()=>showHomeDetail(host,{title:e.name,tone:'violet',items:[{label:'Dates',value:`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)}`},{label:'Travel type',value:e.travelType==='cruise'?'Cruise':e.travelType==='motorhome'||e.travelType==='rv'?'Motorhome':'Standard'},{label:'Status',value:status}]})); list.append(row); }
   panel.append(list); return panel;
 }
 
-function renderSearchResults(model,navigate){ const wrap=node('div','home-search-results'); if(!model.searchResults.length){wrap.append(node('p','home-search-empty','No matching results'));return wrap;} for(const result of model.searchResults){ const button=node('button','home-search-result'); button.type='button'; const copy=node('span','home-search-result-copy'); copy.append(node('strong','',result.title),node('small','',[result.screenLabel,result.dateContext].filter(Boolean).join(' · '))); button.append(copy); button.setAttribute('aria-label',['Open search result',result.title,result.screenLabel,result.dateContext].filter(Boolean).join(' · ')); button.addEventListener('click',()=>navigate(COLLECTION_TO_SCREEN[result.collection]||'home',{collection:result.collection,id:result.id,editorTone:'blue'})); wrap.append(button); } return wrap; }
+function renderSearchResults(model,host){ const wrap=node('div','home-search-results'); if(!model.searchResults.length){wrap.append(node('p','home-search-empty','No matching results'));return wrap;} for(const result of model.searchResults){ const button=node('button',`home-search-result${result.needsBudgetRepair?' is-repair':''}`); button.type='button'; const copy=node('span','home-search-result-copy'); copy.append(node('strong','',result.title),node('small','',[result.screenLabel,result.dateContext].filter(Boolean).join(' · '))); if(result.needsBudgetRepair)copy.append(node('small','home-search-repair','DESTINATION BUDGET REPAIR REQUIRED')); button.append(copy); button.setAttribute('aria-label',['View search result',result.title,result.screenLabel,result.dateContext,result.needsBudgetRepair?'Destination Budget repair required':''].filter(Boolean).join(' · ')); button.addEventListener('click',()=>showHomeDetail(host,{title:result.title,tone:result.needsBudgetRepair?'gold':'blue',items:[{label:'Area',value:result.screenLabel||COLLECTION_TO_SCREEN[result.collection]||'Travel Command Centre'},{label:'Date',value:result.dateContext||'—'},...(result.needsBudgetRepair?[{label:'Budget status',value:'Destination Budget repair required. The old destination/amount relationship is not trusted until this record is repaired.'}]:[]),{label:'Navigation',value:'Use the left menu to open that screen'}]})); wrap.append(button); } return wrap; }
 
 export function renderHomeScreen({stateService,currentDate,navigate}){
   const main=node('main','screen-root home-screen'); main.dataset.screen='home'; let query='';
@@ -499,12 +513,18 @@ export function renderHomeScreen({stateService,currentDate,navigate}){
     main.append(renderHero(model,state,main,navigate));
     const daily=renderDailyBudget(model), destination=renderDestinationBudget(model), annual=renderAnnual(model,currentDate,state);
     const stats=node('section','home-ref-stats'); stats.append(daily,destination,annual); main.append(stats);
-    const upcoming=compactUpcoming(model,navigate), alerts=compactAlerts(model,navigate), schengen=compactSchengen(model), timeline=compactTimeline(state,currentDate,navigate);
+    const upcoming=compactUpcoming(model,main), alerts=compactAlerts(model,main), schengen=compactSchengen(model), timeline=compactTimeline(state,currentDate,main);
     const minis=node('section','home-ref-minis'); minis.append(upcoming,alerts,schengen,timeline); main.append(minis);
+    makeExpandableCard(daily,{host:main,title:'Daily Budget',tone:'teal'});
+    makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'blue'});
+    makeExpandableCard(annual,{host:main,title:'Annual Position',tone:'magenta'});
     makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'blue'});
     makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'orange'});
+    makeExpandableCard(schengen,{host:main,title:'Schengen Status',tone:'green'});
+    makeExpandableCard(timeline,{host:main,title:'Trip Timeline',tone:'violet'});
+    const nextCard=main.querySelector('.home-next-destination-card'); if(model.nextDestination&&nextCard) makeExpandableCard(nextCard,{host:main,title:'Next Destination',tone:'violet'});
     const search=document.createElement('input'); search.type='search'; search.className='home-ref-search'; search.placeholder='Search destinations, reservations, notes and more'; search.value=query; search.setAttribute('aria-label','Global search'); main.append(search);
-    if(query.trim()){ const results=node('section','home-search-overlay'); results.append(renderSearchResults(model,navigate)); main.append(results); }
+    if(query.trim()){ const results=node('section','home-search-overlay'); results.append(renderSearchResults(model,main)); main.append(results); }
     search.addEventListener('input',e=>{const caret=e.target.selectionStart??e.target.value.length;const selectionEnd=e.target.selectionEnd??caret;query=e.target.value;render();const next=main.querySelector('.home-ref-search');next?.focus();next?.setSelectionRange(Math.min(caret,next.value.length),Math.min(selectionEnd,next.value.length));});
   }
   render(); return main;

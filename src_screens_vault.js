@@ -1,5 +1,5 @@
-import { createModal, setModalTone } from './src_components_modal.js';
-import { createPageHero } from './src_components_page-hero.js';
+import { createModal, makeExpandableCard, setModalTone } from './src_components_modal.js';
+import { createPageHero, applyHeaderImage } from './src_components_page-hero.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { buildVaultViewModel, VAULT_CATEGORY_LABELS } from './src_core_vault-view-model.js';
@@ -158,12 +158,12 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
     error.textContent='';
     fields.replaceChildren(selectField('Category','category',CATEGORY_OPTIONS,v.category), inputField('Title','title','text',v.title), selectField('Owner','owner',OWNER_OPTIONS,v.owner), inputField('Reference / Number','reference','text',v.reference), inputField('Issue / Start Date','issueDate','date',v.issueDate), inputField('Expiry / End Date','expiryDate','date',v.expiryDate), textAreaField('Details','details',v.details), textAreaField('Notes','notes',v.notes));
     const categorySelect=fields.querySelector('[name="category"]');
-    categorySelect?.addEventListener('change',()=>{ if(!editorTone) setModalTone(modal,VAULT_TONES[categorySelect.value]||'blue'); });
-    setModalTone(modal,editorTone || VAULT_TONES[v.category]||'blue');
+    categorySelect?.addEventListener('change',()=>{ setModalTone(modal,VAULT_TONES[categorySelect.value]||editorTone||'blue'); });
+    setModalTone(modal,VAULT_TONES[v.category] || editorTone || 'blue');
   }
   populate(saved);
   const actions=[];
-  if (existing) actions.push({ label:'Delete', kind:'danger', onClick:dialog => confirmDestructive({ title:'Delete Vault record', message:`Delete ${vaultRecordContext(existing,{includeCategory:true})} and its screenshot attachments? This cannot be undone.`, tone:editorTone || VAULT_TONES[body.querySelector('[name="category"]')?.value || saved.category] || 'blue', onConfirm:() => { const assetKeys=stateService.snapshot().attachments.filter(item=>item.vaultRecordId===existing.id).map(item=>item.assetKey).filter(Boolean); stateService.commit(draft => deleteVaultRecordDraft(draft, existing.id)); void stateService.removeVaultAssets?.(assetKeys); if (dialog.isConnected && dialog.open) dialog.close(); } }) });
+  if (existing) actions.push({ label:'Delete', kind:'danger', onClick:dialog => confirmDestructive({ title:'Delete Vault record', message:`Delete ${vaultRecordContext(existing,{includeCategory:true})} and its screenshot attachments? This cannot be undone.`, tone:VAULT_TONES[body.querySelector('[name="category"]')?.value || saved.category] || editorTone || 'blue', onConfirm:() => { const assetKeys=stateService.snapshot().attachments.filter(item=>item.vaultRecordId===existing.id).map(item=>item.assetKey).filter(Boolean); stateService.commit(draft => deleteVaultRecordDraft(draft, existing.id)); void stateService.removeVaultAssets?.(assetKeys); if (dialog.isConnected && dialog.open) dialog.close(); } }) });
   actions.push(
     { label:'Undo Changes', onClick:() => populate(session.undo()) },
     { label:'Cancel', onClick:dialog => { session.cancel(); dialog.close(); } },
@@ -186,7 +186,7 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
     } }
 
   );
-  modal = createModal({ title:existing?'Edit Vault Record':'Add Vault Record', body, actions, className:`tcc-editor-modal tcc-vault-editor-modal tone-${editorTone || VAULT_TONES[saved.category] || 'blue'}` });
+  modal = createModal({ title:existing?'Edit Vault Record':'Add Vault Record', body, actions, className:`tcc-editor-modal tcc-vault-editor-modal tone-${VAULT_TONES[saved.category] || editorTone || 'blue'}` });
   modalHost(host, modal);
 }
 
@@ -253,9 +253,9 @@ function openAttachmentPicker({ stateService, host, record }) {
   input.click();
 }
 
-function openStreamingEditor({ stateService, host, recordId = null, editorTone = null }) {
+function openStreamingEditor({ stateService, host, recordId = null, editorTone = null, presetService = '' }) {
   const state=stateService.snapshot(); const existing=recordId?state.streaming.find(record=>record.id===recordId):null; if(recordId&&!existing)return;
-  const saved={service:existing?.service||'',owner:existing?.owner||'Both',username:existing?.username||'',password:existing?.password||'',notes:existing?.notes||''}; const session=new FormSession(saved);
+  const saved={service:existing?.service||presetService||'',owner:existing?.owner||'Both',username:existing?.username||'',password:existing?.password||'',notes:existing?.notes||''}; const session=new FormSession(saved);
   const body=node('div','vault-editor'); const fields=node('div','vault-form-grid'); const error=node('p','vault-form-error'); body.append(fields,error);
   const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
   const capture=()=>({service:value('service'),owner:value('owner'),username:value('username'),password:value('password'),notes:value('notes')});
@@ -282,8 +282,10 @@ function openEmailEditor({ stateService, host, recordId = null }) {
 function renderLocked(main, stateService, access, requestRender) {
   main.classList.add('vault-screen-locked');
   const hero=node('section','vault-lock-hero vault-lock-hero-concealed');
-  hero.append(node('p','eyebrow','PROTECTED LOCAL STORAGE'),node('h1','','The Vault'));
-  const tapTarget=node('button','vault-lock-tap-target');tapTarget.type='button';tapTarget.setAttribute('aria-label','Protected Vault lock emblem');
+  applyHeaderImage(hero,'header-vault',{position:'center center'});
+  const title=node('div','vault-lock-title');
+  title.append(node('p','eyebrow','THE VAULT'),node('h1','','The Vault'));
+  const tapTarget=node('button','vault-lock-tap-target');tapTarget.type='button';tapTarget.setAttribute('aria-label','Vault locked. Tap the vault emblem three times for protected access.');
   const lockIcon=node('span','vault-lock-icon'); lockIcon.append(createLineIcon('vault'));tapTarget.append(lockIcon);
   let taps=0;let resetTimer=null;
   tapTarget.addEventListener('click',()=>{
@@ -292,7 +294,11 @@ function renderLocked(main, stateService, access, requestRender) {
     if(taps>=3){taps=0;openUnlockDialog({stateService,host:main,access,requestRender});return;}
     resetTimer=setTimeout(()=>{taps=0;},1800);
   });
-  hero.append(tapTarget,node('p','vault-lock-copy','Protected travel records are concealed on this iPad.'));
+  const status=node('div','vault-lock-status');
+  status.append(lockIcon,node('div','vault-lock-status-copy'));
+  status.querySelector('.vault-lock-status-copy').append(node('strong','','VAULT LOCKED'),node('span','','PROTECTED ACCESS'));
+  tapTarget.replaceChildren(status);
+  hero.append(title,tapTarget,node('p','vault-lock-copy','Protected travel records are concealed on this iPad.'));
   main.append(hero);
 }
 
@@ -303,13 +309,17 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const all=node('button','vault-all-records');all.type='button';all.append(vaultCategoryIcon('all'),node('span','vault-all-copy',''),node('strong','','OPEN')); all.querySelector('.vault-all-copy').append(node('b','','ALL VAULT RECORDS'),node('small','',`${state.vault.length} records · ${state.attachments.length} screenshot attachments`)); all.addEventListener('click',()=>openAllVaultRecords({stateService,host:main,access,requestRender}));main.append(all);
   const now=String(currentDate||'').slice(0,10); const today=now?new Date(`${now}T00:00:00Z`):new Date(); const daysUntil=value=>Math.ceil((new Date(`${value}T00:00:00Z`)-today)/86400000); const expiring=state.vault.filter(r=>r.expiryDate&&daysUntil(r.expiryDate)>=0&&daysUntil(r.expiryDate)<=180).sort((a,b)=>String(a.expiryDate).localeCompare(String(b.expiryDate))); const expired=state.vault.filter(r=>r.expiryDate&&daysUntil(r.expiryDate)<0); const active=state.vault.length-expired.length;
   const summaryRow=node('section','vault-summary-row'); const summary=node('article','vault-summary-card');summary.append(node('h2','','Document Summary'));const stats=node('div','vault-summary-stats'); for(const [label,value,tone] of [['Total records',state.vault.length,'total'],['Valid / active',active,'active'],['Expiry watch · 180d',expiring.length,'watch'],['Expired',expired.length,'expired']]){const m=node('div',`vault-summary-stat vault-summary-${tone}`);m.append(node('strong','',String(value)),node('span','',label));stats.append(m);}summary.append(stats);
-  const expiry=node('article','vault-expiry-card');expiry.append(node('h2','','Expiry Reminders')); if(!expiring.length)expiry.append(node('p','vault-empty','No records expire within 180 days.')); else{const list=node('div','vault-expiry-list');for(const r of expiring.slice(0,4)){const days=daysUntil(r.expiryDate);const countdown=days===0?'Today':`${days} day${days===1?'':'s'}`;const row=node('button','vault-expiry-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',`Expires ${formatAUDate(r.expiryDate)}`].join(' · ')),node('b','',countdown));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})} · Expires ${formatAUDate(r.expiryDate)} · ${countdown}`);row.addEventListener('click',()=>{access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone='gold';requestRender();});list.append(row);}expiry.append(list);} summaryRow.append(summary,expiry);main.append(summaryRow);
+  const expiry=node('article','vault-expiry-card');expiry.append(node('h2','','Expiry Reminders')); if(!expiring.length)expiry.append(node('p','vault-empty','No records expire within 180 days.')); else{const list=node('div','vault-expiry-list');for(const r of expiring.slice(0,4)){const days=daysUntil(r.expiryDate);const countdown=days===0?'Today':`${days} day${days===1?'':'s'}`;const row=node('button','vault-expiry-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',`Expires ${formatAUDate(r.expiryDate)}`].join(' · ')),node('b','',countdown));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})} · Expires ${formatAUDate(r.expiryDate)} · ${countdown}`);row.addEventListener('click',()=>{access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});list.append(row);}expiry.append(list);} summaryRow.append(summary,expiry);main.append(summaryRow);
+  makeExpandableCard(summary,{host:main,title:'Document Summary',tone:'teal'});
+  makeExpandableCard(expiry,{host:main,title:'Expiry Reminders',tone:'gold'});
   const lower=node('div','vault-overview-lower');
-  const emergency=node('section','vault-emergency-card'); emergency.append(node('h2','','Emergency Travel Card')); const emergencyRecords=state.vault.filter(r=>r.category==='emergency').slice(0,3); if(!emergencyRecords.length)emergency.append(node('p','vault-empty','No emergency contacts stored')); for(const r of emergencyRecords){const row=node('button','vault-emergency-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection='emergency';access.selectedRecordId=r.id;access.selectedRecordTone='red';requestRender();});emergency.append(row);} lower.append(emergency);
-  const activity=node('section','vault-activity');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'indigo'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection=target.category;access.selectedRecordId=target.id;access.selectedRecordTone='indigo';requestRender();});}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);lower.append(activity);main.append(lower);
+  const emergency=node('section','vault-emergency-card'); emergency.append(node('h2','','Emergency Travel Card')); const emergencyRecords=state.vault.filter(r=>r.category==='emergency').slice(0,3); if(!emergencyRecords.length)emergency.append(node('p','vault-empty','No emergency contacts stored')); for(const r of emergencyRecords){const row=node('button','vault-emergency-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection='emergency';access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'red';requestRender();});emergency.append(row);} lower.append(emergency);
+  const activity=node('section','vault-activity');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'indigo'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>{access.activeSection=target.category;access.selectedRecordId=target.id;access.selectedRecordTone=VAULT_TONES[target.category]||'blue';requestRender();});}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);lower.append(activity);main.append(lower);
+  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red'});
+  makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'indigo'});
   const streaming=node('button','vault-streaming-card');streaming.type='button';const streamingIcon=node('span','vault-category-icon');streamingIcon.append(createLineIcon('streaming'));streaming.append(streamingIcon,node('strong','','Streaming'),node('small','',`${model.streaming.length} stored services`));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});main.append(streaming);
 }
-function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone='blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tone-blue'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
+function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tone-blue'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
 
 function renderCategory(main,stateService,access,requestRender){
   const state=stateService.snapshot();const model=buildVaultViewModel(state,{unlocked:true,activeSection:access.activeSection});const category=access.activeSection;
@@ -323,25 +333,82 @@ function renderCategory(main,stateService,access,requestRender){
   if(selected && state.vault.some(record=>record.id===selected&&record.category===category)){ access.selectedRecordId=null; access.selectedRecordTone=null; queueMicrotask(()=>{if(main.isConnected)openVaultRecordEditor({stateService,host:main,recordId:selected,initialCategory:category,access,editorTone:selectedTone});}); }
 }
 
+const STREAMING_SERVICE_CATALOGUE = Object.freeze([
+  'Netflix','Disney+','Prime Video','Apple TV+','Max','Paramount+','Stan','Binge',
+  'Kayo Sports','YouTube','AFL','NFL','ABC iview','SBS On Demand','7plus','9Now'
+]);
+
+function normalizedStreamingService(value='') {
+  return String(value||'').trim().toLocaleLowerCase('en-AU').replace(/[^a-z0-9]+/g,'');
+}
+
+const STREAMING_SERVICE_MATCHERS = Object.freeze([
+  [/netflix/,'N','netflix'],[/stan/,'STAN','stan'],[/prime|amazon/,'prime video','prime'],[/disney/,'Disney+','disney'],
+  [/binge/,'BINGE','binge'],[/kayo/,'Kayo','kayo'],[/apple\s*tv|appletv/,'tv+','apple'],[/youtube/,'YouTube','youtube'],
+  [/paramount/,'Paramount+','paramount'],[/max|hbo/,'max','max'],[/\bafl\b|watch\s*afl/,'AFL','afl'],[/\bnfl\b|game\s*pass/,'NFL','nfl'],
+  [/iview|abc/,'ABC iview','iview'],[/sbs/,'SBS ON DEMAND','sbs'],[/7\s*plus|7plus/,'7plus','seven'],[/9\s*now|9now/,'9Now','nine']
+]);
+
+function canonicalStreamingServiceKey(value='') {
+  const raw=String(value||'').trim();
+  const key=raw.toLocaleLowerCase('en-AU');
+  const match=STREAMING_SERVICE_MATCHERS.find(([pattern])=>pattern.test(key));
+  return match?.[2] || normalizedStreamingService(raw);
+}
+
 function streamingServiceMark(service) {
   const raw=String(service||'').trim();
   const key=raw.toLowerCase();
-  const known=[
-    [/netflix/,'N','netflix'],[/stan/,'STAN','stan'],[/prime|amazon/,'prime','prime'],[/disney/,'D+','disney'],
-    [/binge/,'BINGE','binge'],[/kayo/,'KAYO','kayo'],[/apple\s*tv/,'tv+','apple'],[/youtube/,'YT','youtube'],
-    [/paramount/,'P+','paramount'],[/max|hbo/,'MAX','max'],[/\bafl\b|watch\s*afl/,'AFL','afl'],[/\bnfl\b|game\s*pass/,'NFL','nfl']
-  ];
-  const match=known.find(([pattern])=>pattern.test(key));
-  const text=match?.[1]||raw.replace(/[^A-Za-z0-9+]/g,'').slice(0,3).toUpperCase()||'TV';
+  const match=STREAMING_SERVICE_MATCHERS.find(([pattern])=>pattern.test(key));
+  const text=match?.[1]||raw.replace(/[^A-Za-z0-9+]/g,'').slice(0,8)||'TV';
   const slug=match?.[2]||'generic';
   const mark=node('span',`vault-streaming-mark vault-streaming-mark-${slug}`,text);
   mark.setAttribute('aria-hidden','true');
   return mark;
 }
 
+function openStreamingDetail({ stateService, host, recordId }) {
+  const record=stateService.snapshot().streaming.find(item=>item.id===recordId); if(!record)return;
+  const body=node('div','vault-streaming-detail');
+  const hero=node('div','vault-streaming-detail-hero');
+  hero.append(streamingServiceMark(record.service),node('div','vault-streaming-detail-title'));
+  hero.querySelector('.vault-streaming-detail-title').append(node('strong','',record.service),node('span','',record.owner||'Shared'));
+  const facts=node('div','vault-streaming-detail-facts');
+  const fact=(label,value)=>{const card=node('div','vault-streaming-detail-fact');card.append(node('small','',label),node('strong','',value||'Not stored'));return card;};
+  facts.append(fact('Owner',record.owner||'Shared'),fact('Username / Login',record.username||'Not stored'));
+  const passwordCard=node('div','vault-streaming-detail-password');
+  passwordCard.append(node('small','','Password'));
+  const passwordRow=node('div','vault-streaming-detail-password-row');
+  const password=node('code','vault-password','••••••••');
+  const toggle=node('button','button vault-password-toggle','Show');toggle.type='button';toggle.setAttribute('aria-pressed','false');toggle.setAttribute('aria-label',`Show password for ${streamingRecordContext(record)}`);
+  let shown=false;toggle.addEventListener('click',()=>{shown=!shown;password.textContent=shown?(record.password||'No password stored'):'••••••••';toggle.textContent=shown?'Hide':'Show';toggle.setAttribute('aria-pressed',String(shown));toggle.setAttribute('aria-label',`${shown?'Hide':'Show'} password for ${streamingRecordContext(record)}`);});
+  passwordRow.append(password,toggle);passwordCard.append(passwordRow);facts.append(passwordCard);
+  body.append(hero,facts);
+  if(record.notes){const notes=node('div','vault-streaming-detail-notes');notes.append(node('small','','Notes'),node('p','',record.notes));body.append(notes);}
+  const dialog=createModal({title:'TV & Movies',body,actions:[
+    {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openStreamingEditor({stateService,host,recordId:record.id,editorTone:'violet'}));}},
+    {label:'Close',onClick:d=>d.close()}
+  ],className:'tcc-expanded-modal tone-violet vault-streaming-detail-modal'});
+  modalHost(host,dialog);
+}
+
 function renderStreaming(main,stateService,access,requestRender){
-  const model=buildVaultViewModel(stateService.snapshot(),{unlocked:true,activeSection:'streaming'});const head=node('section','vault-section-hero vault-section-streaming');const copy=node('div');copy.append(node('p','eyebrow','THE VAULT'),node('h1','','Streaming'),node('p','','Protected local streaming logins'));const actions=node('div','vault-section-actions');const back=node('button','button','Back');back.type='button';back.addEventListener('click',()=>{leaveStreaming(access);requestRender();});const add=node('button','button vault-add','Add Streaming');add.type='button';add.addEventListener('click',()=>openStreamingEditor({stateService,host:main}));actions.append(back,add);head.append(copy,actions);main.append(head);
-  const list=node('section','vault-streaming-list');if(!model.streaming.length)list.append(node('p','vault-empty','No entries yet'));for(const record of model.streaming){const row=node('article','vault-streaming-row');const copyRow=node('div','vault-streaming-copy');copyRow.append(streamingServiceMark(record.service),node('strong','',record.service),node('small','',record.owner));if(record.username)copyRow.append(node('span','',record.username));const password=node('code','vault-password','••••••••');const toggle=node('button','vault-password-toggle','Show');toggle.type='button';toggle.setAttribute('aria-label',`Show password for ${streamingRecordContext(record)}`);toggle.setAttribute('aria-pressed','false');let shown=false;toggle.addEventListener('click',()=>{shown=!shown;password.textContent=shown?(record.password||'No password stored'):'••••••••';toggle.textContent=shown?'Hide':'Show';toggle.setAttribute('aria-label',`${shown?'Hide':'Show'} password for ${streamingRecordContext(record)}`);toggle.setAttribute('aria-pressed',String(shown));});const edit=node('button','button vault-edit','Edit');edit.type='button';edit.setAttribute('aria-label',`Edit streaming login for ${streamingRecordContext(record)}`);edit.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:record.id}));row.append(copyRow,password,toggle,edit);list.append(row);}main.append(list);
+  const model=buildVaultViewModel(stateService.snapshot(),{unlocked:true,activeSection:'streaming'});
+  const head=node('section','vault-section-hero vault-section-streaming');const copy=node('div');copy.append(node('p','eyebrow','PRIVATE · LOCAL · OFFLINE'),node('h1','','TV & Movies'),node('p','','Tap a saved service to view it larger. Tap an empty service to add its local login.'));
+  const actions=node('div','vault-section-actions');const back=node('button','button','Back');back.type='button';back.addEventListener('click',()=>{leaveStreaming(access);requestRender();});const add=node('button','button vault-add','Add Streaming');add.type='button';add.addEventListener('click',()=>openStreamingEditor({stateService,host:main}));actions.append(back,add);head.append(copy,actions);main.append(head);
+  const savedByService=new Map(model.streaming.map(record=>[canonicalStreamingServiceKey(record.service),record]));
+  const catalogue=[...STREAMING_SERVICE_CATALOGUE];
+  for(const record of model.streaming){if(!catalogue.some(service=>canonicalStreamingServiceKey(service)===canonicalStreamingServiceKey(record.service)))catalogue.push(record.service);}
+  const grid=node('section','vault-streaming-grid');
+  for(const service of catalogue){
+    const record=savedByService.get(canonicalStreamingServiceKey(service));
+    const tile=node('button',`vault-streaming-tile${record?' is-stored':' is-empty'}`);tile.type='button';
+    tile.append(streamingServiceMark(service),node('span','vault-streaming-tile-name',service),node('small','vault-streaming-tile-status',record?`${record.owner||'Shared'} · STORED`:'ADD LOGIN'));
+    tile.setAttribute('aria-label',record?`Open saved ${streamingRecordContext(record)}`:`Add streaming login for ${service}`);
+    tile.addEventListener('click',()=>record?openStreamingDetail({stateService,host:main,recordId:record.id}):openStreamingEditor({stateService,host:main,presetService:service,editorTone:'violet'}));
+    grid.append(tile);
+  }
+  main.append(grid);
 }
 
 function renderHiddenEmails(main,stateService,access,requestRender){
@@ -358,7 +425,7 @@ export function renderVaultScreen({ stateService, vaultAccessSession:access, req
   const lock=node('button','vault-hero-lock','Lock Vault');lock.type='button';lock.addEventListener('click',()=>{lockVault(access);requestRender();});
   heroActions.append(streaming,status,lock);
   main.append(createPageHero({ key:'header-vault', eyebrow:'THE VAULT', title:'The Vault', subtitle:'Secure your important travel documents and essential information.', className:'vault-reference-hero', actions:heroActions, position:'center center' }));
-  const pending=stateService.snapshot().ui?.pendingOpen;if(pending?.collection==='vault'&&pending.id){const target=stateService.snapshot().vault.find(record=>record.id===pending.id);if(target){access.activeSection=target.category;access.selectedRecordId=null;access.selectedRecordTone=null;queueMicrotask(()=>{if(!main.isConnected)return;stateService.commit(draft=>{draft.ui.pendingOpen=null;});const liveHost=document.querySelector('[data-screen="vault"]');if(liveHost)openVaultRecordEditor({stateService,host:liveHost,recordId:target.id,initialCategory:target.category,access,editorTone:pending.editorTone || null});});}}
+  const pending=stateService.snapshot().ui?.pendingOpen;if(pending?.collection==='vault'&&pending.id){const target=stateService.snapshot().vault.find(record=>record.id===pending.id);if(target){access.activeSection=target.category;access.selectedRecordId=null;access.selectedRecordTone=null;queueMicrotask(()=>{if(!main.isConnected)return;stateService.commit(draft=>{draft.ui.pendingOpen=null;});const liveHost=document.querySelector('[data-screen="vault"]');if(liveHost)openVaultRecordEditor({stateService,host:liveHost,recordId:target.id,initialCategory:target.category,access,editorTone:VAULT_TONES[target.category] || null});});}}
   if(access.activeSection!=='streaming'){access.streamingOpenedSinceUnlock=false;hideHiddenEmails(access);}
   if(access.activeSection==='overview')renderOverview(main,stateService,access,requestRender,currentDate);else if(access.activeSection==='streaming')renderStreaming(main,stateService,access,requestRender);else if(VAULT_CATEGORIES.includes(access.activeSection))renderCategory(main,stateService,access,requestRender);else{access.activeSection='overview';access.streamingOpenedSinceUnlock=false;hideHiddenEmails(access);renderOverview(main,stateService,access,requestRender,currentDate);}
   renderHiddenEmails(main,stateService,access,requestRender);return main;

@@ -1,4 +1,4 @@
-import { captureLocalFocus, createModal, restoreLocalFocus } from './src_components_modal.js';
+import { captureLocalFocus, createModal, makeExpandableCard, restoreLocalFocus } from './src_components_modal.js';
 import { createPageHero } from './src_components_page-hero.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
@@ -123,7 +123,8 @@ function renderHealth(stateService,currentDate,host){
   const healthSummary=dirty && model.status==='verified'?'Saved travel data has changed since the last whole-app verification. Run the check before relying on the green status.':model.status==='verified'?'All central integrity checks are clear.':model.status==='needs-setup'?'Core integrity is clear; one or more setup items remain.':`${model.issueCount} integrity issue${model.issueCount===1?'':'s'} need attention.`;
   copy.append(node('p','eyebrow','APP HEALTH'),node('h2','',healthTitle),node('p','',healthSummary));const score=node('div','settings-health-score');score.append(node('strong','',`${model.verifiedCount}/${model.checks.length}`),node('small','',dirty?'re-check required':'verified'));hero.append(copy,score);panel.append(hero);
   const run=node('button',`settings-health-run settings-health-run-${displayStatus}`); run.type='button'; run.append(createLineIcon(!dirty&&model.status==='verified'?'check':'plus'),document.createTextNode(!dirty&&model.status==='verified'?' APP HEALTH VERIFIED':' CHECK THE WHOLE APP')); run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();const checked=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});if(checked.status!=='needs-attention')stateService.markAppHealthChecked?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
-  const grid=node('div','settings-health-grid');for(const item of model.checks){
+  const healthTones=['teal','blue','indigo','violet','orange','green','magenta','gold','sky'];
+  const grid=node('div','settings-health-grid');for(const [index,item] of model.checks.entries()){
     const card=node('article',`settings-health-card settings-health-card-${item.status}`);
     const icon=node('span','settings-health-icon'); icon.append(createLineIcon(HEALTH_ICONS[item.label]||'check'));
     const cardCopy=node('div','settings-health-card-copy');cardCopy.append(node('strong','',item.label),node('p','',item.summary));
@@ -131,6 +132,7 @@ function renderHealth(stateService,currentDate,host){
     card.append(icon,cardCopy,status);
     if(item.issues.length>1){const details=document.createElement('details');const summary=node('summary','',`${item.issues.length} details`);details.append(summary);const list=document.createElement('ul');for(const issue of item.issues){const li=document.createElement('li');li.textContent=issue;list.append(li);}details.append(list);card.append(details);}
     grid.append(card);
+    makeExpandableCard(card,{host,title:item.label,tone:healthTones[index]||'blue'});
   }panel.append(grid);return panel;
 }
 
@@ -147,5 +149,18 @@ export function renderSettingsScreen({stateService,currentDate,vaultAccessSessio
 
   const backup=node('section','settings-panel settings-backup');const bHead=node('div','settings-section-head');bHead.append(node('h2','','Backup & Restore'),node('span','settings-local-chip','Full JSON · Local'));backup.append(bHead,node('p','settings-panel-copy','Export one complete Travel Command Centre backup file. Restore validates the entire backup before replacing current data.'));const bActions=node('div','settings-actions');const exportButton=node('button','button settings-backup-button','Export Backup');exportButton.type='button';const restoreButton=node('button','button settings-restore-button','Restore Backup');restoreButton.type='button';let backupBusy=false;const setBackupBusy=busy=>{backupBusy=Boolean(busy);for(const control of [exportButton,restoreButton])control.disabled=backupBusy;if(backupBusy)backup.setAttribute('aria-busy','true');else backup.removeAttribute('aria-busy');};exportButton.addEventListener('click',async()=>{if(backupBusy)return;const original=exportButton.textContent;setBackupBusy(true);exportButton.textContent='EXPORTING…';try{await new Promise(resolve=>requestAnimationFrame(()=>resolve()));await downloadBackup(stateService,currentDate);}finally{if(exportButton.isConnected)exportButton.textContent=original;setBackupBusy(false);}});restoreButton.addEventListener('click',()=>{if(backupBusy)return;chooseRestoreFile({stateService,host:main,vaultAccessSession,onBusyChange:setBackupBusy});});bActions.append(exportButton,restoreButton);backup.append(bActions);main.append(backup);
 
-  const info=node('section','settings-panel settings-info');info.append(node('h2','','Application'));const rows=node('div','settings-info-rows');rows.append(node('div','','Platform\niPad Landscape · Offline PWA'),node('div','','Travellers\n2'),node('div','','Storage\nLocal device only'),node('div','','External Sync\nNone'));info.append(rows);main.append(info);return main;
+  const info=node('section','settings-panel settings-info');info.append(node('h2','','Application'));const rows=node('div','settings-info-rows');rows.append(node('div','','Platform\niPad Landscape · Offline PWA'),node('div','','Travellers\n2'),node('div','','Storage\nLocal device only'),node('div','','External Sync\nNone'));info.append(rows);main.append(info);
+
+  // R36 accessibility rule: enlargement itself is useful for Kym. Settings
+  // information groups stay local to Settings and enlarge read-only; explicit
+  // Edit/Backup actions retain their existing semantics inside the snapshot.
+  const settingsExpanders=[
+    [defaults,'Travel & Budget Defaults','blue'],
+    [schengen,'Schengen Status','teal'],
+    [security,'Security','indigo'],
+    [backup,'Backup & Restore','gold'],
+    [info,'Application','violet']
+  ];
+  for(const [panel,title,tone] of settingsExpanders) makeExpandableCard(panel,{host:main,title,tone});
+  return main;
 }

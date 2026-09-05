@@ -109,25 +109,32 @@ function annualMonthlyHistory(state, currentYear, annualBudgetAUD, currentDate) 
 }
 
 function recentExpenses(expenses, today, limit = 8) {
-  // This is the editable recent-entry list, not an actual-spend ledger. Future-dated
-  // expenses are valid commitments and must remain visible after Save instead of
-  // appearing to vanish until their transaction date arrives.
-  return [...(expenses || [])]
-    .filter(record => !record.needsBudgetRepair && record.date)
-    .sort((a, b) => String(b.modifiedAt || '').localeCompare(String(a.modifiedAt || '')) || String(b.date || '').localeCompare(String(a.date || '')))
-    .slice(0, limit)
-    .map(record => ({
-      id:record.id,
-      itineraryId:record.itineraryId || null,
-      date:record.date,
-      displayDate:formatAUDate(record.date),
-      isFuture:toISODate(record.date) > today,
-      category:record.category,
-      description:record.description || '',
-      originalCurrency:record.originalCurrency || 'AUD',
-      originalAmount:Number(record.originalAmount || 0),
-      audAmount:Number(record.audAmount || 0)
-    }));
+  // This is the editable recent-entry list, not an actual-spend ledger. Repair
+  // records are operationally higher priority than ordinary recency: include
+  // every repair record before filling the normal compact limit with trusted
+  // entries. That prevents an old/undated legacy repair from disappearing merely
+  // because several newer expenses were saved afterwards.
+  const sorted = [...(expenses || [])].sort((a, b) => String(b.modifiedAt || '').localeCompare(String(a.modifiedAt || '')) || String(b.date || '').localeCompare(String(a.date || '')));
+  const repairs = sorted.filter(record => record.needsBudgetRepair === true);
+  const trusted = sorted.filter(record => record.needsBudgetRepair !== true);
+  const records = [...repairs, ...trusted.slice(0, Math.max(0, limit - repairs.length))];
+  return records
+    .map(record => {
+      const hasDate = typeof record.date === 'string' && Boolean(record.date);
+      return {
+        id:record.id,
+        itineraryId:record.needsBudgetRepair === true ? null : (record.itineraryId || null),
+        date:record.date || null,
+        displayDate:hasDate ? formatAUDate(record.date) : 'DATE REQUIRED',
+        isFuture:hasDate ? toISODate(record.date) > today : false,
+        needsBudgetRepair:record.needsBudgetRepair === true,
+        category:record.category,
+        description:record.description || '',
+        originalCurrency:record.originalCurrency || 'AUD',
+        originalAmount:Number(record.originalAmount || 0),
+        audAmount:Number(record.audAmount || 0)
+      };
+    });
 }
 
 function accountSummary(accounts) {

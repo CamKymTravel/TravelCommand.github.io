@@ -3,7 +3,7 @@ import { sortItinerary } from './src_core_planning.js';
 
 function currency(value) {
   const code = String(value ?? '').trim().toUpperCase();
-  if (!/^[A-Z]{3}$/.test(code)) throw new Error('Default currency must be a 3-letter code');
+  if (code === 'XXX' || !/^[A-Z]{3}$/.test(code)) throw new Error('Default currency must be a real 3-letter code');
   return code;
 }
 
@@ -16,8 +16,13 @@ export function saveGeneralSettingsDraft(state, fields = {}) {
   const journeyStartDate = fields.journeyStartDate ? toISODate(fields.journeyStartDate) : null;
   const earliest = sortItinerary(state.itinerary || [])[0]?.startDate || null;
   if (journeyStartDate && earliest && toISODate(earliest) < journeyStartDate) throw new Error('Journey Start cannot be later than the earliest itinerary stay. Edit the itinerary first.');
+  // Validate every field before writing any Settings value. StateService.commit
+  // already works on an isolated draft, but mutation helpers should remain
+  // atomic on their own so a rejected field can never leave a partially
+  // changed draft for another caller to reuse.
+  const defaultCurrency = currency(fields.defaultCurrency == null || fields.defaultCurrency === '' ? 'AUD' : fields.defaultCurrency);
   state.settings.journeyStartDate = journeyStartDate;
-  state.settings.defaultCurrency = currency(fields.defaultCurrency == null || fields.defaultCurrency === '' ? 'AUD' : fields.defaultCurrency);
+  state.settings.defaultCurrency = defaultCurrency;
   state.settings.annualBudgetAUD = annualBudgetAUD;
   state.settings.dateFormat = 'DD/MM/YYYY';
   return state.settings;

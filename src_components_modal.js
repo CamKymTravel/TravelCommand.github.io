@@ -2,6 +2,7 @@ import { createLineIcon } from './src_components_icons.js';
 
 const MODAL_TONES = Object.freeze(['sky','blue','indigo','teal','green','magenta','violet','red','orange','gold']);
 let modalSequence = 0;
+let expandedSnapshotSequence = 0;
 
 const LOCAL_FOCUSABLE = 'button, a[href], input, select, textarea, summary, [role="button"], [tabindex]';
 
@@ -90,11 +91,14 @@ export function createModal({ title, body, actions = [], className = '' }) {
   dialog.innerHTML = `<form method="dialog"><header><h2 id="${titleId}"></h2></header><section class="modal-body"></section><footer></footer></form>`;
   const form = dialog.querySelector('form');
   const header = dialog.querySelector('header');
-  if (String(className || '').split(/\s+/).includes('tcc-editor-modal')) {
+  const modalClasses = String(className || '').split(/\s+/).filter(Boolean);
+  const isEditorModal = modalClasses.includes('tcc-editor-modal');
+  const isExpandedModal = modalClasses.includes('tcc-expanded-modal');
+  if (isEditorModal || isExpandedModal) {
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'tcc-modal-close';
-    close.setAttribute('aria-label', 'Close editor without saving');
+    close.setAttribute('aria-label', isEditorModal ? 'Close editor without saving' : 'Close expanded view');
     close.append(createLineIcon('close'));
     close.addEventListener('click', () => {
       if (dialog.dataset.actionBusy === 'true') return;
@@ -188,6 +192,34 @@ const ACTION_INTERACTIVE = 'button, a, [role="button"]';
 
 function snapshotExpandedCard(source) {
   const clone = source.cloneNode(true);
+  // A deep clone must not duplicate DOM ids from the live card behind the
+  // modal. Duplicate ids can make Safari/VoiceOver resolve a cloned label or
+  // aria-labelledby reference back to the hidden source widget. Preserve any
+  // internal relationships by remapping ids and local references as a set.
+  const snapshotId = ++expandedSnapshotSequence;
+  const idMap = new Map();
+  const idNodes = [clone, ...clone.querySelectorAll('[id]')].filter(node => node instanceof Element && node.id);
+  idNodes.forEach((node, index) => {
+    const oldId = node.id;
+    const newId = `tcc-expanded-snapshot-${snapshotId}-${index + 1}`;
+    idMap.set(oldId, newId);
+    node.id = newId;
+  });
+  const tokenRefAttrs = ['aria-labelledby','aria-describedby','aria-controls','aria-owns','headers'];
+  for (const node of [clone, ...clone.querySelectorAll('*')]) {
+    if (!(node instanceof Element)) continue;
+    for (const attr of tokenRefAttrs) {
+      const value = node.getAttribute(attr);
+      if (!value) continue;
+      node.setAttribute(attr, value.split(/\s+/).map(token => idMap.get(token) || token).join(' '));
+    }
+    for (const attr of ['for','list']) {
+      const value = node.getAttribute(attr);
+      if (value && idMap.has(value)) node.setAttribute(attr, idMap.get(value));
+    }
+    const href = node.getAttribute('href');
+    if (href?.startsWith('#') && idMap.has(href.slice(1))) node.setAttribute('href', `#${idMap.get(href.slice(1))}`);
+  }
   // Vault screenshot thumbnails are hydrated from IndexedDB asynchronously. If
   // a card is enlarged before that read completes, cloneNode() captures an img
   // with no src and the enlarged snapshot would otherwise stay blank even after
@@ -222,7 +254,6 @@ function snapshotExpandedCard(source) {
     syncHeaderImage();
     if (sourceHeader.dataset.imageReady !== 'true') sourceHeader.addEventListener('tcc-header-image-ready', syncHeaderImage, { once:true });
   });
-  clone.removeAttribute('id');
   clone.removeAttribute('data-expandable');
   clone.removeAttribute('data-expandable-mode');
   clone.removeAttribute('tabindex');
@@ -292,7 +323,7 @@ function rgbFromCssColor(value) {
   return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
 
-function inferExpandedTone(source, fallback = 'sky') {
+export function materialToneFromRenderedSurface(source, fallback = 'sky') {
   if (!(source instanceof Element) || typeof getComputedStyle !== 'function') return fallback;
   const style = getComputedStyle(source);
   const rgb = rgbFromCssColor(style.borderTopColor || style.borderColor);
@@ -317,7 +348,7 @@ export function materialToneFromContext(source = null, fallback = 'sky') {
   if (classTone) return classTone;
   const expandTone = context.dataset?.expandTone;
   if (MODAL_TONES.includes(expandTone)) return expandTone;
-  return inferExpandedTone(context, safeFallback);
+  return materialToneFromRenderedSurface(context, safeFallback);
 }
 
 export function openExpandedCard({ host, source, title, tone = 'sky', body = null }) {
@@ -330,7 +361,7 @@ export function openExpandedCard({ host, source, title, tone = 'sky', body = nul
   // whose final material layer deliberately refines a semantic hue without
   // forcing every caller to duplicate that visual decision. Neutral/weak
   // borders fall back to the declared semantic tone.
-  const resolvedTone = inferExpandedTone(source, fallbackTone);
+  const resolvedTone = materialToneFromRenderedSurface(source, fallbackTone);
   const content = document.createElement('div');
   content.className = `tcc-expanded-card-body tone-${resolvedTone}`;
   const snapshot = body || snapshotExpandedCard(source);
@@ -339,7 +370,7 @@ export function openExpandedCard({ host, source, title, tone = 'sky', body = nul
     title,
     body: content,
     className: `tcc-expanded-modal tone-${resolvedTone}`,
-    actions: [{ label:'Close', onClick:d=>d.close() }]
+    actions: []
   });
   if (!body) wireSnapshotActions(snapshot, source, dialog);
   host.append(dialog);

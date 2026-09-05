@@ -1,5 +1,4 @@
 import { formatAUDate, toISODate } from './src_core_dates.js';
-import { formatMoney } from './src_core_currency.js';
 import { isDestinationBudgetUsable } from './src_core_budget.js';
 import { calculateForwardCoverage } from './src_core_itinerary-view-model.js';
 import { buildChecklistViewModel } from './src_core_checklist-view-model.js';
@@ -22,8 +21,13 @@ export function buildHomeAlerts(state,currentDate){
   if(next){const days=daysUntil(next.startDate,today);if(days<=14)alerts.push(alert(`next:${next.id}`,'Next Destination',`${next.name} starts in ${days} day${days===1?'':'s'}.`,days<=3?'high':'info',{screen:'itinerary',collection:'itinerary',id:next.id},next.startDate));}
 
   const checklist=buildChecklistViewModel(state,today);
-  if(checklist.nextDestination&&checklist.ready.status==='not-ready')alerts.push(alert(`checklist:${checklist.nextDestination.id}`,'Checklist Readiness',`${checklist.ready.remaining} required task${checklist.ready.remaining===1?'':'s'} remain before ${checklist.nextDestination.name}.`,'high',{screen:'checklist',collection:'itinerary',id:checklist.nextDestination.id},checklist.nextDestination.startDate));
-  else if(checklist.nextDestination&&checklist.ready.status==='needs-setup')alerts.push(alert(`checklist-setup:${checklist.nextDestination.id}`,'Checklist Needs Setup',`Add required checklist items for ${checklist.nextDestination.name}.`,'medium',{screen:'checklist',collection:'itinerary',id:checklist.nextDestination.id},checklist.nextDestination.startDate));
+  // Arrival-day tasks remain available in Checklist, but the move has already
+  // happened. Do not keep a stale Home warning that says work remains "before"
+  // the destination after its travel date has passed. Travel-day readiness is
+  // still actionable; the following day the model rolls forward to the next move.
+  const readinessAlertApplies=checklist.automaticStage!=='arrival';
+  if(readinessAlertApplies&&checklist.nextDestination&&checklist.ready.status==='not-ready')alerts.push(alert(`checklist:${checklist.nextDestination.id}`,'Checklist Readiness',`${checklist.ready.remaining} required task${checklist.ready.remaining===1?'':'s'} remain before ${checklist.nextDestination.name}.`,'high',{screen:'checklist',collection:'itinerary',id:checklist.nextDestination.id},checklist.nextDestination.startDate));
+  else if(readinessAlertApplies&&checklist.nextDestination&&checklist.ready.status==='needs-setup')alerts.push(alert(`checklist-setup:${checklist.nextDestination.id}`,'Checklist Needs Setup',`Add required checklist items for ${checklist.nextDestination.name}.`,'medium',{screen:'checklist',collection:'itinerary',id:checklist.nextDestination.id},checklist.nextDestination.startDate));
 
   const journeyStart=state.settings?.journeyStartDate || sorted[0]?.startDate || null;
   const coverage=calculateForwardCoverage(state.itinerary||[],today,3,journeyStart);
@@ -37,7 +41,7 @@ export function buildHomeAlerts(state,currentDate){
 
   for(const stay of state.itinerary||[]){if(toISODate(stay.endDate)<today)continue;if(!isDestinationBudgetUsable(stay))alerts.push(alert(`budget:${stay.id}`,'Destination Budget Needs Setup',`${stay.name} · ${formatAUDate(stay.startDate)} – ${formatAUDate(stay.endDate)} needs amount, currency and fixed exchange rate.`,'high',{screen:'budget',collection:'itinerary',id:stay.id},stay.startDate));}
   const repairs=[...(state.expenses||[]).map(r=>['expenses',r]),...(state.reservations||[]).map(r=>['reservations',r])].filter(([,r])=>r.needsBudgetRepair);
-  for(const [collection,record] of repairs){const repairDate=collection==='expenses'?record.date:record.dateTime;const kind=collection==='expenses'?'expense':'reservation';const fallback=collection==='expenses'?String(record.category||'Expense').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'Reservation';const subject=String(collection==='expenses'?(record.description||fallback):(record.title||fallback)).trim()||fallback;const dateLabel=repairDate?formatAUDate(repairDate):'date not set';const amount=formatMoney(record.originalAmount,record.originalCurrency||'AUD');alerts.push(alert(`repair:${collection}:${record.id}`,'Destination Budget Repair',`${subject} · ${dateLabel} · ${amount} needs Destination Budget repair.`,'critical',{screen:collection==='expenses'?'budget':'reservations',collection,id:record.id},repairDate||null));}
+  for(const [collection,record] of repairs){const repairDate=collection==='expenses'?record.date:record.dateTime;const kind=collection==='expenses'?'expense':'reservation';const fallback=collection==='expenses'?String(record.category||'Expense').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'Reservation';const subject=String(collection==='expenses'?(record.description||fallback):(record.title||fallback)).trim()||fallback;const dateLabel=repairDate?formatAUDate(repairDate):'date not set';alerts.push(alert(`repair:${collection}:${record.id}`,'Destination Budget Repair',`${subject} · ${dateLabel} needs Destination Budget repair. Amount/currency remain unverified until the record is repaired.`,'critical',{screen:collection==='expenses'?'budget':'reservations',collection,id:record.id},repairDate||null));}
 
   for(const record of state.vault||[]){if(!record.expiryDate)continue;const days=daysUntil(record.expiryDate,today);if(days>180)continue;const label=record.category==='passport'?'Passport':record.category==='visa'?'Visa':record.category==='insurance'?'Insurance':'Vault record';const subject=[record.title||label,record.owner].filter(Boolean).join(' · ');const expiry=formatAUDate(record.expiryDate);const timing=days===0?'today':`in ${days} day${days===1?'':'s'}`;alerts.push(alert(`vault-expiry:${record.id}`,`${label} Expiry`,days<0?`${subject} expired ${expiry}.`:`${subject} expires ${expiry} · ${timing}.`,days<0?'critical':days<=14?'high':days<=60?'medium':'low',{screen:'vault',collection:'vault',id:record.id},record.expiryDate));}
 

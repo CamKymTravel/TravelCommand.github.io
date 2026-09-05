@@ -36,18 +36,19 @@ function addCalendarMonthsISO(value, months) {
   const targetYear=year+Math.floor(zero/12);
   const targetMonth=((zero%12)+12)%12;
   const lastDay=new Date(Date.UTC(targetYear,targetMonth+1,0)).getUTCDate();
-  const targetDay=Math.min(day,lastDay);
-  return new Date(Date.UTC(targetYear,targetMonth,targetDay)).toISOString().slice(0,10);
+  if(day<=lastDay)return new Date(Date.UTC(targetYear,targetMonth,day)).toISOString().slice(0,10);
+  // Forward Coverage uses this result as an exclusive calendar-month boundary.
+  // When the source date has no matching day in the target month (29 Feb or
+  // the 31st), clamping to the target month's last day and then excluding that
+  // boundary drops a legitimate final calendar day. Roll the exclusive edge
+  // to the following day so the complete target month remains covered.
+  return new Date(Date.UTC(targetYear,targetMonth,lastDay+1)).toISOString().slice(0,10);
 }
 
 function dayISO(day) { return new Date(day*DAY_MS).toISOString().slice(0,10); }
 
 export function calculateForwardCoverage(entries, currentDate, months = 6, journeyStartDate = null) {
   const normalizedEntries=entries||[];
-  if(!normalizedEntries.length&&!journeyStartDate){
-    const startISO=toISODate(currentDate);
-    return {startDate:startISO,endDate:startISO,horizonDays:0,plannedDays:0,gapDays:0,overlapDays:0,coveragePercent:0,segments:[]};
-  }
   const todayISO=toISODate(currentDate);
   const journeyISO=journeyStartDate?toISODate(journeyStartDate):null;
   const startISO=journeyISO&&journeyISO>todayISO?journeyISO:todayISO;

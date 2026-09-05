@@ -70,6 +70,20 @@ if (!stateService.isRecoveryMode()) {
   }
 }
 
+// R40 build-health gate: every newly installed/updated build must visibly
+// require one whole-app verification. The marker is local to this build and
+// does not keep re-dirtying the app after Kym successfully verifies R40.
+const APP_HEALTH_BUILD_MARKER='v55-r72-screenshot-audit-2026-09-05';
+if (!stateService.isRecoveryMode()) {
+  const markerKey=`${runtimeConfig.storageKey}:app-health-build-marker`;
+  let installedMarker=null;
+  try { installedMarker=globalThis.localStorage?.getItem(markerKey)||null; } catch {}
+  if (installedMarker!==APP_HEALTH_BUILD_MARKER) {
+    stateService.invalidateAppHealthCheck();
+    try { globalThis.localStorage?.setItem(markerKey,APP_HEALTH_BUILD_MARKER); } catch {}
+  }
+}
+
 function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=text;return el;}
 
 function launchFlagEmoji(country='') {

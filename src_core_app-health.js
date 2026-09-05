@@ -93,7 +93,14 @@ function crossScreenCheck(state) {
   const issues=[];
   const itineraryIds=new Set((state.itinerary||[]).map(item=>item.id));
   for(const collection of ['expenses','reservations','checklists','journeyHistory','calendarEvents']) {
-    const broken=(state[collection]||[]).filter(record=>record.itineraryId&&!itineraryIds.has(record.itineraryId)).length;
+    const broken=(state[collection]||[]).filter(record=>{
+      // A legacy cost in explicit Destination Budget repair mode may carry a
+      // stale itinerary pointer solely as recoverable old data. That pointer is
+      // deliberately non-authoritative until the record is re-saved by date,
+      // so do not report it as a second cross-screen relationship failure.
+      if((collection==='expenses'||collection==='reservations')&&record.needsBudgetRepair===true)return false;
+      return record.itineraryId&&!itineraryIds.has(record.itineraryId);
+    }).length;
     if(broken)issues.push(`${collection}: ${broken} broken itinerary relationship${broken===1?'':'s'}.`);
   }
 

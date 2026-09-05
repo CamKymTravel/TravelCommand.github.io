@@ -1,3 +1,101 @@
+# ACTIVE OUTSTANDING WORK — V55 R72 SCREENSHOT SIMULATION
+
+R72 is the current screenshot/interaction checkpoint. Source/model regression gates are green; the principal remaining official gate is physical installed-iPad 1024×768 visual/lifecycle acceptance and any new reproducible defects shown by Cameron's screenshots. Do not redo already-verified R37–R72 work without evidence.
+
+---
+
+# ACTIVE OUTSTANDING WORK — V55 R71
+
+R71 is the only current working checkpoint. **Do not redo completed R37–R71 source work.** Read `CURRENT_R71_STATUS.md` for the implementation ledger.
+
+Active work is limited to: physical 1024×768 iPad visual acceptance; completion of the final-cascade sub-44px live-control audit only where the computed/final control is genuinely too small; physical header-crop recognition; installed-PWA update/offline lifecycle; physical Vault screenshot/Backup/Restore/Protected Recovery; offline Safari speech; and final Cameron visual approval.
+
+No source redesign is authorised. Historical sections below are regression archaeology only.
+
+---
+
+# V55 R71 OUTSTANDING WORK — CURRENT
+
+The active source checkpoint is R71. Preserve every verified R13–R63 behaviour. R60 closed the form-control parity omission. R61 locked Vault document colour continuity to the record category across every entry route and enlarged the visible Checklist Required/Optional checkbox for low-vision use. R62 extended the same dark-app authority to Safari native date/time/select/search chrome so bright default control fragments cannot leak into Add/Edit or analytical filter surfaces. R63 additionally locked parent-widget -> expanded-view colour continuity and remapped cloned DOM ids/relationships for Safari/VoiceOver safety. R64 keeps App Health as the deliberate motion exception under iPad Reduce Motion using a slower whole-panel heartbeat with no button scaling. Home remains the material authority, semantic hue variety remains deliberate, large surfaces stay restrained for light-sensitive eyes, and old/original screenshots remain non-authoritative for colour. Do not reopen already-fixed behaviours unless a reproducible regression is observed. Priority remains the physical 1024×768 iPad visual/lifecycle acceptance work below.
+
+## Highest-priority next acceptance/fix items
+
+1. **App Health physical visual check:** verify dirty/unchecked state has an unmistakable restrained heartbeat across the whole red App Health panel, not merely the red CHECK THE WHOLE APP button. After successful check, panel/button must become green/still. If panel itself does not pulse, fix presentation only.
+2. **Full 1024×768 iPad screenshot pass on all 9 screens:** compare against current screenshot audit and named structural refs. Check header crop, widget hierarchy, readable text, flags, large dates, semantic colours, no horizontal scroll, and full-screen expansions.
+3. **Home:** confirm larger hero solves lower-row sizing balance; photograph remains visible; Current Destination recognition is dominant; lower Schengen/Alerts/Upcoming/Timeline row not oversized.
+4. **Shared headers:** Budget/Reservations/Itinerary/Calendar current+next cards must not smother the country photo. Specialist Journey/Checklist/Settings headers need clean crop.
+5. **Colour quality:** continue broad current-palette semantic colour pass where cards still look generically navy. Preserve approved colours and parent→expanded colour continuity. Never copy first-build colours.
+6. **Forms:** Add Expense/Add Reservation/Add Destination physical iPad readability and mistake-prevention pass, especially native date/select presentation and selected-state clarity.
+7. **Calendar/Journey/Itinerary:** verify first-build-like structural flow/readability is achieved without old colours.
+8. **Vault/Streaming:** verify locked door appearance, three-tap entry, unlocked card hierarchy and 4×4 Streaming recognition grid on device.
+9. **Expanded widgets/maps:** ensure every compact/readability expansion genuinely fills most landscape viewport and actual map/content grows, not just modal shell.
+10. **Installed PWA lifecycle:** update/cache, offline launch, persistent storage, IndexedDB Vault screenshot add/reopen/delete, backup/restore/protected recovery.
+11. **Offline speech:** confirm local Safari voices for Play/Slow/Repeat ×3/Louder; package self-contained audio only if required local voices are unreliable.
+12. Final Cameron visual approval before any Master/Gold lock.
+
+## Do not call complete yet
+
+R71 is a protected working checkpoint, not final visual acceptance. Static regression can pass while the physical iPad still reveals sizing/crop/pulse/touch defects.
+
+## V55 R59 local working continuation — 05 Sep 2026
+- Vault category drill-down heroes and record cards must not restore old/original build slab colours. Keep passport/visa/insurance/accommodation/emergency/streaming hue recognition, but use Home-derived deep material brightness, border strength, depth and restrained glow.
+- New/edited Vault record modal colour continuity remains protected; R59 only normalises the large in-screen drill-down surfaces.
+- Home map year filters and Checklist history rows retain at least 44px tap height.
+- Runtime/cache/App Health identity advances coherently to R59 because live CSS changed.
+
+
+## V55 R60 historical working continuation — 05 Sep 2026
+- Historical R60 checkpoint; superseded by R61.
+- Checklist dropdowns and Settings Schengen Status/Notes controls must retain the same enlarged dark editor material, readable typography and iPad sizing as other form controls.
+- Do not allow Safari/native default select or textarea styling to reappear as a separate visual mini-theme.
+- R59 Vault depth-material continuity, R58 single-heartbeat, R57 selected-state comfort and R56 readability floors remain protected.
+- Runtime/cache/App Health identity advances coherently to R60 because live CSS changed.
+
+---
+
+# PREVIOUS OUTSTANDING WORK (preserved)
+## 05 Sep 2026 — R33 recognition-first row safety pass
+
+R33 corrects three source-level interaction/readability regressions found after the screenshot review. Home Current Destination now includes a packaged offline country outline beside the large flag/name. Itinerary stay/trip rows and Forward Coverage segments enlarge read-only first; Edit is an explicit action inside the large detail, so a casual information tap cannot drop Kym into an editor. Journey History completed rows now open a true near-full-screen read-only journey detail instead of a cramped inline expansion, with country flag, large dates/costs and full linked-spend breakdown. Calendar items also enlarge read-only first; personal Reminder/Note records expose Edit explicitly from that detail. Itinerary, Journey History and Calendar Agenda now use large country flags as peripheral-recognition cues. Historical first-build colours remain non-authoritative. No financial, routing, storage, Vault-security or menu-navigation rules changed.
+
+## 05 Sep 2026 — R32 Vault recognition / TV & Movies pass
+
+R32 fixes two reproducible source mismatches against the locked usability authority. The locked Vault now uses the supplied vault-door artwork and a large VAULT LOCKED / PROTECTED ACCESS target while preserving the exact concealed three-tap unlock. Streaming is now a large recognition-first TV & Movies service-tile grid; saved services open a near-full-screen read-only detail with explicit Show/Edit, while unsaved service tiles only prefill the existing Add Streaming editor. No old-build app colours were imported and no stored-data/security/navigation rules changed.
+
+
+## 05 Sep 2026 — R30 global colour/accessibility continuation
+
+R30 extends the current approved premium semantic palette across remaining visually generic dashboard panels without importing first-build colours. Home remains the material benchmark, not a single-colour template. Compact widgets may expand purely for Kym’s readability, and expanded dialogs are required to use essentially the full iPad landscape viewport. App Health dirty/unchecked state is explicitly red with a visible restrained heartbeat; a successful whole-app check is green and still. This pass is presentation-only and must not change travel data, routing, budgeting, Vault security, storage or calculation rules.
+# V55 R29 HISTORICAL WORKING SUCCESSOR — 05 Sep 2026
+
+R29 continues directly from R28. App Health now fulfils the requested unmistakable state transition at the panel level as well as the button: every newly installed/updated R29 build starts dirty/red with a restrained heartbeat until CHECK THE WHOLE APP succeeds; a clean successful verification becomes green and all heartbeat animation stops. The current approved premium semantic colour system is extended across the remaining visually generic widgets: Home Alerts/Upcoming Events/Schengen/Trip Timeline receive distinct full-surface tones while remaining subordinate to the three primary budget cards; Vault category cards now carry their own colour through the whole material surface; Vault Summary/Expiry/Emergency/Recent Activity/Streaming are differentiated; Checklist History receives its own identity. Historical first-build colours are not copied. No calculation, routing, storage, Vault security, menu-only navigation or data model behaviour is changed.
+
+---
+
+# V55 R26 HISTORICAL WORKING SUCCESSOR — 05 Sep 2026
+
+R26 was the local working tree at that historical checkpoint on top of the immutable R13 continuity authority. It continues the Kym-readability/mistake-prevention audit by making destination identity and exact dates materially more obvious inside Add Expense, Add Reservation and Add/Edit Destination. Expense routing now shows the matched country flag plus a large FROM→TO date ticket; Reservation routing adds the missing flag to its already-protected dated stay ticket; Itinerary editors gain a live flag/name/country/travel-type/date orientation strip. Shared stay-header overlays were reduced slightly so more country artwork remains recognisable without shrinking the important flag/name/date text. Home secondary operational text was raised again without allowing the lower row to outrank the three primary budget cards. R25 full-screen expansion, map enlargement, menu-only navigation and all prior R14–R25 protections remain intact. Remaining acceptance is still physical target-iPad/PWA/Vault/offline-speech/final-colour review unless a new reproducible defect is found.
+
+---
+
+# ACTIVE OUTSTANDING WORK — V55 R13 CONTINUITY FREEZE
+
+**Install/test this exact continuity package:** `Travel_Command_Centre_V1_CONTINUITY_ANTI_REGRESSION_V55_R13_ACTIVE_NO_LOSS_2026-09-05.zip`.
+
+There is no known unfinished source implementation task at handoff. Do not invent redesign work. Continue source auditing only if it finds a reproducible defect. The remaining acceptance boundary is:
+
+1. Physical target-iPad 1024×768 review across all nine screens, Add/Edit forms and both Home helpers.
+2. Recognisable header crops with minimal zoom; cruise/RV dedicated headers; zero horizontal scrolling; practical vertical reachability; large touch targets; focus/modal/native-picker behaviour.
+3. Installed-PWA update test from the prior Athens build, including safe service-worker refresh while editors/pickers are open.
+4. Practical Vault IndexedDB screenshot add/reopen/delete, Backup/Restore, storage failure and Protected Recovery/Retry.
+5. Offline Safari speech test for the current-country toilet helper: Play / Slow / Repeat ×3 / Louder using local voices only. If required voices are unavailable offline, use a self-contained packaged-audio fallback with no online service.
+6. Final global colour-quality pass. Screenshots are structure/layout/defect evidence only; final colour requires Cameron’s explicit approval.
+7. After all device gates pass, run the full regression protocol once more before any Master/Gold Lock declaration.
+
+**Nothing from R13 is authorised to be removed, simplified or replaced while doing these checks.**
+
+---
+
 # V55 Athens R13 — Active Remaining Acceptance
 
 The V55 Athens simulation derivative is built, source/model verified and protected by the exact working checkpoint. **Athens is not blocked.** Do not return to V54/V53 or rebuild from screenshots.
@@ -127,7 +225,7 @@ This section supersedes any older wording about what remains active. Historical 
 6. For multilingual destinations, use a practical default and support alternatives where useful rather than guessing from a composite route label. Cruise/RV keeps **Starting Country** as the trip language/country context unless the user changes the defined model later.
 7. Add offline spoken toilet-phrase playback if feasible on target iPad. Desired controls: **Play, Slow, Repeat ×3, Louder**. Do not depend on internet speech services. If browser speech cannot be guaranteed offline, prefer packaged local audio/metadata in a low-file-count architecture.
 8. Preserve Kym-focused usability: very clear large phrase, easy pronunciation, useful visual hierarchy, and plants/gardens slightly prominent in Country Quick Look.
-9. Do the final whole-app colour pass only after functionality is stable. **Screenshots are not colour approval.** Every coloured widget must share the same perceived saturation, brightness, contrast, depth, border/highlight and restrained-glow quality; only hue should differ.
+9. Maintain the R49 whole-app material lock: **screenshots are not colour approval**. Home is the primary material authority; every coloured widget must share the same perceived saturation, brightness, contrast, depth, border/highlight and restrained-glow quality while semantic hues may differ. Legacy/original Vault colours are not protected.
 10. Re-audit every parent widget -> expander -> deeper editor/detail path after the global colour pass so interaction depth never reverts to a generic/old-build tone.
 11. Re-test all nine screens on the target iPad, including current/no-current destination states, Standard/Cruise/RV context, helper access, language coverage, offline behaviour, service-worker refresh and no horizontal scroll.
 12. Complete practical Vault IndexedDB add/reopen/Backup/Restore/Protected-Recovery/delete testing before master/Gold Lock.
@@ -135,7 +233,7 @@ This section supersedes any older wording about what remains active. Historical 
 ## V50 deep regression protocol for the next chat
 
 1. Run `python3 verify_regression_guard.py --verify` before any edit and require `PASSED — BASELINE VERIFIED`.
-2. Read `CONTINUITY_START_HERE.md`, `LOCKED_REQUIREMENTS.md`, this file, `REGRESSION_CONTRACT.json`, then `VISUAL_REFERENCE_INDEX.md`.
+2. Read `CONTINUITY_START_HERE.md`, `LOCKED_REQUIREMENTS.md`, this file, historical regression-contract reference (not part of the active R71 package), then `VISUAL_REFERENCE_INDEX.md`.
 3. Continue from this exact V50 tree. Never restart from screenshots or an older package.
 4. For every implementation batch, use `--allow-changes` with the exact changed files. Unexpected drift is a stop condition.
 5. Preserve the 100-item historical no-loss ledger below. New work is additive; do not delete historical protections to shorten the package.
@@ -555,3 +653,189 @@ Do not confuse **functionally passing** with **visually/master approved**. Home 
 - Shared modal tone classes are final-screen-layer authority: screen-specific modal shells cannot override the selected widget/category/type colour, and sticky actions/focus treatment inherit the active tone.
 - Motorhome/Cruise route-stop Remove controls retain the compact visible “Remove” label but expose the exact stop number/name to VoiceOver so repeated destructive controls are not ambiguous.
 - Budget Reservations stays read-only in Budget, but saved rows deep-link to the exact prefilled Reservation editor so the global saved-record tap contract is preserved.
+
+## V55 R16 local working continuation — 05 Sep 2026
+- Kym clarity pass enlarged Add Expense/Add Reservation choices, amount/date fields and dated Destination Budget preview without changing automatic date routing.
+- Calendar multi-day destination/travel period strips were visually connected across adjacent day cells to restore the clearer first-build travel-flow cue.
+- Shared current/next stay banner flag/name/country/date hierarchy was strengthened again for peripheral recognition.
+- Colour authority remains the current premium material system; first-build screenshots are layout/readability references only.
+
+## V55 R17 local working continuation — 05 Sep 2026
+- Home hierarchy rebalanced: larger destination/photo hero and more dominant three primary budget cards; secondary four-panel row is no longer allowed to visually outrank them.
+- Home current destination country outline and large city/country treatment strengthened for peripheral recognition.
+- Journey History/Checklist supplied artwork now fills its hero frame with modest cropping rather than the narrower height-fit treatment that could leave visual imperfections/gutters.
+- Settings hero fit adjusted for its unusually wide source artwork.
+
+## V55 R18 local working continuation — 05 Sep 2026
+- Vault unlocked hero now reveals substantially more of the supplied vault-door scene while keeping the live Streaming/status/Lock rail authoritative.
+- Vault category cards, all-records control and overview summaries have larger labels/counts for Kym readability.
+- Locked Vault keeps the concealed three-tap access behaviour but restores the vault-door artwork as the dominant first impression and enlarges the protected-access target.
+
+## V55 R19 local working continuation — 05 Sep 2026
+- Checklist dashboard Add clutter removed at source (not merely hidden): HIS/HERS and Permanent/Destination cards are information/expansion surfaces only. Their full-screen expanded views now contain the explicit large Add Item action, large checklist rows, completion control and View-to-read-only flow; Edit remains explicit inside the large read-only detail.
+- Current Checklist item text no longer acts as a hidden edit shortcut; item taps open a large same-screen read-only detail before any Edit action.
+- Itinerary compact-stat expanded views now have deliberate full-width row layout with flags/icons, large names and separated context; Countries Planned / Route Trips / Planned Stops / Missing Stays can no longer collapse into concatenated text.
+- Itinerary Motorhome/Cruise list rows now keep the mode icon and add a visible country flag for faster peripheral country recognition.
+- Journey History summary/Destination Totals expanded lists now separate identity, context and money into large columns with flags rather than running values together.
+- Reservations category full-screen summaries now use three distinct headline cells plus a separate flight-context line, eliminating the old concatenated “upcoming / to book / completed” text.
+- No cross-screen navigation calls were introduced; sidebar/menu remains the only screen-navigation path.
+
+## V55 R20 local working continuation — 05 Sep 2026
+- Expanded-card snapshots now use a genuine near-full-screen reading surface with a top-right close control and no redundant bottom Close row. Snapshot expansions no longer spend vertical space repeating the same outer modal title above the card title.
+- Home Country Quick Look / Phrase Helper hero now carries the current-country flag as a large peripheral-recognition cue without changing helper data/audio behaviour.
+- Calendar agenda records now carry the linked itinerary country into the view model and show a visible country flag plus larger title/date typography; destination colour remains the canonical flow cue.
+- Checklist Add/Edit native select controls are styled back into the premium dark material with 16px+ readable text instead of the detached white Safari appearance.
+- Settings App Health explanations/status text and Settings fact copy are enlarged for Kym readability; vertical scrolling is accepted rather than preserving micro-copy.
+- Budget Accounts duplicate “Add Account + Add Account” label defect is corrected; the control now renders one icon plus one label.
+- The 05 Sep menu-only navigation rule and accessibility/full-screen expansion rule are now written into `LOCKED_REQUIREMENTS.md` so the next continuation cannot regress to cross-screen widget deep-links or token enlargements.
+- No canonical budget, date-routing, persistence, Vault-access, calculation or mutation behaviour changed in this pass.
+
+## V55 R21 local working continuation — 05 Sep 2026
+- Main-screen Kym readability pass removes the remaining operational micro-text without changing screen structure, colours or data behaviour.
+- Home secondary widgets remain visually subordinate to Daily/Destination/Annual budget cards, but event/timeline/Schengen labels, dates and statuses are enlarged to readable sizes.
+- Budget current-stay labels/notes, Reservations dashboard support text, Itinerary date/context text, Checklist task/status copy and Vault status/activity labels are enlarged. Vertical growth is preferred over unreadably small text where needed.
+- Decorative eyebrow text may remain compact; operational destination names, dates, money, task names and status information must not depend on 6–9px typography.
+- No canonical budget, routing, persistence, calculation, Vault-access or mutation behaviour changed in this pass.
+- Service-worker cache generation is bumped for R21 because the live readability stylesheet changed; an installed iPad must not keep serving the R20/R13 cached CSS graph.
+
+## V55 R22 local working continuation — 05 Sep 2026
+- Residual Kym-readability audit closed the source-level operational 6–9px exceptions that remained after R21: Itinerary status badges, Journey History milestones/map stats/pagination, Budget Monthly Spend History labels, Reservation category/repair/status copy, Checklist support copy and Calendar month-view day/event text are enlarged without altering their data meaning.
+- Reservation repair/relationship warnings are explicitly readable and cannot fall back to 7–8px warning text.
+- Sidebar Data Status is enlarged because it is operational feedback rather than decorative branding.
+- Service-worker registration generation and cache identity are now coherent (`55-kym-readability-r22-2026-09-05`). This repairs the R21 governance mismatch where live CSS changed but the registration query still named the R13 generation.
+- No canonical budget, routing, persistence, calculation, Vault-access or mutation behaviour changed in this pass. First-build screenshots remain structure/readability evidence only; current premium colour/material authority remains unchanged.
+- R22 source verification after the focused pass: 66/66 JavaScript/ES-module syntax checks passed; `src_design_reference-pass.css` braces balance 2357/2357; V53 deep acceptance passed; V54 deep acceptance passed; deterministic retained simulation sweep passed **1,461/1,461 days and 10,227/10,227 core view-model builds**. The historical `verify_regression_guard.py` still contains superseded V54-era static marker expectations and is not the active V55 exact-source gate; the active V55 working-checkpoint verifier is regenerated/used per the R13 continuity protocol.
+
+## V55 R23 working checkpoint — Kym glance-readability and large-date safety pass
+
+- Residual operational micro-text in Home, Destination Budgets, Reservations routing confirmation, Itinerary, Journey History, Checklist, Vault, Calendar and Settings is lifted to a practical iPad reading floor. Decorative brand eyebrows remain compact.
+- Destination Budget date tickets and Reservation automatic-routing previews now give the day/month/year context materially stronger visual weight so repeated stays and the automatically selected dated budget are harder to misread.
+- Home keeps the approved hierarchy: the three primary budget cards retain greater visual weight than Schengen / Alerts / Upcoming / Timeline, while the smaller cards no longer rely on tiny status/date copy.
+- Small utility controls retain at least a 44px iPad touch target.
+- No canonical data model, allocation, calculation, mutation, storage, Backup/Restore, Vault-access or menu-only navigation logic is changed.
+- Service-worker generation advances to R23 so the installed iPad cannot silently retain R22 presentation CSS.
+
+Still active before release/master: real target-iPad screenshot/interaction acceptance and practical Vault IndexedDB screenshot add/reopen/Backup/Restore/Recovery/delete validation.
+
+---
+
+# V55 R28 HISTORICAL WORKING SUCCESSOR — 05 Sep 2026
+
+R28 continues directly from R27. It keeps the corrected red heartbeat App Health requirement and deliberately bumps the per-build health marker so the newly installed R28 build opens dirty/red/pulsing until CHECK THE WHOLE APP succeeds; successful verification remains green and non-pulsing. This pass also extends the current approved premium semantic colour system across remaining generic widgets rather than copying first-build colours: Budget Living Expenses/Reservations/Recent Expenses, Reservations Upcoming/Completed/Health, Itinerary Map/Forward Coverage/Upcoming/Completed and map metrics, Calendar Month/Agenda/toolbar, and Journey History Completed Stays/Destination Totals/health. Expanded modal glow now follows the parent tone family. First-build screenshots remain structure/readability authority only. No calculation, routing, storage, Vault-security or menu-only navigation behaviour is changed.
+
+---
+
+## 05 Sep 2026 — R31 interaction/header source hardening
+
+R31 turns several previously documented rules into source-level protections. Main-screen navigation is now sidebar-only; information rows stay on their screen and use local readable detail instead of deep-linking. Itinerary regains the shared destination header; shared stay headers now include flags and smaller overlay cards so more country imagery remains visible. Checklist Add controls move from small dashboard cards into enlarged views. Home primary/secondary status cards gain the requested readability expansions. App Health now has an actual per-build invalidation gate, so R31's first open is red/pulsing until the whole-app check succeeds rather than inheriting an old green fingerprint. Remaining acceptance is still target-iPad visual/PWA/Vault/offline-speech review plus further evidence-based visual polish.
+
+
+## 05 Sep 2026 — R35 Add/Edit + large-date readability lock
+- Add/Edit screens are deliberate error-prevention surfaces for Kym: field labels, entered values, selected tiles and Save/Cancel actions must remain comfortably readable at iPad landscape distance.
+- Date and datetime inputs must be materially larger than ordinary micro-copy, with prominent tabular date text. Destination Budget date tickets must show readable FROM/TO, day, month and year context; repeated destination stays may never be distinguished by tiny date text.
+- Automatic dated Destination Budget routing confirmation in Add Expense/Add Reservation is operational information and must not regress to fine print.
+- These presentation rules do not authorise changing date-driven routing, budget allocation, calculations, mutations, storage, Vault security, sidebar-only navigation or the current premium colour authority.
+
+## 05 Sep 2026 — R36 compact-widget enlargement completion
+R36 closes a source-level gap against the Kym eyesight rule: Journey Snapshot, Milestones, Journey Check, individual Settings App Health checks, and Settings information groups now genuinely enlarge near-full-screen. Continue the visual screen audit from this checkpoint; do not remove these expanders merely because some expanded views are primarily enlargements rather than richer data. Physical target-iPad visual acceptance remains outstanding.
+
+
+10. R50 colour-comfort acceptance remains a physical iPad gate: confirm the whole build feels like one app, retains a useful mixture of colours, has strong readable contrast, and does not produce glare from saturated large surfaces or excessive glow. Historical screenshots must not be used to recolour widgets.
+
+## V55 R51 local working continuation — 05 Sep 2026
+- Whole-app R50 colour comfort remains locked: varied semantic hues, restrained large-surface saturation/brightness, Home-derived material, strong contrast and no historical screenshot colour matching.
+- New Add Expense now matches Add Reservation/Add Destination/Calendar: stable command-blue shell with strong semantic selected tile; existing edits inherit originating colour. Vault category editors remain the explicit category-colour continuity exception.
+- Stale continuity text that could reintroduce cross-screen Home navigation or full-shell recolouring of new Add forms has been superseded.
+- Service-worker/cache/App Health identity advances coherently to R51 because live JS changed.
+- Removed the obsolete unlayered R30 inline colour theme from `index.html`; it could override newer layered material rules. R51 keeps only critical App Health/readability/expanded-modal guards there.
+- Expanded modals are now hard-locked to vertical scrolling only, and the app shell has an explicit horizontal-overflow guard for iPad landscape.
+
+## V55 R52 local working continuation — 05 Sep 2026
+- Remaining Itinerary, Calendar and Journey Map/filter large analytical surfaces now use the shared Home-derived comfort material recipe while retaining distinct semantic hues.
+- Historical screenshot colours remain non-authoritative. Vault legacy brightness/saturation remains explicitly unprotected.
+- Compact selected-state controls stay obvious without high-luminance slab fills.
+- Residual operational destination/date/routing/status text is hard-floored at 11px, with key orientation/routing cues at 12px.
+- Runtime/cache/App Health identity advances coherently to R52 because live CSS/JS changed.
+- Physical target-iPad visual/PWA/Vault/offline-speech acceptance remains open.
+
+## V55 R53 local working continuation — 05 Sep 2026
+- Full-screen expanded views and existing-record editors now use Home-derived dark comfort material rather than older saturated tone-specific full-screen backgrounds.
+- Parent/source colour continuity remains through border, title, focus and restrained accent tint.
+- New Add forms remain calm command-blue; Vault category editing remains the explicit category-colour continuity exception.
+- R53 was a historical working checkpoint; older R26/R28/R31/R49/R52 "current" wording has been demoted to historical wording to prevent accidental regression.
+- Runtime/cache/App Health identity advances coherently to R53.
+
+
+## V55 R61 historical working continuation — 05 Sep 2026
+- Historical R61 checkpoint; superseded by R62.
+- Vault document records must resolve their semantic tone from `VAULT_TONES[record.category]` no matter whether opened from Expiry Reminders, Recent Activity, All Vault Records, category lists, or pending/global-search routes. Do not reintroduce route-specific blue/gold/indigo document tones.
+- Streaming remains its own purple/violet family.
+- Checklist Required/Optional uses a clearly visible 30px native checkbox inside a minimum 56px row; do not shrink it back to a tiny Safari default.
+- R60 Settings/Checklist form-control parity, R59 Vault depth material, R58 single App Health heartbeat and all earlier protections remain locked.
+- Runtime/cache/App Health identity advances coherently to R61 because live JS/CSS changed.
+
+
+## V55 R62 local working continuation — 05 Sep 2026
+- Historical R62 checkpoint; superseded by R63. Preserve its native dark-control protections.
+- Safari-native editor/filter controls retain native behavior but explicitly use dark colour-scheme chrome.
+- R61 Vault route-colour continuity + enlarged Required/Optional checkbox remain protected.
+- Runtime/cache/App Health identity advances coherently to R62 because live CSS changed.
+
+
+### R62 source-level installed-data lifecycle evidence
+- Full JSON backup round-trip with the packaged simulation screenshot passes: canonical IndexedDB-style asset metadata is rehydrated into the exported JSON, internal `assetKey` is not leaked, Restore externalises the screenshot again, byte content matches and the post-Restore Vault asset audit is clean.
+- Forced healthy-state Restore write failure passes: original canonical travel state is preserved, staged replacement screenshot bytes are cleaned, Protected Recovery is entered, and Retry iPad Storage safely recovers the original state.
+- Forced Restore selected while already in Protected Recovery passes: the validated replacement candidate and staged screenshot bytes are retained, Retry iPad Storage completes the Restore, and the restored screenshot re-audits cleanly.
+- These are source/in-memory tests only. Physical Safari persistent-storage/IndexedDB/update testing remains an acceptance gate.
+
+
+## V55 R63 local working continuation — 05 Sep 2026
+- Historical R63 checkpoint; superseded by R64. Preserve its expanded-view continuity and unique-id protections.
+- Itinerary Forward Journey Map enlargement follows the actual rendered parent tone; no hard-coded blue drift.
+- Generic expanded-card snapshots remap ids plus internal label/ARIA/hash references, preventing duplicate-id collisions with the live source widget.
+- Removed dormant Reservation/Itinerary brightness amplification so iPad touch/hover states cannot create abrupt luminance jumps.
+- Preserve R62 native dark control chrome and every earlier functional/visual protection.
+- Physical 1024×768 iPad visual/VoiceOver/update acceptance remains open.
+- Runtime/cache/App Health identity advances coherently to R63 because live JS changed.
+
+
+## V55 R64 local working continuation — 05 Sep 2026
+- Historical R64 checkpoint; its protections remain absorbed by R65.
+- App Health remains the deliberate motion exception under iPad Reduce Motion: slower restrained panel heartbeat, no button scaling; verified green/still.
+- Preserve R63 rendered parent->expanded tone continuity, snapshot id/ARIA remapping and removal of brightness amplification.
+- Physical 1024×768 iPad visual/VoiceOver/update acceptance remains open.
+- Runtime/cache/App Health identity advances coherently to R64 because live boot/CSS behavior changed.
+
+
+## V55 R65 local working continuation — 05 Sep 2026
+- R65 is historical and fully absorbed by R71; R64 and earlier checkpoints are historical.
+- Calendar month event/period controls retain 44px painted targets and 12px readable copy. At most two are shown directly in each day; denser days route through the existing `+ more on this day` modal.
+- This is an accessibility/density correction only: Calendar data, colours, read-only-first detail, Reminder/Note editing and sidebar-only navigation are unchanged.
+- Runtime/cache/App Health identity advances coherently to R65 because live Calendar JS/CSS changed.
+
+
+## V55 R66 local working continuation — 05 Sep 2026
+- R66 is historical and fully absorbed by R67; R65 and earlier checkpoints are historical.
+- Specialist header routing is protected: Princess artwork for Cruise; USA motorhome artwork when `startCountry` or `country` is United States; Europe/other motorhome artwork otherwise. City hints are fallback only.
+- R65 Calendar 44px month controls and every earlier Home/material/accessibility/functional lock remain unchanged.
+- Runtime/cache/App Health identity advances coherently to R66 because shared header JS changed.
+
+## V55 R67 local working continuation — 05 Sep 2026
+- R67 is historical and fully absorbed by R68; R66 and earlier checkpoints are historical.
+- Preserve R65's 44px Calendar month-entry accessibility without letting busy-day controls spill into adjacent calendar rows. Days with >2 entries show one direct item plus the complete-day `+N more` action; 1–2-entry days remain fully visible.
+- Calendar day cells retain enough height for two 44px controls, with no nested month-cell scrolling and no horizontal page scrolling.
+- Runtime/cache/App Health identity advances coherently to R67 because live Calendar JS/CSS changed.
+
+## V55 R68 local working continuation — 05 Sep 2026
+- R68 is historical and fully absorbed by R71; R67 and earlier checkpoints are historical.
+- Busy-day Calendar overflow lists remain neutral/calm, but each selected item must recover its own semantic material colour through read-only detail and Edit.
+- R67 44px Calendar density geometry remains locked and unchanged.
+- Runtime/cache/App Health identity advances coherently to R68 because live Calendar JS changed.
+
+## V55 R71 local working continuation — 05 Sep 2026
+- R71 is the only current working checkpoint; R68 and earlier approved checkpoints are historical. R69/R70 were same-session rejected experiments and must not be restored.
+- The locked drill-down colour rule is parent/context continuity: To Book gold; Upcoming Reservations blue; Next Upcoming red; Recent Expenses blue; and the other V51 context mappings remain unchanged.
+- Category/type tiles inside the editor stay visibly distinct without overriding a deliberately inherited parent context.
+- Old screenshots remain non-authoritative for hue/saturation/brightness; Home remains the material-quality authority.
+- Runtime/cache/App Health identity is R71.
+
