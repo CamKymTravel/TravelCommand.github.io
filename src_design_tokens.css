@@ -1,0 +1,62 @@
+@layer tokens {
+  :root {
+    --bg-app: #07101f;
+    --bg-app-deep: #040a14;
+    --surface-sidebar: rgba(9, 20, 37, 0.96);
+    --surface-panel: rgba(16, 32, 54, 0.82);
+    --surface-elevated: rgba(22, 42, 70, 0.92);
+    --border-soft: rgba(150, 196, 255, 0.14);
+    --border-strong: rgba(150, 196, 255, 0.28);
+    --text-primary: #eef5fb;
+    --text-secondary: #afbed0;
+    --text-muted: #8394a9;
+    /* R56: readable small operational copy without white glare. */
+    --text-operational: #b8c6d6;
+    --accent-home: #58c7ff;
+    --success: #57d69b;
+    --warning: #ffd15b;
+    --danger: #ff6f83;
+    --feature-teal: #46d9ca;
+    --feature-blue: #5d8dff;
+    --feature-indigo: #806dff;
+    --feature-violet: #b86dff;
+    --feature-magenta: #f165bd;
+    --feature-red: #ff6f83;
+    --feature-orange: #ff9a5a;
+    --feature-yellow: #ffd15b;
+    --feature-green: #57d69b;
+    --radius-sm: 12px;
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --space-1: 6px;
+    --space-2: 10px;
+    --space-3: 14px;
+    --space-4: 18px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --control-h: 48px;
+    --sidebar-w: 184px;
+    --shadow-panel: 0 18px 42px rgba(0,0,0,.28);
+    --glow-soft: 0 0 20px rgba(88,199,255,.07);
+
+    /* V55 R49 — app-wide Home material authority.
+       These tokens define perceived material quality only; semantic hue remains
+       screen/widget-specific. Historical screenshots are never palette authority. */
+    --material-deep:#071321;
+    --material-mid:#10243a;
+    --material-high:#172f4c;
+    --material-shadow:0 16px 34px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.045);
+    --material-shadow-strong:0 18px 40px rgba(0,0,0,.28), 0 0 24px rgba(88,199,255,.055), inset 0 1px rgba(255,255,255,.055);
+    --material-inner:rgba(3,13,24,.38);
+    --material-inner-border:rgba(190,222,245,.11);
+    --material-highlight:rgba(255,255,255,.055);
+
+    /* V55 R50 — light-sensitive-eye comfort envelope.
+       Keep varied semantic hues, but limit how much hue/light is allowed to
+       occupy large surfaces. Accent text/icons may stay vivid for recognition. */
+    --comfort-surface-tint:12%;
+    --comfort-surface-glow:17%;
+    --comfort-border-strength:42%;
+    --comfort-active-border-strength:62%;
+  }
+}

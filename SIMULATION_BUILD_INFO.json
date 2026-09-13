@@ -1,0 +1,73 @@
+{
+  "build": "Tokyo 4-Year Full Simulation S25",
+  "date": "2026-09-13",
+  "simulationDate": "2030-02-20",
+  "currentDestination": "Tokyo, Japan",
+  "baseline": "S24 working checkpoint; baseline source preserved separately and not promoted to MASTER",
+  "fixtureRevision": "2030-02-20-full-four-year-heavy-v1",
+  "counts": {
+    "itinerary": 48,
+    "expenses": 329,
+    "reservations": 71,
+    "calendarEvents": 32,
+    "journeyHistory": 43,
+    "checklists": 36,
+    "vault": 9,
+    "attachments": 2,
+    "accounts": 5,
+    "alerts": 3
+  },
+  "intentionallyUnsetDestinationBudgets": [
+    {
+      "name": "Kyoto",
+      "startDate": "2030-04-01",
+      "endDate": "2030-04-14"
+    },
+    {
+      "name": "Seoul",
+      "startDate": "2030-05-01",
+      "endDate": "2030-05-20"
+    },
+    {
+      "name": "Bangkok Return",
+      "startDate": "2030-05-21",
+      "endDate": "2030-06-10"
+    }
+  ],
+  "futureItinerary": [
+    {
+      "name": "Kyoto",
+      "country": "Japan",
+      "startDate": "2030-04-01",
+      "endDate": "2030-04-14",
+      "destinationBudgetAUD": 0
+    },
+    {
+      "name": "Osaka",
+      "country": "Japan",
+      "startDate": "2030-04-15",
+      "endDate": "2030-04-30",
+      "destinationBudgetAUD": 2600
+    },
+    {
+      "name": "Seoul",
+      "country": "South Korea",
+      "startDate": "2030-05-01",
+      "endDate": "2030-05-20",
+      "destinationBudgetAUD": 0
+    },
+    {
+      "name": "Bangkok Return",
+      "country": "Thailand",
+      "startDate": "2030-05-21",
+      "endDate": "2030-06-10",
+      "destinationBudgetAUD": 0
+    }
+  ],
+  "storageKey": "tcc:v1:tokyo-4year-full-simulation-s25",
+  "notes": [
+    "Simulation data only.",
+    "Uses a separate storage key from the normal Travel Command Centre build.",
+    "Unset budgets are intentional so Home Alerts and App Health can demonstrate the budget-warning workflow."
+  ]
+}

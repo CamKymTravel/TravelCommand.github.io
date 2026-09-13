@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07101f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Travel Command Centre">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./app-icon.png">
+  <link rel="preload" href="./app-icon.png" as="image">
+  <link rel="apple-touch-startup-image" href="./startup-ipad-1024-landscape.png" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <link rel="apple-touch-startup-image" href="./startup-ipad-1194-landscape.png" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)">
+  <title>Travel Command Centre — Tokyo Simulation</title>
+  <link rel="stylesheet" href="./src_design_app.css">
+
+  <script>
+    globalThis.__TCC_RUNTIME_CONFIG__ = Object.freeze({
+      mode:'simulation',
+      storageKey:'tcc:v1:tokyo-4year-full-simulation-s25',
+      currentDate:'2030-02-20',
+      fixtureUrl:'./tokyo-4year-simulation-fixture.json',
+      seedIfEmpty:true,
+      serviceWorkerUrl:'./sw.js?v=tokyo-4year-full-simulation-s25-2026-09-13',
+      testingFlags:{ fixtureRevision:'2030-02-20-full-four-year-heavy-v1' }
+    });
+  </script>
+  <style id="tcc-r71-critical-visual-guards">
+    /* R71 critical unlayered guards only. The layered Home-derived stylesheet is
+       the visual authority; do not recreate a second theme here. */
+
+    /* Zero-horizontal-scroll hard stop for the target iPad shell. */
+    :root {
+      --tcc-safe-top:env(safe-area-inset-top,0px);
+      --tcc-safe-right:env(safe-area-inset-right,0px);
+      --tcc-safe-bottom:env(safe-area-inset-bottom,0px);
+      --tcc-safe-left:env(safe-area-inset-left,0px);
+    }
+    html, body { overflow-x:hidden; }
+    .app-shell { width:100%; max-width:100vw; min-width:0; overflow-x:hidden; }
+    .tcc-modal {
+      max-width:calc(100vw - 34px - var(--tcc-safe-left) - var(--tcc-safe-right));
+      max-height:calc(100dvh - 34px - var(--tcc-safe-top) - var(--tcc-safe-bottom));
+    }
+
+    /* App Health is the deliberate motion exception: dirty/unverified pulses as
+       one restrained red heartbeat; successful verification is green and still. */
+    @keyframes tccHealthHeartbeat {
+      0%,100% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 14px rgba(255,111,131,.07),inset 0 1px rgba(255,255,255,.035); }
+      42% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 21px rgba(255,111,131,.15),inset 0 0 0 1px rgba(255,111,131,.08); }
+      56% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 27px rgba(255,111,131,.20),inset 0 0 0 2px rgba(255,111,131,.11); }
+      70% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 19px rgba(255,111,131,.12),inset 0 0 0 1px rgba(255,111,131,.06); }
+    }
+    @keyframes tccHealthButtonHeartbeat {
+      0%,100% { transform:scale(1); box-shadow:0 7px 18px rgba(111,23,44,.12); }
+      52% { transform:scale(1.008); box-shadow:0 8px 22px rgba(255,111,131,.19); }
+    }
+    [data-screen="settings"] .settings-health-dirty,
+    [data-screen="settings"] .settings-health-needs-attention {
+      border-color:rgba(255,111,131,.46)!important;
+      background:
+        radial-gradient(circle at 86% 0%,rgba(255,111,131,.12),transparent 42%),
+        linear-gradient(145deg,#2a202b,#101a2a 62%,#071321)!important;
+      animation:tccHealthHeartbeat 1.55s ease-in-out infinite!important;
+    }
+    [data-screen="settings"] .settings-health-dirty .settings-health-run,
+    [data-screen="settings"] .settings-health-needs-attention .settings-health-run {
+      border-color:rgba(255,145,159,.66)!important;
+      background:linear-gradient(180deg,#b83c54,#762136)!important;
+      animation:tccHealthButtonHeartbeat 1.55s ease-in-out infinite!important;
+      filter:none!important;
+    }
+    [data-screen="settings"] .settings-health-verified {
+      border-color:rgba(112,164,142,.30)!important;
+      background:
+        radial-gradient(circle at 86% 0%,rgba(87,214,155,.055),transparent 43%),
+        linear-gradient(145deg,#172531,#0b1826 60%,#071321)!important;
+      animation:none!important;
+    }
+    [data-screen="settings"] .settings-health-verified .settings-health-run {
+      border-color:rgba(126,237,184,.38)!important;
+      background:linear-gradient(180deg,#245e4b,#183e35)!important;
+      animation:none!important;
+      filter:none!important;
+    }
+
+    /* Strong operational status copy remains readable. */
+    [data-screen="settings"] .settings-health-card-copy > strong { font-size:15px!important; }
+    [data-screen="settings"] .settings-health-card-copy > p { font-size:12px!important; line-height:1.38!important; }
+    [data-screen="settings"] .settings-health-card-status small { font-size:12px!important; }
+
+    /* Expanded views stay large enough to be useful on iPad, but their height is
+       content-driven. Empty/read-only views must never be stretched into the
+       photographed full-screen blank navy slabs. Scroll remains vertical only. */
+    @media (orientation:landscape) and (min-width:900px) {
+      .tcc-modal.tcc-expanded-modal {
+        width:min(1040px,calc(100vw - var(--sidebar-w,224px) - 28px - var(--tcc-safe-left) - var(--tcc-safe-right)))!important;
+        max-width:calc(100vw - var(--sidebar-w,224px) - 28px - var(--tcc-safe-left) - var(--tcc-safe-right))!important;
+        height:fit-content!important;
+        min-height:0!important;
+        max-height:min(86dvh,820px)!important;
+        margin:auto!important;
+        overflow:hidden!important;
+      }
+      .tcc-modal.tcc-expanded-modal > form {
+        height:auto!important;
+        min-height:0;
+        max-height:min(86dvh,820px);
+        grid-template-rows:auto minmax(0,1fr) auto;
+      }
+      .tcc-modal.tcc-expanded-modal .modal-body,
+      .tcc-modal.tcc-expanded-modal .tcc-expanded-card-body {
+        min-height:0;
+        max-height:min(74dvh,702px);
+        overflow-y:auto;
+        overflow-x:hidden;
+      }
+      .tcc-modal.tcc-expanded-modal .tcc-expanded-card-snapshot { min-height:0!important; align-self:start; }
+      .tcc-modal.tcc-expanded-modal .offline-map svg { max-height:none!important; height:min(64dvh,620px)!important; }
+    }
+
+    /* Information-bearing dashboard labels never fall back to micro-text. */
+    [data-screen="itinerary"] .itinerary-stat-copy span,
+    [data-screen="itinerary"] .itinerary-map-metric span,
+    [data-screen="journey-history"] .journey-milestone small,
+    [data-screen="journey-history"] .journey-milestone span,
+    [data-screen="reservations"] .reservation-tab-support small,
+    [data-screen="budget"] .budget-muted,
+    [data-screen="checklist"] .checklist-note,
+    [data-screen="vault"] .vault-empty { font-size:12px!important; }
+
+    /* App Health remains the deliberate motion exception even when iPad Reduce
+       Motion is enabled, but the accessible variant removes button scaling and
+       slows the panel to a very small luminance/edge heartbeat. */
+    @keyframes tccHealthReducedHeartbeat {
+      0%,100% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 12px rgba(255,111,131,.065),inset 0 1px rgba(255,255,255,.035); }
+      50% { box-shadow:0 18px 40px rgba(0,0,0,.26),0 0 18px rgba(255,111,131,.115),inset 0 0 0 1px rgba(255,111,131,.065); }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      [data-screen="settings"] .settings-health-dirty,
+      [data-screen="settings"] .settings-health-needs-attention {
+        animation:tccHealthReducedHeartbeat 2.6s ease-in-out infinite!important;
+      }
+      [data-screen="settings"] .settings-health-dirty .settings-health-run,
+      [data-screen="settings"] .settings-health-needs-attention .settings-health-run { animation:none!important; transform:none!important; }
+    }
+  
+
+    /* 13 Sep 2026 — APP HEALTH MEDICAL BENCHMARK LOCK.
+       The Build-1 medical language is authoritative: ambulance identity, visible
+       ECG line and traffic-light health states. This unlayered guard sits after
+       the layered theme so a later visual pass cannot flatten App Health again. */
+    [data-screen="settings"] .settings-health {
+      --health-state-rgb:255,209,91;
+      padding:18px!important;
+      border:1px solid rgba(126,184,199,.28)!important;
+      border-radius:20px!important;
+      background:radial-gradient(circle at 86% 0%,rgba(61,151,161,.09),transparent 43%),linear-gradient(145deg,#132b34,#081824 66%,#06121d)!important;
+      box-shadow:0 18px 42px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.035)!important;
+    }
+    [data-screen="settings"] .settings-health-verified { --health-state-rgb:87,214,155; }
+    [data-screen="settings"] .settings-health-needs-setup { --health-state-rgb:255,209,91; }
+    [data-screen="settings"] .settings-health-needs-attention,
+    [data-screen="settings"] .settings-health-dirty { --health-state-rgb:255,111,131; }
+    [data-screen="settings"] .settings-health-hero { align-items:center!important; gap:16px!important; }
+    [data-screen="settings"] .settings-health-brand { min-width:0!important; display:grid!important; grid-template-columns:58px minmax(0,1fr)!important; align-items:center!important; gap:14px!important; }
+    [data-screen="settings"] .settings-health-ambulance {
+      width:58px!important;height:58px!important;display:grid!important;place-items:center!important;
+      border:1px solid rgba(255,135,151,.56)!important;border-radius:16px!important;
+      background:radial-gradient(circle at 45% 34%,rgba(255,255,255,.11),transparent 48%),linear-gradient(145deg,#773143,#381b28)!important;
+      color:#ffe9ec!important;box-shadow:inset 0 1px rgba(255,255,255,.09),0 0 20px rgba(255,111,131,.10)!important;
+    }
+    [data-screen="settings"] .settings-health-ambulance .tcc-line-icon,
+    [data-screen="settings"] .settings-health-ambulance svg { width:33px!important;height:33px!important; }
+    [data-screen="settings"] .settings-health-eyebrow { margin:0 0 2px!important;color:#8bdff1!important;font-size:10.5px!important;font-weight:900!important;letter-spacing:.16em!important; }
+    [data-screen="settings"] .settings-health-copy h2 { margin:0 0 3px!important;font-size:32px!important;line-height:1!important;letter-spacing:-.025em!important;color:#f7fbff!important; }
+    [data-screen="settings"] .settings-health-copy > p:last-child { margin:0!important;color:#b8c9d3!important;font-size:13px!important;line-height:1.35!important; }
+    [data-screen="settings"] .settings-health-score {
+      min-width:300px!important;display:grid!important;grid-template-columns:44px minmax(0,1fr) 92px!important;align-items:center!important;gap:11px!important;
+      padding:11px 13px!important;border:1px solid rgba(var(--health-state-rgb),.42)!important;border-radius:15px!important;
+      background:linear-gradient(145deg,rgba(var(--health-state-rgb),.13),rgba(6,20,30,.80))!important;
+      box-shadow:inset 0 1px rgba(255,255,255,.04)!important;
+    }
+    [data-screen="settings"] .settings-health-score-icon { width:42px!important;height:42px!important;display:grid!important;place-items:center!important;border:2px solid rgba(var(--health-state-rgb),.62)!important;border-radius:50%!important;background:rgba(var(--health-state-rgb),.11)!important;color:rgb(var(--health-state-rgb))!important;box-shadow:0 0 0 6px rgba(var(--health-state-rgb),.045)!important; }
+    [data-screen="settings"] .settings-health-score-icon .tcc-line-icon,
+    [data-screen="settings"] .settings-health-score-icon svg { width:23px!important;height:23px!important; }
+    [data-screen="settings"] .settings-health-score-copy { min-width:0!important;display:grid!important;gap:2px!important; }
+    [data-screen="settings"] .settings-health-score-copy strong { color:#f4f8fa!important;font-size:17px!important;line-height:1.05!important;letter-spacing:.025em!important; }
+    [data-screen="settings"] .settings-health-score-copy small { color:rgba(var(--health-state-rgb),.94)!important;font-size:10px!important;font-weight:900!important;letter-spacing:.07em!important; }
+    [data-screen="settings"] .settings-health-pulse-line { width:92px!important;height:30px!important;opacity:.95!important;overflow:visible!important; }
+    [data-screen="settings"] .settings-health-pulse-line path { fill:none!important;stroke:rgb(var(--health-state-rgb))!important;stroke-width:2.6!important;stroke-linecap:round!important;stroke-linejoin:round!important;filter:drop-shadow(0 0 4px rgba(var(--health-state-rgb),.20))!important; }
+    [data-screen="settings"] .settings-health-run,
+    [data-screen="settings"] .settings-health-run[class*="settings-health-run-"] {
+      min-height:50px!important;margin-top:14px!important;padding:0 16px!important;display:grid!important;grid-template-columns:28px max-content minmax(72px,1fr)!important;align-items:center!important;justify-content:center!important;gap:10px!important;
+      border:1px solid rgba(var(--health-state-rgb),.58)!important;border-radius:12px!important;background:linear-gradient(180deg,rgba(var(--health-state-rgb),.28),rgba(var(--health-state-rgb),.14))!important;color:#f8fbfc!important;font-size:15px!important;font-weight:900!important;letter-spacing:.055em!important;text-shadow:none!important;
+      box-shadow:inset 0 1px rgba(255,255,255,.05),0 8px 18px rgba(0,0,0,.16)!important;
+    }
+    [data-screen="settings"] .settings-health-run .tcc-line-icon,
+    [data-screen="settings"] .settings-health-run .tcc-line-icon svg { width:25px!important;height:25px!important;color:rgb(var(--health-state-rgb))!important; }
+    [data-screen="settings"] .settings-health-run-label { white-space:nowrap!important; }
+    [data-screen="settings"] .settings-health-run-pulse { width:100%!important;max-width:150px!important;height:26px!important;justify-self:end!important;overflow:visible!important; }
+    [data-screen="settings"] .settings-health-run-pulse path { fill:none!important;stroke:rgb(var(--health-state-rgb))!important;stroke-width:2.25!important;stroke-linecap:round!important;stroke-linejoin:round!important; }
+    [data-screen="settings"] .settings-health-run.is-running .settings-health-run-pulse path { stroke-dasharray:170!important;animation:tccHealthTrace .9s linear infinite!important; }
+    @keyframes tccHealthTrace { from { stroke-dashoffset:170; } to { stroke-dashoffset:0; } }
+    [data-screen="settings"] .settings-health-grid { grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;margin-top:14px!important; }
+    [data-screen="settings"] .settings-health-card { min-width:0!important;padding:11px 12px!important;border:1px solid rgba(143,178,194,.18)!important;border-radius:12px!important;background:linear-gradient(145deg,rgba(17,42,55,.78),rgba(6,20,32,.90))!important;box-shadow:inset 3px 0 rgba(143,178,194,.22)!important; }
+    [data-screen="settings"] .settings-health-card-verified { border-color:rgba(87,214,155,.22)!important;box-shadow:inset 3px 0 rgba(87,214,155,.66)!important; }
+    [data-screen="settings"] :is(.settings-health-card-needs-setup,.settings-health-card-not-configured) { border-color:rgba(255,209,91,.24)!important;box-shadow:inset 3px 0 rgba(255,209,91,.70)!important; }
+    [data-screen="settings"] .settings-health-card-needs-attention { border-color:rgba(255,111,131,.26)!important;box-shadow:inset 3px 0 rgba(255,111,131,.72)!important; }
+    [data-screen="settings"] .settings-health-card-copy > strong { color:#f1f6f8!important;font-size:14px!important; }
+    [data-screen="settings"] .settings-health-card-copy > p { color:#aebfca!important;font-size:11.5px!important;line-height:1.32!important; }
+    [data-screen="settings"] .settings-health-card-status small { font-size:10.5px!important;font-weight:900!important;letter-spacing:.05em!important; }
+    [data-screen="settings"] .settings-health-card-verified .settings-health-card-status small { color:#83e6b3!important; }
+    [data-screen="settings"] :is(.settings-health-card-needs-setup,.settings-health-card-not-configured) .settings-health-card-status small { color:#ffe08a!important; }
+    [data-screen="settings"] .settings-health-card-needs-attention .settings-health-card-status small { color:#ff9dad!important; }
+    @media (max-width:1080px), (max-height:800px) {
+      [data-screen="settings"] .settings-health { padding:14px!important; }
+      [data-screen="settings"] .settings-health-brand { grid-template-columns:48px minmax(0,1fr)!important;gap:10px!important; }
+      [data-screen="settings"] .settings-health-ambulance { width:48px!important;height:48px!important;border-radius:13px!important; }
+      [data-screen="settings"] .settings-health-ambulance .tcc-line-icon,[data-screen="settings"] .settings-health-ambulance svg { width:28px!important;height:28px!important; }
+      [data-screen="settings"] .settings-health-copy h2 { font-size:28px!important; }
+      [data-screen="settings"] .settings-health-score { min-width:245px!important;grid-template-columns:38px minmax(0,1fr) 68px!important;padding:9px 10px!important;gap:8px!important; }
+      [data-screen="settings"] .settings-health-score-icon { width:36px!important;height:36px!important; }
+      [data-screen="settings"] .settings-health-score-copy strong { font-size:15px!important; }
+      [data-screen="settings"] .settings-health-pulse-line { width:68px!important; }
+      [data-screen="settings"] .settings-health-run { min-height:46px!important;margin-top:10px!important;grid-template-columns:24px max-content minmax(56px,1fr)!important;font-size:13.5px!important; }
+      [data-screen="settings"] .settings-health-run-pulse { max-width:110px!important; }
+      [data-screen="settings"] .settings-health-grid { gap:7px!important;margin-top:10px!important; }
+      [data-screen="settings"] .settings-health-card { padding:9px 10px!important; }
+      [data-screen="settings"] .settings-health-card-copy > strong { font-size:12.5px!important; }
+      [data-screen="settings"] .settings-health-card-copy > p { font-size:10.5px!important; }
+    }
+
+
+
+    /* S20 launch sequence authority — native splash matched, offline, short and non-network-blocking.
+       The complete Home screen is rendered underneath this overlay first. The
+       launch layer then moves from the Travel Command icon to current-country
+       identity and fades away; it never waits for a service worker or network. */
+    #tcc-launch {
+      position:fixed; inset:0; z-index:2147483000; display:grid; place-items:center;
+      overflow:hidden; pointer-events:auto; opacity:1; visibility:visible;
+      background:
+        radial-gradient(circle at 50% 42%,rgba(38,126,176,.18),transparent 32%),
+        radial-gradient(circle at 50% 100%,rgba(19,77,116,.13),transparent 44%),
+        linear-gradient(155deg,#071423 0%,#04101d 58%,#020a12 100%);
+      transition:opacity .32s ease,visibility .32s step-end;
+      contain:layout paint style;
+    }
+    #tcc-launch::before {
+      content:""; position:absolute; inset:0; pointer-events:none;
+      background:linear-gradient(115deg,transparent 24%,rgba(123,214,245,.055) 49%,transparent 73%);
+      transform:translateX(-42%); opacity:.7;
+      animation:tccLaunchSheen 1.55s ease-out both;
+    }
+    .tcc-launch-stage {
+      position:absolute; inset:0; display:grid; place-items:center; align-content:center;
+      text-align:center; padding:calc(34px + var(--tcc-safe-top)) 36px calc(34px + var(--tcc-safe-bottom));
+      transition:opacity .40s ease,transform .52s cubic-bezier(.22,.72,.22,1),filter .40s ease;
+      will-change:opacity,transform; transform-origin:center center; -webkit-backface-visibility:hidden; backface-visibility:hidden;
+    }
+    .tcc-launch-brand { opacity:1; transform:scale(1); }
+    .tcc-launch-brand-inner { display:grid; justify-items:center; gap:15px; }
+    .tcc-launch-logo {
+      width:104px; height:104px; border-radius:25px; object-fit:cover;
+      box-shadow:0 0 0 1px rgba(129,216,244,.32),0 24px 62px rgba(0,0,0,.42),0 0 42px rgba(69,174,220,.14);
+    }
+    .tcc-launch-brand-wordmark { display:grid; gap:2px; }
+    .tcc-launch-brand-wordmark strong {
+      color:#f3f8fb; font-family:Georgia,"Times New Roman",serif; font-size:24px;
+      line-height:1; letter-spacing:.14em; font-weight:700;
+    }
+    .tcc-launch-brand-wordmark span {
+      color:#82d7ef; font-size:9px; font-weight:900; letter-spacing:.31em;
+      text-transform:uppercase;
+    }
+    .tcc-launch-destination { opacity:0; transform:translateY(14px) scale(.965); filter:blur(3px); }
+    .tcc-launch-destination-inner { display:grid; justify-items:center; gap:4px; min-width:min(520px,80vw); }
+    .tcc-launch-flag,
+    .tcc-launch-country,
+    .tcc-launch-city,
+    .tcc-launch-home-label {
+      opacity:0; transform:translateY(8px);
+      transition:opacity .28s ease,transform .34s cubic-bezier(.22,.72,.22,1);
+    }
+    .tcc-launch-flag {
+      display:grid; place-items:center; width:86px; height:62px; margin-bottom:12px;
+      font-size:54px; line-height:1; filter:drop-shadow(0 12px 18px rgba(0,0,0,.28));
+    }
+    .tcc-launch-country {
+      color:#83ddf4; font-size:15px; line-height:1.15; font-weight:900;
+      letter-spacing:.22em; text-transform:uppercase;
+    }
+    .tcc-launch-city {
+      margin-top:4px; color:#f6f9fb; font-family:Georgia,"Times New Roman",serif;
+      font-size:48px; line-height:1.02; font-weight:700; letter-spacing:-.02em;
+      text-shadow:0 10px 30px rgba(0,0,0,.32);
+    }
+    .tcc-launch-home-label {
+      margin-top:12px; color:#a9bac6; font-size:10px; line-height:1;
+      font-weight:900; letter-spacing:.18em; text-transform:uppercase;
+    }
+    html[data-tcc-launch-phase="destination"] .tcc-launch-brand {
+      opacity:0; transform:translateY(-12px) scale(.94); filter:blur(2px);
+    }
+    html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-destination {
+      opacity:1; transform:translateY(0) scale(1); filter:none;
+    }
+    html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-flag {
+      opacity:1; transform:none; transition-delay:.02s;
+    }
+    html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-country {
+      opacity:1; transform:none; transition-delay:.10s;
+    }
+    html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-city {
+      opacity:1; transform:none; transition-delay:.18s;
+    }
+    html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-home-label {
+      opacity:1; transform:none; transition-delay:.28s;
+    }
+    html[data-tcc-launch-phase="done"] #tcc-launch {
+      opacity:0; visibility:hidden; pointer-events:none;
+    }
+    @keyframes tccLaunchSheen { 0%{transform:translateX(-46%);opacity:0} 28%{opacity:.66} 100%{transform:translateX(46%);opacity:0} }
+    @media (max-width:1080px), (max-height:800px) {
+      .tcc-launch-logo { width:88px; height:88px; border-radius:22px; }
+      .tcc-launch-brand-wordmark strong { font-size:21px; }
+      .tcc-launch-city { font-size:42px; }
+      .tcc-launch-flag { width:76px; height:54px; font-size:48px; margin-bottom:10px; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      #tcc-launch::before { animation:none; opacity:0; }
+      .tcc-launch-stage { transition:opacity .18s linear!important; transform:none!important; filter:none!important; }
+      #tcc-launch { transition:opacity .18s linear,visibility .18s step-end!important; }
+    }
+  </style>
+
+</head>
+<body>
+  <div id="tcc-launch" aria-hidden="true">
+    <div class="tcc-launch-stage tcc-launch-brand">
+      <div class="tcc-launch-brand-inner">
+        <img class="tcc-launch-logo" src="./app-icon.png" alt="">
+        <div class="tcc-launch-brand-wordmark"><strong>TRAVEL</strong><span>COMMAND CENTRE</span></div>
+      </div>
+    </div>
+    <div class="tcc-launch-stage tcc-launch-destination">
+      <div class="tcc-launch-destination-inner">
+        <div class="tcc-launch-flag"></div>
+        <div class="tcc-launch-country"></div>
+        <div class="tcc-launch-city"></div>
+        <div class="tcc-launch-home-label">Opening Home</div>
+      </div>
+    </div>
+  </div>
+  <div id="app" class="app-shell"></div>
+  <script>
+    // Launch fail-safe: never let presentation chrome strand the user if a module
+    // load is interrupted. This timer is presentation-only and does not perform
+    // any network or service-worker work.
+    globalThis.__TCC_LAUNCH_FAILSAFE__ = setTimeout(() => {
+      const launch = document.querySelector('#tcc-launch');
+      if (launch) launch.remove();
+      document.documentElement.removeAttribute('data-tcc-launch-phase');
+      document.documentElement.removeAttribute('data-tcc-launch-identity');
+    }, 4800);
+  </script>
+  <script type="module">
+    // Offline-first launch authority: import the complete installed shell immediately.
+    // Service-worker update checks run only after the app is already open.
+    await import('./src_main.js');
+
+    /* R58: semantic colour is owned by the layered Home-derived CSS.
+       Do not reintroduce post-render widget recolouring or a DOM MutationObserver
+       as a second visual authority. */
+
+  </script>
+</body>
+</html>

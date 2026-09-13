@@ -1,0 +1,786 @@
+import { buildHomeViewModel } from './src_core_home-view-model.js';
+import { formatMoney, audToLocal } from './src_core_currency.js';
+import { formatAUDate } from './src_core_dates.js';
+import { isDestinationBudgetUsable } from './src_core_budget.js';
+import { applyStayHeaderImage } from './src_components_page-hero.js';
+import { createModal } from './src_components_modal.js';
+import { makeExpandableCard } from './src_components_modal.js';
+import { createLineIcon } from './src_components_icons.js';
+import { createCountryOutline, countrySlug } from './src_components_country.js';
+import { saveSchengenSettingsDraft } from './src_core_settings-mutations.js';
+import { localISODate } from './src_core_device-time.js';
+
+// V50 protected continuity markers: COUNTRY QUICK LOOK · OFFLINE | History & Culture
+const COLLECTION_TO_SCREEN = Object.freeze({ itinerary:'itinerary', reservations:'reservations', calendarEvents:'calendar', journeyHistory:'journey-history', checklists:'checklist', vault:'vault', expenses:'budget' });
+
+function q(display,food,animal,plant,history){return{display,food:[food],animals:[animal],plants:[plant],history:[history]};}
+function r(display,food,animals,plants,history){return{display,food,animals,plants,history};}
+const COUNTRY_QUICK_LOOK=Object.freeze({
+  algeria:r('Algeria',['Couscous','Rechta noodles','Chorba soup','Makroud date pastries'],['Barbary macaques','Fennec foxes','Dorcas gazelles','Flamingos at wetlands'],['Aleppo pine','Atlas cedar','Date palms','Sahara wildflowers after rain'],['Casbah of Algiers','Roman ruins such as Timgad','Sahara ksour and oasis towns','Amazigh and Arab cultural heritage']),
+  albania:r('Albania',['Byrek','Tavë kosi','Qofte','Adriatic seafood'],['Golden eagles','Brown bears','Balkan lynx','Dalmatian pelicans'],['Albanian Alps wildflowers','Olive groves','Citrus along the coast','Mountain and city gardens'],['Berat and Gjirokastër','Hilltop castles','Ottoman-era bazaars','Riviera and mountain-village traditions']),
+  argentina:r('Argentina',['Empanadas','Asado barbecue','Milanesa','Dulce de leche'],['Guanacos','Capybaras','Andean condors','Magellanic penguins'],['Jacarandas','Ceibo — the national flower','Pampas grasslands','Patagonian steppe flora'],['Buenos Aires tango culture','Gaucho and estancia heritage','Mendoza wine country','Andean and Indigenous traditions']),
+  bahamas:r('The Bahamas',['Conch salad','Cracked conch','Peas and rice','Guava duff'],['West Indian flamingos','Sea turtles','Nurse sharks','Dolphins'],['Caribbean pine forests','Yellow elder — national flower','Mangroves','Tropical orchids'],['Nassau’s historic centre','Junkanoo tradition','African and Loyalist heritage','Distinctive Out Island communities']),
+  brazil:r('Brazil',['Pão de queijo','Feijoada','Churrasco','Brigadeiro'],['Capybaras','Jaguars','Toucans','Amazon river dolphins'],['Ipê trees','Orchids','Bromeliads','Amazon rainforest plants'],['Rio de Janeiro','Afro-Brazilian Salvador','Indigenous cultures','Modernist Brasília']),
+  bulgaria:r('Bulgaria',['Banitsa','Shopska salad','Kavarma','Bulgarian yoghurt'],['Brown bears','Golden jackals','Griffon vultures','Chamois'],['Damask roses','Lavender fields','Rhodope wildflowers','Beech and pine forests'],['Plovdiv’s old town','Rila Monastery','Thracian tombs','Folk music, dance and craft traditions']),
+  cambodia:r('Cambodia',['Fish amok','Beef lok lak','Kuy teav noodle soup','Num banh chok'],['Irrawaddy dolphins','Asian elephants','Gibbons','Giant ibis'],['Lotus','Sugar palms','Tropical orchids','Mangroves and flooded forests'],['Angkor temples','Phnom Penh’s Royal Palace','Khmer dance and arts','Mekong and Tonlé Sap communities']),
+  canada:r('Canada',['Poutine','Maple syrup','Butter tarts','Pacific smoked salmon'],['Moose','Black and brown bears','Beavers','Whales'],['Sugar maples','Boreal forests','Prairie wildflowers','Major botanic gardens'],['First Nations, Inuit and Métis cultures','Québec’s historic cities','Rockies and national parks','Major museums and multicultural cities']),
+  chile:r('Chile',['Pastel de choclo','Empanadas','Completos','Pacific seafood'],['Humboldt penguins','Andean condors','Guanacos','Andean flamingos'],['Copihue — national flower','Araucaria trees','Atacama desert blooms','Vineyard landscapes'],['Valparaíso','Rapa Nui heritage','Santiago museums','Patagonian and Andean traditions']),
+  china:r('China',['Jiaozi dumplings','Peking duck','Regional hot pot','Dim sum'],['Giant pandas','Golden snub-nosed monkeys','Red-crowned cranes','Takins'],['Peonies','Lotus','Bamboo','Classical scholar gardens'],['Forbidden City','Great Wall','Terracotta Army','Rich regional and ethnic traditions']),
+  colombia:r('Colombia',['Arepas','Bandeja paisa','Ajiaco','Empanadas'],['Andean condors','Spectacled bears','Amazon river dolphins','Extraordinary hummingbird diversity'],['Orchids','Wax palms','Coffee-region gardens','Amazon rainforest plants'],['Cartagena','Bogotá museums','Coffee towns','Afro-Colombian and Indigenous cultures']),
+  austria:r('Austria',['Wiener schnitzel','Sachertorte','Kaiserschmarrn','Apple strudel'],['Alpine ibex','Chamois','Alpine marmots','Golden eagles'],['Edelweiss','Alpine roses','Gentians','Formal palace and alpine gardens'],['Habsburg Vienna','Salzburg music heritage','Mountain castles and abbeys','Historic coffee-house culture']),
+  australia:r('Australia',['Lamingtons','Meat pies','Barramundi','Flat white coffee'],['Koalas','Kangaroos','Wombats','Platypus'],['Eucalyptus forests','Banksias and grevilleas','Bottlebrush and waratahs','Excellent native botanic gardens'],['First Nations cultures','Convict and colonial heritage','Major museums and galleries','Distinctive coastal and outback communities']),
+  belgium:r('Belgium',['Belgian waffles','Frites','Chocolate and pralines','Moules-frites'],['Red deer','Wild boar','Red squirrels','Grey seals on the North Sea coast'],['Hallerbos bluebells','Ardennes woodland','Flower-rich city parks','Botanic gardens and glasshouses'],['Brussels Grand Place','Bruges and Ghent canals','World War I heritage sites','Strong comic-art and design culture']),
+  croatia:r('Croatia',['Peka','Black risotto','Pašticada','Istrian truffles'],['Bottlenose dolphins','Griffon vultures','Brown bears','Chamois'],['Lavender on the islands','Olive groves','Wild orchids','Plitvice forest and lake flora'],['Dubrovnik’s city walls','Diocletian’s Palace in Split','Istrian hill towns','Adriatic island and maritime culture']),
+  cyprus:r('Cyprus',['Halloumi','Souvla','Cypriot meze','Loukoumades'],['Cyprus mouflon','Greater flamingos','Loggerhead turtles','Green turtles'],['Cyprus cyclamen','Wild orchids','Olive and carob trees','Bougainvillea-filled gardens'],['Paphos mosaics','Troodos painted churches','Ancient Kourion','Nicosia’s layered history']),
+  czechia:r('Czechia',['Svíčková','Roast duck with dumplings','Koláče pastries','Czech beer-hall food'],['Eurasian lynx','Red deer','Wild boar','European beavers'],['Linden — the national tree','Bohemian forest wildflowers','Historic palace gardens','Moravian vineyard landscapes'],['Prague Castle','Český Krumlov','Historic spa towns','Medieval squares and beer culture']),
+  'costa-rica':r('Costa Rica',['Gallo pinto','Casado','Ceviche','Fried plantains'],['Three-toed sloths','Scarlet macaws','Howler monkeys','Sea turtles'],['Guaria morada orchid','Heliconias','Cloud-forest plants','Mangroves'],['National-park culture','Coffee heritage','Indigenous communities','Relaxed pura vida identity']),
+  denmark:r('Denmark',['Smørrebrød','Danish pastries','Frikadeller meatballs','Pølser hot dogs'],['Harbour porpoises','Red deer','Grey seals','White-tailed sea eagles'],['Beech forests','Coastal heath','Spring bulbs','Copenhagen botanic gardens'],['Copenhagen harbour and palaces','Viking heritage','Renaissance castles','Modern design and architecture']),
+  'dominican-republic':r('Dominican Republic',['Mangú','La bandera','Sancocho','Tostones'],['Humpback whales','Rhinoceros iguanas','West Indian manatees','Flamingos'],['Royal palms','Bayahibe rose — national flower','Mangroves','Cacao and coffee plants'],['Santo Domingo Colonial Zone','Merengue and bachata','Taíno heritage','Caribbean town and village traditions']),
+  estonia:r('Estonia',['Kama','Dark rye bread','Smoked fish','Kohuke curd snacks'],['Eurasian lynx','Brown bears','Moose','Grey seals'],['Cornflower — national flower','Bog and wetland plants','Birch and pine forests','Botanical gardens'],['Tallinn Old Town','Song Festival tradition','Historic manor houses','Sauna and bog-walking culture']),
+  finland:r('Finland',['Karelian pies','Salmon soup','Rye bread','Korvapuusti cinnamon buns'],['Reindeer','Brown bears','Elk','Saimaa ringed seals'],['Lily of the valley','Birch forests','Cloudberries','Arctic and lakeside wildflowers'],['Sauna culture','Helsinki design and architecture','Sámi culture in Lapland','Historic wooden towns']),
+  iceland:r('Iceland',['Skyr','Lamb soup','Geothermal-baked rye bread','Fresh North Atlantic fish'],['Arctic foxes','Puffins','Whales','Icelandic horses'],['Arctic thyme','Moss-covered lava fields','Lupin-filled summer landscapes','Geothermal greenhouse gardens'],['Old Norse sagas','Turf-house heritage','Geothermal pool culture','Volcanic and fishing-community history']),
+  india:r('India',['Masala dosa','Biryani','Regional thali meals','Street chaat'],['Bengal tigers','Asian elephants','Indian peafowl','Langurs'],['Lotus','Marigolds','Banyan trees','Mughal and botanic gardens'],['Temples, forts and palaces','Huge regional craft traditions','Railway and market culture','Diverse festivals and living religions']),
+  ireland:r('Ireland',['Irish stew','Soda bread','Seafood chowder','Boxty potato cakes'],['Red deer','Puffins','Grey seals','Red squirrels'],['Gorse','Bluebell woods','Fuchsia-lined hedgerows','Historic estate gardens'],['Castles and monastic ruins','Traditional music','Georgian Dublin','Prehistoric passage tombs and stone sites']),
+  jamaica:r('Jamaica',['Jerk chicken','Ackee and saltfish','Jamaican patties','Curry goat'],['Doctor bird hummingbirds','Jamaican iguanas','American crocodiles','Dolphins and reef life'],['Lignum vitae','Tropical orchids','Blue Mountain coffee plants','Lush tropical gardens'],['Reggae heritage','Maroon history','African and Caribbean traditions','Markets, music and colourful town life']),
+  laos:r('Laos',['Larb','Sticky rice','Tam mak hoong papaya salad','Khao piak noodles'],['Gibbons','Asian elephants','Irrawaddy dolphins in the south','Hornbills'],['Frangipani — national flower','Orchids','Bamboo forests','Mekong wetland plants'],['Luang Prabang heritage','Buddhist temples','Morning alms traditions','Hmong, Khmu and other ethnic cultures']),
+  egypt:r('Egypt',['Koshari','Ful medames','Ta’ameya','Molokhia'],['Nile crocodiles in the far south','Desert foxes','Dugongs in the Red Sea','Dolphins and reef life'],['Lotus','Date palms','Papyrus','Desert acacia'],['Pyramids and Giza','Luxor temples and tombs','Alexandria’s Mediterranean history','Islamic and Coptic Cairo']),
+  france:r('France',['Baguettes and pastries','Regional cheeses','Crêpes','Regional market cuisine'],['Alpine ibex','Marmots','Camargue flamingos','Dolphins along Mediterranean coasts'],['Lavender fields','Rose gardens','Alpine wildflowers','Famous formal and artist gardens'],['Paris museums and monuments','Loire châteaux','Roman and medieval towns','Café and market culture']),
+  germany:r('Germany',['Pretzels','Regional sausages','Currywurst','Black Forest cake'],['Red deer','Wild boar','Red foxes','White storks'],['Black Forest firs','Rhododendron and palace gardens','Wildflower meadows','Historic botanical collections'],['Berlin’s modern history','Rhine and Bavarian castles','Medieval old towns','Automotive, science and art museums']),
+  greece:r('Greece',['Moussaka','Souvlaki','Spanakopita','Greek salad and meze'],['Loggerhead turtles','Mediterranean monk seals','Golden jackals','Dolphins'],['Olive groves','Bougainvillea','Wild herbs','Spring island wildflowers'],['Athens and the Acropolis','Delphi and ancient sites','Byzantine and Orthodox heritage','Island villages and harbour culture']),
+  hungary:r('Hungary',['Goulash','Lángos','Paprika-rich stews','Kürtőskalács chimney cake'],['Great bustards','Red deer','Wild boar','European otters'],['Acacia and linden trees','Danube wetland plants','Spring meadow flowers','Thermal-bath and city gardens'],['Budapest along the Danube','Thermal bath culture','Castle districts','Folk music, markets and paprika traditions']),
+  indonesia:r('Indonesia',['Nasi goreng (fried rice)','Satay chicken or beef skewers','Babi guling (suckling pig)','Bali coffee and fresh tropical juices'],['Playful macaques','Endangered Bali myna','Sea turtles around island beaches','Colourful reef life'],['Frangipani (jepun) blooms','Orchids in abundance','Iconic rice terraces','Lush tropical gardens'],['Temple etiquette and sarongs','Remove shoes where required','Keep small cash for local purchases','Use bottled or treated drinking water']),
+  liechtenstein:r('Liechtenstein',['Käsknöpfle cheese noodles','Alpine cheeses','Rösti-style potato dishes','Pastries and café cakes'],['Alpine ibex','Chamois','Marmots','Golden eagles'],['Alpine wildflowers','Vineyards around Vaduz','Mountain orchids','Rose and village gardens'],['Vaduz Castle','Compact national museums','Rhine Valley villages','Alpine walking and farming traditions']),
+  italy:r('Italy',['Pizza','Fresh pasta','Gelato','Espresso and regional pastries'],['Alpine ibex','Marsican brown bears','Flamingos','Dolphins'],['Cypress-lined landscapes','Olive groves','Wisteria and roses','Renaissance and villa gardens'],['Ancient Rome and Pompeii','Florence and Renaissance art','Venice and maritime history','Hill towns, churches and piazzas']),
+  japan:r('Japan',['Sushi and sashimi','Ramen','Okonomiyaki','Wagashi sweets'],['Japanese macaques','Sika deer','Red-crowned cranes','Tanuki'],['Cherry blossoms','Japanese maples','Wisteria','Moss, temple and strolling gardens'],['Kyoto temples and historic districts','Castles and samurai history','Onsen bathing culture','Markets, museums and modern city culture']),
+  jordan:r('Jordan',['Mansaf','Falafel','Mezze','Knafeh'],['Arabian oryx','Nubian ibex','Desert foxes','Migratory raptors'],['Black iris','Olive trees','Date palms','Desert wildflowers after rain'],['Petra','Jerash Roman ruins','Wadi Rum','Amman’s ancient and modern layers']),
+  morocco:r('Morocco',['Tagine','Couscous','Pastilla','Mint tea'],['Barbary macaques','Fennec foxes','Northern bald ibis','Dromedary camels'],['Argan trees','Valley of Roses','Atlas cedar forests','Palm-filled oasis gardens'],['Historic medinas','Riads and courtyard architecture','Souqs and craft traditions','Amazigh and Arab cultural heritage']),
+  netherlands:r('Netherlands',['Stroopwafels','Bitterballen','Dutch herring','Poffertjes'],['Eurasian spoonbills','Grey seals','Brown hares','White storks'],['Tulip fields','Keukenhof displays','Canalside gardens','Heather and dune flora'],['Amsterdam canal ring','Windmills and water engineering','Rijksmuseum and art heritage','Cycling and compact historic towns']),
+  portugal:r('Portugal',['Pastel de nata','Bacalhau','Grilled sardines','Bifana pork rolls'],['Iberian wolves','Bottlenose dolphins','Flamingos','Atlantic seabirds'],['Cork oak landscapes','Camellias and azaleas','Jacaranda-lined streets','Historic palace and botanic gardens'],['Azulejo tilework','Castles and walled towns','Fado music','Maritime exploration heritage']),
+  russia:r('Russia',['Pelmeni','Blini','Borscht','Pirozhki'],['Amur tigers','Brown bears','Baikal seals','Reindeer'],['Birch forests','Vast taiga','Summer wildflowers','Imperial palace gardens'],['Hermitage and Winter Palace','Moscow Kremlin','Historic cathedrals','Trans-Siberian and regional cultures']),
+  spain:r('Spain',['Tapas','Paella','Tortilla española','Churros'],['Iberian lynx','Cantabrian brown bears','Flamingos','Griffon vultures'],['Orange blossom','Olive groves','Lavender','Palace and Moorish gardens'],['Alhambra','Gaudí architecture','Madrid’s major museums','Regional fiestas and historic old towns']),
+  switzerland:r('Switzerland',['Fondue','Raclette','Rösti','Swiss chocolate'],['Alpine ibex','Marmots','Chamois','Golden eagles'],['Alpine roses','Edelweiss','Gentians','Botanical and lakeside gardens'],['Historic old towns','Scenic mountain railways','Alpine passes','Castles and multilingual regional culture']),
+  thailand:r('Thailand',['Pad thai','Green curry','Som tam','Mango sticky rice'],['Asian elephants','Gibbons','Hornbills','Whale sharks and reef life'],['Lotus','Orchids','Frangipani','Tropical temple and botanic gardens'],['Bangkok temples','Ayutthaya ruins','Night and floating markets','Respectful temple and royal etiquette']),
+  turkey:r('Türkiye',['Simit','Kebabs','Meze','Baklava'],['Van cats','Loggerhead turtles','Brown bears','Wild goats'],['Tulips','Roses','Olive groves','Lavender fields'],['Hagia Sophia and Istanbul','Ephesus and ancient sites','Cappadocia','Bazaars, hammams and Ottoman heritage']),
+  'united-kingdom':r('United Kingdom',['Fish and chips','Sunday roast','Savoury pies','Afternoon tea'],['Red squirrels','Red deer','Puffins','Grey seals'],['Bluebell woods','Rose gardens','Heather moorlands','Kew and major botanic gardens'],['Castles and Roman sites','World-class museums','Industrial and maritime heritage','Historic villages, markets and film locations']),
+  'united-states':r('United States',['Regional barbecue','Burgers and diners','Tex-Mex','Regional seafood and comfort food'],['Bald eagles','American bison','Alligators','Black and brown bears'],['Giant sequoias and redwoods','Desert cacti','National-park wildflowers','Major botanic gardens'],['Smithsonian and major museums','Civil Rights and Indigenous history','National parks and road-trip culture','Famous film, music and sports locations']),
+  vietnam:r('Vietnam',['Phở','Bánh mì','Bún chả','Fresh rice-paper rolls'],['Red-shanked doucs','Gibbons','Asian elephants','Sea turtles'],['Lotus','Orchids','Rice terraces','Tropical gardens and mangroves'],['Huế imperial heritage','Hội An old town','Hanoi’s old quarter','Museums and 20th-century history']),
+  'bosnia-and-herzegovina':r('Bosnia and Herzegovina',['Ćevapi with flatbread and onion','Burek and other filled pita pastries','Bosnian coffee served slowly','Begova čorba chicken-and-okra soup'],['Brown bears in mountain forests','Chamois on rocky high country','Golden eagles over the Dinaric Alps','Wild trout in clear karst rivers'],['Bosnian lily in mountain meadows','Beech and fir forests','Spring wildflowers across the Dinaric Alps','Riverside gardens in historic towns'],['Mostar’s Old Bridge and old bazaar','Sarajevo’s Ottoman and Austro-Hungarian layers','Coffee-house culture','Mosques, churches and synagogues close together']),
+  latvia:r('Latvia',['Grey peas with bacon','Rye bread','Smoked fish from the Baltic coast','Sklandrausis carrot-and-potato tart'],['White storks in rural areas','European beavers','Roe deer in forests and fields','Grey seals on the Baltic coast'],['Oxeye daisy — Latvia’s national flower','Birch and pine forests','Wildflower meadows','Rhododendron displays in Riga gardens'],['Riga’s Art Nouveau district','Song and Dance Festival tradition','Wooden architecture','Medieval old towns and Baltic trade history']),
+  lithuania:r('Lithuania',['Cepelinai potato dumplings','Šaltibarščiai cold beet soup','Dark rye bread','Kibinai pastries'],['White storks across farmland','European bison in protected areas','Roe deer and elk','Grey seals on the Baltic coast'],['Rue (rūta) in Lithuanian tradition','Linden-lined parks','Pine forests of the Curonian Spit','Spring meadow wildflowers'],['Vilnius Old Town','Hill of Crosses','Trakai Island Castle','Strong song, craft and folk traditions']),
+  luxembourg:r('Luxembourg',['Judd mat gaardebounen smoked pork with beans','Gromperekichelcher potato cakes','Quetschentaart plum tart','Moselle wines'],['Red deer in the Ardennes','Wild boar in forest regions','Red foxes','Birdlife along the Moselle and Alzette'],['Historic rose-growing tradition','Beech and oak woodland','Vineyards along the Moselle','Formal parks in Luxembourg City'],['Old quarters and fortifications','Bock Casemates','Castles throughout the countryside','Multilingual French-German-Luxembourgish culture']),
+  malaysia:r('Malaysia',['Nasi lemak','Roti canai','Char kway teow','Satay and peanut sauce'],['Malayan tiger','Bornean orangutan','Proboscis monkey','Hornbills'],['Hibiscus — the national flower','Orchids and tropical gardens','Mangrove forests','Giant rainforest trees'],['George Town street heritage','Melaka’s trading-port history','Malay, Chinese and Indian cultural mix','Mosques, temples and food markets']),
+  malta:r('Malta',['Pastizzi','Rabbit stew (fenek)','Ftira bread sandwiches','Imqaret date pastries'],['Maltese wall lizard','Blue rock thrush','Yelkouan shearwater','Dolphins in surrounding waters'],['Maltese rock-centaury — national plant','Bougainvillea in towns and gardens','Carob and olive trees','Spring wildflowers across the islands'],['Valletta’s fortified streets','Megalithic temples','Knights of St John heritage','Colourful village festas']),
+  mexico:r('Mexico',['Tacos al pastor','Mole sauces','Tamales','Churros and regional sweets'],['Axolotl','Jaguar','Monarch butterflies','Sea turtles on Pacific and Caribbean coasts'],['Dahlia — Mexico’s national flower','Agave landscapes','Jacaranda-lined city streets','Cacti and desert gardens'],['Maya and Aztec heritage','Day of the Dead traditions','Colonial historic centres','Markets, murals and regional craft traditions']),
+  monaco:r('Monaco',['Barbagiuan filled fritters','Socca chickpea pancake','Stocafi salt-cod dishes','Mediterranean seafood'],['Peregrine falcons around coastal cliffs','Mediterranean seabirds','Dolphins offshore','Marine life in the Pelagos Sanctuary'],['Exotic Garden collections','Mediterranean palms and succulents','Princess Grace Rose Garden','Flower-filled terraces'],['Monaco-Ville old town','Prince’s Palace','Oceanographic Museum','Belle Époque and Grand Prix heritage']),
+  montenegro:r('Montenegro',['Kačamak','Njeguški pršut smoked ham','Buzara seafood','Krempita custard slice'],['Balkan chamois','Brown bears','Golden eagles','Dolphins in the Adriatic'],['Mountain wildflowers in Durmitor','Black pine forests','Olive groves near the coast','Mediterranean herbs and pomegranate'],['Kotor’s walled old town','Ostrog Monastery','Venetian Adriatic heritage','Mountain village traditions']),
+  'new-zealand':r('New Zealand',['Hāngi-cooked food','Green-lipped mussels','Meat pies','Pavlova and seasonal fruit'],['Kiwi','Kea','New Zealand fur seal','Hector’s dolphin'],['Pōhutukawa — the Christmas tree','Silver fern','Native flax (harakeke)','Botanic gardens rich in native flora'],['Māori culture and marae traditions','Waitangi history','Art Deco Napier','Strong outdoor and conservation culture']),
+  'north-macedonia':r('North Macedonia',['Tavče gravče baked beans','Pastrmajlija flatbread','Ajvar pepper relish','Shopska salad'],['Balkan lynx','Brown bears','Dalmatian pelicans around Prespa','Golden eagles'],['Mountain wildflowers','Beech and pine forests','Plane trees in old towns','Lakeside reeds and wetlands'],['Ohrid’s churches and lake heritage','Skopje Old Bazaar','Orthodox monasteries','Ottoman and Balkan cultural layers']),
+  norway:r('Norway',['Fårikål lamb and cabbage','Brunost brown cheese','Fresh and smoked salmon','Skillingsboller cinnamon buns'],['Moose','Reindeer','Atlantic puffins','White-tailed sea eagles'],['Heather-covered hills','Birch forests','Mountain wildflowers','Botanic gardens adapted to northern climates'],['Fjords and coastal villages','Medieval stave churches','Sámi culture in the north','Maritime and Viking heritage']),
+  oman:r('Oman',['Shuwa slow-cooked spiced meat','Majboos rice dishes','Omani halwa','Dates with kahwa coffee'],['Arabian oryx','Green turtles at nesting beaches','Dromedary camels','Dolphins offshore'],['Frankincense trees in Dhofar','Date palms','Jebel Akhdar rose terraces','Wadi oases and desert plants'],['Forts and watchtowers','Mutrah and Nizwa souqs','Frankincense-route heritage','Dhow and seafaring traditions']),
+  panama:r('Panama',['Sancocho chicken soup','Ceviche','Patacones fried plantain','Arroz con pollo'],['Three-toed sloths','Harpy eagles','Howler and capuchin monkeys','Sea turtles'],['Holy Ghost orchid','Heliconias','Mangrove forests','Dense tropical rainforest'],['Panama Canal','Casco Viejo','Guna and Emberá cultures','Caribbean and Pacific port heritage']),
+  peru:r('Peru',['Ceviche','Lomo saltado','Causa potato dishes','Anticuchos'],['Vicuña','Andean condor','Spectacled bear','Sea lions along the Pacific coast'],['Cantuta — Peru’s national flower','High-Andes puya plants','Orchids in cloud forests','Extraordinary potato diversity'],['Machu Picchu and Inca heritage','Cusco’s layered architecture','Nazca Lines','Markets and regional textile traditions']),
+  philippines:r('Philippines',['Adobo','Sinigang sour soup','Lechon','Halo-halo'],['Philippine eagle','Philippine tarsier','Whale sharks','Tamaraw'],['Sampaguita — the national flower','Orchids','Mangrove forests','Lush rice-terrace landscapes'],['Jeepney culture','Spanish-colonial churches and towns','Colourful fiestas','Strong regional and Indigenous traditions']),
+  poland:r('Poland',['Pierogi','Żurek sour rye soup','Bigos hunter’s stew','Pączki doughnuts'],['European bison','White storks','Grey wolves','European beavers'],['Ancient Białowieża woodland','Tatra crocuses','Linden trees','Formal palace and city gardens'],['Kraków’s historic centre','Warsaw’s reconstructed Old Town','Castles and fortified towns','Rich Jewish, Catholic and regional heritage']),
+  qatar:r('Qatar',['Machboos rice and meat','Harees','Luqaimat sweet dumplings','Karak tea'],['Arabian oryx','Dugongs','Whale sharks','Flamingos and migratory birds'],['Sidra — a national symbol','Mangroves at Al Thakira','Date palms','Hardy desert wildflowers after rain'],['Souq Waqif','Museum of Islamic Art','Pearl-diving heritage','Dhow and Gulf maritime traditions']),
+  romania:r('Romania',['Sarmale cabbage rolls','Mici grilled rolls','Mămăligă polenta','Papanași cheese doughnuts'],['Brown bears','Eurasian lynx','Chamois','Dalmatian pelicans in the Danube Delta'],['Carpathian wildflower meadows','Beech forests','Peonies','Botanic gardens in major cities'],['Transylvanian fortified towns','Painted monasteries','Danube Delta communities','Bucharest’s Belle Époque and modern layers']),
+  serbia:r('Serbia',['Ćevapi','Pljeskavica','Kajmak','Sarma'],['White-tailed eagles','European otters','Brown bears in western mountains','Grey wolves'],['Plum orchards','Oak and beech forests','Danube wetland flora','Lilac-rich valleys and spring meadows'],['Belgrade Fortress','Orthodox monasteries','Novi Sad and Petrovaradin','Danube and Balkan crossroads heritage']),
+  singapore:r('Singapore',['Hainanese chicken rice','Laksa','Kaya toast','Chilli crab'],['Smooth-coated otters','Long-tailed macaques','Oriental pied hornbills','Monitor lizards'],['National Orchid Garden','Gardens by the Bay','Bukit Timah rainforest','Tropical roadside and park planting'],['Hawker-centre culture','Peranakan heritage','Historic shophouses','Malay, Chinese, Indian and global influences']),
+  slovakia:r('Slovakia',['Bryndzové halušky','Kapustnica cabbage soup','Lokše potato flatbreads','Trdelník-style sweet pastries'],['Tatra chamois','Brown bears','Eurasian lynx','Alpine marmots'],['Tatra alpine flowers','Beech and fir forests','Linden trees','Mountain botanical gardens'],['Castles on hilltops','Historic mining towns','Wooden churches','Bratislava’s Danube and Habsburg heritage']),
+  slovenia:r('Slovenia',['Potica rolled cake','Štruklji dumplings','Jota bean-and-sauerkraut stew','Kranjska klobasa sausage'],['Brown bears','Olm cave salamanders','Alpine ibex','Carniolan honey bees'],['Linden trees','Julian Alps wildflowers','Vineyards','Ljubljana Botanic Garden'],['Lake Bled and Alpine heritage','Karst caves','Ljubljana’s historic centre','Long beekeeping tradition']),
+  'south-africa':r('South Africa',['Braai barbecue','Bobotie','Bunny chow','Malva pudding'],['Elephants, lions and other Big Five wildlife','African penguins','Southern right whales','Meerkats and antelope'],['King protea — national flower','Cape fynbos','Kirstenbosch gardens','Jacaranda-lined streets in Pretoria'],['Apartheid and freedom-struggle history','Cape and Winelands heritage','Zulu, Xhosa and many other living cultures','World-class museums and heritage sites']),
+  'south-korea':r('South Korea',['Bibimbap','Korean barbecue','Kimchi','Tteokbokki'],['Korean water deer','Red-crowned cranes','Raccoon dogs','Oriental magpies'],['Mugunghwa — Rose of Sharon','Spring cherry blossoms','Bamboo groves','Palace and temple gardens'],['Joseon royal palaces','Hanok villages','Traditional markets','Contemporary music, film and design culture']),
+  'sri-lanka':r('Sri Lanka',['Rice and curry','Hoppers','Kottu roti','String hoppers'],['Asian elephants','Sri Lankan leopards','Sloth bears','Blue whales'],['Blue water lily — national flower','Tea gardens','Orchids and tropical flowers','Coconut palms'],['Sigiriya','Ancient Buddhist temples','Galle Fort','Kandyan and coastal cultural traditions']),
+  sweden:r('Sweden',['Swedish meatballs','Kanelbullar cinnamon buns','Gravlax','Crispbread and cheese'],['Moose','Reindeer','Brown bears','Grey seals around the archipelagos'],['Birch and spruce forests','Summer wildflower meadows','Botanical gardens','Archipelago coastal flora'],['Gamla Stan in Stockholm','Fika café culture','Sámi heritage in the north','Strong design and museum culture']),
+  taiwan:r('Taiwan',['Beef noodle soup','Xiaolongbao','Lu rou fan braised pork rice','Bubble tea'],['Formosan macaques','Taiwan black bears','Taiwan blue magpies','Sea turtles'],['Orchids','Tea gardens','Spring cherry blossoms','Subtropical mountain forests'],['Temple culture','Night markets','Indigenous Taiwanese cultures','Historic old streets and Japanese-era heritage']),
+  tunisia:r('Tunisia',['Couscous','Brik pastry','Harissa','Lablabi chickpea soup'],['Fennec foxes','Barbary sheep','Flamingos','Sea turtles'],['Olive groves','Jasmine','Date palms','Bougainvillea and Mediterranean gardens'],['Carthage','Tunis medina','Roman sites such as Dougga','Blue-and-white Sidi Bou Said']),
+  'united-arab-emirates':r('United Arab Emirates',['Machboos','Harees','Luqaimat','Dates with Arabic coffee'],['Arabian oryx','Falcons','Dugongs','Green turtles'],['Ghaf — the national tree','Date palms','Coastal mangroves','Desert flowers after winter rain'],['Forts and old souqs','Pearl-diving heritage','Bedouin traditions','Bold modern architecture and museums'])
+});
+
+const TOILET_LANGUAGE=Object.freeze({
+  algeria:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  albania:{language:'Albanian',phrase:'Ku është tualeti?',say:'koo esht too-ah-LEH-tee?',slow:'koo | esht | too · ah · LEH · tee'},
+  argentina:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  bahamas:{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  brazil:{language:'Portuguese',phrase:'Onde fica o banheiro?',say:'ON-jee FEE-kah oo ban-YEH-roo?',slow:'ON · jee | FEE · kah | oo | ban · YEH · roo'},
+  bulgaria:{language:'Bulgarian',phrase:'Къде е тоалетната?',say:'kuh-DEH eh toh-ah-LET-nah-tah?',slow:'kuh · DEH | eh | toh · ah · LET · nah · tah'},
+  cambodia:{language:'Khmer',phrase:'បង្គន់នៅឯណា?',say:'bang-KON nov ae-NAH?',slow:'bang · KON | nov | ae · NAH'},
+  canada:{language:'English',phrase:'Where’s the washroom?',say:'wairs the WOSH-room?',slow:'wairs | the | WOSH · room'},
+  chile:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  china:{language:'Mandarin',phrase:'厕所在哪里？',say:'tsuh-swaw dzeye nah-lee?',slow:'tsuh · swaw | dzeye | nah · lee'},
+  colombia:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  austria:{language:'German',phrase:'Wo ist die Toilette?',say:'voh ist dee toy-LET-uh?',slow:'voh | ist | dee | toy · LET · uh'},
+  australia:{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  belgium:{language:'French',phrase:'Où sont les toilettes ?',say:'oo sohn lay twah-LET?',slow:'oo | sohn | lay | twah · LET'},
+  croatia:{language:'Croatian',phrase:'Gdje je WC?',say:'gdye yeh veh-TSEH?',slow:'gdye | yeh | veh · TSEH'},
+  cyprus:{language:'Greek',phrase:'Πού είναι η τουαλέτα;',say:'poo EE-neh ee too-ah-LEH-tah?',slow:'poo | EE · neh | ee | too · ah · LEH · tah'},
+  czechia:{language:'Czech',phrase:'Kde je toaleta?',say:'gdeh yeh toh-ah-LEH-tah?',slow:'gdeh | yeh | toh · ah · LEH · tah'},
+  'costa-rica':{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  denmark:{language:'Danish',phrase:'Hvor er toilettet?',say:'vor air toy-LET-et?',slow:'vor | air | toy · LET · et'},
+  'dominican-republic':{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  estonia:{language:'Estonian',phrase:'Kus on tualett?',say:'koos on too-ah-LET?',slow:'koos | on | too · ah · LET'},
+  finland:{language:'Finnish',phrase:'Missä on vessa?',say:'MEES-sah on VES-sah?',slow:'MEES · sah | on | VES · sah'},
+  iceland:{language:'Icelandic',phrase:'Hvar er klósettið?',say:'kvar er KLOH-seth-ith?',slow:'kvar | er | KLOH · seth · ith'},
+  india:{language:'Hindi',phrase:'शौचालय कहाँ है?',say:'show-cha-LYE kah-HAAN hai?',slow:'show · cha · LYE | kah · HAAN | hai'},
+  ireland:{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  jamaica:{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  laos:{language:'Lao',phrase:'ຫ້ອງນ້ຳຢູ່ໃສ?',say:'hong nahm yoo sai?',slow:'hong · nahm | yoo | sai'},
+  egypt:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  france:{language:'French',phrase:'Où sont les toilettes ?',say:'oo sohn lay twah-LET?',slow:'oo | sohn | lay | twah · LET'},
+  germany:{language:'German',phrase:'Wo ist die Toilette?',say:'voh ist dee toy-LET-uh?',slow:'voh | ist | dee | toy · LET · uh'},
+  greece:{language:'Greek',phrase:'Πού είναι η τουαλέτα;',say:'poo EE-neh ee too-ah-LEH-tah?',slow:'poo | EE · neh | ee | too · ah · LEH · tah'},
+  hungary:{language:'Hungarian',phrase:'Hol van a mosdó?',say:'hol vahn ah MOSH-doh?',slow:'hol | vahn | ah | MOSH · doh'},
+  indonesia:{language:'Indonesian',phrase:'Di mana toilet?',say:'dee MAH-nah TOY-let?',slow:'dee | MAH · nah | TOY · let'},
+  liechtenstein:{language:'German',phrase:'Wo ist die Toilette?',say:'voh ist dee toy-LET-uh?',slow:'voh | ist | dee | toy · LET · uh'},
+  italy:{language:'Italian',phrase:'Dov’è il bagno?',say:'doh-VEH eel BAHN-yo?',slow:'doh · VEH | eel | BAHN · yo'},
+  japan:{language:'Japanese',phrase:'トイレはどこですか？',say:'TOY-reh wah DOH-koh dess kah?',slow:'TOY · reh | wah | DOH · koh | dess | kah'},
+  jordan:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  morocco:{language:'Moroccan Arabic',phrase:'فين الحمام؟',say:'FEEN el-ham-MAAM?',slow:'FEEN | el · ham · MAAM'},
+  netherlands:{language:'Dutch',phrase:'Waar is het toilet?',say:'vahr iss hut twah-LET?',slow:'vahr | iss | hut | twah · LET'},
+  portugal:{language:'Portuguese',phrase:'Onde fica a casa de banho?',say:'ON-duh FEE-kah ah KAH-zah duh BAHN-yoo?',slow:'ON · duh | FEE · kah | ah | KAH · zah | duh | BAHN · yoo'},
+  russia:{language:'Russian',phrase:'Где туалет?',say:'gdyeh too-ah-LET?',slow:'gdyeh | too · ah · LET'},
+  spain:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAHN-yo?',slow:'DON · deh | es · TAH | el | BAHN · yo'},
+  switzerland:{language:'German',phrase:'Wo ist die Toilette?',say:'voh ist dee toy-LET-uh?',slow:'voh | ist | dee | toy · LET · uh'},
+  thailand:{language:'Thai',phrase:'ห้องน้ำอยู่ที่ไหน?',say:'hong-NAHM yoo tee NAI?',slow:'hong · NAHM | yoo | tee | NAI'},
+  turkey:{language:'Turkish',phrase:'Tuvalet nerede?',say:'too-vah-LET neh-reh-DEH',slow:'too · vah · LET | neh · reh · DEH'},
+  'united-states':{language:'English',phrase:'Where is the restroom?',say:'where iz the REST-room?',slow:'where | iz | the | REST · room'},
+  'united-kingdom':{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  vietnam:{language:'Vietnamese',phrase:'Nhà vệ sinh ở đâu?',say:'nyah veh sing uh DOH?',slow:'nyah | veh | sing | uh | DOH'},
+  'bosnia-and-herzegovina':{language:'Bosnian',phrase:'Gdje je toalet?',say:'gdye yeh toh-ah-LET?',slow:'gdye | yeh | toh · ah · LET'},
+  latvia:{language:'Latvian',phrase:'Kur ir tualete?',say:'koor eer too-ah-LEH-teh?',slow:'koor | eer | too · ah · LEH · teh'},
+  lithuania:{language:'Lithuanian',phrase:'Kur yra tualetas?',say:'koor EE-rah too-ah-LEH-tahs?',slow:'koor | EE · rah | too · ah · LEH · tahs'},
+  luxembourg:{language:'French',phrase:'Où sont les toilettes ?',say:'oo sohn lay twah-LET?',slow:'oo | sohn | lay | twah · LET'},
+  malaysia:{language:'Malay',phrase:'Di mana tandas?',say:'dee MAH-nah TAHN-dahs?',slow:'dee | MAH · nah | TAHN · dahs'},
+  malta:{language:'Maltese',phrase:'Fejn hi t-tojlit?',say:'fayn hee tuh-TOY-lit?',slow:'fayn | hee | tuh · TOY · lit'},
+  mexico:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  monaco:{language:'French',phrase:'Où sont les toilettes ?',say:'oo sohn lay twah-LET?',slow:'oo | sohn | lay | twah · LET'},
+  montenegro:{language:'Montenegrin',phrase:'Gdje je toalet?',say:'gdye yeh toh-ah-LET?',slow:'gdye | yeh | toh · ah · LET'},
+  'new-zealand':{language:'te reo Māori',phrase:'Kei hea te wharepaku?',say:'kay HEH-ah teh fah-reh-PAH-koo?',slow:'kay | HEH · ah | teh | fah · reh · PAH · koo'},
+  'north-macedonia':{language:'Macedonian',phrase:'Каде е тоалетот?',say:'KAH-deh eh toh-ah-LEH-tot?',slow:'KAH · deh | eh | toh · ah · LEH · tot'},
+  norway:{language:'Norwegian',phrase:'Hvor er toalettet?',say:'vor air too-ah-LET-et?',slow:'vor | air | too · ah · LET · et'},
+  oman:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  panama:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  peru:{language:'Spanish',phrase:'¿Dónde está el baño?',say:'DON-deh es-TAH el BAH-nyoh?',slow:'DON · deh | es · TAH | el | BAH · nyoh'},
+  philippines:{language:'Filipino',phrase:'Nasaan ang banyo?',say:'nah-SAH-an ang BAHN-yoh?',slow:'nah · SAH · an | ang | BAHN · yoh'},
+  poland:{language:'Polish',phrase:'Gdzie jest toaleta?',say:'jyeh yest toh-ah-LEH-tah?',slow:'jyeh | yest | toh · ah · LEH · tah'},
+  qatar:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  romania:{language:'Romanian',phrase:'Unde este toaleta?',say:'OON-deh ES-teh toh-ah-LEH-tah?',slow:'OON · deh | ES · teh | toh · ah · LEH · tah'},
+  serbia:{language:'Serbian',phrase:'Где је тоалет?',say:'gdeh yeh toh-ah-LET?',slow:'gdeh | yeh | toh · ah · LET'},
+  singapore:{language:'Malay',phrase:'Di mana tandas?',say:'dee MAH-nah TAHN-dahs?',slow:'dee | MAH · nah | TAHN · dahs'},
+  slovakia:{language:'Slovak',phrase:'Kde je toaleta?',say:'gdeh yeh toh-ah-LEH-tah?',slow:'gdeh | yeh | toh · ah · LEH · tah'},
+  slovenia:{language:'Slovenian',phrase:'Kje je stranišče?',say:'kyeh yeh strah-NEESH-cheh?',slow:'kyeh | yeh | strah · NEESH · cheh'},
+  'south-africa':{language:'English',phrase:'Where’s the toilet?',say:'wairs the TOY-let?',slow:'wairs | the | TOY · let'},
+  'south-korea':{language:'Korean',phrase:'화장실이 어디예요?',say:'hwa-jang-SHEEL-ee uh-dee-YEH-yo?',slow:'hwa · jang · SHEEL · ee | uh · dee · YEH · yo'},
+  'sri-lanka':{language:'Sinhala',phrase:'වැසිකිළිය කොහෙද?',say:'veh-see-KEE-lee-yah koh-HEH-dah?',slow:'veh · see · KEE · lee · yah | koh · HEH · dah'},
+  sweden:{language:'Swedish',phrase:'Var är toaletten?',say:'var air too-ah-LET-en?',slow:'var | air | too · ah · LET · en'},
+  taiwan:{language:'Mandarin',phrase:'洗手間在哪裡？',say:'shee-show-jyen dzeye nah-lee?',slow:'shee · show · jyen | dzeye | nah · lee'},
+  tunisia:{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'},
+  'united-arab-emirates':{language:'Arabic',phrase:'أين الحمام؟',say:'AYN al-ham-MAAM?',slow:'AYN | al · ham · MAAM'}
+});
+
+const COUNTRY_HELPER_CONTEXT=Object.freeze({
+  albania:{language:'Albanian',currency:'ALL',timezone:'UTC+1 · UTC+2 summer',capital:'Tirana',calling:'+355',plug:'C / F · 230V',drive:'Right',payments:'Cards are common in cities; cash is useful outside them.',tipping:'Round up or leave about 5–10% for good service.',voice:'sq-AL',polite:'Faleminderit',politeSay:'fah-leh-meen-DEH-reet',signs:{toilet:'Tualet / WC',women:'Femra',men:'Meshkuj',accessible:'Aksesueshëm'}},
+  algeria:{language:'Arabic · Tamazight',currency:'DZD',timezone:'UTC+1',capital:'Algiers',calling:'+213',plug:'C / F · 230V',drive:'Right',payments:'Cash remains useful; cards are stronger in larger hotels and shops.',tipping:'Small tips are appreciated in cafés, restaurants and for service.',voice:'ar-DZ',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'مرحاض / WC',women:'نساء',men:'رجال',accessible:'ذوي الإعاقة'}},
+  argentina:{language:'Spanish',currency:'ARS',timezone:'UTC−3',capital:'Buenos Aires',calling:'+54',plug:'C / I · 220V',drive:'Right',payments:'Cards widely used; keep some pesos for small purchases.',tipping:'Around 10% in restaurants is common when service is good.',voice:'es-AR',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Sanitarios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  australia:{language:'English',currency:'AUD',timezone:'UTC+8 to UTC+11 · varies by state/season',capital:'Canberra',calling:'+61',plug:'I · 230V',drive:'Left',payments:'Tap-and-go cards are accepted almost everywhere.',tipping:'Optional; not normally expected.',voice:'en-AU',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Toilet / WC',women:'Women / Female',men:'Men / Male',accessible:'Accessible'}},
+  austria:{language:'German',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Vienna',calling:'+43',plug:'C / F · 230V',drive:'Right',payments:'Cards are common; some smaller venues still prefer cash.',tipping:'Round up or add roughly 5–10% in restaurants.',voice:'de-AT',polite:'Danke',politeSay:'DAHN-kuh',signs:{toilet:'Toilette / WC',women:'Damen',men:'Herren',accessible:'Barrierefrei'}},
+  bahamas:{language:'English',currency:'BSD · USD widely accepted',timezone:'UTC−5 · UTC−4 summer',capital:'Nassau',calling:'+1 242',plug:'A / B · 120V',drive:'Left',payments:'Cards widely accepted in tourist areas; small cash is useful.',tipping:'Often 15–20%; check whether service is already added.',voice:'en-US',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Restroom / Bathroom',women:'Women / Ladies',men:'Men / Gentlemen',accessible:'Accessible'}},
+  belgium:{language:'Dutch · French · German',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Brussels',calling:'+32',plug:'C / E · 230V',drive:'Right',payments:'Cards are easy to use; some places prefer local debit.',tipping:'Service is included; rounding up is enough.',voice:'nl-BE',polite:'Dank u',politeSay:'dahnk oo',signs:{toilet:'Toilet / WC',women:'Dames / Femmes',men:'Heren / Hommes',accessible:'Toegankelijk / Accessible'}},
+  brazil:{language:'Portuguese',currency:'BRL',timezone:'UTC−2 to UTC−5',capital:'Brasília',calling:'+55',plug:'N · 127/220V varies',drive:'Right',payments:'Contactless cards and Pix are widespread; carry some cash.',tipping:'Restaurants commonly add about 10% service.',voice:'pt-BR',polite:'Obrigado / Obrigada',politeSay:'oh-bree-GAH-doo / dah',signs:{toilet:'Banheiro / Sanitário',women:'Feminino',men:'Masculino',accessible:'Acessível'}},
+  bulgaria:{language:'Bulgarian',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Sofia',calling:'+359',plug:'C / F · 230V',drive:'Right',payments:'Cards common in cities; some cash remains useful.',tipping:'About 10% for good restaurant service is common.',voice:'bg-BG',polite:'Благодаря',politeSay:'blah-go-dah-RYAH',signs:{toilet:'Тоалетна / WC',women:'Жени',men:'Мъже',accessible:'Достъпно'}},
+  cambodia:{language:'Khmer',currency:'KHR · USD often used',timezone:'UTC+7',capital:'Phnom Penh',calling:'+855',plug:'A / C / G · 230V',drive:'Right',payments:'Cash is important; QR payments are common locally.',tipping:'Not compulsory; small tips are appreciated.',voice:'km-KH',polite:'អរគុណ',politeSay:'aw-KOON',signs:{toilet:'បង្គន់ / WC',women:'ស្រី',men:'ប្រុស',accessible:'ជនពិការ'}},
+  canada:{language:'English · French',currency:'CAD',timezone:'UTC−3:30 to UTC−8 · varies',capital:'Ottawa',calling:'+1',plug:'A / B · 120V',drive:'Right',payments:'Cards and contactless payments are standard.',tipping:'About 15–20% is common for table service.',voice:'en-CA',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Washroom / Restroom',women:'Women / Femmes',men:'Men / Hommes',accessible:'Accessible'}},
+  chile:{language:'Spanish',currency:'CLP',timezone:'UTC−3 / UTC−4 · seasonal/region dependent',capital:'Santiago',calling:'+56',plug:'C / L · 220V',drive:'Right',payments:'Cards widely accepted; cash useful for markets and small vendors.',tipping:'10% is customary in restaurants and is often suggested on the bill.',voice:'es-CL',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Servicios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  china:{language:'Mandarin Chinese',currency:'CNY',timezone:'UTC+8',capital:'Beijing',calling:'+86',plug:'A / C / I · 220V',drive:'Right',payments:'Mobile payment dominates; international card acceptance varies.',tipping:'Generally not expected in ordinary local service.',voice:'zh-CN',polite:'谢谢',politeSay:'shyeh-shyeh',signs:{toilet:'厕所 / 卫生间',women:'女',men:'男',accessible:'无障碍'}},
+  colombia:{language:'Spanish',currency:'COP',timezone:'UTC−5',capital:'Bogotá',calling:'+57',plug:'A / B · 110V',drive:'Right',payments:'Cards are common in cities; cash remains useful.',tipping:'A voluntary 10% service amount is often suggested.',voice:'es-CO',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Servicios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  croatia:{language:'Croatian',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Zagreb',calling:'+385',plug:'C / F · 230V',drive:'Right',payments:'Cards accepted widely; cash handy for small cafés and islands.',tipping:'Round up or leave about 5–10% for good service.',voice:'hr-HR',polite:'Hvala',politeSay:'HVAH-lah',signs:{toilet:'WC / Toalet',women:'Žene',men:'Muški',accessible:'Pristupačno'}},
+  cyprus:{language:'Greek · Turkish',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Nicosia',calling:'+357',plug:'G · 230V',drive:'Left',payments:'Cards widely accepted in towns and resorts.',tipping:'Small tips or about 5–10% are appreciated.',voice:'el-GR',polite:'Ευχαριστώ',politeSay:'ef-hah-ree-STOH',signs:{toilet:'Τουαλέτα / WC',women:'Γυναίκες',men:'Άνδρες',accessible:'Προσβάσιμο'}},
+  czechia:{language:'Czech',currency:'CZK',timezone:'UTC+1 · UTC+2 summer',capital:'Prague',calling:'+420',plug:'C / E · 230V',drive:'Right',payments:'Cards common; cash useful in smaller places.',tipping:'Around 10% is normal for good table service.',voice:'cs-CZ',polite:'Děkuji',politeSay:'DYEH-koo-yee',signs:{toilet:'Toaleta / WC',women:'Ženy',men:'Muži',accessible:'Bezbariérové'}},
+  'costa-rica':{language:'Spanish',currency:'CRC',timezone:'UTC−6',capital:'San José',calling:'+506',plug:'A / B · 120V',drive:'Right',payments:'Cards are easy to use in tourist areas; cash is handy for small purchases.',tipping:'Restaurants often include service; small extra tips are optional.',voice:'es-CR',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Servicios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  denmark:{language:'Danish',currency:'DKK',timezone:'UTC+1 · UTC+2 summer',capital:'Copenhagen',calling:'+45',plug:'C / E / F / K · 230V',drive:'Right',payments:'Cards and contactless payments dominate everyday spending.',tipping:'Not expected; round up only when you want to.',voice:'da-DK',polite:'Tak',politeSay:'tahk',signs:{toilet:'Toilet / WC',women:'Kvinder / Damer',men:'Mænd / Herrer',accessible:'Handicaptoilet'}},
+  'dominican-republic':{language:'Spanish',currency:'DOP',timezone:'UTC−4',capital:'Santo Domingo',calling:'+1 809 / 829 / 849',plug:'A / B · 120V',drive:'Right',payments:'Cards common in resorts and cities; cash useful for small vendors.',tipping:'Many bills include service; an additional small tip is common for good service.',voice:'es-DO',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Servicios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  estonia:{language:'Estonian',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Tallinn',calling:'+372',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless payments are extremely common.',tipping:'Optional; about 5–10% for good table service is appreciated.',voice:'et-EE',polite:'Aitäh',politeSay:'eye-TAH',signs:{toilet:'Tualett / WC',women:'Naised',men:'Mehed',accessible:'Ligipääsetav'}},
+  finland:{language:'Finnish · Swedish',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Helsinki',calling:'+358',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless payments are standard.',tipping:'Not expected; rounding up is enough if you wish.',voice:'fi-FI',polite:'Kiitos',politeSay:'KEE-tos',signs:{toilet:'WC / Vessa',women:'Naiset',men:'Miehet',accessible:'Esteetön'}},
+  iceland:{language:'Icelandic',currency:'ISK',timezone:'UTC+0',capital:'Reykjavík',calling:'+354',plug:'C / F · 230V',drive:'Right',payments:'Cards are accepted almost everywhere, even for very small purchases.',tipping:'Not normally expected.',voice:'is-IS',polite:'Takk',politeSay:'tahk',signs:{toilet:'Salerni / Klósett / WC',women:'Konur',men:'Karlar',accessible:'Aðgengilegt'}},
+  india:{language:'Hindi · English widely used',currency:'INR',timezone:'UTC+5:30',capital:'New Delhi',calling:'+91',plug:'C / D / M · 230V',drive:'Left',payments:'UPI is dominant locally; cards and cash remain important for travellers.',tipping:'Often 5–10% in restaurants when service is not already included.',voice:'hi-IN',polite:'धन्यवाद',politeSay:'dhun-yuh-VAAD',signs:{toilet:'शौचालय / Toilet',women:'महिला',men:'पुरुष',accessible:'दिव्यांग'}},
+  ireland:{language:'English · Irish',currency:'EUR',timezone:'UTC+0 · UTC+1 summer',capital:'Dublin',calling:'+353',plug:'G · 230V',drive:'Left',payments:'Cards and contactless payments are widely accepted.',tipping:'About 10–12.5% for table service when service is not already added.',voice:'en-IE',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Toilet / WC',women:'Women / Mná',men:'Men / Fir',accessible:'Accessible'}},
+  jamaica:{language:'English · Jamaican Patois widely spoken',currency:'JMD',timezone:'UTC−5',capital:'Kingston',calling:'+1 876 / 658',plug:'A / B · 110V',drive:'Left',payments:'Cards common in tourist areas; Jamaican cash remains useful.',tipping:'Around 10–15% is common when service is not already included.',voice:'en-JM',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Toilet / Restroom',women:'Women / Ladies',men:'Men / Gents',accessible:'Accessible'}},
+  laos:{language:'Lao',currency:'LAK',timezone:'UTC+7',capital:'Vientiane',calling:'+856',plug:'A / B / C / E / F · 230V',drive:'Right',payments:'Cash is important; QR payment is common locally but traveller access varies.',tipping:'Not compulsory; small tips are appreciated in tourism.',voice:'lo-LA',polite:'ຂອບໃຈ',politeSay:'khop jai',signs:{toilet:'ຫ້ອງນ້ຳ / WC',women:'ຍິງ',men:'ຊາຍ',accessible:'ຜູ້ພິການ'}},
+  egypt:{language:'Arabic',currency:'EGP',timezone:'UTC+2 · UTC+3 summer',capital:'Cairo',calling:'+20',plug:'C / F · 220V',drive:'Right',payments:'Cash remains important; cards work at larger hotels and shops.',tipping:'Baksheesh is common for many small services.',voice:'ar-EG',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'حمام / دورة مياه',women:'سيدات',men:'رجال',accessible:'ذوي الإعاقة'}},
+  france:{language:'French',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Paris',calling:'+33',plug:'C / E · 230V',drive:'Right',payments:'Cards and contactless are widespread.',tipping:'Service is included; rounding up or a few euros is optional.',voice:'fr-FR',polite:'Merci',politeSay:'mehr-SEE',signs:{toilet:'Toilettes / WC',women:'Femmes / Dames',men:'Hommes / Messieurs',accessible:'Accessible / PMR'}},
+  germany:{language:'German',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Berlin',calling:'+49',plug:'C / F · 230V',drive:'Right',payments:'Cards are increasingly common; cash is still useful.',tipping:'Usually round up or add about 5–10%.',voice:'de-DE',polite:'Danke',politeSay:'DAHN-kuh',signs:{toilet:'Toilette / WC',women:'Damen',men:'Herren',accessible:'Barrierefrei'}},
+  greece:{language:'Greek',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Athens',calling:'+30',plug:'C / F · 230V',drive:'Right',payments:'Cards are common; cash useful on small islands and at markets.',tipping:'Round up or leave roughly 5–10% for good service.',voice:'el-GR',polite:'Ευχαριστώ',politeSay:'ef-hah-ree-STOH',signs:{toilet:'Τουαλέτα / WC',women:'Γυναίκες',men:'Άνδρες',accessible:'Προσβάσιμο'}},
+  hungary:{language:'Hungarian',currency:'HUF',timezone:'UTC+1 · UTC+2 summer',capital:'Budapest',calling:'+36',plug:'C / F · 230V',drive:'Right',payments:'Cards widely accepted; cash still useful for smaller purchases.',tipping:'About 10–15% is common; check if service is already included.',voice:'hu-HU',polite:'Köszönöm',politeSay:'KUH-suh-nuhm',signs:{toilet:'Mosdó / WC',women:'Női',men:'Férfi',accessible:'Akadálymentes'}},
+  indonesia:{language:'Bahasa Indonesia',currency:'IDR',timezone:'UTC+7 to UTC+9',capital:'Jakarta',calling:'+62',plug:'C / F · 230V',drive:'Left',payments:'Cards work in major tourist areas; cash and local QR remain useful.',tipping:'Not mandatory; small tips are appreciated.',voice:'id-ID',polite:'Terima kasih',politeSay:'teh-REE-mah KAH-seeh',signs:{toilet:'Toilet / Kamar kecil',women:'Wanita / Perempuan',men:'Pria / Laki-laki',accessible:'Aksesibel'}},
+  italy:{language:'Italian',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Rome',calling:'+39',plug:'C / F / L · 230V',drive:'Right',payments:'Cards widely accepted; small cash useful for cafés and markets.',tipping:'Not compulsory; round up or leave a few euros for good service.',voice:'it-IT',polite:'Grazie',politeSay:'GRAHT-see-eh',signs:{toilet:'Toilette / WC / Bagno',women:'Donne',men:'Uomini',accessible:'Accessibile'}},
+  japan:{language:'Japanese',currency:'JPY',timezone:'UTC+9',capital:'Tokyo',calling:'+81',plug:'A / B · 100V',drive:'Left',payments:'Cards and IC payments are common, but cash is still useful.',tipping:'Generally not expected and can be awkward.',voice:'ja-JP',polite:'ありがとうございます',politeSay:'ah-ree-gah-toh goh-zah-ee-MAHS',signs:{toilet:'トイレ / お手洗い',women:'女性',men:'男性',accessible:'多目的 / バリアフリー'}},
+  jordan:{language:'Arabic',currency:'JOD',timezone:'UTC+3',capital:'Amman',calling:'+962',plug:'C / F / G · 230V',drive:'Right',payments:'Cash is useful; cards are common in larger hotels and shops.',tipping:'Small tips are customary for service staff and guides.',voice:'ar-JO',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'حمام / مرحاض',women:'نساء / سيدات',men:'رجال',accessible:'ذوي الإعاقة'}},
+  liechtenstein:{language:'German',currency:'CHF',timezone:'UTC+1 · UTC+2 summer',capital:'Vaduz',calling:'+423',plug:'C / J · 230V',drive:'Right',payments:'Cards are standard; Swiss francs are the everyday currency.',tipping:'Service is included; rounding up is appreciated.',voice:'de-CH',polite:'Danke',politeSay:'DAHN-kuh',signs:{toilet:'Toilette / WC',women:'Damen',men:'Herren',accessible:'Barrierefrei'}},
+  morocco:{language:'Arabic · Amazigh',currency:'MAD',timezone:'UTC+1 normally',capital:'Rabat',calling:'+212',plug:'C / E · 220V',drive:'Right',payments:'Cash remains important; cards work at larger businesses.',tipping:'Small tips are customary in restaurants and for service.',voice:'ar-MA',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'مرحاض / Toilette',women:'نساء / Femmes',men:'رجال / Hommes',accessible:'ذوي الإعاقة'}},
+  netherlands:{language:'Dutch',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Amsterdam',calling:'+31',plug:'C / F · 230V',drive:'Right',payments:'Cards are dominant; some places prefer debit.',tipping:'Service included; round up or add about 5–10% for good service.',voice:'nl-NL',polite:'Dank u',politeSay:'dahnk oo',signs:{toilet:'Toilet / WC',women:'Dames',men:'Heren',accessible:'Toegankelijk'}},
+  portugal:{language:'Portuguese',currency:'EUR',timezone:'UTC+0 · UTC+1 summer',capital:'Lisbon',calling:'+351',plug:'C / F · 230V',drive:'Right',payments:'Cards common; keep some cash for cafés, markets and small shops.',tipping:'About 5–10% is appreciated but not compulsory.',voice:'pt-PT',polite:'Obrigado / Obrigada',politeSay:'oh-bree-GAH-doo / dah',signs:{toilet:'Casa de banho / WC',women:'Senhoras',men:'Homens / Senhores',accessible:'Acessível'}},
+  russia:{language:'Russian',currency:'RUB',timezone:'UTC+2 to UTC+12',capital:'Moscow',calling:'+7',plug:'C / F · 220V',drive:'Right',payments:'Payment access can vary for foreign cards; keep a practical cash plan.',tipping:'Around 5–10% is common for good restaurant service.',voice:'ru-RU',polite:'Спасибо',politeSay:'spah-SEE-bah',signs:{toilet:'Туалет / WC',women:'Женский / Ж',men:'Мужской / М',accessible:'Доступная среда'}},
+  spain:{language:'Spanish',currency:'EUR',timezone:'UTC+1 · UTC+2 summer on mainland',capital:'Madrid',calling:'+34',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are widely accepted.',tipping:'Optional; round up or leave 5–10% for particularly good service.',voice:'es-ES',polite:'Gracias',politeSay:'GRAH-thyahs',signs:{toilet:'Baño / Aseos / WC',women:'Mujeres / Señoras',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  switzerland:{language:'German · French · Italian',currency:'CHF',timezone:'UTC+1 · UTC+2 summer',capital:'Bern',calling:'+41',plug:'C / J · 230V',drive:'Right',payments:'Cards are widely accepted; cash remains easy to use.',tipping:'Service included; rounding up is customary.',voice:'de-CH',polite:'Danke',politeSay:'DAHN-kuh',signs:{toilet:'Toilette / WC',women:'Damen / Femmes',men:'Herren / Hommes',accessible:'Barrierefrei / Accessible'}},
+  thailand:{language:'Thai',currency:'THB',timezone:'UTC+7',capital:'Bangkok',calling:'+66',plug:'A / B / C / O · 220V',drive:'Left',payments:'Cash remains very useful; cards work well at larger businesses.',tipping:'Not compulsory; small tips are appreciated in tourist service.',voice:'th-TH',polite:'ขอบคุณ',politeSay:'khawp-KHUN',signs:{toilet:'ห้องน้ำ',women:'หญิง',men:'ชาย',accessible:'ผู้พิการ'}},
+  turkey:{language:'Turkish',currency:'TRY',timezone:'UTC+3',capital:'Ankara',calling:'+90',plug:'C / F · 230V',drive:'Right',payments:'Cards widely accepted; cash is useful for markets and small vendors.',tipping:'About 5–10% is common in restaurants and cafés.',voice:'tr-TR',polite:'Teşekkür ederim',politeSay:'teh-sheh-KOOR eh-deh-REEM',signs:{toilet:'Tuvalet / WC',women:'Kadın / Bayan',men:'Erkek / Bay',accessible:'Engelli'}},
+  'united-kingdom':{language:'English',currency:'GBP',timezone:'UTC+0 · UTC+1 summer',capital:'London',calling:'+44',plug:'G · 230V',drive:'Left',payments:'Contactless cards are standard almost everywhere.',tipping:'Around 10–12.5% for table service when service is not already added.',voice:'en-GB',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Toilets / WC / Loo',women:'Women / Ladies',men:'Men / Gents',accessible:'Accessible'}},
+  'united-states':{language:'English',currency:'USD',timezone:'Multiple zones · UTC−5 to UTC−10 mainland/Alaska/Hawaii',capital:'Washington, D.C.',calling:'+1',plug:'A / B · 120V',drive:'Right',payments:'Cards widely accepted; contactless availability varies by venue.',tipping:'Often 18–25% for table service; check local/service context.',voice:'en-US',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Restroom / Bathroom',women:'Women / Ladies',men:'Men / Gentlemen',accessible:'Accessible'}},
+  vietnam:{language:'Vietnamese',currency:'VND',timezone:'UTC+7',capital:'Hanoi',calling:'+84',plug:'A / C · 220V',drive:'Right',payments:'Cash is still important; cards and QR are common in larger businesses.',tipping:'Not compulsory; small tips are increasingly appreciated in tourism.',voice:'vi-VN',polite:'Cảm ơn',politeSay:'gahm uhn',signs:{toilet:'Nhà vệ sinh / WC',women:'Nữ',men:'Nam',accessible:'Người khuyết tật'}},
+  'bosnia-and-herzegovina':{language:'Bosnian · Croatian · Serbian',currency:'BAM',timezone:'UTC+1 · UTC+2 summer',capital:'Sarajevo',calling:'+387',plug:'C / F · 230V',drive:'Right',payments:'Cards work well in cities and larger businesses; cash is useful for smaller cafés, markets and rural stops.',tipping:'About 5–10% is appreciated for good restaurant and café service.',voice:'hr-HR',polite:'Hvala',politeSay:'HVAH-lah',signs:{toilet:'Toalet / WC',women:'Žene',men:'Muškarci',accessible:'Pristupačno'}},
+  latvia:{language:'Latvian',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Riga',calling:'+371',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are widely accepted; a little cash is still handy.',tipping:'Optional; about 5–10% is appreciated for good table service.',voice:'lv-LV',polite:'Paldies',politeSay:'PAHL-dee-ess',signs:{toilet:'Tualete / WC',women:'Sievietes',men:'Vīrieši',accessible:'Pieejams'}},
+  lithuania:{language:'Lithuanian',currency:'EUR',timezone:'UTC+2 · UTC+3 summer',capital:'Vilnius',calling:'+370',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are common throughout cities and tourist areas.',tipping:'Optional; around 5–10% is common for good restaurant service.',voice:'lt-LT',polite:'Ačiū',politeSay:'AH-choo',signs:{toilet:'Tualetas / WC',women:'Moterys',men:'Vyrai',accessible:'♿ / Neįgaliesiems'}},
+  luxembourg:{language:'Luxembourgish · French · German',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Luxembourg',calling:'+352',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are widely accepted.',tipping:'Service is included; rounding up or leaving a small extra amount is enough.',voice:'fr-FR',polite:'Merci',politeSay:'mehr-SEE',signs:{toilet:'Toilettes / WC',women:'Dames / Femmes',men:'Hommes / Herren',accessible:'Accessible'}},
+  malaysia:{language:'Malay',currency:'MYR',timezone:'UTC+8',capital:'Kuala Lumpur',calling:'+60',plug:'G · 230V',drive:'Left',payments:'Cards and e-wallets are common in cities; cash remains useful at markets and smaller food stalls.',tipping:'Not generally expected; small tips are welcome for especially helpful service.',voice:'ms-MY',polite:'Terima kasih',politeSay:'teh-REE-mah KAH-seeh',signs:{toilet:'Tandas / WC',women:'Wanita',men:'Lelaki',accessible:'OKU / ♿'}},
+  malta:{language:'Maltese · English',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Valletta',calling:'+356',plug:'G · 230V',drive:'Left',payments:'Cards and contactless are widely accepted.',tipping:'Around 5–10% is appreciated when a service charge has not already been added.',voice:'mt-MT',polite:'Grazzi',politeSay:'GRUT-see',signs:{toilet:'Tojlit / WC',women:'Nisa',men:'Irġiel',accessible:'Aċċessibbli'}},
+  mexico:{language:'Spanish',currency:'MXN',timezone:'UTC−5 to UTC−8 · varies by region',capital:'Mexico City',calling:'+52',plug:'A / B · 127V',drive:'Right',payments:'Cards are common in cities and tourist areas; pesos remain useful for markets, tips and smaller businesses.',tipping:'Around 10–15% is common in restaurants; service expectations vary by venue.',voice:'es-MX',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Sanitarios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  monaco:{language:'French',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Monaco',calling:'+377',plug:'C / E / F · 230V',drive:'Right',payments:'Cards and contactless are standard throughout the principality.',tipping:'Service is normally included; rounding up or leaving a small extra amount is sufficient.',voice:'fr-FR',polite:'Merci',politeSay:'mehr-SEE',signs:{toilet:'Toilettes / WC',women:'Femmes',men:'Hommes',accessible:'Accessible'}},
+  montenegro:{language:'Montenegrin',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Podgorica',calling:'+382',plug:'C / F · 230V',drive:'Right',payments:'Cards are common in tourist centres; cash is useful for smaller venues and rural areas.',tipping:'Around 5–10% is appreciated for good service.',voice:'sr-RS',polite:'Hvala',politeSay:'HVAH-lah',signs:{toilet:'Toalet / WC',women:'Žene',men:'Muškarci',accessible:'Pristupačno'}},
+  'new-zealand':{language:'English · te reo Māori',currency:'NZD',timezone:'UTC+12 · UTC+13 summer',capital:'Wellington',calling:'+64',plug:'I · 230V',drive:'Left',payments:'Cards and contactless are accepted almost everywhere.',tipping:'Optional and not normally expected.',voice:'en-NZ',polite:'Kia ora',politeSay:'kee-ah OR-ah',signs:{toilet:'Toilet / WC',women:'Women / Wāhine',men:'Men / Tāne',accessible:'Accessible / ♿'}},
+  'north-macedonia':{language:'Macedonian',currency:'MKD',timezone:'UTC+1 · UTC+2 summer',capital:'Skopje',calling:'+389',plug:'C / F · 230V',drive:'Right',payments:'Cards work well in cities; denar cash is useful in smaller towns, markets and cafés.',tipping:'Around 5–10% is appreciated for good restaurant and café service.',voice:'mk-MK',polite:'Благодарам',politeSay:'blah-goh-DAH-rahm',signs:{toilet:'Тоалет / WC',women:'Жени',men:'Мажи',accessible:'♿'}},
+  norway:{language:'Norwegian',currency:'NOK',timezone:'UTC+1 · UTC+2 summer',capital:'Oslo',calling:'+47',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are dominant, including for very small purchases.',tipping:'Optional; rounding up or adding about 5–10% for excellent table service is enough.',voice:'nb-NO',polite:'Takk',politeSay:'tahk',signs:{toilet:'Toalett / WC',women:'Kvinner / Damer',men:'Menn / Herrer',accessible:'Tilgjengelig'}},
+  oman:{language:'Arabic',currency:'OMR',timezone:'UTC+4',capital:'Muscat',calling:'+968',plug:'G · 240V',drive:'Right',payments:'Cards are common in hotels, malls and larger businesses; cash is useful in souqs and smaller shops.',tipping:'Not compulsory; 5–10% is appreciated where service is not already included.',voice:'ar-SA',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'دورة المياه / حمام / WC',women:'نساء',men:'رجال',accessible:'♿'}},
+  panama:{language:'Spanish',currency:'PAB · USD widely used',timezone:'UTC−5',capital:'Panama City',calling:'+507',plug:'A / B · 120V',drive:'Right',payments:'Cards are common in Panama City and tourist areas; cash is useful for smaller businesses and transport.',tipping:'Around 10% is common in restaurants when service is not already included.',voice:'es-PA',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Sanitarios',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  peru:{language:'Spanish',currency:'PEN',timezone:'UTC−5',capital:'Lima',calling:'+51',plug:'A / B / C · 220V',drive:'Right',payments:'Cards are common in cities and tourist areas; soles cash remains useful for markets and smaller venues.',tipping:'Around 10% is common in restaurants when service is good.',voice:'es-PE',polite:'Gracias',politeSay:'GRAH-syahs',signs:{toilet:'Baño / Servicios higiénicos',women:'Mujeres / Damas',men:'Hombres / Caballeros',accessible:'Accesible'}},
+  philippines:{language:'Filipino · English',currency:'PHP',timezone:'UTC+8',capital:'Manila',calling:'+63',plug:'A / B / C · 220V',drive:'Right',payments:'Cards and e-wallets are common in cities; cash is important for local transport, markets and smaller businesses.',tipping:'Small tips are appreciated; restaurants may already add a service charge.',voice:'fil-PH',polite:'Salamat',politeSay:'sah-LAH-maht',signs:{toilet:'Banyo / CR',women:'Babae',men:'Lalaki',accessible:'PWD / Accessible'}},
+  poland:{language:'Polish',currency:'PLN',timezone:'UTC+1 · UTC+2 summer',capital:'Warsaw',calling:'+48',plug:'C / E · 230V',drive:'Right',payments:'Cards and contactless are extremely common; a little cash is still useful.',tipping:'Around 10% is customary for good restaurant service.',voice:'pl-PL',polite:'Dziękuję',politeSay:'jen-KOO-yeh',signs:{toilet:'Toaleta / WC',women:'Kobiety / Damska',men:'Mężczyźni / Męska',accessible:'Dostępna / ♿'}},
+  qatar:{language:'Arabic · English widely used',currency:'QAR',timezone:'UTC+3',capital:'Doha',calling:'+974',plug:'G · 240V',drive:'Right',payments:'Cards and contactless are widely accepted; cash is still useful in traditional markets.',tipping:'Around 10% is common when a service charge has not already been added.',voice:'ar-SA',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'دورة المياه / WC',women:'نساء / Women',men:'رجال / Men',accessible:'Accessible / ♿'}},
+  romania:{language:'Romanian',currency:'RON',timezone:'UTC+2 · UTC+3 summer',capital:'Bucharest',calling:'+40',plug:'C / F · 230V',drive:'Right',payments:'Cards are widely accepted in cities; cash remains useful in rural areas and small businesses.',tipping:'Around 10% is common for good restaurant and café service.',voice:'ro-RO',polite:'Mulțumesc',politeSay:'mool-tsoo-MESK',signs:{toilet:'Toaletă / WC',women:'Femei',men:'Bărbați',accessible:'Accesibil'}},
+  serbia:{language:'Serbian',currency:'RSD',timezone:'UTC+1 · UTC+2 summer',capital:'Belgrade',calling:'+381',plug:'C / F · 230V',drive:'Right',payments:'Cards are common in cities and tourist areas; cash is useful for smaller venues.',tipping:'Around 5–10% is appreciated for good service.',voice:'sr-RS',polite:'Хвала / Hvala',politeSay:'HVAH-lah',signs:{toilet:'Тоалет / Toalet / WC',women:'Жене / Žene',men:'Мушкарци / Muškarci',accessible:'Pristupačno / ♿'}},
+  singapore:{language:'English · Malay · Mandarin · Tamil',currency:'SGD',timezone:'UTC+8',capital:'Singapore',calling:'+65',plug:'G · 230V',drive:'Left',payments:'Cards, contactless and phone payments are widely accepted; some hawker stalls still prefer cash or local QR.',tipping:'Not normally expected; restaurants often add service charge.',voice:'ms-MY',polite:'Terima kasih',politeSay:'teh-REE-mah KAH-seeh',signs:{toilet:'Toilet / Tandas',women:'Women / Wanita',men:'Men / Lelaki',accessible:'Accessible / ♿'}},
+  slovakia:{language:'Slovak',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Bratislava',calling:'+421',plug:'C / E · 230V',drive:'Right',payments:'Cards are common in cities and tourist areas; some cash is handy for smaller venues.',tipping:'About 5–10% is common for good restaurant service.',voice:'sk-SK',polite:'Ďakujem',politeSay:'DYAH-koo-yem',signs:{toilet:'Toaleta / WC',women:'Ženy',men:'Muži',accessible:'Bezbariérové / ♿'}},
+  slovenia:{language:'Slovenian',currency:'EUR',timezone:'UTC+1 · UTC+2 summer',capital:'Ljubljana',calling:'+386',plug:'C / F · 230V',drive:'Right',payments:'Cards and contactless are widely accepted; cash remains useful for small purchases.',tipping:'Optional; 5–10% is appreciated for good table service.',voice:'sl-SI',polite:'Hvala',politeSay:'HVAH-lah',signs:{toilet:'Stranišče / WC',women:'Ženske',men:'Moški',accessible:'Dostopno / ♿'}},
+  'south-africa':{language:'English · multiple other official languages',currency:'ZAR',timezone:'UTC+2',capital:'Pretoria (administrative)',calling:'+27',plug:'C / M / N · 230V',drive:'Left',payments:'Cards are widely accepted; cash is useful for small purchases and tipping in some settings.',tipping:'Around 10–15% is common for table service.',voice:'en-ZA',polite:'Thank you',politeSay:'THANK yoo',signs:{toilet:'Toilet / Restroom',women:'Women / Ladies',men:'Men / Gents',accessible:'Accessible / ♿'}},
+  'south-korea':{language:'Korean',currency:'KRW',timezone:'UTC+9',capital:'Seoul',calling:'+82',plug:'C / F · 220V',drive:'Right',payments:'Cards are accepted almost everywhere; a small amount of cash can still be useful.',tipping:'Not normally expected.',voice:'ko-KR',polite:'감사합니다',politeSay:'gahm-sah-hahm-nee-DAH',signs:{toilet:'화장실',women:'여자',men:'남자',accessible:'장애인 / ♿'}},
+  'sri-lanka':{language:'Sinhala · Tamil',currency:'LKR',timezone:'UTC+5:30',capital:'Sri Jayawardenepura Kotte',calling:'+94',plug:'D / G / M · 230V',drive:'Left',payments:'Cards work well at hotels and larger businesses; cash is very useful for transport, markets and smaller venues.',tipping:'Small tips are common; around 10% is typical where service is not included.',voice:'si-LK',polite:'ස්තුතියි',politeSay:'STOO-thee-ee',signs:{toilet:'Toilet / WC',women:'Women',men:'Men',accessible:'Accessible / ♿'}},
+  sweden:{language:'Swedish',currency:'SEK',timezone:'UTC+1 · UTC+2 summer',capital:'Stockholm',calling:'+46',plug:'C / F · 230V',drive:'Right',payments:'Sweden is highly cash-light; cards and phone payments are standard.',tipping:'Optional; rounding up or adding 5–10% for very good service is enough.',voice:'sv-SE',polite:'Tack',politeSay:'tahk',signs:{toilet:'Toalett / WC',women:'Damer / Kvinnor',men:'Herrar / Män',accessible:'Tillgänglig / ♿'}},
+  taiwan:{language:'Mandarin Chinese',currency:'TWD',timezone:'UTC+8',capital:'Taipei',calling:'+886',plug:'A / B · 110V',drive:'Right',payments:'Cards and mobile payments are common, but cash remains very useful at night markets and small shops.',tipping:'Not normally expected.',voice:'zh-TW',polite:'謝謝',politeSay:'shyeh-shyeh',signs:{toilet:'洗手間 / 廁所',women:'女',men:'男',accessible:'無障礙 / ♿'}},
+  tunisia:{language:'Arabic · French widely used',currency:'TND',timezone:'UTC+1',capital:'Tunis',calling:'+216',plug:'C / E · 230V',drive:'Right',payments:'Cards are common at hotels and larger businesses; cash is important in medinas, cafés and smaller shops.',tipping:'Small tips are customary; around 5–10% is common in restaurants.',voice:'ar-SA',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'مرحاض / Toilettes / WC',women:'نساء / Femmes',men:'رجال / Hommes',accessible:'Accessible / ♿'}},
+  'united-arab-emirates':{language:'Arabic · English widely used',currency:'AED',timezone:'UTC+4',capital:'Abu Dhabi',calling:'+971',plug:'G · 230V',drive:'Right',payments:'Cards and contactless are accepted almost everywhere; small cash is still useful for tips and traditional markets.',tipping:'Around 10% is common when service is not already included.',voice:'ar-AE',polite:'شكراً',politeSay:'SHUK-ran',signs:{toilet:'دورة المياه / WC',women:'نساء / Women',men:'رجال / Men',accessible:'Accessible / ♿'}}
+});
+
+function node(tag, className, text) { const element=document.createElement(tag); if(className) element.className=className; if(text!=null) element.textContent=text; return element; }
+const slug = countrySlug;
+function departureCountry(stay={}){if(stay.travelType!=='cruise'&&stay.travelType!=='motorhome'&&stay.travelType!=='rv')return stay.country||'';if(stay.startCountry)return stay.startCountry;const city=String(stay.startCity||'').trim().toLowerCase();const cityCountry={london:'United Kingdom',munich:'Germany',rome:'Italy',miami:'United States',nashville:'United States',dallas:'United States','los angeles':'United States','new york':'United States',amsterdam:'Netherlands'};if(cityCountry[city])return cityCountry[city];const first=String(stay.country||'').split(/\s*(?:\/|→|->|,)\s*/)[0].trim();const regions=new Set(['caribbean','europe','asia','africa','north america','south america','central america','middle east','mediterranean','baltic','scandinavia','world']);return regions.has(first.toLowerCase())?'':first;}
+function localMoney(aud,currency,rate){ if(currency&&currency!=='AUD'&&Number(rate)>0){ const local=audToLocal(Math.abs(Number(aud)||0),rate)*Math.sign(Number(aud)||0); return [formatMoney(local,currency),`AUD ${formatMoney(aud,'AUD')}`]; } return [formatMoney(aud,'AUD'),null]; }
+
+function helperMetaChip(label,value,icon='globe'){ const chip=node('div','home-helper-chip'); const iconWrap=node('span','home-helper-chip-icon'); iconWrap.append(createLineIcon(icon)); chip.append(iconWrap,node('span','home-helper-chip-label',label),node('strong','',value||'—')); return chip; }
+function helperFactList(items=[]){ const list=node('ul','home-helper-facts'); for(const pair of items){ const li=node('li',''); const name=Array.isArray(pair)?pair[0]:String(pair||''); const copy=Array.isArray(pair)?pair[1]:''; li.append(node('strong','',name)); if(copy) li.append(node('span','',copy)); list.append(li); } return list; }
+function helperFeatureCard(section,title,icon,items,stay){ const card=node('section',`home-helper-feature home-helper-${section}`); applyStayHeaderImage(card,stay,{position:section==='plants'?'center 58%':section==='animals'?'center 45%':section==='food'?'center 62%':'center center'}); const head=node('div','home-helper-feature-head'); const iconWrap=node('span','home-helper-round-icon'); iconWrap.append(createLineIcon(icon)); head.append(iconWrap,node('h4','',title)); card.append(head,helperFactList(items)); return card; }
+function helperContext(country){ return COUNTRY_HELPER_CONTEXT[slug(country)] || null; }
+function helperTravelMode(stay){ const type=String(stay?.travelType||'standard').toLowerCase(); return type==='cruise'?'Cruise':(type==='motorhome'||type==='rv')?'Motorhome / RV':'Standard stay'; }
+
+// Safari can populate speechSynthesis voices after initial page load. Keep a
+// live local cache instead of treating one early empty getVoices() result as
+// proof that the iPad has no usable offline voice. The cache never weakens the
+// offline rule: only voices explicitly exposed with localService===true qualify.
+const helperVoiceRegistry={voices:[],primed:false};
+function primeHelperVoices(){
+  if(!('speechSynthesis' in window))return [];
+  const synth=window.speechSynthesis;
+  const refresh=()=>{
+    try{
+      const voices=[...synth.getVoices()];
+      if(voices.length)helperVoiceRegistry.voices=voices;
+    }catch{}
+    return helperVoiceRegistry.voices;
+  };
+  refresh();
+  if(!helperVoiceRegistry.primed){
+    helperVoiceRegistry.primed=true;
+    try{synth.addEventListener?.('voiceschanged',refresh);}catch{}
+  }
+  return helperVoiceRegistry.voices;
+}
+function helperLocalVoice(context){ if(!context?.voice || !('speechSynthesis' in window)) return null; let live=[]; try{live=[...window.speechSynthesis.getVoices()];}catch{} if(live.length)helperVoiceRegistry.voices=live; else primeHelperVoices(); const voices=live.length?live:helperVoiceRegistry.voices; const wanted=String(context.voice).toLowerCase(); const root=wanted.split('-')[0]; return voices.find(v=>v.localService===true&&String(v.lang||'').toLowerCase()===wanted) || voices.find(v=>v.localService===true&&String(v.lang||'').toLowerCase().split('-')[0]===root) || null; }
+function speakOfflinePhrase(text,context,{rate=.88,volume=.88,repeat=1,status=null}={}){ if(!text || !('speechSynthesis' in window)){ if(status) status.textContent='Spoken audio is not supported by this iPad browser.'; return false; } const voice=helperLocalVoice(context); if(!voice){ const voicesReady=helperVoiceRegistry.voices.length>0; if(status) status.textContent=voicesReady?`No installed offline ${context?.language||'local-language'} voice is available on this iPad. The written phrase remains fully offline.`:'The iPad voice list is still loading. Tap the control again once it appears; the written phrase remains fully offline.'; return false; } window.speechSynthesis.cancel(); for(let i=0;i<repeat;i+=1){ const utterance=new SpeechSynthesisUtterance(text); utterance.voice=voice; utterance.lang=voice.lang; utterance.rate=rate; utterance.volume=volume; utterance.pitch=1; window.speechSynthesis.speak(utterance); } if(status) status.textContent=`Using installed ${voice.name} voice · offline/local voice only.`; return true; }
+primeHelperVoices();
+function helperHero(stay,country,context,{kind='quick'}={}){ const hero=node('section',`home-helper-hero home-helper-hero-${kind}`); applyStayHeaderImage(hero,stay,{position:'center center'}); const copy=node('div','home-helper-hero-copy'); copy.append(node('p','eyebrow',kind==='toilet'?'PHRASE HELPER':'CURRENT DESTINATION'),node('h3','',kind==='toilet'?"Where’s the toilet?":`${country}${stay?.title&&String(stay.title).toLowerCase()!==String(country).toLowerCase()?` · ${stay.title}`:''}`)); const chips=node('div','home-helper-chip-grid'); chips.append(helperMetaChip('Language',context?.language||TOILET_LANGUAGE[slug(country)]?.language||'Offline reference','globe'),helperMetaChip('Currency',context?.currency||stay?.localCurrency||'—','spend'),helperMetaChip('Time zone',context?.timezone||'Offline reference','slow'),helperMetaChip('Travel mode',helperTravelMode(stay),'itinerary')); copy.append(chips); hero.append(copy); return hero; }
+
+function showQuickLook(host, stay, navigate = null) {
+  if (!stay) {
+    const body=node('div','home-quick-look home-quick-look-empty');
+    body.append(node('p','eyebrow','CURRENT DESTINATION · OFFLINE'),node('h3','','No current destination'),node('p','','Add a dated destination in Itinerary. Once its dates include today, this card becomes your Current Destination and opens its offline Country Quick Look.'));
+    const actions=[{label:'Close',onClick:d=>d.close()}];
+    if(typeof navigate==='function') actions.unshift({label:'Open Itinerary',onClick:d=>{d.close();queueMicrotask(()=>navigate('itinerary'));}});
+    const dialog=createModal({title:'Current Destination',body,actions,className:'tone-teal'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+    return;
+  }
+  const country=departureCountry(stay); const key=slug(country); const facts=COUNTRY_QUICK_LOOK[key] || q(country||'Current destination',['Food','Offline Quick Look is not available for this destination.'],['Wildlife','Offline Quick Look is not available for this destination.'],['Plants & gardens','Offline Quick Look is not available for this destination.'],['History','Offline Quick Look is not available for this destination.']);
+  const context=helperContext(country); const body=node('div','home-quick-look home-helper-rich');
+  let dialog=null;
+  body.append(helperHero(stay,country,context,{kind:'quick'}));
+  const heading=node('div','home-helper-section-title'); const headingCopy=node('div',''); headingCopy.append(node('p','eyebrow','COUNTRY QUICK LOOK'),node('h3','',facts.display),node('p','','Compact local essentials for Cameron & Kym — all stored in the app for offline use.')); heading.append(headingCopy); body.append(heading);
+  const grid=node('div','home-helper-feature-grid');
+  grid.append(helperFeatureCard('plants','Plants & Gardens','leaf',facts.plants,stay),helperFeatureCard('animals','Animals & Wildlife','wildlife',facts.animals,stay),helperFeatureCard('food','Food & Drink','food',facts.food,stay),helperFeatureCard('culture','Culture & Local Context','culture',facts.history,stay)); body.append(grid);
+  const lower=node('div','home-helper-lower-grid');
+  const phrase=TOILET_LANGUAGE[key]; const languageCard=node('section','home-helper-lower home-helper-language-preview');
+  languageCard.append(
+    node('p','eyebrow','LANGUAGE BASICS'),
+    node('h4','',context?.language||phrase?.language||'Local language'),
+    node('strong','home-helper-preview-phrase',context?.polite||'Offline reference'),
+    node('span','',context?.politeSay?`Say: ${context.politeSay}`:'Practical language details are stored separately from the Phrase Helper.')
+  );
+  const practical=node('section','home-helper-lower home-helper-practical'); practical.append(node('p','eyebrow','PRACTICAL ESSENTIALS'),node('h4','','Useful offline basics')); const essentialGrid=node('div','home-helper-essential-grid'); const essentials=context?[['Capital',context.capital],['Calling code',context.calling],['Plug / power',context.plug],['Drive',context.drive],['Payments',context.payments],['Tipping',context.tipping]]:[['Language',phrase?.language||'—'],['Currency',stay?.localCurrency||'—'],['Offline note','Detailed practical essentials are not yet available for this country.']]; for(const [label,value] of essentials){ const item=node('div','home-helper-essential'); item.append(node('span','',label),node('strong','',value)); essentialGrid.append(item); } practical.append(essentialGrid); lower.append(languageCard,practical); body.append(lower);
+  dialog=createModal({title:`Country Quick Look · ${facts.display}`,body,actions:[],className:'tone-teal home-helper-modal home-helper-quick-modal',showCloseButton:true}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+}
+
+function showToilet(host, stay, navigate = null){
+  const country=departureCountry(stay||{}); const key=slug(country); const item=TOILET_LANGUAGE[key]; const context=helperContext(country); const body=node('div','home-toilet home-helper-rich'); let dialog=null;
+  if(!stay){ body.append(node('p','home-toilet-label',"WHERE'S THE TOILET?"),node('strong','home-toilet-phrase','No current destination'),node('p','home-toilet-language','Add a dated destination in Itinerary and the compass will automatically use that destination’s language.')); const actions=[{label:'Close',onClick:d=>d.close()}]; if(typeof navigate==='function')actions.unshift({label:'Open Itinerary',onClick:d=>{d.close();queueMicrotask(()=>navigate('itinerary'));}}); dialog=createModal({title:'Quick language aid',body,actions,className:'tone-sky'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); return; }
+  body.append(helperHero(stay,country,context,{kind:'toilet'}));
+  if(!item){ const missing=node('section','home-helper-phrase-stage'); missing.append(node('p','eyebrow','SAY THIS PHRASE'),node('strong','home-toilet-phrase','Language aid unavailable'),node('p','home-toilet-language',`${country||'This destination'} does not yet have an offline toilet phrase. No English fallback has been substituted.`)); body.append(missing); }
+  else {
+    const stage=node('section','home-helper-phrase-stage'); const audioIcon=node('div','home-helper-audio-orb'); audioIcon.append(createLineIcon('volume')); const phraseWrap=node('div','home-helper-phrase-copy'); phraseWrap.append(node('p','eyebrow','SAY THIS PHRASE'),node('strong','home-toilet-phrase',item.phrase)); const breakdown=node('div','home-helper-pronunciation'); const meaning=node('div','home-helper-pronounce-item'); meaning.append(node('span','','ENGLISH MEANING'),node('strong','',"Where is the toilet?")); const say=node('div','home-helper-pronounce-item'); say.append(node('span','','PRONUNCIATION'),node('strong','',item.say)); const slow=node('div','home-helper-pronounce-item'); slow.append(node('span','','SLOW BREAKDOWN'),node('strong','',item.slow)); breakdown.append(meaning,say,slow); phraseWrap.append(breakdown); stage.append(audioIcon,phraseWrap);
+    const controls=node('div','home-helper-audio-controls'); const status=node('p','home-helper-audio-status','Audio checks for an installed local iPad voice when you press a control. Written help is always available offline.'); status.setAttribute('role','status'); status.setAttribute('aria-live','polite'); status.setAttribute('aria-atomic','true'); const controlsSpec=[['play','Play',.88,.88,1],['slow','Slow',.38,.88,1],['repeat','Repeat ×3',.82,.9,3],['volume','Louder',.82,1,1]]; for(const [icon,label,rate,volume,repeat] of controlsSpec){ const button=node('button','home-helper-audio-button'); button.type='button'; const controlIcon=node('span',''); controlIcon.append(createLineIcon(icon)); button.append(controlIcon,node('strong','',label)); button.addEventListener('click',()=>speakOfflinePhrase(item.phrase,context,{rate,volume,repeat,status})); controls.append(button); } stage.append(controls,status); body.append(stage);
+    const lower=node('div','home-helper-lower-grid'); const polite=node('section','home-helper-lower home-helper-polite'); applyStayHeaderImage(polite,stay,{position:'center 60%'}); polite.append(node('p','eyebrow','POLITE EXTRA'),node('h4','',context?.polite||'Thank you'),node('strong','home-helper-preview-phrase',context?.politeSay||''),node('span','',context?.polite?'A useful thank-you to pair with the phrase.':'Polite extra is not yet available for this country.'));
+    const signs=node('section','home-helper-lower home-helper-signs'); applyStayHeaderImage(signs,stay,{position:'center 35%'}); signs.append(node('p','eyebrow','SIGNS TO LOOK FOR'),node('h4','','Recognise the restroom signs')); const signGrid=node('div','home-helper-sign-grid'); const signItems=context?.signs?[['Toilet / WC',context.signs.toilet],['Women',context.signs.women],['Men',context.signs.men],['Accessible',context.signs.accessible]]:[['Toilet / WC','WC']]; for(const [label,value] of signItems){ const sign=node('div','home-helper-sign'); sign.append(node('span','',label),node('strong','',value)); signGrid.append(sign); } signs.append(signGrid); lower.append(polite,signs); body.append(lower);
+    const offline=node('div','home-helper-offline-note'); const offlineCheck=node('span','home-helper-offline-icon'); offlineCheck.append(createLineIcon('check')); offline.append(offlineCheck,node('strong','','Offline prepared'),node('span','','All written phrase and country information is stored locally. Spoken playback only runs when the iPad exposes a local installed voice.')); body.append(offline);
+  }
+  dialog=createModal({title:`Phrase Helper · ${country}`,body,actions:[],className:'tone-sky home-helper-modal home-helper-toilet-modal',showCloseButton:true}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>{if('speechSynthesis' in window)window.speechSynthesis.cancel();dialog.remove();},{once:true});
+}
+
+function flagEmoji(country='') {
+  const codes={
+    albania:'AL',algeria:'DZ',argentina:'AR',australia:'AU',austria:'AT',bahamas:'BS',belgium:'BE',
+    'bosnia-and-herzegovina':'BA',brazil:'BR',bulgaria:'BG',cambodia:'KH',canada:'CA',chile:'CL',china:'CN',
+    colombia:'CO','costa-rica':'CR',croatia:'HR',cyprus:'CY',czechia:'CZ',denmark:'DK','dominican-republic':'DO',
+    egypt:'EG',estonia:'EE',finland:'FI',france:'FR',germany:'DE',greece:'GR',hungary:'HU',iceland:'IS',india:'IN',
+    indonesia:'ID',ireland:'IE',italy:'IT',jamaica:'JM',japan:'JP',jordan:'JO',laos:'LA',latvia:'LV',liechtenstein:'LI',
+    lithuania:'LT',luxembourg:'LU',malaysia:'MY',malta:'MT',mexico:'MX',monaco:'MC',montenegro:'ME',morocco:'MA',
+    netherlands:'NL','new-zealand':'NZ','north-macedonia':'MK',norway:'NO',oman:'OM',panama:'PA',peru:'PE',
+    philippines:'PH',poland:'PL',portugal:'PT',qatar:'QA',romania:'RO',russia:'RU',serbia:'RS',singapore:'SG',
+    slovakia:'SK',slovenia:'SI','south-africa':'ZA','south-korea':'KR',spain:'ES','sri-lanka':'LK',sweden:'SE',
+    switzerland:'CH',taiwan:'TW',thailand:'TH',tunisia:'TN',turkey:'TR','united-arab-emirates':'AE',
+    'united-kingdom':'GB','united-states':'US',vietnam:'VN'
+  };
+  const code=codes[slug(country)];
+  return code ? [...code].map(ch=>String.fromCodePoint(127397+ch.charCodeAt(0))).join('') : '🌍';
+}
+
+function pct(value){ return `${Math.max(0,Math.round(Number(value)||0))}%`; }
+function pctFill(value){ return `${Math.max(0,Math.min(100,Math.round(Number(value)||0)))}%`; }
+function progressLine(label,value,tone=''){ const wrap=node('div',`home-budget-progress ${tone}`.trim()); const display=pct(value); const top=node('div','home-budget-progress-head'); top.append(node('span','',label),node('strong','',display)); const track=node('span','home-budget-progress-track'); track.setAttribute('role','progressbar'); track.setAttribute('aria-label',label); track.setAttribute('aria-valuemin','0'); track.setAttribute('aria-valuemax','100'); track.setAttribute('aria-valuenow',String(Math.max(0,Math.min(100,Math.round(Number(value)||0))))); track.setAttribute('aria-valuetext',display); const fill=node('span','home-budget-progress-fill'); fill.style.width=pctFill(value); track.append(fill); wrap.append(top,track); return wrap; }
+function compactMoney(value){ const v=Number(value)||0; const abs=Math.abs(v); if(abs>=1000000) return `$${(abs/1000000).toFixed(abs>=10000000?1:2)}m`; if(abs>=1000) return `$${Math.round(abs).toLocaleString('en-AU')}`; return `$${Math.round(abs)}`; }
+function monthLabel(index){ return ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][index]||''; }
+function eventDateParts(displayDate=''){ const m=String(displayDate).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if(!m) return {day:'—',month:''}; return {day:String(m[1]).padStart(2,'0'),month:monthLabel(Number(m[2])-1)}; }
+function upcomingEventTypeLabel(event){ if(event?.kind==='reservation') return ({flight:'Flight',train:'Train',cruise:'Cruise',rv:'RV / Motorhome',hotel:'Hotel',airbnb:'Airbnb',accommodation:'Hotel',ticket:'Tickets & Attractions'})[event.type]||'Reservation'; return event?.type==='reminder'?'Reminder':event?.type==='note'?'Note':'Personal'; }
+
+function showHomeDetail(host,{title,tone='blue',items=[],actions=[]}={}){
+  const body=node('section','home-local-detail');
+  const list=node('div','home-local-detail-list');
+  for(const item of items.filter(Boolean)){
+    const row=node('div','home-local-detail-row');
+    row.append(node('small','',item.label||''),node('strong','',item.value||'—'));
+    list.append(row);
+  }
+  body.append(list);
+  const dialog=createModal({title:title||'Details',body,className:`tcc-expanded-modal tone-${tone}`,actions:[...actions,{label:'Close',onClick:d=>d.close()}]});
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+
+function renderHero(model, state, host, navigate){
+  const hero=node('section','home-reference-hero'); applyStayHeaderImage(hero,model.currentStay);
+  const currentWrap=node('div','home-destination-hero-wrap');
+  const current=node('div','home-stay-card home-destination-hero-card');
+  current.tabIndex=0; current.setAttribute('role','button');
+  current.setAttribute('aria-label',model.currentStay?['Open current destination quick look',model.currentStay.title,model.currentStay.country,model.currentStay.dates].filter(Boolean).join(' · '):'Open Current Destination setup');
+  if(model.currentStay){
+    if(['cruise','motorhome','rv'].includes(String(model.currentStay.travelType||'').toLowerCase())) {
+      current.classList.add('home-destination-hero-route');
+      hero.classList.add('home-reference-hero-route');
+    }
+    const top=node('div','home-destination-hero-top'); top.append(node('span','home-destination-flag',flagEmoji(departureCountry(model.currentStay))),node('p','home-ref-kicker','CURRENT DESTINATION')); if(model.currentStay.travelType==='cruise'||model.currentStay.travelType==='motorhome'||model.currentStay.travelType==='rv'){ const mode=node('span','home-route-mode'); mode.append(createLineIcon(model.currentStay.travelType==='cruise'?'cruise':'rv'),node('span','',model.currentStay.travelType==='cruise'?'Cruise':'Motorhome')); top.append(mode); }
+    const title=node('div','home-destination-title'); title.append(node('strong','home-stay-name',model.currentStay.title),node('span','home-destination-country',model.currentStay.country));
+    const outline=createCountryOutline(departureCountry(model.currentStay),'home-destination-country-outline');
+    const meta=node('div','home-destination-meta'); meta.append(node('span','',model.currentStay.dates),node('span','',`${model.currentStay.remainingDays} days remaining`));
+    const progressWrap=node('div','home-stay-progress-wrap');
+    const progressLine=node('div','home-stay-progress-line'); progressLine.append(node('span','',`DAY ${model.currentStay.currentDay} OF ${model.currentStay.totalDays}`),node('span','',`${Math.round(model.currentStay.progress)}%`));
+    const progress=document.createElement('progress'); progress.max=100; progress.value=Math.max(0,Math.min(100,Number(model.currentStay.progress)||0)); progress.setAttribute('aria-label','Days in current stay'); progress.setAttribute('aria-valuetext',`${model.currentStay.currentDay} of ${model.currentStay.totalDays} days`);
+    progressWrap.append(progressLine,progress);
+    current.append(top,title,meta,progressWrap,outline);
+  } else current.append(node('p','home-ref-kicker','CURRENT DESTINATION'),node('strong','home-stay-name','No current stay'),node('span','home-destination-country','Tap to set up your itinerary'));
+  const openCurrent=()=>showQuickLook(host,model.currentStay,navigate);
+  current.addEventListener('click',openCurrent);
+  current.addEventListener('keydown',event=>{if(event.target!==current)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();openCurrent();}});
+  currentWrap.append(current);
+  // Phrase Helper remains a discreet sidebar-compass secret. Keep a hidden
+  // programmatic trigger for src_main's sidebar brand callback, but never show
+  // a helper/toilet shortcut inside the Current Destination hero.
+  const phraseTrigger=node('button','home-compass home-secret-phrase-trigger'); phraseTrigger.type='button'; phraseTrigger.hidden=true; phraseTrigger.tabIndex=-1; phraseTrigger.setAttribute('aria-hidden','true'); phraseTrigger.addEventListener('click',event=>{event.stopPropagation();showToilet(host,model.currentStay,navigate);});
+  hero.append(currentWrap,phraseTrigger);
+
+  // Home is the fixed command-centre view. The current destination is the
+  // sole orientation banner; upcoming travel remains available in Alerts and
+  // Trip Timeline without a competing Next Destination panel.
+  return hero;
+}
+
+function homeCard(kind,kicker){ const card=node('section',`home-ref-card home-ref-${kind}`); const head=node('div','home-budget-card-head'); const marker=node('span','home-budget-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('p','home-ref-kicker',kicker)); card.append(head); return card; }
+
+function renderDailyBudget(model){
+  const card=homeCard('daily','DAILY BUDGET');
+  if(!model.currentStay){ card.append(node('strong','home-ref-value','—')); return card; }
+  if(!isDestinationBudgetUsable(model.currentStay)){ card.append(node('span','home-card-label','DESTINATION BUDGET NEEDS SETUP'),node('strong','home-ref-value home-ref-value-xl','—'),node('small','home-budget-note','Set the AUD budget and fixed exchange rate in Destination Budgets. Currency is automatic.')); return card; }
+  const planned=model.currentStay.destinationBudgetAUD/Math.max(1,model.currentStay.totalDays);
+  const actual=model.currentStay.destinationSpentAUD/Math.max(1,model.currentStay.currentDay);
+  const delta=planned-actual;
+  const [primary,secondary]=localMoney(planned,model.currentStay.localCurrency,model.currentStay.fixedLocalPerAUD);
+  card.append(node('span','home-card-label','PLANNED DAILY ALLOWANCE'),node('strong','home-ref-value home-ref-value-xl',primary));
+  if(secondary) card.append(node('span','home-ref-secondary',secondary));
+  const lower=node('div','home-budget-lower');
+  const [actualPrimary,actualSecondary]=localMoney(actual,model.currentStay.localCurrency,model.currentStay.fixedLocalPerAUD);
+  const [variancePrimary,varianceSecondary]=localMoney(Math.abs(delta),model.currentStay.localCurrency,model.currentStay.fixedLocalPerAUD);
+  const row=node('div','home-budget-value-row'); const valueStack=node('span','home-budget-value-stack'); valueStack.append(node('strong',delta>=0?'is-good':'is-bad',actualPrimary)); if(actualSecondary)valueStack.append(node('small','',actualSecondary)); row.append(node('span','','AVERAGE SPEND / DAY'),valueStack);
+  const track=node('span','home-budget-simple-track'); const fill=node('span','home-budget-simple-fill'); fill.style.width=pctFill(planned?actual/planned*100:0); track.append(fill);
+  lower.append(row,track,node('small','',`${variancePrimary}${varianceSecondary?` · ${varianceSecondary}`:''} ${delta>=0?'under':'over'} daily allowance`)); card.append(lower);
+  return card;
+}
+
+function renderDestinationBudget(model){
+  const card=homeCard('destination','DESTINATION BUDGET');
+  if(!model.currentStay){ card.append(node('strong','home-ref-value','—')); return card; }
+  if(!isDestinationBudgetUsable(model.currentStay)){ card.append(node('span','home-card-label','DESTINATION BUDGET NEEDS SETUP'),node('strong','home-ref-value home-ref-value-xl','—'),node('small','home-budget-note','Open Budget to lock in this stay.')); return card; }
+  const [primary,secondary]=localMoney(model.currentStay.destinationRemainingAUD,model.currentStay.localCurrency,model.currentStay.fixedLocalPerAUD);
+  const used=model.currentStay.destinationBudgetAUD?model.currentStay.destinationSpentAUD/model.currentStay.destinationBudgetAUD*100:0;
+  const expected=model.currentStay.destinationBudgetAUD*(model.currentStay.progress/100);
+  const paceDelta=expected-model.currentStay.destinationSpentAUD;
+  card.append(node('span','home-card-label','AFTER COMMITMENTS'),node('strong','home-ref-value home-ref-value-xl',primary)); if(secondary) card.append(node('span','home-ref-secondary',secondary));
+  const lower=node('div','home-budget-lower'); lower.append(progressLine('BUDGET USED',used,'budget-used'),progressLine('STAY ELAPSED',model.currentStay.progress,'stay-elapsed'));
+  const note=node('small',paceDelta>=0?'home-budget-note is-good':'home-budget-note is-bad',`${formatMoney(Math.abs(paceDelta),'AUD')} ${paceDelta>=0?'under':'over'} planned pace`); lower.append(note); card.append(lower); return card;
+}
+
+function annualPeriodSpent(state,startISO,endISO){
+  const dateOf=r=>String(r.date || r.dateTime || '').slice(0,10);
+  const expenses=(state.expenses||[]).filter(r=>!r.needsBudgetRepair).filter(r=>{const d=dateOf(r); return d>=startISO&&d<=endISO;}).reduce((sum,r)=>sum+Number(r.audAmount||0),0);
+  const reservations=(state.reservations||[]).filter(r=>r.status!=='to-book'&&!r.needsBudgetRepair).filter(r=>{const d=dateOf(r); return d>=startISO&&d<=endISO;}).reduce((sum,r)=>sum+Number(r.audAmount||0),0);
+  return expenses+reservations;
+}
+function iso(y,m,d){ return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function daysInMonth(y,m){ return new Date(Date.UTC(y,m,0)).getUTCDate(); }
+function annualDeltaRow(label,delta){ const row=node('div','home-annual-delta-row'); row.append(node('span','',label),node('strong',delta>=0?'is-good':'is-bad',`${compactMoney(delta)} ${delta>=0?'UNDER':'OVER'}`)); return row; }
+function renderAnnual(model,currentDate,state){
+  const card=homeCard('annual','ANNUAL POSITION'); const spent=model.annual.spentAUD, budget=model.annual.budgetAUD;
+  if(!(Number(budget)>0)){ card.append(node('span','home-card-label','ANNUAL BUDGET NEEDS SETUP'),node('strong','home-ref-value home-ref-value-lg','—'),node('small','home-budget-note','Set the Annual Budget in Settings.')); return card; }
+  const date=new Date(`${currentDate}T00:00:00Z`); const y=date.getUTCFullYear(), month=date.getUTCMonth()+1, day=date.getUTCDate();
+  const start=new Date(Date.UTC(y,0,1)); const elapsed=Math.max(1,Math.floor((date-start)/86400000)+1); const days=(Date.UTC(y+1,0,1)-Date.UTC(y,0,1))/86400000;
+  const pace=budget*(elapsed/days), under=pace-spent, projected=spent/elapsed*days, projectedDelta=budget-projected;
+  const monthlyBudget=budget/12;
+  const mtd=annualPeriodSpent(state,iso(y,month,1),iso(y,month,day));
+  const prev=month===1?{y:y-1,m:12}:{y,m:month-1}; const prevSpend=annualPeriodSpent(state,iso(prev.y,prev.m,1),iso(prev.y,prev.m,daysInMonth(prev.y,prev.m)));
+  card.append(node('span','home-card-label',under>=0?'UNDER YEAR-TO-DATE PACE':'OVER YEAR-TO-DATE PACE'),node('strong','home-ref-value home-ref-value-lg',formatMoney(Math.abs(under),'AUD')));
+  const deltas=node('div','home-annual-deltas'); deltas.append(annualDeltaRow('THIS MONTH · MTD',monthlyBudget-mtd),annualDeltaRow('LAST MONTH',monthlyBudget-prevSpend),annualDeltaRow('PROJECTED YEAR-END',projectedDelta)); card.append(deltas);
+  const lower=node('div','home-annual-progress'); lower.append(progressLine('YEAR ELAPSED',elapsed/days*100,'year-elapsed'),progressLine('SPEND VS PACE',pace?spent/pace*100:0,'spend-pace')); card.append(lower); return card;
+}
+
+function homeAreaLabel(screen=''){
+  return ({budget:'Budget',reservations:'Reservations',itinerary:'Itinerary',calendar:'Calendar','journey-history':'Journey History',checklist:'Checklist',vault:'The Vault',settings:'Settings',home:'Home'})[String(screen||'')] || 'Travel Command Centre';
+}
+function upcomingDetailItems(event,state){
+  const items=[];
+  if(event?.kind==='reservation'){
+    const source=(state.reservations||[]).find(item=>item.id===event.sourceId)||null;
+    const stay=source?.itineraryId?(state.itinerary||[]).find(item=>item.id===source.itineraryId):null;
+    items.push(
+      {label:'Type',value:upcomingEventTypeLabel(event)},
+      {label:'Date',value:event.displayDate||'—'},
+      {label:'Time',value:event.displayTime||'—'},
+      {label:'Status',value:String(source?.status||event.status||'Booked').replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase())},
+      {label:'Original Cost',value:source?formatMoney(Number(source.originalAmount||0),source.originalCurrency||'AUD'):'—'},
+      {label:'AUD Cost',value:source?.audAmount!=null?formatMoney(Number(source.audAmount||0),'AUD'):'—'},
+      {label:'Destination Budget',value:stay?`${stay.name} · ${formatAUDate(stay.startDate)} – ${formatAUDate(stay.endDate)}`:(event.needsBudgetRepair?'REPAIR REQUIRED':'No matched stay')},
+      {label:'Notes',value:source?.notes||'No notes'}
+    );
+    return items;
+  }
+  const source=(state.calendarEvents||[]).find(item=>item.id===event?.sourceId)||null;
+  const stay=source?.itineraryId?(state.itinerary||[]).find(item=>item.id===source.itineraryId):null;
+  items.push(
+    {label:'Type',value:upcomingEventTypeLabel(event)},
+    {label:'Date',value:event?.displayDate||'—'},
+    {label:'Time',value:event?.displayTime||'—'},
+    {label:'Destination / Trip',value:stay?`${stay.name} · ${formatAUDate(stay.startDate)} – ${formatAUDate(stay.endDate)}`:'General / no stay selected'},
+    {label:'Status',value:'Personal calendar item'},
+    {label:'Notes',value:source?.notes||source?.note||'No notes'}
+  );
+  return items;
+}
+
+function compactAlerts(model,host,navigate){
+  const panel=node('section','home-mini-panel home-mini-alerts'); const head=node('div','home-mini-head'); const title=node('h2','','Alerts'); if(model.alerts.length) title.append(node('span','home-alert-count',String(model.alerts.length))); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,title); panel.append(head);
+  const list=node('div','home-mini-list'); if(!model.alerts.length) list.append(node('p','home-mini-empty','No alerts'));
+  model.alerts.slice(0,3).forEach(alert=>{ const item=node('div',`home-mini-row home-alert-row home-alert-priority-${alert.priority}`); item.setAttribute('aria-hidden','true'); item.append(node('span','home-alert-dot',''),node('strong','',alert.message||alert.title)); list.append(item); });
+  if(model.alerts.length>3) list.append(node('div','home-mini-more',`+${model.alerts.length-3} more · tap Alerts to view all`)); panel.append(list); return panel;
+}
+function compactUpcoming(model,host,state,navigate){
+  const panel=node('section','home-mini-panel home-mini-upcoming'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Upcoming Events')); panel.append(head); const list=node('div','home-mini-list');
+  if(!model.upcomingEvents.length) list.append(node('p','home-mini-empty','No upcoming events'));
+  model.upcomingEvents.slice(0,3).forEach(event=>{ const d=eventDateParts(event.displayDate); const item=node('div',`home-mini-row home-event-row${event.needsBudgetRepair?' is-repair':''}`); item.setAttribute('aria-hidden','true'); const badge=node('span','home-date-badge'); badge.append(node('strong','',d.day),node('small','',d.month)); const copy=node('span','home-event-copy'); const typeLabel=upcomingEventTypeLabel(event); copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · '))); if(event.needsBudgetRepair)copy.append(node('small','home-event-repair','DESTINATION BUDGET REPAIR REQUIRED')); item.append(badge,copy); list.append(item); });
+  if(model.upcomingEvents.length>3) list.append(node('div','home-mini-more',`+${model.upcomingEvents.length-3} more · tap Upcoming Events to view all`)); panel.append(list); return panel;
+}
+function compactSchengen(model){
+  const panel=node('section','home-mini-panel home-mini-schengen'); panel.classList.toggle('is-not-allowed',model.schengen.status==='not-allowed'); panel.classList.toggle('is-not-checked',model.schengen.status==='not-checked'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Schengen Status')); panel.append(head);
+  const content=node('div','home-schengen-content');
+  const used=Number(model.schengen.daysUsed)||0, remaining=Number(model.schengen.daysRemaining)||0, total=Math.max(90,used+remaining||90);
+  const body=node('div','home-schengen-body');
+  const ring=node('div','home-schengen-ring'); ring.style.setProperty('--schengen-used',pct(used/total*100));
+  const hasSchengenCounts=model.schengen.daysUsed!=null&&model.schengen.daysRemaining!=null;
+  ring.classList.toggle('is-unchecked',!hasSchengenCounts||model.schengen.status==='not-checked');
+  ring.classList.toggle('is-not-allowed',model.schengen.status==='not-allowed');
+  if(hasSchengenCounts){ring.setAttribute('role','progressbar');ring.setAttribute('aria-label','Schengen allowance used');ring.setAttribute('aria-valuemin','0');ring.setAttribute('aria-valuemax',String(total));ring.setAttribute('aria-valuenow',String(Math.max(0,Math.min(total,used))));ring.setAttribute('aria-valuetext',`${used} days used · ${remaining} days remaining of ${total}`);}else{ring.setAttribute('role','img');ring.setAttribute('aria-label','Schengen allowance · Not checked');}
+  ring.append(node('strong','',model.schengen.daysRemaining!=null?String(model.schengen.daysRemaining):'—'),node('span','','DAYS LEFT'),node('small','',`OF ${total}`));
+  const meta=node('div','home-schengen-metrics');
+  const u=node('div');u.append(node('strong','',String(model.schengen.daysUsed??'—')),node('span','','USED'));
+  const l=node('div');l.append(node('strong','',String(model.schengen.daysRemaining??'—')),node('span','','LEFT'));
+  const must=node('div','home-schengen-must-leave'); must.append(node('span','','MUST LEAVE BY'),node('strong','',model.schengen.mustLeaveByDate?formatAUDate(model.schengen.mustLeaveByDate):'—'));
+  meta.append(u,l,must); body.append(ring,meta); content.append(body);
+  const dates=node('div','home-schengen-dates');
+  const entry=node('div'); entry.append(node('span','','ENTRY'),node('strong','',model.schengen.entryDate?formatAUDate(model.schengen.entryDate):'—'));
+  const exit=node('div'); exit.append(node('span','','EXIT'),node('strong','',model.schengen.plannedExitDate?formatAUDate(model.schengen.plannedExitDate):'—'));
+  dates.append(entry,exit); content.append(dates);
+  const status=node('div',`home-schengen-status schengen-${model.schengen.status}`,(model.schengen.status==='allowed'?'SAFE':model.schengen.status==='not-allowed'?'NOT ALLOWED':'NOT CHECKED')); content.append(status);
+  panel.append(content); return panel;
+}
+function compactTimeline(state,currentDate,host,navigate){
+  const panel=node('section','home-mini-panel home-mini-timeline'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Trip Timeline')); panel.append(head);
+  const entries=[...(state.itinerary||[])].filter(e=>String(e.endDate)>=String(currentDate)).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))).slice(0,3); const list=node('div','home-mini-list');
+  if(!entries.length) list.append(node('p','home-mini-empty','No entries yet'));
+  for(const e of entries){ const row=node('button','home-mini-row home-timeline-row'); row.type='button'; const icon=node('span','home-timeline-icon'); icon.append(createLineIcon(e.travelType==='cruise'?'cruise':e.travelType==='motorhome'?'rv':'history')); const copy=node('span','home-timeline-copy'); copy.append(node('strong','',e.name),node('small','',`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)}`)); const status=String(e.startDate)<=String(currentDate)&&String(e.endDate)>=String(currentDate)?'In progress':'Upcoming'; row.append(icon,copy,node('span',`home-timeline-status ${status==='In progress'?'is-current':''}`,status)); row.setAttribute('aria-label',`View trip timeline · ${e.name} · ${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)} · ${status}`); row.addEventListener('click',()=>{const start=new Date(`${e.startDate}T00:00:00Z`),end=new Date(`${e.endDate}T00:00:00Z`);const duration=Math.max(1,Math.round((end-start)/86400000)+1);showHomeDetail(host,{title:e.name,tone:'violet',items:[{label:'Destination',value:[e.name,departureCountry(e)].filter(Boolean).join(', ')},{label:'Dates',value:`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)}`},{label:'Duration',value:`${duration} day${duration===1?'':'s'}`},{label:'Travel type',value:e.travelType==='cruise'?'Cruise':e.travelType==='motorhome'||e.travelType==='rv'?'Motorhome':'Standard'},{label:'Status',value:status},{label:'Budget routing',value:Number(e.destinationBudgetAUD)>0?'Destination Budget attached':'Check Destination Budget for this dated stay'}],actions:typeof navigate==='function'?[{label:'Open Itinerary Stay',onClick:d=>{d.close();queueMicrotask(()=>navigate('itinerary',{collection:'itinerary',id:e.id}));}}]:[]});}); list.append(row); }
+  panel.append(list); return panel;
+}
+
+
+
+function expandedStat(label,value,sub='',tone=''){
+  const card=node('div',`home-expanded-stat${tone?` is-${tone}`:''}`);
+  card.append(node('span','',label),node('strong','',value));
+  if(sub)card.append(node('small','',sub));
+  return card;
+}
+function expandedSection(title){const section=node('section','home-expanded-section');if(title)section.append(node('h3','',title));return section;}
+function expandedProgress(label,value,tone='sky'){
+  const wrap=node('div','home-expanded-progress');const head=node('div','home-expanded-progress-head');head.append(node('span','',label),node('strong','',`${Math.max(0,Math.round(Number(value)||0))}%`));
+  const track=node('span','home-expanded-track');const fill=node('span',`home-expanded-fill tone-${tone}`);fill.style.width=pctFill(value);track.append(fill);wrap.append(head,track);return wrap;
+}
+function expandedRouteAction(label,navigate,screen,payload=null){
+  if(typeof navigate!=='function')return null;
+  const button=node('button','button home-expanded-route-action',label);button.type='button';
+  button.addEventListener('click',()=>{button.closest('dialog')?.close();queueMicrotask(()=>navigate(screen,payload));});
+  return button;
+}
+function buildDailyExpanded(model,navigate){
+  const body=node('div','home-expanded-dashboard home-expanded-daily');
+  const stay=model.currentStay;if(!stay){body.append(node('p','home-expanded-empty','No current destination.'));const action=expandedRouteAction('OPEN ITINERARY',navigate,'itinerary');if(action)body.append(action);return body;}
+  if(!isDestinationBudgetUsable(stay)){const setup=expandedSection('DESTINATION BUDGET NEEDS SETUP');setup.append(node('p','home-expanded-callout is-bad','A daily allowance is not reliable until this dated stay has an AUD budget and fixed exchange rate. The itinerary supplies the local currency automatically.'));const action=expandedRouteAction('OPEN BUDGET',navigate,'budget');if(action)setup.append(action);body.append(setup);return body;}
+  const planned=stay.destinationBudgetAUD/Math.max(1,stay.totalDays);const actual=stay.destinationSpentAUD/Math.max(1,stay.currentDay);const variance=planned-actual;
+  const [plannedLocal,plannedAud]=localMoney(planned,stay.localCurrency,stay.fixedLocalPerAUD);const [actualLocal,actualAud]=localMoney(actual,stay.localCurrency,stay.fixedLocalPerAUD);const [varianceLocal,varianceAud]=localMoney(Math.abs(variance),stay.localCurrency,stay.fixedLocalPerAUD);
+  const stats=node('div','home-expanded-stats home-expanded-stats-four');
+  stats.append(expandedStat('PLANNED DAILY',plannedLocal,plannedAud,'sky'),expandedStat('ACTUAL DAILY',actualLocal,actualAud,variance>=0?'green':'red'),expandedStat('DAILY VARIANCE',varianceLocal,`${varianceAud}${varianceAud?' · ':''}${variance>=0?'under allowance':'over allowance'}`,variance>=0?'green':'red'),expandedStat('DAYS REMAINING',String(stay.remainingDays),`${formatAUDate(stay.endDate)} segment end`,'blue'));
+  body.append(stats);
+  const pace=expandedSection('DAILY SPEND AGAINST PLAN');pace.append(expandedProgress('Actual daily spend',planned?actual/planned*100:0,variance>=0?'green':'red'),expandedProgress('Stay elapsed',stay.progress,'violet'),node('p','home-expanded-callout',`${varianceLocal}${varianceAud?` · ${varianceAud}`:''} ${variance>=0?'under':'over'} daily allowance · Current stay ${stay.dates}.`));body.append(pace);return body;
+}
+function buildDestinationExpanded(model,navigate){
+  const body=node('div','home-expanded-dashboard home-expanded-destination');const stay=model.currentStay;if(!stay){body.append(node('p','home-expanded-empty','No current destination.'));const action=expandedRouteAction('OPEN ITINERARY',navigate,'itinerary');if(action)body.append(action);return body;}
+  if(!isDestinationBudgetUsable(stay)){const setup=expandedSection('DESTINATION BUDGET NEEDS SETUP');setup.append(node('p','home-expanded-callout is-bad','This stay is not locked in for automatic date-based routing yet. Set the AUD budget and fixed exchange rate in Destination Budgets. The itinerary already supplies the local currency.'));const action=expandedRouteAction('OPEN BUDGET',navigate,'budget');if(action)setup.append(action);body.append(setup);return body;}
+  const total=localMoney(stay.destinationBudgetAUD,stay.localCurrency,stay.fixedLocalPerAUD);const spent=localMoney(stay.destinationSpentAUD,stay.localCurrency,stay.fixedLocalPerAUD);const remain=localMoney(stay.destinationRemainingAUD,stay.localCurrency,stay.fixedLocalPerAUD);const daily=localMoney(stay.destinationBudgetAUD/Math.max(1,stay.totalDays),stay.localCurrency,stay.fixedLocalPerAUD);
+  const used=stay.destinationBudgetAUD?stay.destinationSpentAUD/stay.destinationBudgetAUD*100:0;const expected=stay.destinationBudgetAUD*(stay.progress/100);const paceDelta=expected-stay.destinationSpentAUD;
+  const stats=node('div','home-expanded-stats home-expanded-stats-six');stats.append(expandedStat('TOTAL BUDGET',total[0],total[1],'sky'),expandedStat('SPENT TO DATE',spent[0],spent[1],'red'),expandedStat('AFTER COMMITMENTS',remain[0],remain[1],'green'),expandedStat('DAILY ALLOWANCE',daily[0],daily[1],'teal'),expandedStat('DAYS REMAINING',String(stay.remainingDays),'days','violet'),expandedStat('FIXED RATE',stay.fixedLocalPerAUD?`1 AUD = ${Number(stay.fixedLocalPerAUD).toFixed(2)} ${stay.localCurrency}`:'Not set','locked for this stay','gold'));body.append(stats);
+  const paceLocal=localMoney(Math.abs(paceDelta),stay.localCurrency,stay.fixedLocalPerAUD);const pace=expandedSection('STAY PACE');pace.append(expandedProgress('Budget used',used,paceDelta>=0?'green':'red'),expandedProgress('Stay elapsed',stay.progress,'violet'),node('p',`home-expanded-callout ${paceDelta>=0?'is-good':'is-bad'}`,`${paceLocal[0]}${paceLocal[1]?` · ${paceLocal[1]}`:''} ${paceDelta>=0?'under':'over'} planned pace`));body.append(pace);return body;
+}
+function annualMetrics(model,currentDate,state){
+  const budget=model.annual.budgetAUD,spent=model.annual.spentAUD;const date=new Date(`${currentDate}T00:00:00Z`);const y=date.getUTCFullYear(),month=date.getUTCMonth()+1,day=date.getUTCDate();const start=new Date(Date.UTC(y,0,1));const elapsed=Math.max(1,Math.floor((date-start)/86400000)+1);const days=(Date.UTC(y+1,0,1)-Date.UTC(y,0,1))/86400000;const expected=budget*(elapsed/days),position=expected-spent,projected=spent/elapsed*days,buffer=budget-projected;const monthlyBudget=budget/12;const mtd=annualPeriodSpent(state,iso(y,month,1),iso(y,month,day));const prev=month===1?{y:y-1,m:12}:{y,m:month-1};const prevSpend=annualPeriodSpent(state,iso(prev.y,prev.m,1),iso(prev.y,prev.m,daysInMonth(prev.y,prev.m)));return{budget,spent,expected,position,projected,buffer,monthlyBudget,mtd,prevSpend,elapsedPct:elapsed/days*100,pacePct:expected?spent/expected*100:0};
+}
+function buildAnnualExpanded(model,currentDate,state,navigate){
+  const body=node('div','home-expanded-dashboard home-expanded-annual');if(!(model.annual.budgetAUD>0)){body.append(node('p','home-expanded-empty','Annual Budget needs setup before pace and forecast figures can be trusted.'));const action=expandedRouteAction('OPEN SETTINGS',navigate,'settings');if(action)body.append(action);return body;}const m=annualMetrics(model,currentDate,state);
+  const stats=node('div','home-expanded-stats home-expanded-stats-eight');stats.append(expandedStat('ANNUAL BUDGET',formatMoney(m.budget,'AUD'),`${model.annual.year} · AUD`,'gold'),expandedStat('SPENT SO FAR',formatMoney(m.spent,'AUD'),'actual spend · AUD','sky'),expandedStat('EXPECTED BY TODAY',formatMoney(m.expected,'AUD'),`${Math.round(m.elapsedPct)}% of year elapsed`,'blue'),expandedStat('YTD POSITION',formatMoney(Math.abs(m.position),'AUD'),m.position>=0?'under pace':'over pace',m.position>=0?'green':'red'),expandedStat('PROJECTED YEAR END',formatMoney(m.projected,'AUD'),'AUD','violet'),expandedStat('PROJECTED BUFFER',formatMoney(Math.abs(m.buffer),'AUD'),m.buffer>=0?'under annual budget':'over annual budget',m.buffer>=0?'green':'red'),expandedStat('THIS MONTH · MTD',formatMoney(m.mtd,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.mtd),'AUD')} ${m.monthlyBudget>=m.mtd?'under':'over'} pace`,'teal'),expandedStat('LAST MONTH',formatMoney(m.prevSpend,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.prevSpend),'AUD')} ${m.monthlyBudget>=m.prevSpend?'under':'over'} target`,'indigo'));body.append(stats);
+  const pace=expandedSection('ANNUAL PACE');pace.append(expandedProgress('Year elapsed',m.elapsedPct,'gold'),expandedProgress('Spend vs pace',m.pacePct,m.position>=0?'green':'red'),node('p','home-expanded-callout',`${formatMoney(Math.abs(m.buffer),'AUD')} projected ${m.buffer>=0?'under':'over'} budget.`));body.append(pace);return body;
+}
+const HOME_EXPANDED_PAGE_SIZE=20;
+function homeExpandedPagedList(items,{renderItem,emptyText='No entries yet',itemLabel='items'}={}){
+  const all=Array.isArray(items)?items:[];
+  const wrap=node('div','home-expanded-paged-list');
+  const rows=node('div','home-expanded-list');
+  const pager=node('div','home-expanded-pager');
+  const previous=node('button','button home-expanded-page-button','Previous'); previous.type='button';
+  const status=node('span','home-expanded-page-status');
+  const next=node('button','button home-expanded-page-button','Next'); next.type='button';
+  pager.append(previous,status,next);
+  let page=0;
+  const pageCount=Math.max(1,Math.ceil(all.length/HOME_EXPANDED_PAGE_SIZE));
+  const draw=()=>{
+    rows.replaceChildren();
+    const start=page*HOME_EXPANDED_PAGE_SIZE;
+    const visible=all.slice(start,start+HOME_EXPANDED_PAGE_SIZE);
+    if(!visible.length) rows.append(node('p','home-expanded-empty',emptyText));
+    visible.forEach((item,index)=>rows.append(renderItem(item,start+index)));
+    status.textContent=`Page ${page+1} of ${pageCount} · ${all.length} ${itemLabel}`;
+    previous.disabled=page<=0; next.disabled=page>=pageCount-1;
+    pager.hidden=all.length<=HOME_EXPANDED_PAGE_SIZE;
+  };
+  previous.addEventListener('click',()=>{if(page>0){page-=1;draw();rows.scrollIntoView?.({block:'nearest'});}});
+  next.addEventListener('click',()=>{if(page<pageCount-1){page+=1;draw();rows.scrollIntoView?.({block:'nearest'});}});
+  wrap.append(rows,pager); draw(); return wrap;
+}
+function buildUpcomingExpanded(model,currentDate,navigate){
+  const body=node('div','home-expanded-dashboard home-expanded-upcoming');
+  const all=[...(model.upcomingEvents||[])];
+  const reservations=all.filter(e=>e.kind==='reservation').length;
+  const personal=all.filter(e=>e.kind==='calendar').length;
+  const top=node('div','home-expanded-stats home-expanded-stats-four');
+  const next=all[0]; let nextTiming='—';
+  if(next?.dateTime){const days=Math.max(0,Math.round((new Date(`${String(next.dateTime).slice(0,10)}T00:00:00Z`)-new Date(`${currentDate}T00:00:00Z`))/86400000));nextTiming=days===0?'Today':`In ${days} day${days===1?'':'s'}`;}
+  top.append(expandedStat('UPCOMING ITEMS',String(all.length),'all future bookings + personal events','blue'),expandedStat('NEXT ITEM',nextTiming,next?.title||'No upcoming item','sky'),expandedStat('RESERVATIONS',String(reservations),'future reservations','violet'),expandedStat('PERSONAL EVENTS',String(personal),'future reminders + notes','teal'));
+  body.append(top);
+  const list=expandedSection('ALL UPCOMING');
+  list.append(homeExpandedPagedList(all,{emptyText:'No upcoming events',itemLabel:'items',renderItem:event=>{
+    const actionable=Boolean(event.sourceId&&typeof navigate==='function');
+    const row=node(actionable?'button':'div',`home-expanded-list-row${actionable?' is-actionable':''}`);
+    if(actionable){row.type='button';row.setAttribute('aria-label',`Open ${event.title}`);row.addEventListener('click',()=>{row.closest('dialog')?.close();queueMicrotask(()=>navigate(event.kind==='reservation'?'reservations':'calendar',{collection:event.kind==='reservation'?'reservations':'calendarEvents',id:event.sourceId,editorTone:event.needsBudgetRepair?'gold':null}));});}
+    const d=eventDateParts(event.displayDate);const badge=node('span','home-expanded-date');badge.append(node('strong','',d.day),node('small','',d.month));
+    const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,upcomingEventTypeLabel(event),event.status].filter(Boolean).join(' · ')));
+    row.append(badge,copy);if(actionable)row.append(node('b','home-expanded-open-label','OPEN'));return row;
+  }}));
+  body.append(list);return body;
+}
+function buildAlertsExpanded(model,navigate,stateService,currentDate){
+  const body=node('div','home-expanded-dashboard home-expanded-alerts');
+  const reopenAfterStateChange=()=>queueMicrotask(()=>{
+    const card=document.querySelector('[data-screen="home"] .home-mini-alerts');
+    const trigger=card?.querySelector('.tcc-expand-trigger');
+    if(trigger)trigger.click();
+    else if(card)card.click();
+  });
+  const severityMeta=priority=>{
+    const value=String(priority||'info').toLowerCase();
+    if(value==='critical')return{label:'CRITICAL',tone:'red'};
+    if(value==='high')return{label:'HIGH',tone:'red'};
+    if(value==='medium')return{label:'WATCH',tone:'amber'};
+    if(value==='low')return{label:'INFO',tone:'green'};
+    return{label:'INFO',tone:'green'};
+  };
+  function draw(){
+    const fresh=buildHomeViewModel(stateService.snapshot(),currentDate);
+    const all=[...(fresh.alerts||[])];
+    body.replaceChildren();
+    const list=expandedSection('ATTENTION');
+    const legend=node('div','home-expanded-alert-legend');
+    for(const [tone,label] of [['red','Urgent'],['amber','Watch'],['green','Information']]){
+      const item=node('span',`home-expanded-alert-legend-item is-${tone}`);
+      item.append(node('i','home-expanded-traffic-light',''),node('b','',label));
+      legend.append(item);
+    }
+    list.append(legend);
+    const note=node('p','home-expanded-alert-note','Remove hides the alert from Home only. The source record stays unchanged.');
+    list.append(note);
+    list.append(homeExpandedPagedList(all,{emptyText:'No alerts',itemLabel:'alerts',renderItem:(a,i)=>{
+      const severity=severityMeta(a.priority);
+      const row=node('div',`home-expanded-list-row home-expanded-alert-row alert-${a.priority} is-${severity.tone}`);
+      const light=node('span',`home-expanded-traffic-light is-${severity.tone}`,'');
+      light.setAttribute('aria-label',`${severity.label} alert`);
+      const priority=node('span',`home-expanded-priority is-${severity.tone}`,severity.label);
+      const copy=node('span','home-expanded-list-copy');
+      const dueLabel=a.displayDueDate&&!String(a.message||'').includes(a.displayDueDate)?`Due ${a.displayDueDate}`:'';
+      copy.append(node('strong','',a.title||`Alert ${i+1}`),node('small','',[a.message,dueLabel].filter(Boolean).join(' · ')));
+      const actions=node('span','home-expanded-alert-actions');
+      const remove=node('button','home-expanded-alert-action home-expanded-alert-remove','REMOVE');
+      remove.type='button';
+      remove.setAttribute('aria-label',`Remove alert: ${a.title||`Alert ${i+1}`}`);
+      remove.addEventListener('click',()=>{
+        const openDialog=row.closest('dialog');
+        if(openDialog?.open) openDialog.close();
+        stateService.commit(draft=>{
+          const ids=new Set(Array.isArray(draft.ui.dismissedHomeAlertIds)?draft.ui.dismissedHomeAlertIds:[]);
+          ids.add(String(a.id));
+          draft.ui.dismissedHomeAlertIds=[...ids].slice(-250);
+        });
+        reopenAfterStateChange();
+      });
+      actions.append(remove);
+      row.append(light,priority,copy,actions);
+      return row;
+    }}));
+    const dismissed=stateService.snapshot().ui.dismissedHomeAlertIds||[];
+    if(dismissed.length){
+      const restore=node('button','button home-expanded-alert-restore',`RESTORE REMOVED ALERTS (${dismissed.length})`);
+      restore.type='button';
+      restore.addEventListener('click',()=>{
+        const openDialog=restore.closest('dialog');
+        if(openDialog?.open) openDialog.close();
+        stateService.commit(draft=>{draft.ui.dismissedHomeAlertIds=[];});
+        reopenAfterStateChange();
+      });
+      list.append(restore);
+    }
+    body.append(list);
+  }
+  draw();
+  return body;
+}
+function field(label,name,type,value){const wrap=node('label','home-expanded-field');wrap.append(node('span','',label));const input=document.createElement('input');input.name=name;input.type=type;input.value=value||'';if(type==='date'){input.lang='en-AU';const display=input.value?formatAUDate(input.value):'DD/MM/YYYY';input.setAttribute('aria-label',`${label} · ${display}`);}wrap.append(input);return wrap;}
+function buildSchengenExpanded(model,stateService){
+  const body=node('div','home-expanded-dashboard home-expanded-schengen');const s=model.schengen;const used=s.daysUsed??0,remaining=s.daysRemaining??90;const top=node('div','home-expanded-schengen-top');const ring=node('div','home-expanded-schengen-ring');ring.style.setProperty('--schengen-used',pct((Number(used)||0)/90*100));ring.classList.toggle('is-unchecked',s.daysUsed==null||s.daysRemaining==null||s.status==='not-checked');ring.classList.toggle('is-not-allowed',s.status==='not-allowed');ring.append(node('strong','',String(s.daysRemaining??'—')),node('span','','DAYS LEFT'),node('small','','OF 90'));const stats=node('div','home-expanded-stats home-expanded-stats-four');stats.append(expandedStat('STATUS',s.status==='allowed'?'SAFE':s.status==='not-allowed'?'NOT ALLOWED':'NOT CHECKED','manual Schengen tracker',s.status==='allowed'?'green':s.status==='not-allowed'?'red':'gold'),expandedStat('DAYS USED',String(s.daysUsed??'—'),'of 90','gold'),expandedStat('ENTRY',s.entryDate?formatAUDate(s.entryDate):'—','manual','teal'),expandedStat('EXIT / LEAVE BY',s.mustLeaveByDate?formatAUDate(s.mustLeaveByDate):(s.plannedExitDate?formatAUDate(s.plannedExitDate):'—'),'manual','green'));top.append(ring,stats);body.append(top);
+  const editor=expandedSection('ENTER SCHENGEN DETAILS');const form=node('div','home-expanded-form-grid');form.append(field('Entry Date','entryDate','date',s.entryDate),field('Planned Exit','plannedExitDate','date',s.plannedExitDate),field('Must Leave By','mustLeaveByDate','date',s.mustLeaveByDate),field('Days Used','daysUsed','number',s.daysUsed??''),field('Days Remaining','daysRemaining','number',s.daysRemaining??''));const statusWrap=node('label','home-expanded-field');statusWrap.append(node('span','','Status'));const select=document.createElement('select');select.name='status';for(const [v,l] of [['allowed','Allowed / Safe'],['not-allowed','Not Allowed'],['not-checked','Not Checked']]){const o=document.createElement('option');o.value=v;o.textContent=l;o.selected=v===s.status;select.append(o);}statusWrap.append(select);form.append(statusWrap);editor.append(form);const message=node('p','home-expanded-form-message');const save=node('button','button home-expanded-save','SAVE SCHENGEN DETAILS');save.type='button';save.addEventListener('click',()=>{try{const val=n=>form.querySelector(`[name="${n}"]`)?.value??'';stateService.commit(draft=>saveSchengenSettingsDraft(draft,{status:val('status'),daysUsed:val('daysUsed'),daysRemaining:val('daysRemaining'),entryDate:val('entryDate'),plannedExitDate:val('plannedExitDate'),mustLeaveByDate:val('mustLeaveByDate'),lastCheckedDate:localISODate(new Date(stateService.now?.() || Date.now())),note:draft.settings.schengen?.note||''}));message.textContent='Saved. Home Schengen status has been updated.';message.className='home-expanded-form-message is-good';}catch(err){message.textContent=err.message;message.className='home-expanded-form-message is-bad';}});editor.append(save,message);body.append(editor);return body;
+}
+function buildTimelineExpanded(state,currentDate,navigate){
+  const body=node('div','home-expanded-dashboard home-expanded-timeline');
+  const entries=[...(state.itinerary||[])].filter(e=>String(e.endDate)>=String(currentDate)).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate)));
+  const current=entries.find(e=>String(e.startDate)<=String(currentDate)&&String(e.endDate)>=String(currentDate));const next=entries.find(e=>String(e.startDate)>String(currentDate));
+  const top=node('div','home-expanded-stats home-expanded-stats-four');top.append(expandedStat('PLANNED SEGMENTS',String(entries.length),'current + full forward itinerary','violet'),expandedStat('CURRENT',current?.name||'—','in progress now','green'),expandedStat('NEXT',next?.name||'—','next planned segment','sky'),expandedStat('COVERAGE',entries.length?`${formatAUDate(entries[0].startDate)} → ${formatAUDate(entries[entries.length-1].endDate)}`:'—','full forward timeline','blue'));body.append(top);
+  const section=expandedSection('FULL TRIP TIMELINE');
+  section.append(homeExpandedPagedList(entries,{emptyText:'No entries yet',itemLabel:'segments',renderItem:e=>{
+    const active=String(e.startDate)<=String(currentDate)&&String(e.endDate)>=String(currentDate);const actionable=typeof navigate==='function';const row=node(actionable?'button':'div',`home-expanded-list-row timeline-row${actionable?' is-actionable':''}`);
+    if(actionable){row.type='button';row.setAttribute('aria-label',`Open itinerary stay ${e.name}`);row.addEventListener('click',()=>{row.closest('dialog')?.close();queueMicrotask(()=>navigate('itinerary',{collection:'itinerary',id:e.id}));});}
+    const tag=node('span','home-expanded-priority',active?'NOW':'NEXT');const copy=node('span','home-expanded-list-copy');const mode=e.travelType==='cruise'?'Cruise':(e.travelType==='motorhome'||e.travelType==='rv'?'Motorhome':'Standard');const start=new Date(`${e.startDate}T00:00:00Z`),end=new Date(`${e.endDate}T00:00:00Z`);const days=Math.max(1,Math.round((end-start)/86400000)+1);copy.append(node('strong','',e.name),node('small','',`${formatAUDate(e.startDate)} – ${formatAUDate(e.endDate)} · ${mode} · ${days} days`));row.append(tag,copy,node('b',active?'is-good':'',active?'IN PROGRESS':'UPCOMING'));return row;
+  }}));
+  body.append(section);return body;
+}
+
+function renderSearchResults(model,host,navigate){
+  const wrap=node('div','home-search-results');
+  if(!model.searchResults.length){wrap.append(node('p','home-search-empty','No matching results'));return wrap;}
+  for(const result of model.searchResults){
+    const button=node('button',`home-search-result${result.needsBudgetRepair?' is-repair':''}`);button.type='button';
+    const copy=node('span','home-search-result-copy');
+    copy.append(node('strong','',result.title),node('small','',[result.screenLabel,result.dateContext].filter(Boolean).join(' · ')));
+    if(result.needsBudgetRepair)copy.append(node('small','home-search-repair','DESTINATION BUDGET REPAIR REQUIRED'));
+    const affordance=node('span','home-search-result-open');affordance.append(node('small','','OPEN'),createLineIcon('arrowRight'));
+    button.append(copy,affordance);
+    button.setAttribute('aria-label',['Open search result',result.title,result.screenLabel,result.dateContext,result.needsBudgetRepair?'Destination Budget repair required':''].filter(Boolean).join(' · '));
+    button.addEventListener('click',()=>{
+      const screen=COLLECTION_TO_SCREEN[result.collection];
+      if(screen&&typeof navigate==='function'){
+        navigate(screen,{collection:result.collection,id:result.id,editorTone:result.needsBudgetRepair?'gold':null});
+        return;
+      }
+      showHomeDetail(host,{title:result.title,tone:result.needsBudgetRepair?'gold':'blue',items:[{label:'Area',value:result.screenLabel||'Travel Command Centre'},{label:'Date',value:result.dateContext||'—'}]});
+    });
+    wrap.append(button);
+  }
+  return wrap;
+}
+
+export function renderHomeScreen({stateService,currentDate,navigate}){
+  const main=node('main','screen-root home-screen'); main.dataset.screen='home'; let query='';
+  function render(){ const state=stateService.snapshot(); const model=buildHomeViewModel(state,currentDate,{searchQuery:query}); main.replaceChildren();
+    // Empty/setup Home must remain compact rather than stretching sparse cards
+    // into large dead panels just to fill the iPad viewport.
+    main.classList.toggle('is-first-use-empty',!model.currentStay);
+    main.append(renderHero(model,state,main,navigate));
+    const daily=renderDailyBudget(model), destination=renderDestinationBudget(model), annual=renderAnnual(model,currentDate,state);
+    const stats=node('section','home-ref-stats'); stats.append(daily,destination,annual); main.append(stats);
+    const upcoming=compactUpcoming(model,main,state,navigate), alerts=compactAlerts(model,main,navigate), schengen=compactSchengen(model), timeline=compactTimeline(state,currentDate,main,navigate);
+    const minis=node('section','home-ref-minis'); minis.append(upcoming,alerts,schengen,timeline); main.append(minis);
+    makeExpandableCard(daily,{host:main,title:'Daily Budget',tone:'teal',bodyBuilder:()=>buildDailyExpanded(model,navigate)});
+    makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'violet',bodyBuilder:()=>buildDestinationExpanded(model,navigate)});
+    makeExpandableCard(annual,{host:main,title:'Annual Position',tone:'gold',bodyBuilder:()=>buildAnnualExpanded(model,currentDate,state,navigate)});
+    makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'blue',bodyBuilder:()=>buildUpcomingExpanded(model,currentDate,navigate)});
+    makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'orange',bodyBuilder:()=>buildAlertsExpanded(model,navigate,stateService,currentDate)});
+    makeExpandableCard(schengen,{host:main,title:'Schengen Status',tone:model.schengen.status==='not-allowed'?'red':model.schengen.status==='allowed'?'green':'gold',bodyBuilder:()=>buildSchengenExpanded(model,stateService)});
+    makeExpandableCard(timeline,{host:main,title:'Trip Timeline',tone:'violet',bodyBuilder:()=>buildTimelineExpanded(state,currentDate,navigate)});
+    // Global Search is the final fixed row. Home deliberately ends here: no
+    // Journey Map or other below-the-fold panel is allowed to make Home scroll.
+    const search=document.createElement('input'); search.type='search'; search.className='home-ref-search'; search.placeholder='Search destinations, reservations, notes and more'; search.value=query; search.setAttribute('aria-label','Global search'); main.append(search);
+    if(query.trim()){ const results=node('section','home-search-overlay'); results.append(renderSearchResults(model,main,navigate)); main.append(results); }
+    search.addEventListener('input',e=>{const caret=e.target.selectionStart??e.target.value.length;const selectionEnd=e.target.selectionEnd??caret;query=e.target.value;render();const next=main.querySelector('.home-ref-search');next?.focus();next?.setSelectionRange(Math.min(caret,next.value.length),Math.min(selectionEnd,next.value.length));});
+  }
+  render(); return main;
+}
