@@ -1,4 +1,4 @@
-export const DEFAULT_STORAGE_KEY = 'tcc:v1:state';
+export const DEFAULT_STORAGE_KEY = './v1:state';
 
 const STORED_STATE_PREFIX = 'TCCZ1:';
 const STORAGE_COMPRESSION_THRESHOLD = 8192;
@@ -228,7 +228,7 @@ export class MemoryStorageAdapter {
 }
 
 
-export const DEFAULT_VAULT_ASSET_DB = 'tcc:v1:vault-assets';
+export const DEFAULT_VAULT_ASSET_DB = './v1:vault-assets';
 export const DEFAULT_VAULT_ASSET_STORE = 'screenshots';
 
 function requestPromise(request, message) {

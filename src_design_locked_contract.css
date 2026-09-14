@@ -1,0 +1,1231 @@
+@layer tccLocks {
+/* Travel Command Centre — cumulative visual contract lock (S33, 14 Sep 2026)
+   This file is intentionally loaded AFTER the layered app stylesheet and after
+   the legacy/reference passes. It contains only user-approved visual rules that
+   must not drift backward in future builds. Do not use it for experiments. */
+
+:root {
+  --tcc-baby-blue-top:#c8f1ff;
+  --tcc-baby-blue-mid:#9fe3f8;
+  --tcc-baby-blue-bottom:#86d4ef;
+  --tcc-baby-blue-ink:#062338;
+  --tcc-reservation-primary-rgb:126,218,248;
+  --tcc-neutral-rgb:174,184,194;
+  --tcc-alert-red-rgb:255,111,131;
+  --tcc-watch-amber-rgb:255,209,91;
+  --tcc-clear-green-rgb:87,214,155;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 1 — Primary Add actions are the approved pale baby/sky blue.
+   They use dark ink. Never return them to saturated cobalt + white. */
+[data-screen="budget"] .budget-add-expense-bar,
+[data-screen="reservations"] .reservation-add-bar,
+[data-screen="itinerary"] .itinerary-add-bar {
+  border:1px solid rgba(126,218,248,.94) !important;
+  background:linear-gradient(180deg,var(--tcc-baby-blue-top) 0%,var(--tcc-baby-blue-mid) 54%,var(--tcc-baby-blue-bottom) 100%) !important;
+  color:var(--tcc-baby-blue-ink) !important;
+  text-shadow:none !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.78),0 8px 20px rgba(40,151,196,.13) !important;
+}
+[data-screen="budget"] .budget-add-expense-bar :is(.tcc-line-icon,svg),
+[data-screen="reservations"] .reservation-add-bar :is(.tcc-line-icon,svg),
+[data-screen="itinerary"] .itinerary-add-bar :is(.tcc-line-icon,svg) {
+  color:var(--tcc-baby-blue-ink) !important;
+  stroke:currentColor !important;
+}
+
+/* Add Reservation is one visual family. The bar, new-reservation editor accent,
+   selected choices and primary Save action use the same baby-blue language. */
+[data-screen="reservations"] .tcc-reservation-editor-modal.tone-sky {
+  --tcc-editor-rgb:126,218,248 !important;
+  --tcc-editor-title:#bcecff !important;
+  border-color:rgba(var(--tcc-reservation-primary-rgb),.48) !important;
+}
+[data-screen="reservations"] .tcc-reservation-editor-modal.tone-sky > form > footer .button:last-child {
+  border-color:rgba(126,218,248,.94) !important;
+  background:linear-gradient(180deg,var(--tcc-baby-blue-top),var(--tcc-baby-blue-bottom)) !important;
+  color:var(--tcc-baby-blue-ink) !important;
+  text-shadow:none !important;
+}
+[data-screen="reservations"] .reservation-type-tile,
+[data-screen="reservations"] .reservation-flight-scope-tile,
+[data-screen="reservations"] .reservation-allocation-tile {
+  border-color:rgba(174,184,194,.20) !important;
+  background:linear-gradient(145deg,rgba(31,42,54,.72),rgba(8,20,33,.90)) !important;
+  color:#dce7ee !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+[data-screen="reservations"] :is(.reservation-type-tile,.reservation-flight-scope-tile,.reservation-allocation-tile)[data-active="true"] {
+  --choice-rgb:126,218,248 !important;
+  border-color:rgba(126,218,248,.68) !important;
+  background:radial-gradient(circle at 84% 0%,rgba(126,218,248,.14),transparent 52%),linear-gradient(145deg,rgba(22,52,67,.82),rgba(7,24,37,.94)) !important;
+  color:#f5fbff !important;
+  box-shadow:0 0 0 2px rgba(126,218,248,.07),inset 0 1px rgba(255,255,255,.045) !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 2 — Reservations overview is a coherent premium family, not a rainbow.
+   Category identity comes from iconography/labels. Broad tile surfaces stay
+   graphite/navy. Completed is the explicit silver/grey exception. */
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) {
+  --reservation-rgb:126,218,248 !important;
+  border-color:rgba(126,218,248,.30) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(126,218,248,.065),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important;
+  filter:none !important;
+  box-shadow:0 12px 26px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.045) !important;
+}
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed)::before {
+  background:linear-gradient(90deg,rgba(126,218,248,.13),transparent 72%) !important;
+}
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-icon {
+  border-color:rgba(126,218,248,.38) !important;
+  background:rgba(20,47,63,.54) !important;
+  color:#aeeaff !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.055) !important;
+}
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-count strong {
+  color:#d7f4ff !important;
+}
+[data-screen="reservations"] .reservation-tab-completed {
+  --reservation-rgb:174,184,194 !important;
+  --reservation-accent:#aeb8c2 !important;
+  border-color:rgba(174,184,194,.36) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(174,184,194,.08),transparent 52%),linear-gradient(145deg,rgba(57,65,74,.58),rgba(12,22,33,.96)) !important;
+  filter:none !important;
+}
+[data-screen="reservations"] .reservation-tab-completed .reservation-tab-icon {
+  border-color:rgba(174,184,194,.38) !important;
+  background:rgba(92,101,111,.16) !important;
+  color:#d5dde4 !important;
+  box-shadow:none !important;
+}
+[data-screen="reservations"] .reservation-tab-completed .reservation-tab-count strong { color:#d5dde4 !important; }
+
+/* Reservation support widgets belong to the same family. To Book retains the
+   user-approved yellow attention treatment; ordinary summary widgets do not
+   introduce unrelated red/purple slabs. */
+[data-screen="reservations"] .reservation-next-five,
+[data-screen="reservations"] .reservation-booked-total {
+  --comfort-accent:rgb(var(--tcc-reservation-primary-rgb)) !important;
+  border-color:rgba(126,218,248,.30) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(126,218,248,.075),transparent 50%),linear-gradient(145deg,rgba(24,39,52,.96),rgba(7,19,32,.985)) !important;
+  box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04) !important;
+}
+[data-screen="reservations"] .reservation-booked-total :is(.reservation-total-value,.reservation-total-label),
+[data-screen="reservations"] .reservation-next-five h2 { color:#d9f4ff !important; }
+[data-screen="reservations"] .reservation-to-book {
+  --comfort-accent:rgb(var(--tcc-watch-amber-rgb)) !important;
+  border-color:rgba(255,209,91,.46) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(255,209,91,.11),transparent 50%),linear-gradient(145deg,rgba(34,38,38,.96),rgba(9,23,35,.985)) !important;
+}
+[data-screen="reservations"] .reservation-health.reservation-health-verified {
+  border-color:rgba(174,184,194,.24) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(174,184,194,.055),transparent 52%),linear-gradient(145deg,rgba(25,35,44,.92),rgba(7,20,31,.97)) !important;
+}
+[data-screen="reservations"] .reservation-health.reservation-health-needs-attention {
+  border-color:rgba(255,209,91,.38) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(255,209,91,.08),transparent 52%),linear-gradient(145deg,rgba(38,36,28,.92),rgba(7,20,31,.97)) !important;
+}
+[data-screen="reservations"] .reservation-health-status { color:#ffd76b !important; }
+
+/* Search surfaces remain neutral silver/graphite, never category-coloured. */
+[data-screen="reservations"] :is(.reservation-search-input,input[type="search"]),
+[data-screen="home"] :is(.home-ref-search,.home-search-box),
+[data-screen="itinerary"] .itinerary-search,
+[data-screen="journey-history"] :is(.journey-search,input[type="search"]) {
+  border-color:rgba(174,184,194,.26) !important;
+  background:linear-gradient(180deg,rgba(54,64,74,.78),rgba(18,29,40,.90)) !important;
+  color:#f2f6fa !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 3 — Home Alerts are visibly red at widget level. Individual alert rows
+   continue to use red / amber / green traffic-light severity. */
+[data-screen="home"] .home-mini-alerts {
+  border-color:rgba(255,111,131,.46) !important;
+  background:radial-gradient(circle at 88% 0%,rgba(255,111,131,.105),transparent 48%),linear-gradient(145deg,rgba(39,25,34,.94),rgba(8,20,32,.98)) !important;
+  box-shadow:0 13px 28px rgba(0,0,0,.21),0 0 18px rgba(255,111,131,.055),inset 0 1px rgba(255,255,255,.04) !important;
+}
+[data-screen="home"] .home-mini-alerts .home-mini-diamond,
+[data-screen="home"] .home-mini-alerts .home-mini-head h2 { color:#ff9aab !important; }
+[data-screen="home"] .home-alert-count { background:#d83459 !important; color:#fff !important; }
+[data-screen="home"] .home-alert-priority-critical .home-alert-dot,
+[data-screen="home"] .home-alert-priority-high .home-alert-dot { background:rgb(var(--tcc-alert-red-rgb)) !important; color:rgb(var(--tcc-alert-red-rgb)) !important; }
+[data-screen="home"] .home-alert-priority-medium .home-alert-dot { background:rgb(var(--tcc-watch-amber-rgb)) !important; color:rgb(var(--tcc-watch-amber-rgb)) !important; }
+[data-screen="home"] :is(.home-alert-priority-low,.home-alert-priority-info) .home-alert-dot { background:rgb(var(--tcc-clear-green-rgb)) !important; color:rgb(var(--tcc-clear-green-rgb)) !important; }
+
+/* -------------------------------------------------------------------------
+   LOCK 4 — Home Schengen visual returns to the stronger old-build hierarchy:
+   prominent days-left ring, explicit Used/Left, Must Leave By, Entry/Exit and
+   full-width SAFE/NOT ALLOWED bar. */
+[data-screen="home"] .home-mini-schengen {
+  border-color:rgba(87,214,155,.40) !important;
+  background:radial-gradient(circle at 82% 0%,rgba(87,214,155,.09),transparent 48%),linear-gradient(145deg,rgba(10,43,40,.92),rgba(6,25,31,.98)) !important;
+}
+[data-screen="home"] .home-mini-schengen .home-mini-diamond,
+[data-screen="home"] .home-mini-schengen .home-mini-head h2 { color:#a6efd0 !important; }
+[data-screen="home"] .home-schengen-content {
+  grid-template-rows:minmax(0,1fr) auto auto !important;
+  gap:6px !important;
+  padding:5px 8px 7px !important;
+}
+[data-screen="home"] .home-schengen-body {
+  grid-template-columns:96px minmax(0,1fr) !important;
+  gap:8px !important;
+  align-items:center !important;
+}
+[data-screen="home"] .home-schengen-ring {
+  width:96px !important;
+  height:96px !important;
+  justify-self:center !important;
+  background:radial-gradient(circle at center,#0a2530 0 57%,transparent 58%),conic-gradient(#58d69a 0 var(--schengen-used),#f1c84e var(--schengen-used) 100%) !important;
+  box-shadow:inset 0 0 24px rgba(87,214,155,.14),0 0 24px rgba(87,214,155,.10) !important;
+}
+[data-screen="home"] .home-schengen-ring strong { font-size:31px !important; line-height:.92 !important; }
+[data-screen="home"] .home-schengen-ring span { margin-top:4px !important; color:#d4e1e7 !important; font-size:9px !important; font-weight:900 !important; letter-spacing:.09em !important; line-height:1 !important; }
+[data-screen="home"] .home-schengen-ring small { margin-top:3px !important; color:#a8bac4 !important; font-size:8px !important; font-weight:850 !important; letter-spacing:.10em !important; line-height:1 !important; }
+[data-screen="home"] .home-schengen-metrics { grid-template-columns:1fr !important; gap:5px !important; align-content:center !important; }
+[data-screen="home"] .home-schengen-metrics > div {
+  min-height:38px !important;
+  display:grid !important;
+  grid-template-columns:auto minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:5px !important;
+  padding:5px 7px !important;
+  border-color:rgba(87,214,155,.15) !important;
+  background:rgba(4,19,27,.36) !important;
+}
+[data-screen="home"] .home-schengen-metrics > div strong { font-size:13px !important; overflow:visible !important; text-overflow:clip !important; }
+[data-screen="home"] .home-schengen-metrics > div span { font-size:9px !important; font-weight:850 !important; letter-spacing:.08em !important; }
+[data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave {
+  grid-column:1 / -1 !important;
+  min-height:44px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:flex-start !important;
+  justify-content:center !important;
+  gap:2px !important;
+  overflow:visible !important;
+}
+[data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave strong { font-size:13px !important; line-height:1.05 !important; white-space:nowrap !important; }
+[data-screen="home"] .home-schengen-dates { gap:6px !important; }
+[data-screen="home"] .home-schengen-dates > div { min-height:43px !important; padding:5px 7px !important; border-color:rgba(87,214,155,.22) !important; }
+[data-screen="home"] .home-schengen-dates span { font-size:9px !important; }
+[data-screen="home"] .home-schengen-dates strong { font-size:12px !important; overflow:visible !important; text-overflow:clip !important; }
+[data-screen="home"] .home-schengen-status {
+  min-height:25px !important;
+  display:grid !important;
+  place-items:center !important;
+  padding:4px 7px !important;
+  border-color:rgba(87,214,155,.48) !important;
+  background:rgba(87,214,155,.12) !important;
+  color:#7de4aa !important;
+  font-size:10px !important;
+  font-weight:950 !important;
+  letter-spacing:.14em !important;
+}
+[data-screen="home"] .home-schengen-status.schengen-not-allowed { border-color:rgba(255,111,131,.48) !important; background:rgba(255,111,131,.11) !important; color:#ff9dad !important; }
+[data-screen="home"] .home-schengen-status.schengen-not-checked { border-color:rgba(255,209,91,.45) !important; background:rgba(255,209,91,.10) !important; color:#ffe08a !important; }
+
+@media (max-width:1100px), (max-height:800px) {
+  [data-screen="home"] .home-ref-minis { grid-template-columns:1fr 1fr 1.10fr 1fr !important; }
+  [data-screen="home"] .home-mini-head h2 { font-size:14px !important; white-space:nowrap !important; }
+  [data-screen="home"] .home-schengen-content { gap:4px !important; padding:4px 6px 5px !important; }
+  [data-screen="home"] .home-schengen-body { grid-template-columns:82px minmax(0,1fr) !important; gap:6px !important; }
+  [data-screen="home"] .home-schengen-ring { width:82px !important; height:82px !important; }
+  [data-screen="home"] .home-schengen-ring strong { font-size:27px !important; }
+  [data-screen="home"] .home-schengen-ring span { font-size:8px !important; }
+  [data-screen="home"] .home-schengen-ring small { font-size:7px !important; }
+  [data-screen="home"] .home-schengen-metrics > div { min-height:34px !important; padding:4px 6px !important; }
+  [data-screen="home"] .home-schengen-metrics > div strong { font-size:12px !important; }
+  [data-screen="home"] .home-schengen-metrics > div span { font-size:8px !important; }
+  [data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave { min-height:38px !important; }
+  [data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave strong { font-size:11px !important; }
+  [data-screen="home"] .home-schengen-dates > div { min-height:38px !important; padding:4px 6px !important; }
+  [data-screen="home"] .home-schengen-dates span { font-size:8px !important; }
+  [data-screen="home"] .home-schengen-dates strong { font-size:11px !important; }
+  [data-screen="home"] .home-schengen-status { min-height:22px !important; font-size:9px !important; }
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 5 — App Health owns the Verified language and the medical heartbeat.
+   The ambulance stays strong and BOTH ECG traces visibly move in every health
+   state. The pulse does not disappear in the common Needs Setup state. */
+[data-screen="settings"] .settings-health-ambulance {
+  border-color:rgba(255,135,151,.58) !important;
+  color:#ffe9ec !important;
+  background:radial-gradient(circle at 45% 34%,rgba(255,255,255,.12),transparent 48%),linear-gradient(145deg,#773143,#381b28) !important;
+}
+[data-screen="settings"] .settings-health-pulse-line,
+[data-screen="settings"] .settings-health-run-pulse { overflow:visible !important; opacity:1 !important; }
+[data-screen="settings"] .settings-health-pulse-line path,
+[data-screen="settings"] .settings-health-run-pulse path {
+  fill:none !important;
+  stroke:rgb(var(--health-state-rgb,255,209,91)) !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+  stroke-dasharray:180 !important;
+  stroke-dashoffset:180;
+  animation:tccLockedEcgTrace 1.25s linear infinite !important;
+  filter:drop-shadow(0 0 4px rgba(var(--health-state-rgb,255,209,91),.26)) !important;
+}
+[data-screen="settings"] .settings-health-pulse-line path { stroke-width:2.8 !important; }
+[data-screen="settings"] .settings-health-run-pulse path { stroke-width:2.45 !important; }
+[data-screen="settings"] .settings-health-run {
+  grid-template-columns:30px max-content minmax(150px,1fr) !important;
+  gap:13px !important;
+}
+[data-screen="settings"] .settings-health-run-pulse { width:min(230px,100%) !important; max-width:230px !important; height:30px !important; justify-self:end !important; }
+@keyframes tccLockedEcgTrace {
+  0% { stroke-dashoffset:180; opacity:.48; }
+  18% { opacity:1; }
+  72% { opacity:1; }
+  100% { stroke-dashoffset:0; opacity:.58; }
+}
+@media (prefers-reduced-motion:reduce) {
+  [data-screen="settings"] .settings-health-pulse-line path,
+  [data-screen="settings"] .settings-health-run-pulse path {
+    animation:tccLockedEcgTrace 2.4s linear infinite !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 6 — Completed stays/records remain silver/grey. */
+[data-screen="reservations"] :is(.reservation-completed-expanded-modal,.reservation-completed-expanded-modal .reservation-row,.reservation-completed-expanded-modal .reservation-status),
+[data-screen="itinerary"] .itinerary-completed,
+[data-screen="checklist"] .checklist-row[data-completed="true"] {
+  --completed-rgb:174,184,194;
+}
+[data-screen="reservations"] .reservation-completed-expanded-modal {
+  border-color:rgba(174,184,194,.36) !important;
+}
+[data-screen="reservations"] .reservation-completed-expanded-modal .reservation-row {
+  border-color:rgba(174,184,194,.22) !important;
+  background:linear-gradient(145deg,rgba(51,59,67,.48),rgba(8,19,31,.95)) !important;
+}
+[data-screen="reservations"] .reservation-completed-expanded-modal .reservation-status {
+  border-color:rgba(174,184,194,.30) !important;
+  background:rgba(174,184,194,.10) !important;
+  color:#d5dde4 !important;
+}
+/* Completed rows remain silver even inside a category-coloured All Bookings
+   expansion. The outer category frame keeps its identity; history rows/status
+   chips do not turn blue/green again simply because they are shown there. */
+[data-screen="reservations"] .reservation-category-expanded-modal .reservation-row-completed {
+  border-color:rgba(174,184,194,.24) !important;
+  background:linear-gradient(145deg,rgba(51,59,67,.48),rgba(8,19,31,.95)) !important;
+}
+[data-screen="reservations"] .reservation-category-expanded-modal .reservation-row-completed .reservation-status {
+  border-color:rgba(174,184,194,.30) !important;
+  background:rgba(174,184,194,.10) !important;
+  color:#d5dde4 !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   LOCK 7 — All ordinary information panels use one premium graphite/material
+   family. Colour is reserved for meaning, not used as unrelated full-card fill.
+   This is the cross-screen anti-drift rule for Budget, Journey History, Vault
+   and Settings. */
+:root {
+  --tcc-material-border:rgba(174,184,194,.22);
+  --tcc-material-border-strong:rgba(174,184,194,.30);
+  --tcc-material-bg:radial-gradient(circle at 88% 0%,rgba(126,218,248,.045),transparent 48%),linear-gradient(145deg,rgba(25,37,48,.95),rgba(7,18,30,.985));
+  --tcc-material-bg-soft:linear-gradient(145deg,rgba(31,42,52,.82),rgba(8,19,31,.96));
+  --tcc-material-shadow:0 12px 28px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.035);
+}
+[data-screen="budget"] :is(.budget-panel,.budget-summary-card,.budget-reference-planning,.budget-reference-charts,.budget-forecast-panel),
+[data-screen="journey-history"] :is(.journey-panel,.journey-milestones-panel,.journey-mix-panel,.journey-spend-panel),
+[data-screen="vault"] :is(.vault-summary-card,.vault-emergency-card,.vault-expiry-card,.vault-activity,.vault-all-records),
+[data-screen="settings"] :is(.settings-panel,.settings-info,.settings-backup,.settings-defaults,.settings-security,.settings-schengen) {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+  filter:none !important;
+}
+/* Budget meaning remains visible as restrained edges/labels, not purple/green slabs. */
+[data-screen="budget"] .budget-destination-card { border-color:rgba(126,218,248,.32) !important; }
+[data-screen="budget"] .budget-destination-card :is(.budget-card-kicker,.budget-current-total strong) { color:#bcecff !important; }
+[data-screen="budget"] .budget-pace-card { border-color:rgba(174,184,194,.26) !important; }
+[data-screen="budget"] .budget-annual-card { border-color:rgba(255,209,91,.28) !important; }
+/* Journey travel-type colours stay in icons/chips/bars only. */
+[data-screen="journey-history"] :is(.journey-milestones-panel,.journey-mix-panel,.journey-spend-panel) {
+  --comfort-accent:#aeb8c2 !important;
+}
+/* Settings ordinary cards may show semantic dots/chips, never a full green/purple slab. */
+[data-screen="settings"] :is(.settings-info,.settings-backup,.settings-defaults,.settings-security,.settings-schengen) {
+  --comfort-accent:#aeb8c2 !important;
+}
+/* App Health is deliberately excluded from the ordinary Settings material rule. */
+[data-screen="settings"] .settings-health { filter:none !important; }
+
+/* -------------------------------------------------------------------------
+   LOCK 8 — Neutral search/filter controls everywhere. Search is utility chrome,
+   never a destination/category/status colour. */
+[data-screen] input[type="search"],
+[data-screen] .search-input,
+[data-screen] :is(.reservation-search-input,.itinerary-search,.journey-search,.home-search-box,.home-ref-search) {
+  border-color:rgba(174,184,194,.28) !important;
+  background:linear-gradient(180deg,rgba(55,64,73,.76),rgba(18,28,39,.92)) !important;
+  color:#f2f6fa !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+[data-screen] input[type="search"]::placeholder { color:#aeb8c2 !important; opacity:.92 !important; }
+
+/* -------------------------------------------------------------------------
+   LOCK 9 — Reservation Health Check is informational verification, not App
+   Health. It never displays the word Verified and never becomes a green slab. */
+[data-screen="reservations"] .reservation-health.reservation-health-verified {
+  border-color:rgba(174,184,194,.24) !important;
+  background:var(--tcc-material-bg) !important;
+  color:#dce7ee !important;
+}
+[data-screen="reservations"] .reservation-health.reservation-health-verified .reservation-health-status { display:none !important; }
+[data-screen="reservations"] .reservation-health.reservation-health-needs-attention .reservation-health-status {
+  display:inline-flex !important;
+  color:#ffe08a !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 10 — Calendar colour belongs to destination/reservation strips and
+   markers. Surrounding month/agenda chrome stays neutral so the colour coding
+   is legible rather than becoming a purple/blue wash. */
+[data-screen="calendar"] :is(.calendar-panel,.calendar-reference-legend,.calendar-day-detail,.calendar-source-detail) {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 11 — Checklist keeps owner/stage identity in small accents, while the
+   structural cards use premium material. Ready-to-Move retains its semantic
+   traffic-light state. */
+[data-screen="checklist"] :is(.checklist-overview-card,.checklist-next-card,.checklist-stage-panel) {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-ready-action:not(.is-ready) {
+  border-color:rgba(255,209,91,.38) !important;
+  background:linear-gradient(145deg,rgba(47,41,27,.74),rgba(8,20,31,.96)) !important;
+}
+[data-screen="checklist"] .checklist-ready-action.is-ready {
+  border-color:rgba(87,214,155,.38) !important;
+  background:linear-gradient(145deg,rgba(18,49,42,.72),rgba(8,20,31,.96)) !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 12 — Vault locked presentation remains intentionally sparse. When
+   unlocked, ordinary records use material surfaces; emergency/expiry meaning is
+   carried by icon/edge/status accents rather than large purple/green fills. */
+[data-screen="vault"] .vault-access-denied { color:#f3f7fa !important; }
+[data-screen="vault"] :is(.vault-all-row,.vault-activity-row,.vault-expiry-row,.vault-emergency-contact-row) {
+  border-color:rgba(174,184,194,.20) !important;
+  background:var(--tcc-material-bg-soft) !important;
+}
+
+/* -------------------------------------------------------------------------
+   LOCK 13 — Modal/editor primary actions follow the approved pale baby-blue
+   family when they create/save travel data. Cancel/secondary actions remain
+   graphite so primary intent is obvious. */
+.tcc-editor-modal > form > footer .button:last-child,
+.tcc-reservation-editor-modal > form > footer .button:last-child,
+.tcc-budget-editor-modal > form > footer .button:last-child {
+  border-color:rgba(126,218,248,.90) !important;
+  background:linear-gradient(180deg,var(--tcc-baby-blue-top),var(--tcc-baby-blue-bottom)) !important;
+  color:var(--tcc-baby-blue-ink) !important;
+  text-shadow:none !important;
+}
+
+
+/* -------------------------------------------------------------------------
+   LOCK 15 — Expanded views must inherit the parent widget family. Neutral
+   material cards expand to neutral graphite/silver rather than reviving legacy
+   purple/green/blue modal slabs. Semantic/feature exceptions keep their own
+   explicitly declared tone (Alerts red, To Book gold, Ready state, etc.). */
+.tcc-modal.tcc-expanded-modal.tone-neutral {
+  --tcc-expanded-rgb:174,184,194 !important;
+  --tcc-expanded-deep:#26313a !important;
+  --tcc-expanded-mid:#18242e !important;
+  --tcc-expanded-base:#0b1722 !important;
+  border-color:rgba(174,184,194,.34) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(174,184,194,.085),transparent 44%),linear-gradient(145deg,#26313a 0%,#18242e 54%,#0b1722 100%) !important;
+  box-shadow:0 28px 84px rgba(0,0,0,.54),0 0 18px rgba(174,184,194,.04),inset 0 1px rgba(255,255,255,.04) !important;
+}
+.tcc-modal.tcc-expanded-modal.tone-neutral > form > header h2 { color:#e1e8ed !important; }
+.tcc-modal.tcc-expanded-modal.tone-neutral .tcc-expanded-card-body { --tcc-expanded-rgb:174,184,194 !important; }
+
+/* -------------------------------------------------------------------------
+   LOCK 14 — No user-facing "Verified" badges outside App Health. The word may
+   exist in diagnostics/copy, but ordinary screen widgets never render a badge. */
+[data-screen]:not([data-screen="settings"]) :is(.verified,.status-verified,.reservation-health-status)[data-status="verified"] { display:none !important; }
+
+
+
+/* -------------------------------------------------------------------------
+   LOCK 16 — Ordinary editor/manager chrome follows the parent material family.
+   Settings utility editors are neutral; Budget annual/destination workflows use
+   the same gold/sky/neutral families as their parent widgets. This prevents old
+   blue/green/purple modal themes from surviving behind otherwise-correct screens. */
+[data-screen="settings"] .tcc-settings-editor-modal.tone-neutral,
+[data-screen="budget"] :is(.budget-destination-manager-modal,.budget-accounts-manager-modal).tone-neutral,
+[data-screen="calendar"] .calendar-day-detail-modal.tone-neutral {
+  border-color:rgba(174,184,194,.34) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(174,184,194,.085),transparent 44%),linear-gradient(145deg,#26313a 0%,#18242e 54%,#0b1722 100%) !important;
+}
+
+/* ========================================================================
+   LOCK 17 — Vault utility/Streaming chrome is graphite, not a purple/blue
+   secondary theme. Service logos and explicit emergency/status indicators may
+   retain their own compact identity colours; the containing Vault surfaces do
+   not become colour slabs.
+   ======================================================================== */
+[data-screen="vault"] .vault-section-streaming,
+[data-screen="vault"] .vault-streaming-grid,
+[data-screen="vault"] .vault-streaming-tile,
+[data-screen="vault"] .vault-streaming-tile.is-stored {
+  --vault-section-rgb:174,184,194 !important;
+  --vault-section-deep:#17212b !important;
+  --vault-section-base:#0c1620 !important;
+  background:linear-gradient(145deg,rgba(24,36,49,.94),rgba(8,17,26,.98)) !important;
+  border-color:rgba(174,184,194,.24) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+[data-screen="vault"] .vault-section-streaming .eyebrow,
+[data-screen="vault"] .vault-streaming-tile-status,
+.tcc-modal.vault-streaming-detail-modal .vault-streaming-detail-title span {
+  color:#bdc9d2 !important;
+}
+.tcc-modal.vault-streaming-detail-modal.tone-neutral,
+.tcc-modal.tcc-vault-editor-modal.tone-neutral {
+  border-color:rgba(174,184,194,.34) !important;
+  background:linear-gradient(145deg,rgba(24,36,49,.98),rgba(8,17,26,.995)) !important;
+}
+
+/* ========================================================================
+   LOCK 18 — Add and Edit Reservation are one approved baby-blue/navy family.
+   Reservation type remains visible through iconography/labels; changing type
+   must never recolour the whole editor into the old category rainbow.
+   ======================================================================== */
+[data-screen="reservations"] .tcc-reservation-editor-modal {
+  --tcc-editor-rgb:126,218,248 !important;
+  --tcc-editor-title:#bcecff !important;
+  border-color:rgba(126,218,248,.48) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(126,218,248,.10),transparent 44%),linear-gradient(145deg,#203341 0%,#142735 54%,#081824 100%) !important;
+}
+
+/* ========================================================================
+   LOCK 19 — All ordinary Vault record/screenshot editors stay graphite even
+   when the record category has its own compact identity colour. Category
+   colour may remain on section/icon/status accents; it never recolours the
+   full editor surface.
+   ======================================================================== */
+[data-screen="vault"] .tcc-vault-editor-modal {
+  --tcc-editor-rgb:174,184,194 !important;
+  --tcc-editor-title:#e1e8ed !important;
+  --tcc-editor-deep:#26313a !important;
+  --tcc-editor-mid:#18242e !important;
+  --tcc-editor-base:#0b1722 !important;
+  border-color:rgba(174,184,194,.34) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(174,184,194,.085),transparent 44%),linear-gradient(145deg,#26313a 0%,#18242e 54%,#0b1722 100%) !important;
+  box-shadow:0 28px 84px rgba(0,0,0,.54),0 0 18px rgba(174,184,194,.04),inset 0 1px rgba(255,255,255,.04) !important;
+}
+[data-screen="vault"] .tcc-vault-editor-modal > form > header h2 { color:#e1e8ed !important; }
+
+/* ========================================================================
+   LOCK 20 — Add/Edit Expense is one pale-sky/premium-dark workflow. Expense
+   categories keep their approved individual colours only in the category
+   choices/chips; changing category never recolours the whole editor.
+   ======================================================================== */
+[data-screen="budget"] .tcc-budget-editor-modal {
+  --tcc-editor-rgb:126,218,248 !important;
+  --tcc-editor-title:#bcecff !important;
+  --tcc-editor-deep:#203341 !important;
+  --tcc-editor-mid:#142735 !important;
+  --tcc-editor-base:#081824 !important;
+  border-color:rgba(126,218,248,.46) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(126,218,248,.10),transparent 44%),linear-gradient(145deg,#203341 0%,#142735 54%,#081824 100%) !important;
+}
+
+
+
+/* ========================================================================
+   LOCK 21 — Hidden editor colour closure. Checklist owner/stage identity stays
+   in compact accents while the editor shell remains neutral graphite. Calendar
+   editor chrome stays neutral; destination/event colour remains on month/agenda
+   markers. Itinerary Standard/Home Visit uses the approved sky/blue family,
+   Motorhome orange and Cruise violet; map-point picker chrome stays neutral.
+   ======================================================================== */
+[data-screen="checklist"] .tcc-checklist-editor-modal,
+[data-screen="calendar"] .tcc-calendar-editor-modal,
+[data-screen="itinerary"] .itinerary-route-picker-modal.tone-neutral {
+  --tcc-editor-rgb:174,184,194 !important;
+  --tcc-editor-title:#e1e8ed !important;
+  --tcc-editor-deep:#26313a !important;
+  --tcc-editor-mid:#18242e !important;
+  --tcc-editor-base:#0b1722 !important;
+  border-color:rgba(174,184,194,.34) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(174,184,194,.085),transparent 44%),linear-gradient(145deg,#26313a 0%,#18242e 54%,#0b1722 100%) !important;
+  box-shadow:0 28px 84px rgba(0,0,0,.54),0 0 18px rgba(174,184,194,.04),inset 0 1px rgba(255,255,255,.04) !important;
+}
+[data-screen="checklist"] .tcc-checklist-editor-modal > form > header h2,
+[data-screen="calendar"] .tcc-calendar-editor-modal > form > header h2,
+[data-screen="itinerary"] .itinerary-route-picker-modal.tone-neutral > form > header h2 {
+  color:#e1e8ed !important;
+}
+[data-screen="itinerary"] .tcc-itinerary-home-visit-modal,
+[data-screen="itinerary"] .tcc-itinerary-editor-modal.tone-sky {
+  --tcc-editor-rgb:126,218,248 !important;
+  --tcc-editor-title:#bcecff !important;
+}
+[data-screen="itinerary"] .itinerary-home-visit-identity {
+  border-color:rgba(126,218,248,.36) !important;
+  background:linear-gradient(145deg,rgba(31,84,112,.28),rgba(8,22,39,.76)) !important;
+}
+[data-screen="itinerary"] .itinerary-home-visit-copy small { color:#aee9fb !important; }
+[data-screen="itinerary"] .itinerary-home-visit-note {
+  border-color:rgba(126,218,248,.24) !important;
+  background:rgba(10,30,43,.58) !important;
+}
+
+}
+
+/* ========================================================================
+   LOCK 22 — Checklist structural surfaces are neutral premium material. HIS,
+   HERS, Permanent and Destination keep their identity only as compact edge,
+   icon/title and control accents. Shared Extras and Checklist History are
+   ordinary neutral structure; Ready-to-Move remains the sole full-card
+   amber/green checklist state.
+   ======================================================================== */
+[data-screen="checklist"] :is(
+  .checklist-owner-card,
+  .checklist-column,
+  .checklist-shared-extras,
+  .checklist-history
+) {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-owner-his {
+  box-shadow:inset 3px 0 rgba(112,201,255,.72),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-owner-hers {
+  box-shadow:inset 3px 0 rgba(255,142,202,.72),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-column-permanent {
+  box-shadow:inset 3px 0 rgba(87,214,155,.68),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-column-destination {
+  box-shadow:inset 3px 0 rgba(88,199,255,.70),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-owner-his .checklist-owner-head h2 { color:#bfe9ff !important; text-shadow:none !important; }
+[data-screen="checklist"] .checklist-owner-hers .checklist-owner-head h2 { color:#ffc2e2 !important; text-shadow:none !important; }
+[data-screen="checklist"] .checklist-column-permanent .checklist-column-icon { color:#8eebb9 !important; }
+[data-screen="checklist"] .checklist-column-destination .checklist-column-icon { color:#91dcff !important; }
+[data-screen="checklist"] :is(
+  .checklist-owner-his .checklist-owner-list .checklist-row,
+  .checklist-owner-hers .checklist-owner-list .checklist-row,
+  .checklist-column .checklist-row,
+  .checklist-shared-extras .checklist-row,
+  .checklist-history-item
+) {
+  border-color:rgba(174,184,194,.18) !important;
+  background:var(--tcc-material-bg-soft) !important;
+}
+[data-screen="checklist"] .checklist-shared-extras {
+  box-shadow:inset 3px 0 rgba(174,184,194,.42),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-history {
+  box-shadow:inset 3px 0 rgba(174,184,194,.42),var(--tcc-material-shadow) !important;
+}
+[data-screen="checklist"] .checklist-history .checklist-section-head h2 { color:#e1e8ed !important; }
+[data-screen="checklist"] .checklist-history .checklist-count {
+  border-color:rgba(174,184,194,.24) !important;
+  background:rgba(174,184,194,.08) !important;
+  color:#d6e0e6 !important;
+}
+
+/* ========================================================================
+   LOCK 22 — Cross-screen editor tone isolation. Calendar/search/status colour
+   belongs to the source marker or alert, not to the target editor shell.
+   Standard/Home Visit Itinerary editing is always sky; Motorhome and Cruise
+   retain their approved orange/violet travel-type families. Destination Budget
+   editing is always the approved sky family even when opened from a warning.
+   ======================================================================== */
+[data-screen="itinerary"] .tcc-itinerary-editor-modal:not(.tone-orange):not(.tone-violet),
+[data-screen="budget"] .tcc-budget-destination-editor-modal {
+  --tcc-editor-rgb:126,218,248 !important;
+  --tcc-editor-title:#bcecff !important;
+  --tcc-editor-deep:#203341 !important;
+  --tcc-editor-mid:#142735 !important;
+  --tcc-editor-base:#081824 !important;
+  border-color:rgba(126,218,248,.46) !important;
+  background:radial-gradient(circle at 88% -3%,rgba(126,218,248,.10),transparent 44%),linear-gradient(145deg,#203341 0%,#142735 54%,#081824 100%) !important;
+}
+
+/* ========================================================================
+   LOCK 23 — Unlocked Vault structure stays graphite/material. Category and
+   emergency identity is carried only by the compact top rule, icon/count or
+   slim edge accent. Streaming remains a secondary top-right utility, not a
+   purple feature slab.
+   ======================================================================== */
+[data-screen="vault"] .vault-category-card {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+  filter:none !important;
+}
+[data-screen="vault"] .vault-category-card::before { opacity:.72 !important; }
+[data-screen="vault"] .vault-hero-streaming {
+  border-color:rgba(174,184,194,.28) !important;
+  background:var(--tcc-material-bg-soft) !important;
+  color:#d5dfe6 !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+[data-screen="vault"] :is(.vault-emergency-travel-card,.vault-emergency-contacts) {
+  border-color:var(--tcc-material-border) !important;
+  background:var(--tcc-material-bg) !important;
+  box-shadow:var(--tcc-material-shadow) !important;
+}
+[data-screen="vault"] .vault-emergency-travel-card {
+  box-shadow:inset 3px 0 rgba(255,209,91,.58),var(--tcc-material-shadow) !important;
+}
+[data-screen="vault"] .vault-emergency-contacts {
+  box-shadow:inset 3px 0 rgba(255,111,131,.58),var(--tcc-material-shadow) !important;
+}
+
+/* ========================================================================
+   LOCK 24 — Home Visit is a simple Standard/Australia stay, never Cruise.
+   Its secondary Add action therefore uses the Standard sky/material family;
+   violet is reserved for Cruise identity.
+   ======================================================================== */
+[data-screen="itinerary"] .itinerary-add-home {
+  border-color:rgba(126,218,248,.42) !important;
+  background:var(--tcc-material-bg-soft) !important;
+  color:#bcecff !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.05) !important;
+}
+[data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:#8edcff !important; }
+
+/* ========================================================================
+   LOCK 25 — Calendar source/filter chrome is neutral. Destination, booking
+   and personal-event colours remain on the compact swatches, rails and event
+   markers rather than filling the legend controls themselves.
+   ======================================================================== */
+[data-screen="calendar"] .calendar-legend-item {
+  border-color:rgba(174,184,194,.22) !important;
+  background:var(--tcc-material-bg-soft) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+
+
+/* LOCK 23 — Calendar period strips are exact-record controls, never decoration.
+   The visual rail stays thin; its button box is deliberately taller than the
+   painted line so it can be tapped reliably on iPad without turning the month
+   grid back into large coloured blocks. */
+[data-screen="calendar"] .calendar-period-rail {
+  pointer-events:auto !important;
+  z-index:4 !important;
+}
+[data-screen="calendar"] .calendar-period-line {
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  height:44px !important;
+  min-height:44px !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  opacity:1 !important;
+  cursor:pointer !important;
+  touch-action:manipulation !important;
+}
+[data-screen="calendar"] .calendar-period-rail[data-count="2"] {
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:2px !important;
+}
+[data-screen="calendar"] .calendar-period-rail[data-count="2"] .calendar-period-line {
+  height:44px !important;
+  min-height:44px !important;
+}
+/* The date header remains the explicit Day View control and sits above the
+   transparent 44px period hit area, so tapping the date never opens a stay. */
+[data-screen="calendar"] .calendar-day-head {
+  position:relative !important;
+  z-index:5 !important;
+}
+[data-screen="calendar"] .calendar-period-line::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:4px;
+  border-radius:0 0 3px 3px;
+  background:rgb(var(--calendar-rgb));
+  box-shadow:0 0 8px rgba(var(--calendar-rgb),.22);
+  opacity:.86;
+  pointer-events:none;
+}
+[data-screen="calendar"] .calendar-period-line[data-kind="travel-period"]::before {
+  height:3px;
+  opacity:.68;
+}
+[data-screen="calendar"] .calendar-period-line:focus-visible {
+  outline:2px solid rgba(151,223,255,.92) !important;
+  outline-offset:-2px !important;
+  border-radius:4px !important;
+}
+/* LOCK 23a — preserve the explicit date control without swallowing the period
+   strip's 44px hit area. The day header is a compact 44px+ control layered
+   above the rail only where its date label is actually drawn. */
+[data-screen="calendar"] .calendar-day-head.calendar-day-open {
+  width:max-content !important;
+  min-width:44px !important;
+  max-width:100% !important;
+}
+/* LOCK 23b — Calendar month secondary controls remain iPad touch-friendly. */
+[data-screen="calendar"] .calendar-more-button {
+  min-height:44px !important;
+}
+
+/* ========================================================================
+   LOCK 26 — Accounts is a read-only travel-money snapshot in Version 1.
+   The Budget card may expand to show all saved balances, but there is no
+   Add/Edit/Delete account workflow and no transfer/banking action. Bank logos
+   remain compact offline identity marks on the neutral material surface.
+   ======================================================================== */
+[data-screen="budget"] .budget-accounts-summary-card,
+.tcc-modal.tcc-expanded-modal.budget-accounts-manager-modal .budget-accounts-manager-summary,
+.tcc-modal.tcc-expanded-modal.budget-accounts-manager-modal .budget-account-manager-row {
+  border-color:rgba(174,184,194,.24) !important;
+  background:var(--tcc-material-bg-soft) !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
+}
+.tcc-modal.tcc-expanded-modal.budget-accounts-manager-modal .budget-accounts-readonly-note {
+  color:#9eafb9 !important;
+}
+
+/* ========================================================================
+   LOCK 27 — an unset Destination Budget is never displayed as a deliberate
+   zero budget. Itinerary cards/details say BUDGET NOT SET and keep the
+   warning state visually distinct until Budget setup is completed.
+   ======================================================================== */
+[data-screen="itinerary"] .itinerary-entry-budget.is-unset > strong {
+  color:#ffd56b !important;
+}
+[data-screen="itinerary"] .itinerary-entry-budget.is-unset > em {
+  color:#d8b75b !important;
+}
+
+/* ===== S36 TRIPLE-CHECK FORWARD VISUAL CLOSURE ===== */
+@layer tccLocks {
+/* -------------------------------------------------------------------------
+   S36 TRIPLE-CHECK — direct rendered inspection reopened the colour closure.
+   The app stays dark/premium and large surfaces stay restrained, but meaning
+   must not collapse into one cyan/navy family. Use category/source identity in
+   icons, edges, headings, bars and small semantic surfaces. */
+
+/* Budget living categories: broaden the palette beyond green/blue/purple while
+   preserving the approved dark surface and local-currency hierarchy. */
+[data-screen="budget"] .budget-category-groceries,
+.tcc-modal .budget-category-groceries { --choice-rgb:70,217,202 !important; }
+[data-screen="budget"] .budget-category-eating-out,
+.tcc-modal .budget-category-eating-out { --choice-rgb:255,154,90 !important; }
+[data-screen="budget"] .budget-category-transport,
+.tcc-modal .budget-category-transport { --choice-rgb:88,199,255 !important; }
+[data-screen="budget"] .budget-category-entertainment,
+.tcc-modal .budget-category-entertainment { --choice-rgb:241,101,189 !important; }
+[data-screen="budget"] .budget-category-shopping,
+.tcc-modal .budget-category-shopping { --choice-rgb:255,111,131 !important; }
+[data-screen="budget"] .budget-category-miscellaneous,
+.tcc-modal .budget-category-miscellaneous { --choice-rgb:255,209,91 !important; }
+[data-screen="budget"] .budget-category-summary {
+  border-color:rgba(var(--choice-rgb),.42) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--choice-rgb),.16),transparent 52%),linear-gradient(145deg,rgba(var(--choice-rgb),.075),rgba(7,23,39,.93) 72%) !important;
+}
+[data-screen="budget"] .budget-category-summary > span { color:rgb(var(--choice-rgb)) !important; }
+.tcc-modal.tcc-expanded-modal .budget-living-manager-card {
+  border-color:rgba(var(--choice-rgb),.34) !important;
+  background:radial-gradient(circle at 94% 0,rgba(var(--choice-rgb),.10),transparent 50%),linear-gradient(145deg,rgba(var(--choice-rgb),.05),rgba(7,22,36,.95)) !important;
+}
+.tcc-modal.tcc-expanded-modal .budget-living-manager-head h3 { color:rgb(var(--choice-rgb)) !important; }
+
+/* Reservations: graphite tile bodies remain coherent, but category identity is
+   no longer washed into one cyan. Completed remains the silver exception. */
+[data-screen="reservations"] .reservation-tab-flight { --reservation-rgb:88,199,255 !important; }
+[data-screen="reservations"] .reservation-tab-train { --reservation-rgb:70,217,202 !important; }
+[data-screen="reservations"] .reservation-tab-cruise { --reservation-rgb:184,109,255 !important; }
+[data-screen="reservations"] .reservation-tab-rv { --reservation-rgb:255,154,90 !important; }
+[data-screen="reservations"] .reservation-tab-hotel { --reservation-rgb:255,209,91 !important; }
+[data-screen="reservations"] .reservation-tab-airbnb { --reservation-rgb:241,101,189 !important; }
+[data-screen="reservations"] .reservation-tab-ticket { --reservation-rgb:255,111,131 !important; }
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) {
+  border-color:rgba(var(--reservation-rgb),.34) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--reservation-rgb),.075),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important;
+}
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-icon {
+  border-color:rgba(var(--reservation-rgb),.42) !important;
+  background:rgba(var(--reservation-rgb),.10) !important;
+  color:rgb(var(--reservation-rgb)) !important;
+}
+[data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-count strong { color:rgb(var(--reservation-rgb)) !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-flight { --tcc-expanded-rgb:88,199,255 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-train { --tcc-expanded-rgb:70,217,202 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-cruise { --tcc-expanded-rgb:184,109,255 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-rv { --tcc-expanded-rgb:255,154,90 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-hotel { --tcc-expanded-rgb:255,209,91 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-airbnb { --tcc-expanded-rgb:241,101,189 !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-ticket { --tcc-expanded-rgb:255,111,131 !important; }
+
+/* Calendar: destination identity remains in the thin period rails/background
+   tint; source/type identity is a separate readable edge. This stops a Tokyo
+   month from turning every booking and reminder into the same magenta card. */
+[data-screen="calendar"] :is(.calendar-event-chip,.calendar-agenda-row,.calendar-day-detail-row,.calendar-legend-expanded-row)[data-kind="reservation"] {
+  border-left:3px solid rgba(var(--calendar-source-rgb),.92) !important;
+  box-shadow:inset 3px 0 rgba(var(--calendar-source-rgb),.10),inset 0 1px rgba(255,255,255,.035) !important;
+}
+[data-screen="calendar"] :is(.calendar-event-chip,.calendar-agenda-row,.calendar-day-detail-row,.calendar-legend-expanded-row)[data-kind="personal"] {
+  border-left:3px solid rgba(var(--calendar-source-rgb),.92) !important;
+  box-shadow:inset 3px 0 rgba(var(--calendar-source-rgb),.10),inset 0 1px rgba(255,255,255,.035) !important;
+}
+.tcc-modal .calendar-legend-expanded-periods { --calendar-family-rgb:70,217,202; }
+.tcc-modal .calendar-legend-expanded-reservations { --calendar-family-rgb:93,141,255; }
+.tcc-modal .calendar-legend-expanded-personal { --calendar-family-rgb:184,109,255; }
+.tcc-modal .calendar-legend-expanded-copy {
+  border-left:4px solid rgb(var(--calendar-family-rgb,174,184,194)) !important;
+  padding-left:12px !important;
+  color:#dce8f2 !important;
+}
+.tcc-modal .calendar-legend-expanded-row {
+  border-color:rgba(var(--calendar-family-rgb,174,184,194),.24) !important;
+  background:linear-gradient(145deg,rgba(var(--calendar-family-rgb,174,184,194),.055),rgba(7,21,35,.95)) !important;
+}
+/* A Calendar event carries two identities on the collapsed chip: destination
+   colour in the body and source/type colour on the leading edge. Keep both
+   when that same item is enlarged instead of dropping the source/type edge. */
+.tcc-modal.calendar-source-detail-modal .calendar-source-detail-hero {
+  border-left:4px solid rgba(var(--calendar-source-rgb,174,184,194),.92) !important;
+  box-shadow:inset 4px 0 rgba(var(--calendar-source-rgb,174,184,194),.09),inset 0 1px rgba(255,255,255,.035) !important;
+}
+.tcc-modal.calendar-source-detail-modal .calendar-source-detail-fact:first-child {
+  border-left:3px solid rgba(var(--calendar-source-rgb,174,184,194),.78) !important;
+}
+
+/* Checklist and Vault expanded views are meaning-bearing secondary states, not
+   generic grey sheets. The modal tone supplied by screen code carries the
+   family; inner rows stay dark for eye comfort. */
+.tcc-modal .checklist-expanded-head,
+.tcc-modal .vault-overview-expanded .home-expanded-section,
+.tcc-modal .vault-expiry-expanded .home-expanded-section,
+.tcc-modal .vault-emergency-expanded .home-expanded-section,
+.tcc-modal .vault-activity-expanded .home-expanded-section {
+  border-color:rgba(var(--tcc-expanded-rgb),.24) !important;
+}
+.tcc-modal .checklist-expanded-head :is(h2,h3,strong),
+.tcc-modal :is(.vault-overview-expanded,.vault-expiry-expanded,.vault-emergency-expanded,.vault-activity-expanded) h3 {
+  color:rgb(var(--tcc-expanded-rgb)) !important;
+}
+
+/* Utility editors should show the source/list/category family in their frame,
+   but their form fields remain neutral and readable. */
+.tcc-checklist-editor-modal,
+.tcc-vault-editor-modal {
+  border-color:rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb)),.42) !important;
+}
+
+/* S36 specificity correction: category custom properties must beat the older
+   generic reservation-tab:not(.completed) lock. */
+[data-screen="reservations"] .reservation-tab.reservation-tab-flight { --reservation-rgb:88,199,255 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-train { --reservation-rgb:70,217,202 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-cruise { --reservation-rgb:184,109,255 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-rv { --reservation-rgb:255,154,90 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-hotel { --reservation-rgb:255,209,91 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-airbnb { --reservation-rgb:241,101,189 !important; }
+[data-screen="reservations"] .reservation-tab.reservation-tab-ticket { --reservation-rgb:255,111,131 !important; }
+
+/* Explicit category accents: do not depend on the earlier reservation-rgb lock. */
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-flight { border-color:rgba(88,199,255,.40) !important; background:radial-gradient(circle at 90% 0%,rgba(88,199,255,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-train { border-color:rgba(70,217,202,.40) !important; background:radial-gradient(circle at 90% 0%,rgba(70,217,202,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-cruise { border-color:rgba(184,109,255,.40) !important; background:radial-gradient(circle at 90% 0%,rgba(184,109,255,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-rv { border-color:rgba(255,154,90,.42) !important; background:radial-gradient(circle at 90% 0%,rgba(255,154,90,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-hotel { border-color:rgba(255,209,91,.42) !important; background:radial-gradient(circle at 90% 0%,rgba(255,209,91,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-airbnb { border-color:rgba(241,101,189,.42) !important; background:radial-gradient(circle at 90% 0%,rgba(241,101,189,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-ticket { border-color:rgba(255,111,131,.42) !important; background:radial-gradient(circle at 90% 0%,rgba(255,111,131,.09),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important; }
+html body [data-screen="reservations"] .reservation-tab-flight .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-flight .reservation-tab-count strong { color:#58c7ff !important; border-color:rgba(88,199,255,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-train .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-train .reservation-tab-count strong { color:#46d9ca !important; border-color:rgba(70,217,202,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-cruise .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-cruise .reservation-tab-count strong { color:#b86dff !important; border-color:rgba(184,109,255,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-rv .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-rv .reservation-tab-count strong { color:#ff9a5a !important; border-color:rgba(255,154,90,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-hotel .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-hotel .reservation-tab-count strong { color:#ffd15b !important; border-color:rgba(255,209,91,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-airbnb .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-airbnb .reservation-tab-count strong { color:#f165bd !important; border-color:rgba(241,101,189,.46) !important; }
+html body [data-screen="reservations"] .reservation-tab-ticket .reservation-tab-icon, html body [data-screen="reservations"] .reservation-tab-ticket .reservation-tab-count strong { color:#ff6f83 !important; border-color:rgba(255,111,131,.46) !important; }
+
+/* ========================================================================
+   S36 LOCK 26 — EXPANDED WIDGET = SAME WIDGET COLOUR FAMILY.
+   Cameron's explicit 14 Sep rule: enlarging a widget must never swap it into
+   a generic modal colour. The source widget's declared family is carried by
+   makeExpandableCard/openExpandedCard and is authoritative for the outer
+   expanded frame, title, close control and major snapshot surface.
+   ======================================================================== */
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source {
+  border-color:rgba(var(--tcc-expanded-rgb),.46) !important;
+  background:
+    radial-gradient(circle at 88% -3%,rgba(var(--tcc-expanded-rgb),.13),transparent 44%),
+    linear-gradient(145deg,var(--tcc-expanded-deep),var(--tcc-expanded-mid) 56%,var(--tcc-expanded-base)) !important;
+  box-shadow:
+    0 28px 84px rgba(0,0,0,.54),
+    0 0 24px rgba(var(--tcc-expanded-rgb),.075),
+    inset 0 1px rgba(255,255,255,.045) !important;
+}
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source > form > header {
+  border-bottom-color:rgba(var(--tcc-expanded-rgb),.22) !important;
+  background:linear-gradient(180deg,rgba(var(--tcc-expanded-rgb),.075),rgba(5,16,27,.08)) !important;
+}
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source > form > header h2 {
+  color:rgb(var(--tcc-expanded-rgb)) !important;
+  text-shadow:0 0 18px rgba(var(--tcc-expanded-rgb),.12) !important;
+}
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source .tcc-modal-close {
+  border-color:rgba(var(--tcc-expanded-rgb),.34) !important;
+  background:rgba(var(--tcc-expanded-rgb),.085) !important;
+  color:rgb(var(--tcc-expanded-rgb)) !important;
+}
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source .tcc-expanded-card-body {
+  --tcc-source-widget-rgb:var(--tcc-expanded-rgb);
+}
+/* Neutral really means the same silver/graphite family as the source widget;
+   it is not permission for an old blue/green/purple modal rule to win. */
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source.tone-neutral {
+  --tcc-expanded-rgb:174,184,194 !important;
+  --tcc-expanded-deep:#26313a !important;
+  --tcc-expanded-mid:#18242e !important;
+  --tcc-expanded-base:#0b1722 !important;
+}
+
+
+/* ========================================================================
+   S36 LOCK 27 — SOURCE COLOUR WITHOUT FULL-PANEL COLOUR FLOOD.
+   Expanded widgets still inherit the exact source family, but the family is
+   expressed through the frame, title, close control, section edges, icons and
+   small tints. The large reading surface stays premium graphite for Kym-first
+   readability and to avoid rainbow slabs across secondary states.
+   ======================================================================== */
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source {
+  background:
+    radial-gradient(circle at 88% -3%,rgba(var(--tcc-expanded-rgb),.075),transparent 42%),
+    linear-gradient(145deg,#152532 0%,#0c1c2a 54%,#071421 100%) !important;
+}
+.tcc-modal.tcc-expanded-modal.tcc-expanded-inherits-source .tcc-expanded-card-body {
+  background:
+    radial-gradient(circle at 7% 0%,rgba(var(--tcc-expanded-rgb),.055),transparent 40%),
+    linear-gradient(145deg,#102230 0%,#0a1a29 62%,#071421 100%) !important;
+}
+
+/* S36 Budget continuity: one category = one restrained colour everywhere. */
+[data-screen="budget"] .budget-bar-groceries { background:rgb(70,217,202) !important; }
+[data-screen="budget"] .budget-bar-eating-out { background:rgb(255,154,90) !important; }
+[data-screen="budget"] .budget-bar-transport { background:rgb(88,199,255) !important; }
+[data-screen="budget"] .budget-bar-entertainment { background:rgb(241,101,189) !important; }
+[data-screen="budget"] .budget-bar-shopping { background:rgb(255,111,131) !important; }
+[data-screen="budget"] .budget-bar-miscellaneous { background:rgb(255,209,91) !important; }
+[data-screen="budget"] .budget-expense-row[class*="budget-category-"],
+.tcc-modal .budget-expense-row[class*="budget-category-"] {
+  border-left:3px solid rgba(var(--choice-rgb),.82) !important;
+  background:linear-gradient(90deg,rgba(var(--choice-rgb),.050),rgba(7,22,36,.95) 28%) !important;
+}
+[data-screen="budget"] .budget-expense-row[class*="budget-category-"] > div:first-child > strong,
+.tcc-modal .budget-expense-row[class*="budget-category-"] > div:first-child > strong {
+  color:color-mix(in srgb,rgb(var(--choice-rgb)) 38%,#f4f8fb) !important;
+}
+
+/* ========================================================================
+   S36 LOCK 28 — SOURCE WIDGET MUST VISIBLY MATCH ITS EXPANDED FAMILY.
+   The same data-expand-tone that drives the enlarged view also marks the
+   collapsed source with a restrained family border/title/expand control.
+   This closes the visual gap where a graphite source opened into a coloured
+   expansion. Colour stays semantic; large reading surfaces remain graphite.
+   ======================================================================== */
+html body [data-expandable="true"][data-expand-tone="sky"]     { --tcc-source-expand-rgb:88,199,255; }
+html body [data-expandable="true"][data-expand-tone="teal"]    { --tcc-source-expand-rgb:70,217,202; }
+html body [data-expandable="true"][data-expand-tone="blue"]    { --tcc-source-expand-rgb:93,141,255; }
+html body [data-expandable="true"][data-expand-tone="indigo"]  { --tcc-source-expand-rgb:128,109,255; }
+html body [data-expandable="true"][data-expand-tone="violet"]  { --tcc-source-expand-rgb:184,109,255; }
+html body [data-expandable="true"][data-expand-tone="magenta"] { --tcc-source-expand-rgb:241,101,189; }
+html body [data-expandable="true"][data-expand-tone="red"]     { --tcc-source-expand-rgb:255,111,131; }
+html body [data-expandable="true"][data-expand-tone="orange"]  { --tcc-source-expand-rgb:255,154,90; }
+html body [data-expandable="true"][data-expand-tone="gold"]    { --tcc-source-expand-rgb:255,209,91; }
+html body [data-expandable="true"][data-expand-tone="green"]   { --tcc-source-expand-rgb:87,214,155; }
+html body [data-expandable="true"][data-expand-tone="neutral"] { --tcc-source-expand-rgb:174,184,194; }
+
+html body [data-expandable="true"][data-expand-tone] {
+  border-color:rgba(var(--tcc-source-expand-rgb),.34) !important;
+}
+html body [data-expandable="true"][data-expand-tone] :is(.tcc-expand-trigger,.tcc-expand-indicator) {
+  border-color:rgba(var(--tcc-source-expand-rgb),.32) !important;
+  background:rgba(var(--tcc-source-expand-rgb),.075) !important;
+  color:rgb(var(--tcc-source-expand-rgb)) !important;
+}
+html body [data-expandable="true"][data-expand-tone] > h2,
+html body [data-expandable="true"][data-expand-tone] > .settings-section-head > h2,
+html body [data-expandable="true"][data-expand-tone] > .vault-section-head > h2,
+html body [data-expandable="true"][data-expand-tone] > .budget-panel-head > h2,
+html body [data-expandable="true"][data-expand-tone] > .reservation-section-head > h2 {
+  color:color-mix(in srgb,rgb(var(--tcc-source-expand-rgb)) 72%,#f4f8fb) !important;
+}
+
+
+/* ========================================================================
+   S36 LOCK 29 — DESTINATION BUDGETS SOURCE/MANAGER COLOUR CONTINUITY.
+   This direct button expands to its manager without makeExpandableCard, so it
+   explicitly declares teal and receives the same restrained source treatment.
+   ======================================================================== */
+html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-tone="teal"] {
+  --tcc-source-expand-rgb:70,217,202;
+  border-color:rgba(70,217,202,.42) !important;
+  background:radial-gradient(circle at 90% 0,rgba(70,217,202,.10),transparent 48%),linear-gradient(145deg,#123039,#0b2230 66%,#071827) !important;
+}
+html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-tone="teal"] :is(.budget-card-kicker,.budget-card-title) {
+  color:#8de9df !important;
+}
+
+
+/* S36 LOCK 30 — Journey completed-record source/detail colour continuity.
+   Rows remain restrained and readable, but their travel-mode family is visible
+   before expansion so the enlarged detail never changes colour identity. */
+[data-screen="journey-history"] .journey-record-row {
+  --journey-record-rgb: 88,199,255;
+  border-left:3px solid rgba(var(--journey-record-rgb),.62) !important;
+  box-shadow:inset 3px 0 0 rgba(var(--journey-record-rgb),.08);
+}
+[data-screen="journey-history"] .journey-record-row.journey-record-tone-blue,
+[data-screen="journey-history"] .journey-record-row.journey-record-tone-sky { --journey-record-rgb:88,199,255; }
+[data-screen="journey-history"] .journey-record-row.journey-record-tone-orange { --journey-record-rgb:255,164,91; }
+[data-screen="journey-history"] .journey-record-row.journey-record-tone-violet { --journey-record-rgb:163,126,255; }
+[data-screen="journey-history"] .journey-record-row .journey-type-icon {
+  color:rgb(var(--journey-record-rgb)) !important;
+}
+[data-screen="journey-history"] .journey-record-row:hover,
+[data-screen="journey-history"] .journey-record-row:focus-visible {
+  border-left-color:rgb(var(--journey-record-rgb)) !important;
+}
+
+/* ========================================================================
+   S36 LOCK 31 — IPAD TOUCH TARGET CLOSURE.
+   Interactive controls exposed by the main screens must retain at least a
+   44px tap target at both approved landscape sizes. Compact visuals live
+   inside the hit area; the hit area itself must not be shrunk below 44px.
+   ======================================================================== */
+html body [data-screen="calendar"] .calendar-day-head.calendar-day-open {
+  min-height:44px !important;
+  height:auto !important;
+}
+html body [data-screen="calendar"] .calendar-legend-item {
+  min-height:44px !important;
+  padding:6px 9px !important;
+  align-content:center !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-streaming,
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-lock {
+  min-height:44px !important;
+  height:44px !important;
+}
+
+/* ========================================================================
+   S36 LOCK 32 — VAULT HEADER BAKED-STATUS MASK.
+   The supplied Vault artwork still contains its historical "28 documents"
+   status panel. The live Vault Status card is authoritative. Darken the right
+   status zone beneath live controls so no baked count/date/shield can ghost
+   around the card at either approved iPad width. Keep the centre vault door.
+   ======================================================================== */
+html body .tcc-page-hero[data-header-key="header-vault"]::after {
+  background-image:
+    linear-gradient(90deg,
+      rgba(3,11,20,.985) 0%,
+      rgba(3,11,20,.93) 30%,
+      rgba(3,11,20,.54) 43%,
+      rgba(3,11,20,.06) 63%,
+      rgba(3,11,20,.20) 70%,
+      rgba(3,11,20,1) 78%,
+      rgba(3,11,20,1) 100%),
+    var(--hero-image) !important;
+}
+
+
+/* ========================================================================
+   S36 LOCK 33 — HOME 1024 COMPACT READABILITY.
+   The compact Alerts widget must never line-clamp away booking time/context,
+   and Trip Timeline must show the full DD/MM/YYYY – DD/MM/YYYY range on the
+   1024px iPad without making Home taller or introducing page scrolling.
+   ======================================================================== */
+@layer tccLocks {
+  [data-screen="home"] .home-alert-compact-copy {
+    min-width:0;
+    display:grid;
+    gap:1px;
+  }
+  [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > strong {
+    display:block !important;
+    overflow:visible !important;
+    max-height:none !important;
+    -webkit-line-clamp:unset !important;
+    line-clamp:unset !important;
+    white-space:normal !important;
+    text-overflow:clip !important;
+    line-height:1.08 !important;
+  }
+  [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > small {
+    display:block;
+    overflow:visible !important;
+    white-space:normal !important;
+    text-overflow:clip !important;
+    color:#b8cad8 !important;
+    line-height:1.12 !important;
+  }
+  @media (max-width:1050px) {
+    [data-screen="home"] .home-mini-alerts .home-alert-row {
+      grid-template-columns:7px minmax(0,1fr) !important;
+      gap:5px !important;
+      padding-left:5px !important;
+      padding-right:5px !important;
+    }
+    [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > strong {
+      font-size:10.5px !important;
+    }
+    [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > small {
+      font-size:9px !important;
+    }
+    [data-screen="home"] .home-timeline-row {
+      grid-template-columns:21px minmax(0,1fr) !important;
+      column-gap:2px !important;
+      padding-left:3px !important;
+      padding-right:3px !important;
+    }
+    [data-screen="home"] .home-timeline-icon {
+      width:21px !important;
+      height:21px !important;
+    }
+  }
+}
+
+/* ========================================================================
+   S36 LOCK 34 — DESTINATION BUDGET SUMMARY VALUE GLYPH CLOSURE.
+   22px values need a little more line box than 22px. Do not inherit the base
+   pace-metric overflow clip into the Destination Budgets manager summary.
+   ======================================================================== */
+@layer tccLocks {
+  .tcc-modal.budget-destination-manager-modal .budget-destination-manager-summary .budget-pace-metric > strong {
+    line-height:1.18 !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+  }
+}
+
+}

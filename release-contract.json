@@ -1,441 +1,256 @@
 {
-  "contractVersion": "V56-R7.2-continuity-forward-audit-2026-09-13.1",
-  "packageRole": "V56 R7.2 forward continuity working checkpoint S24 — NOT MASTER pending Cameron approval and explicit promotion",
-  "principle": "The approved current build is a one-way baseline. Previously approved structure and behaviour may change only after explicit user instruction. Old-build behaviour must be removed or permanently gated, never allowed to revive through stale code/CSS.",
+  "contractVersion": "V57-R7.2-S37-pre-ipad-simulation-2026-09-14",
+  "packageRole": "S37 pre-iPad simulation candidate — NOT FINAL MASTER until IPAD-01 through IPAD-07 pass on Cameron’s real iPad",
+  "principle": "S37 is the forward-only authority. S36/S35/S34/S33 are historical inputs only. Never replace current S37 screen/widget/colour/interaction fixes with an older checkpoint.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
-    "maxFiles": 99,
+    "maxFiles": 103,
     "requiredHeaderAssets": 86,
-    "requiredBankIcons": [
-      "brand-bank-commonwealth.png",
-      "brand-bank-nab.png",
-      "brand-bank-anz.png",
-      "brand-bank-me.png",
-      "brand-bank-wise.png"
-    ],
-    "requiredStreamingIcons": [
-      "brand-stream-netflix.png",
-      "brand-stream-disney.png",
-      "brand-stream-prime.png",
-      "brand-stream-apple.png",
-      "brand-stream-max.png",
-      "brand-stream-paramount.png",
-      "brand-stream-stan.png",
-      "brand-stream-binge.png",
-      "brand-stream-kayo.png",
-      "brand-stream-youtube.png",
-      "brand-stream-afl.png",
-      "brand-stream-nfl.png",
-      "brand-stream-iview.png",
-      "brand-stream-sbs.png",
-      "brand-stream-seven.png",
-      "brand-stream-nine.png"
-    ],
-    "requiredHeaderKeys": [
-      "banner-albania",
-      "banner-algeria",
-      "banner-argentina",
-      "banner-australia",
-      "banner-austria",
-      "banner-bahamas",
-      "banner-belgium",
-      "banner-bosnia-and-herzegovina",
-      "banner-brazil",
-      "banner-bulgaria",
-      "banner-cambodia",
-      "banner-canada",
-      "banner-chile",
-      "banner-china",
-      "banner-colombia",
-      "banner-costa-rica",
-      "banner-croatia",
-      "banner-cruise-princess",
-      "banner-cyprus",
-      "banner-czech-republic",
-      "banner-denmark",
-      "banner-dominican-republic",
-      "banner-egypt",
-      "banner-estonia",
-      "banner-finland",
-      "banner-france",
-      "banner-germany",
-      "banner-greece",
-      "banner-hungary",
-      "banner-iceland",
-      "banner-india",
-      "banner-indonesia",
-      "banner-ireland",
-      "banner-italy",
-      "banner-jamaica",
-      "banner-japan",
-      "banner-jordan",
-      "banner-laos",
-      "banner-latvia",
-      "banner-liechtenstein",
-      "banner-lithuania",
-      "banner-luxembourg",
-      "banner-malaysia",
-      "banner-malta",
-      "banner-mexico",
-      "banner-monaco",
-      "banner-montenegro",
-      "banner-morocco",
-      "banner-motorhome-europe",
-      "banner-motorhome-usa",
-      "banner-netherlands",
-      "banner-new-zealand",
-      "banner-north-macedonia",
-      "banner-norway",
-      "banner-oman",
-      "banner-panama",
-      "banner-peru",
-      "banner-philippines",
-      "banner-poland",
-      "banner-portugal",
-      "banner-qatar",
-      "banner-romania",
-      "banner-russia",
-      "banner-serbia",
-      "banner-singapore",
-      "banner-slovakia",
-      "banner-slovenia",
-      "banner-south-africa",
-      "banner-south-korea",
-      "banner-spain",
-      "banner-sri-lanka",
-      "banner-sweden",
-      "banner-switzerland",
-      "banner-taiwan",
-      "banner-thailand",
-      "banner-tunisia",
-      "banner-turkey",
-      "banner-united-arab-emirates",
-      "banner-united-kingdom",
-      "banner-united-states",
-      "banner-vietnam",
-      "header-checklist",
-      "header-journey-history",
-      "header-settings",
-      "header-vault",
-      "home-hero"
-    ],
-    "runtimeMode": "production",
-    "storageKey": "tcc:v1:state",
-    "manifestId": "./index.html",
+    "runtimeMode": "simulation",
+    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s37-preipad",
+    "manifestId": "./tokyo-4year-full-simulation-s37",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v56-r7.2-forward-continuity-regression-2026-09-13-s24",
-    "appVersion": "1.2.0-v56-r7.2-continuity",
-    "buildMarker": "v56-r7.2-forward-continuity-regression-2026-09-13-s24"
+    "cacheName": "tcc-v1-v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
+    "appVersion": "1.2.0-v57-r7.2-simulation-s37",
+    "buildMarker": "v57-r7.2-forward-preipad-simulation-2026-09-14-s37"
   },
-  "forbiddenLegacyText": [
-    "Flights & Transport",
-    "Travel History",
-    "Travel Vault",
-    "Dashboard",
-    "Intentional Gap"
+  "runtimeIdentity": {
+    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s37-preipad",
+    "cacheName": "tcc-v1-v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
+    "buildMarker": "v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
+    "serviceWorkerUrl": "./sw.js?v=57-r7.2-forward-preipad-simulation-2026-09-14-s37"
+  },
+  "sourceAuthority": {
+    "authority": "S37 pre-iPad simulation source, fixed forward from S36 and sealed 14 September 2026",
+    "forwardOnly": true,
+    "predecessorsAreHistory": [
+      "S36",
+      "S35",
+      "S34",
+      "S33"
+    ],
+    "provenance": "S37 continues forward from the verified S36 source. Fixes added before this simulation: 1024 Itinerary Destination Budget width, Add Expense Description 44px touch floor, corrected editor-colour brace/cascade, exact expanded blue/indigo/green family matching, completed reservation rows/statuses silver inside category expansions, and 1024 Itinerary country/type two-line readability. Runtime/cache identity was then bumped to S37 so Safari cannot reuse stale S36 cached files."
+  },
+  "hardVisualRules": [
+    "Every expanded widget preserves the same colour family as its collapsed/original widget.",
+    "Large reading surfaces stay premium graphite; semantic identity appears in borders, headings, icons, rails and restrained tints.",
+    "Search fields are neutral grey/silver.",
+    "Completed reservation/itinerary/checklist surfaces are silver/slate, not bright semantic colours.",
+    "Reservation Add/Edit editor stays the approved sky/baby-blue family regardless of booking type.",
+    "Itinerary editor family follows travel type: Standard/Home Visit sky, Motorhome orange, Cruise violet; destination-row colours do not recolour editor shells.",
+    "Budget Destination Budgets source and manager stay teal; Add/Edit Destination Budget editor stays sky.",
+    "Calendar editor shells remain neutral; exact record details preserve destination plus event-type identity.",
+    "Checklist and Vault editors remain neutral even when their source widget uses a semantic colour.",
+    "App Health expanded cards inherit their actual status colour (green/amber/red), not generic sky.",
+    "Home Alerts use red/amber/green traffic-light severity; expanded Alerts remain concise and Remove-only.",
+    "All interactive controls on approved iPad layouts retain at least 44px effective touch targets.",
+    "Home 1024 compact Alerts and Trip Timeline dates must remain fully readable without making Home scroll.",
+    "Vault header must mask obsolete baked status text/count/date at both approved iPad widths.",
+    "Destination Budget manager summary values must not crop 22px currency glyphs."
   ],
-  "forbiddenHomeSurfaces": [
-    "home-next-card",
-    "home-next-plan-card",
-    "home-next-destination-card",
-    "home-journey-map-panel",
-    "home-journey-map-expanded",
-    "home-journey-map-stage"
-  ],
-  "requiredVisualGuards": [
-    "Home fixed one-screen/no Home map/no Home Next Destination",
-    "Main supplied header artwork uses recognisable low-crop presentation; helper heroes use contain where needed to prevent over-zoom",
-    "Add Expense is a visible top-level light-blue Budget action and its editor remains light blue while category tiles retain category accents",
-    "Budget has no separate visible Verify Budget action; canonical Budget integrity remains inside App Health.",
-    "Each widget and its expanded/drill-down view uses one coherent feature-colour family except meaningful semantic status colours",
-    "Calendar destination spans use subtle destination identity colour",
-    "Itinerary and Calendar share destination colour identity",
-    "Journey/route maps remain zoomable and pannable on iPad, with explicit expansion separated from map gestures",
-    "Locked Vault retains the approved cool cyan/metallic vault-door treatment before three-tap unlock",
-    "Completed reservation, itinerary and checklist surfaces use neutral silver/slate rather than green/teal.",
-    "Calendar month view uses thin destination/travel identity rails in the date cells, compact event cards, and +N more expansion rather than thick continuous bars.",
-    "Vault and Settings use the current corrected header system; Build 1 Vault/Settings screenshots are local visual/content benchmarks only, not global sidebar/layout authority.",
-    "Settings App Health uses the Build 1-inspired ambulance plus heartbeat/pulse-line treatment while preserving the current 9/9 canonical checks.",
-    "Search fields use neutral graphite/silver treatment; colour variety is restrained and not dominated by green, blue or purple.",
-    "Streaming remains a secondary protected Vault section and uses restrained graphite rather than a dominant purple surface.",
-    "Home Alerts use red / amber / green traffic-light dots beside the severity label; the expanded list stays concise and Kym-first.",
-    "Where local currency is primary, the AUD equivalent remains clearly labelled and readable as secondary information on Home and every other mixed-currency surface.",
-    "Information widgets and expanded views are content-driven: sparse information must not be stretched into large dead/empty slabs.",
-    "The approved semantic colour system applies consistently to every main screen and secondary/expanded view; neutral search and Completed surfaces stay neutral."
-  ],
-  "requiredInteractionGuards": [
-    "Budget exposes no separate Verify Budget control; App Health runs the canonical Budget integrity check.",
-    "Home Upcoming Events first tap expands complete list",
-    "Home Alerts first tap expands complete list",
-    "Calendar coloured item/strip tap opens the exact tapped record directly; explicit date-header control or blank day area opens full Day View",
-    "Calendar date, event and period controls remain pointer-interactive and at least 44px touch-friendly on the audited iPad layouts",
-    "Recent Expense Entries first tap expands complete list; second row tap edits",
-    "Vault unlock requires three taps on physical door",
-    "Where's the toilet and Country Quick Look close without app restart and do not scroll",
-    "Maps support zoom and pan; map gestures do not accidentally trigger card expansion",
-    "Standard Add Destination has no route/coordinate fields; Motorhome/Cruise alone keep route stops",
-    "RV/Cruise identity uses Starting Country across banner, Budget, Calendar, Journey Map, search and planning statistics",
-    "Saved booked flights may cover an otherwise empty overnight transit day; To Book flights do not suppress real planning gaps",
-    "PIN digits are masked while retaining numeric keypad behaviour",
-    "Changing a stay fixed exchange rate before Destination Budget expenses exist recalculates linked same-local-currency reservation AUD amounts; manual cross-currency equivalents are preserved",
-    "Travel Year controls support a scalable minimum 30-year horizon, extend beyond Year 30 when later data exists, and preserve multi-select filtering.",
-    "Standard destinations, route Starting Cities, and route stops never require typed latitude/longitude: known places resolve offline and unknown places require deliberate offline-map placement before Save.",
-    "Missing/null map coordinates must never be treated as 0,0; manual map corrections remain authoritative and migration repairs known partial coordinates while clearing unknown partial coordinates.",
-    "Itinerary Upcoming, Completed and enlarged Upcoming histories render at most 20 records per page while exact-record navigation opens the page containing the target stay.",
-    "Travel Year previous/next navigation skips empty sparse-year windows and jumps to the nearest populated year block while preserving multi-select state.",
-    "Every live Add Reservation type—Flights, Trains, Cruises, RV/Motorhome, Hotels, Airbnb and Tickets & Attractions—offers both Annual-only and exact-stay Destination Budget allocation.",
-    "A Destination Budget reservation uses the exact dated stay and also rolls into the annual travel total; Annual-only reservations do not consume the stay Destination Budget.",
-    "Reservations Next 5 expands the reservation widget in place and does not navigate to another screen or open an editor.",
-    "Add Reservation retains Undo, visible AUD conversion/equivalent, simplified help copy, and a fixed usable footer at both audited iPad widths.",
-    "Calendar +N more and date/blank-area controls open the full day; exact event taps continue to open the exact record.",
-    "Home compass Phrase Helper and Current Destination Country Quick Look are separate entry points and must not cross-link to each other.",
-    "Expanded Home Alerts use traffic-light severity markers and Remove only; no alert row may navigate to another screen.",
-    "Removing an alert hides only the Home warning and never deletes or mutates its source record."
-  ],
-  "requiredSourceSignatures": [
+  "screenClosureRegister": {
+    "Home": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "all main widgets",
+        "all expanders",
+        "Quick Look",
+        "Phrase Helper",
+        "Alerts",
+        "Upcoming Events",
+        "timeline detail",
+        "search/global navigation",
+        "1024 clipping lock",
+        "launch underlay"
+      ]
+    },
+    "Itinerary": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "Standard",
+        "Home Visit",
+        "Motorhome",
+        "Cruise",
+        "row detail",
+        "destination colours",
+        "year/search/filter/pagination",
+        "edit/undo/delete"
+      ]
+    },
+    "Budget": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "Destination Budget",
+        "Destination Budgets manager",
+        "Add/Edit Destination Budget",
+        "Add/Edit Expense",
+        "living categories",
+        "annual overview",
+        "reservations detail",
+        "Accounts read-only",
+        "charts",
+        "Recent Expense Entries",
+        "summary glyph clipping lock"
+      ]
+    },
+    "Reservations": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "8 category tiles",
+        "Completed",
+        "Next 5",
+        "Add/Edit/Undo/Delete",
+        "allocation routing",
+        "AUD conversion",
+        "Reservation Health Check"
+      ]
+    },
+    "Calendar": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "month",
+        "agenda",
+        "day view",
+        "destination/travel rails",
+        "event/reminder/note detail",
+        "add/edit",
+        "legend",
+        "44px day/legend controls",
+        "navigation"
+      ]
+    },
+    "Journey History": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "rows",
+        "travel-mode detail colours",
+        "search/filter/pagination",
+        "journey map/detail"
+      ]
+    },
+    "Checklist": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "Permanent",
+        "Destination",
+        "Kym",
+        "Cameron",
+        "Both",
+        "task edit/actions",
+        "stage controls",
+        "Ready-to-Move",
+        "Next Destination"
+      ]
+    },
+    "The Vault": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "locked state",
+        "three-tap unlock entry",
+        "unlocked main",
+        "all categories",
+        "All Records",
+        "Streaming",
+        "record editor",
+        "attachments",
+        "44px hero controls",
+        "baked-status mask"
+      ]
+    },
+    "Settings": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "defaults",
+        "Schengen",
+        "PIN entry",
+        "backup/export/restore entry",
+        "App Health 9 cards",
+        "status-colour expansion",
+        "launch/runtime identity"
+      ]
+    },
+    "Global": {
+      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "coverage": [
+        "sidebar/navigation",
+        "runtime/cache identity",
+        "PWA shell",
+        "expanded colour matrix",
+        "touch targets",
+        "overflow",
+        "clipping",
+        "dead space",
+        "hidden editors",
+        "non-widget controls",
+        "launch transition"
+      ]
+    }
+  },
+  "latestSoftwareEvidence": {
+    "exactSource": "56/56 PASS in the final post-seal S37 pre-iPad simulation regression.",
+    "targeted": "16/16 PASS in the final post-seal S37 pre-iPad simulation regression.",
+    "priority": "4/4 PASS in the final post-seal S37 pre-iPad simulation regression.",
+    "expandedColour": "71/71 at 1024×768 and 71/71 at 1194×834 exact collapsed→expanded family match in the S37 colour closure audit.",
+    "touchTargets": "Main screens and hidden editors: zero visible controls below the 44px iPad floor in the real-CSS-order S37 audit.",
+    "mainOverflow": "9/9 screens at both approved sizes: zero document horizontal overflow.",
+    "expandedGeometry": "71/71 expanded/custom states clean at both approved sizes in the S37 closure audit.",
+    "deadSpace": "No new dead/empty panel regression found in final S37 screen sweeps.",
+    "hiddenEditors": "17/17 core hidden editor/detail states at each approved size plus custom route/category/day/Vault states; zero effective touch-target failures.",
+    "textClipping": "0 genuine operational clipping remaining after S37 Itinerary fixes; dense Calendar month cards intentionally clamp long titles and open full detail on tap.",
+    "nonWidgetControls": "9/9 screens at both approved sizes; zero actionable unnamed controls and no dead created buttons.",
+    "launch": "Brand → active Japan/Tokyo → rendered Home transition software-verified at both approved iPad sizes; physical IPAD-01 remains NOT_RUN."
+  },
+  "physicalIpadAcceptance": [
     {
-      "file": "src_screens_reservations.js",
-      "text": "Reservations & Bookings"
+      "id": "IPAD-01",
+      "name": "Add to Home Screen + launch transition",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_screens_reservations.js",
-      "text": "workflow stays light blue"
+      "id": "IPAD-02",
+      "name": "Full offline relaunch + local persistence",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_screens_budget.js",
-      "text": "budget-add-expense-bar"
+      "id": "IPAD-03",
+      "name": "Map pinch/zoom/pan and no accidental expansion",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_screens_budget.js",
-      "text": "AUD subtotal"
+      "id": "IPAD-04",
+      "name": "PIN masking/unlock + Vault relock/privacy on background/app switch",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_screens_budget.js",
-      "text": "function displayCountryForStay"
+      "id": "IPAD-05",
+      "name": "Manual backup export → restore commit → state verification",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_components_offline-map.js",
-      "text": "expandIgnore"
+      "id": "IPAD-06",
+      "name": "Production CRUD smoke across live screens",
+      "status": "NOT_RUN"
     },
     {
-      "file": "src_screens_calendar.js",
-      "text": "clickEvent.stopPropagation()"
-    },
-    {
-      "file": "src_screens_settings.js",
-      "text": "inputField(label,name,'password'"
-    },
-    {
-      "file": "src_core_entities.js",
-      "text": "'the bahamas':'bahamas'"
-    },
-    {
-      "file": "src_core_entities.js",
-      "text": "country: routeTrip ? '' : country"
-    },
-    {
-      "file": "src_core_itinerary-view-model.js",
-      "text": "flight-transit"
-    },
-    {
-      "file": "src_core_itinerary-view-model.js",
-      "text": "country:displayCountryForEntry(entry)"
-    },
-    {
-      "file": "src_core_itinerary-mutations.js",
-      "text": "recalculateAutoConvertedReservationsForStay"
-    },
-    {
-      "file": "src_core_journey-map-model.js",
-      "text": "entry.startCountry || entry.country"
-    },
-    {
-      "file": "src_screens_journey-history.js",
-      "text": "labelMode:expanded?'all':'key'"
-    },
-    {
-      "file": "src_components_page-hero.js",
-      "text": "const currentCountry=flagCountryForStay(currentStay)"
-    },
-    {
-      "file": "src_main.js",
-      "text": "countryFlagEmoji(country)"
-    },
-    {
-      "file": "src_screens_reservations.js",
-      "text": "reservation-allocation-tile"
-    },
-    {
-      "file": "src_screens_reservations.js",
-      "text": "ANNUAL BUDGET COST"
-    },
-    {
-      "file": "src_core_reservation-mutations.js",
-      "text": "annualReservationAUD"
-    },
-    {
-      "file": "src_core_reservation-mutations.js",
-      "text": "Annual reservations may legitimately sit on an uncovered transit day"
-    },
-    {
-      "file": "src_core_budget-ledger.js",
-      "text": "=== 'destination'"
-    },
-    {
-      "file": "src_screens_calendar.js",
-      "text": "calendar-day-open"
-    },
-    {
-      "file": "src_screens_calendar.js",
-      "text": "day.setAttribute('role', 'group')"
-    },
-    {
-      "file": "src_core_year-filters.js",
-      "text": "const previousYear="
-    },
-    {
-      "file": "src_core_year-filters.js",
-      "text": "const nextYear="
-    },
-    {
-      "file": "src_design_finish-pass.css",
-      "text": "R7.2 accessibility/readability hardening"
-    },
-    {
-      "file": "src_core_app-health.js",
-      "text": "export function buildBudgetHealth(state,currentDate=null) { return budgetCheck(state,currentDate); }"
-    },
-    {
-      "file": "src_screens_reservations.js",
-      "text": "This booking is using Annual Budget only."
-    },
-    {
-      "file": "src_screens_reservations.js",
-      "text": "this still rolls into the annual total."
-    },
-    {
-      "file": "src_screens_calendar.js",
-      "text": "calendar-more-button"
-    },
-    {
-      "file": "src_screens_calendar.js",
-      "text": "calendar-period-rail"
-    },
-    {
-      "file": "src_screens_vault.js",
-      "text": "vault-summary-card"
-    },
-    {
-      "file": "src_screens_vault.js",
-      "text": "Emergency Travel Card"
-    },
-    {
-      "file": "src_screens_settings.js",
-      "text": "settings-health-ambulance"
-    },
-    {
-      "file": "src_screens_settings.js",
-      "text": "settings-health-pulse-line"
+      "id": "IPAD-07",
+      "name": "Final visual sweep at real iPad landscape sizes including launch/header artwork",
+      "status": "NOT_RUN"
     }
   ],
-  "fullBuildProtocolSummary": [
-    "Start only from newest sealed continuity master.",
-    "Read the embedded protocol and release contract before editing.",
-    "No unrelated redesign during defect fixes; preserve approved structure and current Home-led premium material authority.",
-    "Remove/quarantine obsolete legacy code; do not rely on later CSS overrides to hide it.",
-    "Run forbidden-regression, structural-presence, colour-authority, interaction-path, data-integrity, offline-shell and physical-iPad gates before promotion.",
-    "Do not package if any locked feature regresses.",
-    "Simulation and production identities/storage/cache must remain isolated.",
-    "Keep simulation/continuity packages under 100 files.",
-    "Create a new continuity master only when Cameron requests it."
-  ],
-  "sourceProvenance": {
-    "sourcePackage": "Travel_Command_Centre_V1_R7_1_MASTER_2026-09-08.zip",
-    "sourceContractVersion": "V56-R7.1-continuity-forward-fix-2026-09-08.1",
-    "sourceContractDigest": "7368d240dae31468b4e9a12d09feefc65c048b51765c4d60f4a254da5a8b6055",
-    "sourceSealRootAlgorithm": "sha256 of sorted name:hash lines from the R7.1 stored seal",
-    "sourceSealRoot": "6c3c69639b346fd07b20ec2aaacdf37f7c5aaf2a13c45636deb3c29369f95b71",
-    "continuationWindow": "2026-09-08",
-    "promotionReason": "Deep forward audit of the actual R7.1 master found four surviving continuity defects: sparse long-horizon year browsing could land on empty six-year blocks; Calendar day cells exposed a parent interactive role around child event buttons in VoiceOver; several non-Home operational controls retained micro text/tap sizes; and the PWA manifest still carried a stale R6 release description. These were fixed and regression-tested forward as R7.2 without rolling back any R7.1 reservation, budget, storage or offline-launch repair."
+  "promotion": {
+    "finalMaster": "BLOCKED",
+    "reason": "IPAD-01 through IPAD-07 are NOT_RUN; S37 is a pre-iPad simulation candidate, not FINAL MASTER."
   },
-  "continuationRepairs": [
-    "Budget colour chains aligned across Annual Budget, Living Expenses, Recent Expenses, Add Expense and Destination Budget drill-downs; Add Expense remains light blue while category tiles stay differentiated.",
-    "Settings Backup, Vault summaries/activity/emergency card, Checklist overview/Next Destination, Journey History summaries/maps/milestones and Home expanded internals aligned to coherent parent colour families; semantic red/green retained only where meaningful.",
-    "Removed stale legacy Home/Vault/Calendar CSS authorities and obsolete suppressed components rather than relying on later overrides.",
-    "Calendar month strips are real interactive controls opening the exact tapped item; blank/date area still opens Day View; obsolete pointer-inert/day-first guard contradiction removed.",
-    "Journey Map gestures are separated from expansion; collapsed map uses key labels, expanded map uses all labels and fit-to-route.",
-    "Reservation Health Check restored as an expandable operational view.",
-    "Settings PIN input masks digits; Accounts copy correctly labels AUD subtotal; Add Reservation copy matches the locked light-blue workflow.",
-    "Country identity unified across automatic currency, flags, outlines, Quick Look, phrase helper, launch and headers; natural The Bahamas/The Netherlands/The Philippines/The United Kingdom aliases added; dedicated silhouettes added for Liechtenstein, Malta, Monaco and Singapore.",
-    "Quick Look/Phrase Helper and Checklist expanded destination heroes no longer recreate over-zoomed/cropped header treatment.",
-    "Itinerary Destination/Starting City Map Point Save path preserves newly selected coordinates.",
-    "RV/Cruise Starting Country is authoritative across banner, Budget, Itinerary view model, Calendar, Journey Map, Global Search and Countries Planned; Standard-to-route conversion clears stale Standard country and restored stale country no longer inflates planning statistics.",
-    "Destination Budget fixed-rate correction recalculates linked same-local-currency reservations atomically before Destination Budget expenses lock the rate; cross-currency manual AUD equivalents are not silently overwritten.",
-    "Forward Coverage accepts a saved booked flight as a Flight Transit day when it is otherwise uncovered; To Book flights never suppress genuine gaps.",
-    "Working-copy guard mode validates intentional changes without weakening the final sealed-file integrity gate.",
-    "Reservation budget routing is now explicit for every live booking type: Flights, Trains, Cruises, RV/Motorhome, Hotels, Airbnb and Tickets & Attractions each offer Annual-only or exact-stay Destination Budget allocation. Destination-scoped costs also roll into the annual travel total.",
-    "Annual reservations may be saved on a valid uncovered transit day. A booked flight can therefore fill a Flight Transit day without requiring a fake stay or Destination Budget; To Book continues not to suppress itinerary gaps.",
-    "Annual-only reservation stay links are contextual only. Deleting a stay safely clears those links while preserving the Annual-only reservation; every destination-scoped reservation type remains protected by its exact stay relationship.",
-    "Legacy reservations without budgetScope migrate deterministically: major booking types become annual, Tickets & Attractions retain destination allocation when their dated stay is valid.",
-    "Service-worker registration/update work is fully non-blocking after the app is already rendered; installed offline launch never awaits a network or worker update probe.",
-    "Budget current-stay Reservations remains a complete read-only booking context: Annual-only and Destination-scoped bookings linked to the stay are visible; only Destination-scoped reservations consume the stay Destination Budget, while all real costs still roll into the annual total.",
-    "Checklist repeat-trip state verified by stay ID: destination-specific checklist records remain separate for repeated destinations and permanent-item completion history is scoped independently to each move/stay.",
-    "Calendar same-day aggregation verified: destination/travel periods, reservations and personal notes/reminders sharing one date all remain present in the month cell and Agenda rather than collapsing to a single item.",
-    "Long-horizon Travel Year paging now jumps to the nearest previous/next populated six-year block, so sparse years such as 1, 5, 12, 20 and 30 never force Kym through empty year pages.",
-    "Calendar month day cells no longer expose a parent button role around nested event buttons. Each day is an accessible group with an explicit date-header Day View button; blank-area taps and exact event taps retain their existing behaviour.",
-    "Targeted non-Home iPad readability hardening raises key operational year, paging, Calendar event/date, Checklist add and Vault lock controls to practical touch/text sizes without changing Home’s locked fixed-screen composition.",
-    "The PWA manifest release description now identifies V56 R7.2 instead of the stale R6 checkpoint, keeping install/update identity aligned with the current sealed master.",
-    "Removed the superseded visible Verify Budget workflow. Canonical Budget integrity remains available through Settings → App Health, while Add Expense stays the visible Budget action.",
-    "12 September screenshot-led repair: Next 5 Reservations now expands in place, Add Reservation is simplified, all seven live reservation types expose Annual-only and Destination Budget allocation, Undo remains available, and AUD conversion remains visible.",
-    "12 September Calendar repair: month cells use thin identity rails, compact events and +N more day expansion following the explicitly approved old-builder calendar visual benchmark without restoring the old app-wide layout.",
-    "12 September Vault/Settings repair: Vault regained Document Summary, Expiry Reminders, Emergency Travel Card, Emergency Contacts and Recent Activity; Settings App Health regained the stronger ambulance and heartbeat/pulse visual language while retaining current 9/9 logic.",
-    "12 September colour/readability audit: Completed surfaces are neutral silver/slate, search is graphite/silver, Streaming is restrained graphite, semantic travel modes remain Standard blue / Motorhome orange / Cruise violet, and audited labels were enlarged where needed.",
-    "12 September iPad containment audit: all nine screens were rendered at 1194×834 and 1024×768 with no horizontal overflow; Add Expense normal entry fits without body scrolling at both target sizes.",
-    "12 September forensic continuity hardening: removed the dormant Quick Look/Phrase Helper switch pathway and locked both helpers to their separate Home entry points.",
-    "12 September AUD/density/colour closure: Home, Itinerary and Reservations explicitly label secondary AUD amounts; sparse Journey/Vault/Settings/Budget panels are content-driven; semantic colours are carried into secondary views.",
-    "13 September S23 Vault simplification: locked state now shows only The Vault header/vault door and Access Denied; triple-tap moved to the header and all lock hints/status/preview cards were removed.",
-    "13 September S23 header forensic pass: Home/stay/page headers use one restrained live border authority; Journey History and Checklist trim the legacy edge baked into their artwork so the same single live border is visible without a double frame.",
-    "13 September S23 App Health pass: ambulance mark, functional whole-app check and animated ECG pulse treatment verified at both approved iPad sizes."
+  "handoffInstruction": "Continue only from this S37 package. Do not return to S36/S35/S34/S33. If any iPad gate fails, fix forward from S37, rerun the full regression protocol, reseal hashes, then repeat the failed iPad gate and dependent gates.",
+  "knownExternalLimitations": [
+    "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
-  "validationAttestation": {
-    "date": "2026-09-12",
-    "fileCount": 99,
-    "workingContinuityGuard": "PASS after 12 September screenshot/colour/contract forward corrections",
-    "sealedContinuityGuard": "PASS after fresh 12 September forward reseal with current cache/build identity",
-    "javascriptSyntax": "PASS across all 64 top-level JavaScript files",
-    "staticImportGraph": "PASS; all 231 relative top-level ESM import targets exist",
-    "manifestJsonHtmlCssParsing": "PASS; manifest is standalone/landscape with current R7.2 identity and no external runtime URLs were found in packaged HTML/CSS",
-    "headerArchiveBoundsAndIndex": "PASS (86 indexed header assets; every offset/length remains inside the packed archive)",
-    "offlineShellCoverage": "PASS via embedded continuity guard; all required top-level files covered and installed navigation remains cache-first",
-    "targetedFunctionalTests": "PASS: calendar-year Annual Budgets; Journey Start budget periods; Settings year-specific budgets; legacy budget compatibility; Journey History Living vs Total cost; repeated destinations; Journey Start anniversaries; route kilometres/countries; all seven live reservation types with Annual-only + exact-stay Destination allocation; Vault Streaming single-entry/covert-tap protections; coherent runtime/service-worker identity.",
-    "sourceInteractionChecks": "PASS: Home forbidden Journey Map/standalone Next Destination remain absent; map zoom/pan/pinch source paths retained; Vault physical door remains exactly three taps; Calendar day cells are accessible groups with explicit Day View header buttons and exact child event controls; service-worker registration/update remains post-render and non-blocking.",
-    "renderedBrowserGate": "PASS in headless Chromium at 1194×834 and 1024×768 for all nine screens after the latest source/identity corrections; no horizontal overflow and no page errors. Reservation editor was additionally rendered at both sizes after all-seven-type allocation copy correction.",
-    "physicalIpadGate": "REQUIRED before final production acceptance; iPad landscape remains final visual/gesture/install authority.",
-    "targetedTestCount": 16,
-    "historicalRegressionCount": 56,
-    "interactionSmokeCount": 4,
-    "latestForwardRegression": "PENDING rerun after Add Expense no-scroll and mixed-currency wording closure.",
-    "colourVisualAudit": "Fresh main + secondary visual audit is in progress after Add Expense no-scroll and mixed-currency wording closure; no simulation may be produced until it passes at 1194×834 and 1024×768."
-  },
-  "remainingAuditChecklist": [
-    "Continue forward-only deep audit from this exact R7.2 sealed master; do not restart from R7.1, R7, 4.12.x or older screenshots/code.",
-    "Run physical iPad landscape visual/gesture pass, including zoom/pan, expanded widgets, modal sizing, text readability and launch sequence.",
-    "Exercise real iPad Add/Edit/Delete flows for expenses, all reservation types, repeat destinations, route trips and Checklist items using production-local storage.",
-    "Exercise Export Backup → destructive test change → Restore Backup on iPad, including Vault screenshot attachments and offline relaunch.",
-    "Before any future simulation/release, run the embedded sealed guard and the applicable Release Gate v9 checks; treat environment-blocked browser checks as NOT RUN rather than PASS, and keep the package below 100 files.",
-    "Do not treat old screenshots as global authority. The explicitly approved old-builder Calendar and Build 1 Vault/Settings screenshots are local visual/content benchmarks only; current Home-led premium material system and current sidebar/order remain app-wide authority.",
-    "Re-run the complete two-size main + secondary colour/density audit after the Add Expense no-scroll closure before creating any simulation."
-  ],
-  "continuityStatus": "FORWARD WORKING CHECKPOINT — full regression required; NOT MASTER until physical iPad acceptance",
-  "handoffInstruction": "Continue only from this forward continuity checkpoint. Run the working continuity guard, 56-harness suite, priority interaction smoke and latest-session targeted regression matrix before editing. Preserve the current no-visible-Verify-Budget rule, all-seven-type reservation budget allocation, Next 5 expand-in-place behaviour, thin-rail Calendar, fuller Vault, Build 1-inspired App Health ambulance/pulse treatment, neutral Completed/search surfaces, Home + Journey History visual authority, calendar-year Annual Budgets, Journey Start travel anniversaries, Journey History Living Cost vs Total Cost separation, Vault minimal locked header + Access Denied + header three-tap/no-zoom behavior, and completed route-country history. Do not promote to MASTER until physical iPad acceptance.",
-  "baselineSeal": {
-    "sealedAt": "2026-09-12T19:05:00+10:00",
-    "algorithm": "sha256",
-    "sealRootAlgorithm": "sha256 of sorted name:hash lines",
-    "sealRoot": "f0a82a0d5149ab570b134d87717d7c85dc026d06ab718806ff53b8a0f2f6f216",
-    "policy": "Any sealed-file hash change blocks continuity/release until the forward change is reviewed and mandatory gates pass. Never reseal merely to hide a regression.",
+  "sourceSeal": {
+    "algorithm": "SHA-256",
+    "scope": "all app-source top-level files except release-contract.json",
+    "digest": "a6c0e2399890317400e13b3a0153cb339088fc6ac53720fb74f639b4a9f099b9",
     "files": {
-      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "9293a5072785fb331b6db44e66badfbb2aadd4ea779d1e62080c83f6047243d3",
+      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "5f2b8b920eba5ad4f7ca4040237074a200d02fa1feb5cdfcd49598088c95a79d",
       "app-icon.png": "8d1fc2690d7ecec030092b0ab24f149eca21c4aaf38473e8c9984b6a4616ea25",
       "brand-bank-anz.png": "5f92a6b998b2306d9897b0a8490acab04963b56e28fa86a63b57d93bffdf746d",
       "brand-bank-commonwealth.png": "8352c7a15a7173711f40c4f6a8e6025d6320bf6114ac2edcd7f935d2977ba103",
@@ -460,15 +275,15 @@
       "brand-stream-youtube.png": "35e44729b587f99b9fc04b7ad491ccdf50bc1cf9aeeb5adb52a42f6a84048155",
       "header-assets.bin": "a71b391502c75b51e527924ae63cd34fcc4dabcecace811ca98fb311911da472",
       "header-index.json": "38b022200803f483f9bddbe3030f4162e1e96b5ac2a7e9ded9bd01498a9cc760",
-      "index.html": "e1ae687396b38227a11939e88049b4806baebc5190f71228d50bc01815a0cddd",
-      "manifest.webmanifest": "ea4124fc35edd55a456ccfe400901702640f5fe82b00aa74220d12b26265e22b",
+      "index.html": "c6be9e6e4478fdb7d7adfc7fa0801c8694d79783bad138f750ede7a801c5a568",
+      "manifest.webmanifest": "5355b2520849fef11d9c24d8fcd72285014cabe3fa2792a620feb7dab344426b",
       "src_components_confirmation.js": "132a3cd95febaf7794dfe1254fe5c80728b6de9bbbc5687798ab926e2101fe07",
       "src_components_country.js": "efc16620d8bcb97cb33e0741c93a5c431fdd2533f3d3f2345aa253d15cfba72c",
       "src_components_form-session.js": "481a117b89f925553e9e9ceac96f13ddcd634b4fdd663614b770ae3d00c9877d",
       "src_components_icons.js": "b2d7e57cf9f6cc2659eaffbd8c13a9d012cae3d4db4f1824ae9f76843c03c977",
-      "src_components_modal.js": "2e6b312f22275d94087130a6a0d1e76931ad99b271a70de2125245cfce7f8bd2",
+      "src_components_modal.js": "675f38cc375152bb220b5a22bf34a2d960ab44b36da3071ef005411f8cf62206",
       "src_components_offline-map.js": "758fd5e2bd6f85c71120fe492ede655cb444c31b7c745fe7b2beb0b9777d7c69",
-      "src_components_page-hero.js": "5216e04f31fdf6dd7b9ec5d1155f2fa3cb3dfe30fc57ce1faaf35afd3546a392",
+      "src_components_page-hero.js": "f3b31ed7bd689cd3741132aa5e82a340d99a155c2248e8ac2f91669a031ebe8f",
       "src_components_sidebar.js": "332cca6d8fc0f9443aedd338e638f793a4231a0d29025e242108ef6d7c0a9f56",
       "src_core_account-mutations.js": "df6cd6f8911bd0ec254d2966388d2ca07366f45a4b83e4d912632f6b86613c34",
       "src_core_app-health.js": "9765330579681ee0b1b57f6407fde74301dc9e0910275e4d2137f0a69d2fa4dc",
@@ -487,7 +302,7 @@
       "src_core_entities.js": "5394cde626c7113b4e23ef4d53e5fa05b05ec0fa6e3b8cc9fb7e0c7e4dbc43be",
       "src_core_expense-mutations.js": "0fb0c52fd5cf8175fc7747d4fd77c71f1b949e9b4293560217fcb19641ac062d",
       "src_core_global-search.js": "d522a0f7f7ba396a8977c2b74d75e9133b2b61a4635abd9a292b1b7c3a9bc1f6",
-      "src_core_home-alerts.js": "4375b0d9cadbf76cd0325688b7917d240e6fec3aac0a10cc543bc57da291d6b8",
+      "src_core_home-alerts.js": "8c64ab934bfb0cbd2904cf79a170353aa5e6072428c7c9c81fb6805d7c429b07",
       "src_core_home-view-model.js": "614eec955bc2462ac922adf41b5aad3f11789cc23673647c3513998daad255cc",
       "src_core_ids.js": "6c842e8d3a6c2320bd85da2f3d06df73a55fae700984821d605ca8a8dd59e085",
       "src_core_itinerary-mutations.js": "aa57c0a9b5625af0d265478e14d14eaf095152b9bd009e71ca3312c41b4c909e",
@@ -502,78 +317,41 @@
       "src_core_reservation-mutations.js": "4fa296e048ab41d8aa8e759fb004f1605446c2440b726e6ee84be1d62b6020c7",
       "src_core_reservations-view-model.js": "5cc2ea9cf2eac29795f9cc24410461f3ebe0940de55b82127bc27f8c0bfb6af0",
       "src_core_restore.js": "264270bbe8f4da5981bfd10dcceb2f98ca1a33a7314e75497ff7a4f9f51dd89b",
-      "src_core_runtime-config.js": "4ce3e3fbf0734fcb5d6307b111506453bd3e7b7b46401a2dd583560979048aa0",
+      "src_core_runtime-config.js": "1817ed76351a9290289ef20083a390ea42798fecc982a7417e85d31e90d6928c",
       "src_core_schema.js": "a96c8ba448f7cf88d78f40bda1e49ef788195da961294dda6a2ff74700097f19",
       "src_core_schengen.js": "4eba8372eb779430afa2f2b66b4a74ab65142b31718af9606d412fe522f909ee",
       "src_core_settings-mutations.js": "5a0b9f77161470062317d02aecc3dd918c882a54bdfdb54a0f3a9706980ac1d6",
       "src_core_state.js": "b049017a709f20d06e8b02b5ef9c78fb5f11d3df7f855741fe2bbe2b42b19d04",
-      "src_core_storage.js": "f2e420233b3707dc7a981c91e137646419192c622f94c21d3b23d9a49866af70",
+      "src_core_storage.js": "1e96a148b0a10beaf8c7115bba671286c0373c831b62eeefcdb3a666c796d6bd",
       "src_core_upcoming-events.js": "e7452b155da559010139590d3df41d16c6e9ad9717e7c43a8f3df869297fc961",
       "src_core_validation.js": "f93bb82c7a1e4b96370a6a6f2946313f38fd6815de763a1c9e05820c29b67a4a",
       "src_core_vault-access.js": "e6b93c8fcdcae83724a098a40db29eb47216b2ec8c8ffa67398e38955492914a",
       "src_core_vault-mutations.js": "85c875ea6390e4603b9f56b6fd97e108a8cec51fd0f150312bf2b30fddaccdd2",
       "src_core_vault-view-model.js": "c48f1a11e392eb7a619e5996edeb904c8836f21eb0f2808579427bef44376807",
       "src_core_year-filters.js": "5f16f14929099810bb07b82656bc9ffc1e22b7a265ef40e77342310680ff4f30",
-      "src_design_app.css": "5cb99811857650e728b43e18a28d9da4cfb89422b6426b3ba3034b8711c81615",
+      "src_design_app.css": "2826f7f3c20d2fe95b5a8089e26e1a89866ae5937a9bbe73fbb2f77f46db4b50",
       "src_design_components.css": "bb7e057c7aab13acb302810892613e879540a324512c78f31f009e862fb34738",
-      "src_design_finish-pass.css": "258c598da3692773087f2abf6f4673eb3372a7e10b2f7b7abcd48d2af369eebe",
-      "src_design_reference-pass.css": "8f29e04ff0a782e71fe8ea085e5ade6ba642807db8bd0d69424e4859a439ffee",
+      "src_design_finish-pass.css": "828ad322a13980ebf8234421f8e4cb8c12eaea907f2422e6b2f3a6a11e363b56",
+      "src_design_locked_contract.css": "0a4dacccdd1359b91089818b294dba426e61148c5bea64aa6e781e2cd2ebf0c4",
+      "src_design_reference-pass.css": "cb5b02ec7917ecca9f564008474e7a6ce1e4dab9c642ca0c7371b9ff458cd5e0",
       "src_design_reset.css": "8be44e4016b1e6f22ec110d7a8e59f1863c191280746a9369e69a0ac02b61dae",
       "src_design_screens.css": "90be72002426b72336c50f846b775ba7b9969619a0c9b683c4547b073c51401f",
       "src_design_tokens.css": "24557420215f36757406eeba64792ae0bd561dfe64928e090224603d63926d64",
-      "src_main.js": "df4760e313e3f427c3fa36025f0a70b244c5521a4d92695911dc5edb64783927",
-      "src_screens_budget.js": "df0934daba2c26ee8a1b8c5d13ce068afa1c53702255f9ab24c5999a756be056",
-      "src_screens_calendar.js": "35506d3fd04ce9d7647986fc1f41c8bef4b808d73ccad758fcb27cd72fe65853",
-      "src_screens_checklist.js": "909d69ae39e3119d8c2b6edd1b110d97602f07bbc3c10b780646bcdc89b794ab",
-      "src_screens_home.js": "ed7fcddf139f455bfb1be51be9a82d75654203b9287cd0dafad09e95e4dc6d5e",
-      "src_screens_itinerary.js": "e4c62e5ff4540dbdaba21e2442124ac39456066b2a30ba5a29edbae53431912c",
-      "src_screens_journey-history.js": "4606cb68df092187416b0b6aac6a0f6d50d5a678cb0e6c7310045cc402721a56",
+      "src_main.js": "0a1c88392e7477514cc2e4fb15265a7a65020b408a5c485b10cc1d7f41e71906",
+      "src_screens_budget.js": "e3821b37bfe0d0e36d7dc867931bda2991c7c9ed5d6c9f6e788b6dbeda97ecce",
+      "src_screens_calendar.js": "4adaf4b5cc12f429d45d74e74edcc9075c3f10c4925b7cb2c20c95d23eb19cbf",
+      "src_screens_checklist.js": "d3ec85d0f4e89684589c9c67f3c91bc8fb3dc57d9b6f8a4d9bb105d442c859a9",
+      "src_screens_home.js": "80f1807cee82aac4d71ddc9bcc6c933c6f9a8580e9ac1e84fcb2666be6e661e2",
+      "src_screens_itinerary.js": "ada73566e2fbd59db05eeea5ed87dfcc5979627fc263e10c2781601ab5870b6a",
+      "src_screens_journey-history.js": "5b19447b5522c44aa2f3f7d5edd0f55b03bebbe5256698a9f6e861501b5a7957",
       "src_screens_registry.js": "a6d185e952dcdab139093ca779d4787189edcd0a40343d3c10974802dfbe1404",
-      "src_screens_reservations.js": "3ffd4a3bfc427666b916e9f9025020677ffa46c29f1f1a3d3417513adb2fb4ac",
-      "src_screens_settings.js": "7c55aa1718851bc63da34250b4d0af4d48856b9811be4f47e6c889e414a0dacb",
-      "src_screens_vault.js": "125ea95b99a52ef597468937fa18a77ea4a863380aa91408eb30d8615c6a56f8",
-      "sw.js": "90fd6c40c729ac3e53f56ff6e076e81917e87b08a4cb588659757a018331aa1e"
+      "src_screens_reservations.js": "87e2f0f0513381ebe191b69d54286882f1b421a003ab23199f62876394603080",
+      "src_screens_settings.js": "dcab3994318fe4e349876e4aefd53325ab6181d67d13287202d13e6cb933d0a1",
+      "src_screens_vault.js": "9dd0cd694ec9bd7361c032f8eeff1d1464f17f469e5db5737d877c4068d70fcf",
+      "startup-ipad-1024-landscape.png": "ad30b2ce2984a53e1249a71f7b284c2ac6094a661048d54a9b5ec07f49d5034e",
+      "startup-ipad-1194-landscape.png": "20b883f742b7602e62de298a9cc1415282c1d38ee977f94fead182651a0e33b5",
+      "sw.js": "3e2967dfb35742a0869f8d5afa4f31ee49ec6aa48927caaef23326f41e728f4e",
+      "tokyo-4year-simulation-fixture.json": "cde66ac75c2b3531ae297c18f1b45ae5413eebfe2ca5c698ffd86506bd5fdd8c"
     }
-  },
-  "runtimeIdentity": {
-    "cacheName": "tcc-v1-v56-r7.2-forward-continuity-regression-2026-09-13-s24",
-    "buildMarker": "v56-r7.2-forward-continuity-regression-2026-09-13-s24"
-  },
-  "latestForwardDelta": {
-    "date": "2026-09-13",
-    "authority": "User-supplied screenshots and explicit instructions in the 12 September continuation chat",
-    "locks": [
-      "No visible Budget Verify control; Budget health is App Health only.",
-      "All seven live reservation types offer Annual-only or exact-stay Destination Budget allocation.",
-      "Destination-scoped reservations also roll into annual travel total; Annual-only reservations do not consume Destination Budget.",
-      "Next 5 Reservations expands in place.",
-      "Calendar follows the approved thin-rail/compact-event old-builder benchmark only for Calendar.",
-      "Vault and Settings use Build 1 screenshots as local visual/content benchmarks; App Health uses ambulance + pulse line.",
-      "Completed surfaces are neutral silver/slate; search is graphite/silver; Streaming is restrained graphite.",
-      "Current corrected header system remains authoritative and must not revive baked-text ghosting or over-zoom.",
-      "Expanded Alerts are traffic-light severity + concise rows + Remove only; there are no cross-screen Open buttons.",
-      "The next populated simulation must include at least one future stay with Destination Budget setup intentionally incomplete so the Budget alert path is visible.",
-      "Local currency remains primary, but every mixed-currency money surface must make the secondary AUD equivalent unmistakable and readable.",
-      "No main or secondary widget may reserve large unused space when its content can size naturally.",
-      "Colour semantics are app-wide and include expanded/modal/secondary screens, not only the nine main screen tops.",
-      "Launch destination stage has no generic globe/Home placeholder; real flag, country and city are populated before the identity stage can become visible.",
-      "Main-screen navigation resets the document viewport to the top so a lower-page interaction on one screen cannot strand the next screen partway down.",
-      "Locked Vault is intentionally minimal: The Vault header with vault-door artwork plus Access Denied only; no hint, status, protected-section preview or visible unlock control is shown.",
-      "The locked Vault opens from three taps on the Vault header itself; optional PIN remains a second step only when enabled.",
-      "Journey History and Checklist headers must show one clean border only; their supplied baked artwork edge must never be doubled by a second live border.",
-      "All top screen headers use the restrained premium border system; no thick, clumsy, bright or double header borders.",
-      "App Health retains the Build 1-inspired ambulance medical mark and visible ECG/heartbeat pulse line; CHECK THE WHOLE APP remains functional."
-    ]
-  },
-  "lockedVisualRules": [
-    "Add Expense normal Destination Budget entry fits at both supported iPad landscape sizes without body scrolling; local amount, locked local currency and clearly labelled AUD equivalent share one compact row.",
-    "Reservation Destination Budget copy is booking-generic (reservation date, never ticket-only wording) and automatic mixed-currency conversion explicitly identifies AUD."
-  ],
-  "repairHistory": [
-    "12 September AUD/no-scroll closure: removed the revived Add Expense tutorial slab, restored the compact three-column local-currency/AUD conversion row, simplified optional description, and removed stale ticket-only reservation routing wording."
-  ],
-  "contractDigest": {
-    "algorithm": "sha256",
-    "value": "9cf9b486976589d27eb986028f97bf960778c11d91f058751deab966a87a2909"
   }
 }

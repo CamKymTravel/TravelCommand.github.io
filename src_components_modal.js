@@ -1,6 +1,6 @@
 import { createLineIcon } from './src_components_icons.js';
 
-const MODAL_TONES = Object.freeze(['sky','blue','indigo','teal','green','magenta','violet','red','orange','gold']);
+const MODAL_TONES = Object.freeze(['neutral','sky','blue','indigo','teal','green','magenta','violet','red','orange','gold']);
 let modalSequence = 0;
 let expandedSnapshotSequence = 0;
 
@@ -94,6 +94,17 @@ export function createModal({ title, body, actions = [], className = '', showClo
   const modalClasses = String(className || '').split(/\s+/).filter(Boolean);
   const isEditorModal = modalClasses.includes('tcc-editor-modal');
   const isExpandedModal = modalClasses.includes('tcc-expanded-modal');
+  // S36 visual closure: custom expanded views use the same inheritance marker
+  // as standard expandable cards. Stamp the declared tone into data/CSS so
+  // every expanded path has one machine-verifiable source-colour identity.
+  if (isExpandedModal && modalClasses.includes('tcc-expanded-inherits-source')) {
+    const inheritedTone = modalClasses.map(value => value.match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
+    if (inheritedTone) {
+      dialog.dataset.sourceWidgetTone = inheritedTone;
+      const inheritedRgb = EXPANDED_TONE_RGB[inheritedTone];
+      if (inheritedRgb) dialog.style.setProperty('--tcc-expanded-rgb', inheritedRgb.join(','));
+    }
+  }
   if (isEditorModal || isExpandedModal || showCloseButton) {
     const close = document.createElement('button');
     close.type = 'button';
@@ -309,6 +320,7 @@ function wireSnapshotActions(clone, source, dialog) {
 }
 
 const EXPANDED_TONE_RGB = Object.freeze({
+  neutral:[174,184,194],
   sky:[88,199,255],
   blue:[93,141,255],
   indigo:[128,109,255],
@@ -350,7 +362,7 @@ export function materialToneFromContext(source = null, fallback = 'sky') {
   const element = source instanceof Element ? source : (document.activeElement instanceof Element ? document.activeElement : null);
   if (!element) return safeFallback;
   const context = element.closest?.('dialog, [data-expand-tone], [data-screen]') || element;
-  const classTone = [...(context.classList || [])].map(value => String(value).match(/^tone-(sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
+  const classTone = [...(context.classList || [])].map(value => String(value).match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
   if (classTone) return classTone;
   const expandTone = context.dataset?.expandTone;
   if (MODAL_TONES.includes(expandTone)) return expandTone;
@@ -383,9 +395,16 @@ export function openExpandedCard({ host, source, title, tone = 'sky', body = nul
   const dialog = createModal({
     title,
     body: content,
-    className: `tcc-expanded-modal tone-${resolvedTone}`,
+    className: `tcc-expanded-modal tcc-expanded-inherits-source tone-${resolvedTone}`,
     actions: []
   });
+  // S36 visual closure: an expanded widget is the same widget at a larger
+  // scale, not a new generic modal. Carry the collapsed widget's declared
+  // colour family into the outer frame as an explicit invariant so later
+  // screen-level CSS cannot silently recolour the expanded state.
+  dialog.dataset.sourceWidgetTone = resolvedTone;
+  const inheritedRgb = EXPANDED_TONE_RGB[resolvedTone];
+  if (inheritedRgb) dialog.style.setProperty('--tcc-expanded-rgb', inheritedRgb.join(','));
   if (!body) wireSnapshotActions(snapshot, source, dialog);
   host.append(dialog);
   dialog.addEventListener('close', () => dialog.remove(), { once:true });

@@ -12,6 +12,7 @@ import { renderOfflineMap } from './src_components_offline-map.js';
 import { resolveOfflinePlace } from './src_core_coordinates.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { buildItineraryColourMap } from './src_core_calendar-view-model.js';
+import { isDestinationBudgetUsable } from './src_core_budget.js';
 
 function itineraryFlagCountry(record = {}) {
   const route=['cruise','motorhome','rv'].includes(String(record.travelType||'').toLowerCase());
@@ -70,13 +71,16 @@ function applyItineraryDestinationColours(model, state) {
 }
 
 function itineraryBudgetAmounts(record = {}) {
+  if(!isDestinationBudgetUsable(record)) {
+    return { configured:false, primary:'BUDGET NOT SET', secondary:'Set in Budget' };
+  }
   const aud=Math.max(0,Number(record.destinationBudgetAUD||0));
   const currency=String(record.localCurrency||'AUD').toUpperCase();
   const rate=Number(record.fixedLocalPerAUD);
   if(currency!=='AUD' && Number.isFinite(rate) && rate>0) {
-    return { primary:formatMoney(aud*rate,currency), secondary:`AUD ${formatMoney(aud,'AUD')}` };
+    return { configured:true, primary:formatMoney(aud*rate,currency), secondary:`AUD ${formatMoney(aud,'AUD')}` };
   }
-  return { primary:formatMoney(aud,'AUD'), secondary:null };
+  return { configured:true, primary:formatMoney(aud,'AUD'), secondary:null };
 }
 
 function node(tag, className, text) {
@@ -237,7 +241,7 @@ function openHomeVisitEditor({ stateService, host, currentDate, prepareRecordVis
       } catch (err) { error.textContent=err.message; }
     }}
   );
-  const modal=createModal({title:existing?'Edit Home Visit':'Add Home Visit',body,actions,className:'tcc-editor-modal tcc-itinerary-home-visit-modal tone-violet'});
+  const modal=createModal({title:existing?'Edit Home Visit':'Add Home Visit',body,actions,className:'tcc-editor-modal tcc-itinerary-home-visit-modal tone-sky'});
   host.append(modal);
   modal.addEventListener('close',()=>modal.remove(),{once:true});
   modal.showModal();
@@ -356,7 +360,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     }});
     map.classList.add('itinerary-route-picker-map');
     pickerBody.append(map);
-    picker=createModal({title:hasMapCoordinates(point)?'Adjust Map Point':'Place Map Point',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-indigo itinerary-route-picker-modal'});
+    picker=createModal({title:hasMapCoordinates(point)?'Adjust Map Point':'Place Map Point',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-neutral itinerary-route-picker-modal'});
     host.append(picker);picker.showModal();picker.addEventListener('close',()=>picker.remove(),{once:true});
   }
 
@@ -469,7 +473,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
       picker?.close();
     }});
     map.classList.add('itinerary-route-picker-map'); pickerBody.append(map);
-    picker=createModal({title:mapped?'Adjust Map Location':'Place Map Location',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-indigo itinerary-route-picker-modal'});
+    picker=createModal({title:mapped?'Adjust Map Location':'Place Map Location',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-neutral itinerary-route-picker-modal'});
     host.append(picker);picker.showModal();picker.addEventListener('close',()=>picker.remove(),{once:true});
   }
 
@@ -575,7 +579,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
         }
         if(previousType!=='standard'&&type==='standard'&&!editorFields.country)editorFields.country=editorFields.startCountry||'';
         markDirty();
-        if (!editorTone) setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'sky');
+        setModalTone(modal, type === 'motorhome' ? 'orange' : type === 'cruise' ? 'violet' : 'sky');
         renderTypeTiles();
         renderFields(editorFields);
         renderLocationEditor();
@@ -591,7 +595,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     dirty.hidden = true;
     editorFields=structuredClone(savedFields);
     body.dataset.travelType = editorFields.travelType || 'standard';
-    setModalTone(modal, existing ? (editorTone || (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'indigo')) : 'sky');
+    setModalTone(modal, existing ? (body.dataset.travelType === 'motorhome' ? 'orange' : body.dataset.travelType === 'cruise' ? 'violet' : 'sky') : 'sky');
     routeDraft = savedRoutePoints.map(point => structuredClone(point));
     renderTypeTiles();
     renderFields(editorFields);
@@ -701,9 +705,9 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     }}
   );
 
-  const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'indigo') : 'indigo';
+  const itineraryTone = existing ? (originalFields.travelType === 'motorhome' ? 'orange' : originalFields.travelType === 'cruise' ? 'violet' : 'sky') : 'indigo';
   const addingHomeVisit = !existing && originalFields.country === 'Australia' && /^home(?:\s*\/|$)/i.test(String(originalFields.name || ''));
-  modal = createModal({ title:existing ? 'Edit Destination / Trip' : addingHomeVisit ? 'Add Home Visit' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${existing ? (editorTone || itineraryTone) : (addingHomeVisit ? 'violet' : 'sky')}` });
+  modal = createModal({ title:existing ? 'Edit Destination / Trip' : addingHomeVisit ? 'Add Home Visit' : 'Add Destination', body, actions, className:`tcc-editor-modal tcc-itinerary-editor-modal tone-${existing ? itineraryTone : 'sky'}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -768,7 +772,7 @@ function renderMap(model, host) {
   const head = node('div', 'itinerary-map-title-row');
   const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','',"Where We're Going"));
   const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode(' Expand Map'));
-  expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key',interactive:true})); const mapTone=materialToneFromRenderedSurface(panel,'teal'); const modal=createModal({title:'Forward Journey Plan',body,actions:[],className:`tcc-expanded-modal itinerary-map-expanded-modal tone-${mapTone}`}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
+  expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key',interactive:true})); const mapTone=materialToneFromRenderedSurface(panel,'teal'); const modal=createModal({title:'Forward Journey Plan',body,actions:[],className:`tcc-expanded-modal tcc-expanded-inherits-source itinerary-map-expanded-modal tone-${mapTone}`}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
   head.append(copy,expand); panel.append(head);
   const first=model.currentStay||null, next=model.nextDestination||null; const routePoints=model.upcoming.reduce((sum,record)=>sum+Number(record.routePointCount||0),0);
   const metrics=node('div','itinerary-map-metrics'); const data=[['Current',first?.name||'—'],['Next',next?.name||'—'],['Planned Stops',String(model.stats.plannedStops)],['Detailed Route Points',String(routePoints)],['Route Trips',String(model.stats.routeTrips)],['Unplanned Gaps',String(model.stats.missingCoverage)]]; for(const [label,value] of data){const metric=node('article','itinerary-map-metric');metric.append(node('span','',label),node('strong','',value));metrics.append(metric);} panel.append(metrics);
@@ -839,13 +843,23 @@ function renderCoverage(model, months = 6, onMonthsChange = null, openDetail = n
     if(segment.type==='flight-transit'){
       const transit=node('div','itinerary-coverage-segment itinerary-segment-flight-transit');transit.style.flexGrow='1';transit.append(node('strong','','FLIGHT TRANSIT'),node('small','',formatAUDate(segment.startDate)));transit.setAttribute('role','img');transit.setAttribute('aria-label',`Flight Transit day · ${formatAUDate(segment.startDate)} · saved flight covers this otherwise unplanned travel day`);timeline.append(transit);continue;
     }
-    const seg=node('button',`itinerary-coverage-segment itinerary-segment-${segment.travelType}`);seg.type='button';seg.style.flexGrow=String(Math.max(1,segment.days));if(segment.destinationColour){seg.style.setProperty('--itinerary-destination-color',segment.destinationColour.color);seg.style.setProperty('--itinerary-destination-rgb',segment.destinationColour.rgb);}seg.append(node('strong','',segment.name),node('small','',`${segment.days}d`));seg.setAttribute('aria-label',`Enlarge ${segment.name} itinerary details · ${formatAUDate(segment.startDate)} – ${formatAUDate(segment.endDate)}`);seg.addEventListener('click',()=>openDetail?.(segment.id));timeline.append(seg);
+    const seg=node('button',`itinerary-coverage-segment itinerary-segment-${segment.travelType}`);seg.type='button';seg.style.flexGrow=String(Math.max(1,segment.days));if(segment.destinationColour){seg.style.setProperty('--itinerary-destination-color',segment.destinationColour.color);seg.style.setProperty('--itinerary-destination-rgb',segment.destinationColour.rgb);}seg.append(node('strong','',segment.name),node('small','',`${segment.days}d`));seg.setAttribute('aria-label',`Enlarge ${segment.name} itinerary details · ${formatAUDate(segment.startDate)} – ${formatAUDate(segment.endDate)}`);seg.addEventListener('click',()=>{seg.closest('dialog')?.close();queueMicrotask(()=>openDetail?.(segment.id));});timeline.append(seg);
   }
  panel.append(timeline); return panel;
 }
 function paceCoverage(value,label,tone=''){const m=node('article',`itinerary-coverage-box ${tone}`);m.append(node('strong','',value),node('span','',label));return m;}
 
+const ITINERARY_DETAIL_TONES={sky:[88,199,255],blue:[93,141,255],indigo:[128,109,255],teal:[70,217,202],green:[87,214,155],magenta:[241,101,189],violet:[184,109,255],red:[255,111,131],orange:[255,154,90],gold:[255,209,91]};
 function itineraryDetailTone(record) {
+  const rgb=String(record?.destinationColour?.rgb||'').split(',').map(value=>Number(value.trim()));
+  if(rgb.length===3&&rgb.every(Number.isFinite)){
+    let best='blue',distance=Infinity;
+    for(const [tone,target] of Object.entries(ITINERARY_DETAIL_TONES)){
+      const d=Math.hypot(rgb[0]-target[0],rgb[1]-target[1],rgb[2]-target[2]);
+      if(d<distance){distance=d;best=tone;}
+    }
+    return best;
+  }
   if(record?.travelType==='motorhome'||record?.travelType==='rv') return 'orange';
   if(record?.travelType==='cruise') return 'violet';
   return 'blue';
@@ -869,7 +883,7 @@ function openItineraryEntryDetail({ host, stateService, record, openEditor }) {
   facts.append(
     fact('Travel type',TRAVEL_TYPE_LABELS[record.travelType]||record.travelType||'Standard'),
     fact('Duration',`${record.days} days`),
-    fact('Destination Budget',[itineraryBudgetAmounts(record).primary,itineraryBudgetAmounts(record).secondary].filter(Boolean).join(' · ')),
+    fact('Destination Budget',itineraryBudgetAmounts(record).configured ? [itineraryBudgetAmounts(record).primary,itineraryBudgetAmounts(record).secondary].filter(Boolean).join(' · ') : 'Budget Not Set'),
     fact('Accommodation',record.hasAccommodation?'Linked':'Not linked')
   );
   if(record.startCity) facts.append(fact('Starting city',record.startCity));
@@ -890,12 +904,13 @@ function openItineraryEntryDetail({ host, stateService, record, openEditor }) {
   const dialog=createModal({
     title:`${record.name||'Destination'} · Details`,
     body,
-    className:`tcc-expanded-modal itinerary-entry-detail-modal tone-${tone}`,
+    className:`tcc-expanded-modal tcc-expanded-inherits-source itinerary-entry-detail-modal tone-${tone}`,
     actions:[
       {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openEditor(record.id,tone));}},
       {label:'Close',onClick:d=>d.close()}
     ]
   });
+  if(record?.destinationColour?.rgb) dialog.style.setProperty('--tcc-expanded-rgb',record.destinationColour.rgb);
   host.append(dialog);
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});
   dialog.showModal();
@@ -944,7 +959,7 @@ function itineraryUpcomingExpandedBody(model, openDetail) {
 }
 
 function renderEntry(record, openDetail) {
-  const button = node('button', `itinerary-entry itinerary-entry-${record.travelType} itinerary-entry-destination-colour`); button.type='button'; if(record.destinationColour){button.style.setProperty('--itinerary-destination-color',record.destinationColour.color);button.style.setProperty('--itinerary-destination-rgb',record.destinationColour.rgb);} button.addEventListener('click',()=>openDetail(record));
+  const button = node('button', `itinerary-entry itinerary-entry-${record.travelType} itinerary-entry-destination-colour`); button.type='button'; if(record.destinationColour){button.style.setProperty('--itinerary-destination-color',record.destinationColour.color);button.style.setProperty('--itinerary-destination-rgb',record.destinationColour.rgb);} button.addEventListener('click',()=>{button.closest('dialog')?.close();queueMicrotask(()=>openDetail(record));});
   const dates=node('span','itinerary-entry-dates'); dates.append(node('strong','',record.displayDates.split(' – ')[0]||''),node('small','','TO'),node('strong','',record.displayDates.split(' – ')[1]||''),node('em','',`${record.days} days`));
   const copy=node('span','itinerary-entry-copy');
   const identity=node('span','itinerary-entry-identity');
@@ -954,7 +969,7 @@ function renderEntry(record, openDetail) {
   identity.append(identityIcon,identityFlag,identityCopy); copy.append(identity);
   const badges=node('span','itinerary-entry-badges'); if(record.hasAccommodation)badges.append(node('i','','ACCOMMODATION LINKED')); if(record.travelType!=='standard')badges.append(node('i','',`${record.routePointCount} ROUTE POINTS`)); copy.append(badges);
   const plan=node('span','itinerary-entry-plan'); plan.append(node('small','','TRAVEL PLAN'),node('strong','',record.travelType==='motorhome'?'Motorhome':record.travelType==='cruise'?'Cruise':'Standard'));
-  const budget=node('span','itinerary-entry-budget'); const budgetAmounts=itineraryBudgetAmounts(record); budget.append(node('small','','DESTINATION BUDGET'),node('strong','',budgetAmounts.primary)); if(budgetAmounts.secondary)budget.append(node('em','',budgetAmounts.secondary));
+  const budgetAmounts=itineraryBudgetAmounts(record); const budget=node('span',`itinerary-entry-budget${budgetAmounts.configured?'':' is-unset'}`); budget.append(node('small','','DESTINATION BUDGET'),node('strong','',budgetAmounts.primary)); if(budgetAmounts.secondary)budget.append(node('em','',budgetAmounts.secondary));
   button.append(dates,copy,plan,budget);
   button.setAttribute('aria-label',[
     'Enlarge itinerary stay details',
@@ -1009,11 +1024,11 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
   };
   rememberOptions();
 
-  const openEditor = (entryId, editorTone = null, initialFields = null) => {
+  const openEditor = (entryId, editorTone = null, initialFields = null, hostOverride = main) => {
     const record=entryId ? stateService.snapshot().itinerary.find(item=>item.id===entryId) : null;
     const isHomeVisit=Boolean(record && record.travelType==='standard' && record.country==='Australia' && /^home(?:\s*\/|$)/i.test(String(record.name||'')));
-    if(isHomeVisit) return openHomeVisitEditor({stateService,host:main,currentDate,prepareRecordVisibility,entryId});
-    return openItineraryEditor({ stateService, host:main, currentDate, entryId, prepareRecordVisibility, editorTone, initialFields });
+    if(isHomeVisit) return openHomeVisitEditor({stateService,host:hostOverride,currentDate,prepareRecordVisibility,entryId});
+    return openItineraryEditor({ stateService, host:hostOverride, currentDate, entryId, prepareRecordVisibility, editorTone, initialFields });
   };
 
   function renderContent() {
@@ -1126,7 +1141,10 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
           if (target && String(target.endDate || '') < String(currentDate || '')) draft.ui.itineraryCompletedOpen = true;
         });
         const liveHost = document.querySelector('[data-screen="itinerary"]');
-        if (liveHost) openEditor(pending.id,pending.editorTone||null);
+        // Clearing pendingOpen triggers the app-level render subscriber. Open
+        // the exact record on the newly connected Itinerary host, never the
+        // detached host captured by this render pass.
+        if (liveHost) openEditor(pending.id,null,null,liveHost);
       });
     }
 

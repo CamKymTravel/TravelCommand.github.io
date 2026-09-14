@@ -2,7 +2,7 @@ import { buildCalendarViewModel, shiftCalendarMonth } from './src_core_calendar-
 import { buildHomeViewModel } from './src_core_home-view-model.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { saveCalendarEventDraft, deleteCalendarEventDraft, PERSONAL_CALENDAR_TYPES } from './src_core_calendar-event-mutations.js';
-import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
+import { createModal, makeExpandableCard, preserveLocalFocus } from './src_components_modal.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
@@ -126,7 +126,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
       const active = body.dataset.type === eventType;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; if (existing && !editorTone) setModalTone(modal, eventType === 'reminder' ? 'violet' : 'sky'); renderTypes(); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; renderTypes(); }));
       typeTiles.append(button);
     }
   }
@@ -184,15 +184,24 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     }}
   );
 
-  modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:`tcc-editor-modal tone-${existing ? (editorTone || (body.dataset.type === 'reminder' ? 'violet' : 'sky')) : 'sky'}` });
+  modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:'tcc-editor-modal tcc-calendar-editor-modal tone-neutral' });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
 }
 
+function calendarSourceRgb(event) {
+  if (event?.kind === 'reservation') return ({ flight:'93,141,255', train:'70,217,202', cruise:'184,109,255', rv:'255,154,90', hotel:'240,185,95', airbnb:'241,101,189', accommodation:'240,185,95', ticket:'255,111,131' })[event.reservationType] || '93,141,255';
+  if (event?.kind === 'personal') return event.personalType === 'reminder' ? '255,209,91' : '184,109,255';
+  return event?.rgb || '70,217,202';
+}
+
 function setEventColour(element, event) {
   element.style.setProperty('--calendar-color', event.color);
   element.style.setProperty('--calendar-rgb', event.rgb);
+  element.style.setProperty('--calendar-source-rgb', calendarSourceRgb(event));
+  if (event?.reservationType) element.dataset.sourceType = event.reservationType;
+  if (event?.personalType) element.dataset.sourceType = event.personalType;
 }
 
 const CALENDAR_MATERIAL_RGB = Object.freeze({
@@ -235,9 +244,11 @@ function openCalendarItem(event, { host, openPersonal, navigate = null, editorTo
   body.append(node('p','calendar-source-detail-menu-note',isPersonal?'This opens read-only first. Use Edit below only when you deliberately want to change this reminder or note.':sourceScreen?'Use Open below to go straight to the saved source record.':'This is a read-only calendar summary.'));
   const actions=[];
   if(isPersonal)actions.push({label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openPersonal(event.sourceId,tone));}});
-  else if(sourceScreen&&sourceLabel&&typeof navigate==='function')actions.push({label:sourceLabel,onClick:d=>{d.close();queueMicrotask(()=>navigate(sourceScreen,{collection:event.sourceCollection,id:event.sourceId,editorTone:tone}));}});
+  else if(sourceScreen&&sourceLabel&&typeof navigate==='function')actions.push({label:sourceLabel,onClick:d=>{d.close();queueMicrotask(()=>navigate(sourceScreen,{collection:event.sourceCollection,id:event.sourceId}));}});
   actions.push({label:'Close',onClick:d=>d.close()});
-  const dialog=createModal({title:event.title||'Calendar Details',body,className:`tcc-expanded-modal calendar-source-detail-modal tone-${tone}`,actions});
+  const dialog=createModal({title:event.title||'Calendar Details',body,className:`tcc-expanded-modal tcc-expanded-inherits-source calendar-source-detail-modal tone-${tone}`,actions});
+  if(event?.rgb) dialog?.style.setProperty('--tcc-expanded-rgb',event.rgb);
+  if(event) dialog?.style.setProperty('--calendar-source-rgb',calendarSourceRgb(event));
   host?.append(dialog);dialog?.addEventListener('close',()=>dialog.remove(),{once:true});dialog?.showModal();
 }
 
@@ -263,7 +274,7 @@ function openCalendarDay(cell, handlers) {
     list.append(row);
   }
   body.append(list);
-  const dialog=createModal({title:formatAUDate(cell.date),body,className:'tcc-expanded-modal calendar-day-detail-modal tone-blue',actions:[{label:'Close',onClick:d=>d.close()}]});
+  const dialog=createModal({title:formatAUDate(cell.date),body,className:'tcc-expanded-modal tcc-expanded-inherits-source calendar-day-detail-modal tone-neutral',actions:[{label:'Close',onClick:d=>d.close()}]});
   handlers.host?.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
 }
 
@@ -336,11 +347,26 @@ function renderMonth(model, handlers) {
     const periodEvents = cell.events.filter(event => event.kind === 'destination-period' || event.kind === 'travel-period');
     const datedEvents = cell.events.filter(event => event.kind !== 'destination-period' && event.kind !== 'travel-period');
     if (periodEvents.length) {
+      const visiblePeriods = periodEvents.slice(0, 2);
       const rail = node('div', 'calendar-period-rail');
-      for (const periodEvent of periodEvents.slice(0, 2)) {
-        const line=node('span','calendar-period-line');
+      rail.dataset.count = String(visiblePeriods.length);
+      rail.setAttribute('aria-label', `${formatAUDate(cell.date)} travel and destination periods`);
+      for (const periodEvent of visiblePeriods) {
+        // The visible Calendar period rail is the exact record control. Keep the
+        // coloured strip visually thin, but never make it a decorative span:
+        // Kym can tap the strip itself to open that destination/travel record.
+        const line=node('button','calendar-period-line');
+        line.type='button';
         line.dataset.kind=periodEvent.kind; line.dataset.segment=periodEvent.segment || '';
-        setEventColour(line,periodEvent); line.setAttribute('aria-hidden','true');
+        const range=`${formatAUDate(periodEvent.startDate)} – ${formatAUDate(periodEvent.endDate)}`;
+        line.title=[periodEvent.title,periodEvent.subtitle,range].filter(Boolean).join(' · ');
+        line.setAttribute('aria-label', ['Open',periodEvent.title,periodEvent.subtitle,range].filter(Boolean).join(' · '));
+        setEventColour(line,periodEvent);
+        line.addEventListener('click', clickEvent => {
+          clickEvent.preventDefault();
+          clickEvent.stopPropagation();
+          openCalendarItem(periodEvent, handlers);
+        });
         rail.append(line);
       }
       day.append(rail);
@@ -420,7 +446,7 @@ function calendarLegendExpandedBody(model, kind, handlers) {
     if(event.notes)row.append(node('small','',event.notes));
     setEventColour(row,event);
     row.setAttribute('aria-label',['Open calendar item',event.title,event.subtitle,event.displayDate,event.displayTime].filter(Boolean).join(' · '));
-    row.addEventListener('click',()=>openCalendarItem(event,handlers));
+    row.addEventListener('click',()=>{row.closest('dialog')?.close();queueMicrotask(()=>openCalendarItem(event,handlers));});
     list.append(row);
   }
   body.append(list);
@@ -505,7 +531,7 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
       const item=node('div',`calendar-legend-item calendar-legend-${kind}`);
       const swatch=node('span','calendar-legend-swatch');swatch.append(createLineIcon(iconName));
       item.append(swatch,node('strong','',labelText),node('small','',String(value)));legend.append(item);
-      makeExpandableCard(item,{host:main,title:labelText,tone:legendTones[kind]||'blue',bodyBuilder:()=>calendarLegendExpandedBody(model,kind,handlers)});
+      makeExpandableCard(item,{host:main,title:labelText,tone:legendTones[kind]||'neutral',bodyBuilder:()=>calendarLegendExpandedBody(model,kind,handlers)});
     }
     main.append(legend);
 

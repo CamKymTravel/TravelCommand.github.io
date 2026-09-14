@@ -1604,7 +1604,7 @@
 }
 .tcc-modal.tcc-expanded-modal .budget-accounts-manager-summary > strong { color:#fff; font-size:34px; line-height:1; }
 .tcc-modal.tcc-expanded-modal .budget-accounts-manager-summary > span { color:#b2c6d3; font-size:14px; }
-.tcc-modal.tcc-expanded-modal .budget-accounts-manager-add { justify-self:start; min-width:190px; min-height:50px; border-color:rgba(70,217,202,.48); background:rgba(70,217,202,.13); }
+.tcc-modal.tcc-expanded-modal .budget-accounts-readonly-note { color:#93a8b7; font-size:12px; line-height:1.45; }
 .tcc-modal.tcc-expanded-modal .budget-account-manager-list { display:grid; gap:10px; }
 .tcc-modal.tcc-expanded-modal .budget-account-manager-row { min-height:78px; }
 
@@ -6166,7 +6166,7 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
   }
   [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple .budget-field { margin:0 !important; }
   [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple .budget-field > span { font-size:11px !important; margin-bottom:3px !important; }
-  [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:38px !important; height:38px !important; }
+  [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:44px !important; height:44px !important; }
   @media (max-width:1080px), (max-height:800px) {
     [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-local-money-grid {
       grid-template-columns:minmax(0,1.48fr) minmax(142px,.58fr) minmax(0,1.08fr) !important;
@@ -6199,7 +6199,7 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
   [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-copy span,
   [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-copy small { font-size:10.5px !important; line-height:1.18 !important; }
   [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple { padding:4px 8px 5px !important; }
-  [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:34px !important; height:34px !important; }
+  [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:44px !important; height:44px !important; }
   @media (max-width:1080px), (max-height:800px) {
     [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tile { min-height:42px !important; padding:3px 5px !important; }
     [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-icon { width:16px !important; height:16px !important; }
@@ -6215,7 +6215,7 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
     [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-auto-conversion strong { font-size:14px !important; }
     [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-locked-currency strong { font-size:18px !important; }
     [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple { padding:3px 7px 4px !important; }
-    [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:32px !important; height:32px !important; }
+    [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-step-detail-simple input { min-height:44px !important; height:44px !important; }
   }
 }
 
@@ -7171,7 +7171,11 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
    width so values and proper nouns never clip or split inside words. */
 @media (max-width:1100px) {
   [data-screen="itinerary"] .itinerary-entry {
-    grid-template-columns:145px minmax(195px,1.32fr) minmax(132px,.72fr) minmax(156px,.82fr) !important;
+    /* S37 working closure: the S36 156px budget column still let the
+       deliberately long BUDGET NOT SET state overflow at 1024px. Rebalance
+       only the internal row columns; the card footprint and approved layout
+       stay unchanged. */
+    grid-template-columns:145px minmax(180px,1.18fr) minmax(120px,.67fr) minmax(185px,.92fr) !important;
   }
   [data-screen="itinerary"] .itinerary-entry-budget > strong {
     white-space:nowrap;
@@ -7584,4 +7588,21 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
 [data-screen="home"] .home-search-overlay {
   left:10px !important;
   right:10px !important;
+}
+
+/* 14 Sep 2026 — S37 pre-simulation narrow itinerary identity closure.
+   The 1024px row can display country + travel type without truncation if the
+   secondary identity line is allowed two restrained lines. Keep the larger
+   iPad composition unchanged. */
+@media (max-width:1100px) {
+  [data-screen="itinerary"] .itinerary-entry-identity-copy small {
+    white-space:normal !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    display:-webkit-box !important;
+    -webkit-box-orient:vertical !important;
+    -webkit-line-clamp:2 !important;
+    line-clamp:2 !important;
+    max-height:2.4em !important;
+  }
 }

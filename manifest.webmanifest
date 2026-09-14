@@ -1,13 +1,13 @@
 {
-  "name": "Travel Command Centre \u2014 Tokyo 4-Year Simulation",
-  "short_name": "TCC Simulation",
+  "name": "Travel Command Centre — Tokyo 4-Year Simulation S37",
+  "short_name": "TCC Tokyo S37",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline Tokyo four-year full-data simulation build for Cameron & Kym. Includes completed travel history, expenses, reservations, checklists, future itinerary and intentionally unset destination budgets for alert testing.",
+  "description": "Offline Tokyo four-year full-data S37 pre-iPad simulation for Cameron & Kym. Includes the forward screen-by-screen colour, clipping, touch-target, editor/detail, reservation-completed, itinerary-readability, logic and continuity fixes.",
   "icons": [
     {
       "src": "./app-icon.png",
@@ -16,5 +16,5 @@
       "purpose": "any"
     }
   ],
-  "id": "./tokyo-4year-full-simulation-s25"
+  "id": "./tokyo-4year-full-simulation-s37"
 }

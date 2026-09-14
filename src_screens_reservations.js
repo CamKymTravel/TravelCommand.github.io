@@ -12,7 +12,7 @@ import { createLineIcon } from './src_components_icons.js';
 import { countryFlagEmoji } from './src_components_country.js';
 import { canonicalCountrySlug } from './src_core_entities.js';
 
-const RESERVATION_TONES = Object.freeze({ flight:'blue', train:'green', cruise:'teal', rv:'orange', hotel:'gold', airbnb:'magenta', accommodation:'gold', ticket:'violet' });
+const RESERVATION_TONES = Object.freeze({ flight:'sky', train:'teal', cruise:'violet', rv:'orange', hotel:'gold', airbnb:'magenta', accommodation:'gold', ticket:'red' });
 const RESERVATION_EDITOR_ICONS = Object.freeze({ flight:'flight', train:'train', cruise:'cruise', rv:'rv', hotel:'hotel', airbnb:'airbnb', accommodation:'hotel', ticket:'ticket' });
 const reservationLiveType = type => type === 'accommodation' ? 'hotel' : type;
 const RESERVATION_MONTHS = Object.freeze(['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']);
@@ -230,7 +230,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       button.addEventListener('click', () => preserveLocalFocus(() => {
         const previousType = body.dataset.type;
         body.dataset.type = type;
-        if (existing && !editorTone) setModalTone(modal, RESERVATION_TONES[type] || 'blue');
+        setModalTone(modal, 'sky');
         renderTypes(); renderFlightScope(); renderAllocation(); updateRoutingPreview();
       }));
       typeTiles.append(button);
@@ -404,7 +404,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     body.dataset.budgetScope = saved.budgetScope === 'destination' ? 'destination' : 'annual';
     body.dataset.flightScope = saved.flightScope || '';
     body.dataset.destinationItineraryId = saved.itineraryId || '';
-    setModalTone(modal, existing ? (editorTone || RESERVATION_TONES[saved.type] || 'blue') : 'sky');
+    setModalTone(modal, 'sky');
     renderTypes();
     renderFlightScope();
     renderAllocation();
@@ -469,7 +469,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       const existingAmount=formatMoney(existing.originalAmount,existing.originalCurrency || 'AUD');
       confirmDestructive({
         title:'Delete reservation',
-        tone:editorTone || RESERVATION_TONES[body.dataset.type] || 'blue',
+        tone:'sky',
         message:`Delete ${existing.title} · ${existingType} · ${existingWhen} · ${existingStatus} · ${existingAmount}? This cannot be undone.`,
         onConfirm:() => {
           stateService.commit(draft => deleteReservationDraft(draft, existing.id));
@@ -479,6 +479,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     }});
   }
   actions.push(
+    { label:'Undo Changes', onClick:() => populate(formSession.undo()) },
     { label:'Cancel', onClick:dialog => { formSession.cancel(); dialog.close(); } },
     { label:'Save', onClick:dialog => {
       try {
@@ -500,8 +501,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     }}
   );
 
-  const reservationTone = RESERVATION_TONES[existing?.type || initialType] || 'blue';
-  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tcc-editor-modal tcc-reservation-editor-modal tone-${existing ? (editorTone || reservationTone) : 'sky'}` });
+  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:'tcc-editor-modal tcc-reservation-editor-modal tone-sky' });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -520,8 +520,9 @@ function amountBlock(record) {
 
 function reservationRow(record, openEditor) {
   const button = node('button', 'reservation-row');
+  if (record.completed) button.classList.add('reservation-row-completed');
   button.type = 'button';
-  button.addEventListener('click', () => openEditor(record.id));
+  button.addEventListener('click', () => { const dialog=button.closest('dialog'); if(dialog?.open)dialog.close(); queueMicrotask(()=>openEditor(record.id)); });
   const copy = node('span', 'reservation-row-copy');
   copy.append(node('strong', '', record.title));
   const flightLabel = record.type === 'flight' && record.flightScope ? `${record.flightScope === 'domestic' ? 'Domestic' : 'International'} Flight` : null;
@@ -551,7 +552,8 @@ function listPanel(title, records, className, openEditor, emptyText = 'No entrie
 function healthPanel(model) {
   const panel = node('section', `reservation-panel reservation-health reservation-health-${model.health.status}`);
   const head = node('div', 'reservation-section-head');
-  head.append(node('h2', '', 'Reservation Health Check'), node('strong', 'reservation-health-status', model.health.status === 'verified' ? 'Verified' : 'Needs Attention'));
+  head.append(node('h2', '', 'Reservation Health Check'));
+  if (model.health.status !== 'verified') head.append(node('strong', 'reservation-health-status', 'Needs Attention'));
   panel.append(head);
   if (!model.health.issues.length) panel.append(node('p', 'reservation-health-copy', 'No duplicate, overdue To Book, Destination Budget repair, or missing AUD-equivalent issues detected.'));
   else {
@@ -569,7 +571,7 @@ function reservationHealthExpandedBody(model) {
   const summary=node('div','reservation-expanded-summary');
   const duplicates=health.duplicateGroups?.length||0;
   summary.append(
-    node('strong','',health.status==='verified'?'Verified':'Needs Attention'),
+    node('strong','',health.status==='verified'?'All checks clear':'Needs Attention'),
     node('span','',`${duplicates} duplicate group${duplicates===1?'':'s'}`),
     node('span','',`${health.overdueToBookCount||0} overdue To Book`),
     node('small','',`Destination Budget repair ${health.needsBudgetRepairCount||0} · Missing AUD equivalent ${health.missingAudEquivalentCount||0}`)
@@ -744,7 +746,7 @@ function openCompletedReservations({ stateService, host, currentDate }) {
     queueMicrotask(()=>{const liveHost=document.querySelector('[data-screen="reservations"]');if(liveHost)openReservationEditor({stateService,host:liveHost,currentDate,reservationId:id,initialType:'flight',editorTone:'blue'});});
   };
   const body=reservationPanelExpandedBody('Completed Reservations',model.allCompleted,openRecord);
-  dialog=createModal({title:'Completed Reservations',body,className:'tcc-expanded-modal reservation-completed-expanded-modal tone-neutral',actions:[{label:'Close',onClick:d=>d.close()}]});
+  dialog=createModal({title:'Completed Reservations',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-completed-expanded-modal tone-neutral',actions:[{label:'Close',onClick:d=>d.close()}]});
   host.append(dialog); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); dialog.showModal();
 }
 
@@ -772,7 +774,7 @@ function renderNextFive(state,currentDate,host){
       if (!host) return;
       const body=reservationPanelExpandedBody('Next 5 Upcoming',records,()=>{});
       for (const button of body.querySelectorAll('button')) { button.disabled=true; button.setAttribute('aria-disabled','true'); }
-      const dialog=createModal({title:'Next 5 Upcoming',body,className:'tcc-expanded-modal reservation-next-five-expanded-modal tone-sky',actions:[{label:'Close',onClick:d=>d.close()}]});
+      const dialog=createModal({title:'Next 5 Upcoming',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-next-five-expanded-modal tone-sky',actions:[{label:'Close',onClick:d=>d.close()}]});
       host.append(dialog); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); dialog.showModal();
     }); list.append(row);
   }
@@ -833,7 +835,7 @@ function openReservationCategorySummary({ stateService, host, currentDate, type,
   dialog=createModal({
     title:`${label} · All Bookings`,
     body,
-    className:`tcc-expanded-modal reservation-category-expanded-modal tone-${RESERVATION_TONES[type]||'blue'}`,
+    className:`tcc-expanded-modal tcc-expanded-inherits-source reservation-category-expanded-modal tone-${RESERVATION_TONES[type]||'sky'}`,
     actions:[{label:'Close',onClick:d=>d.close()}]
   });
   host.append(dialog);
@@ -913,12 +915,12 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'gold'))});
 
     const health=healthPanel(model); left.append(health);
-    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:model.health.status==='verified'?'green':'gold',bodyBuilder:()=>reservationHealthExpandedBody(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}))});
+    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:model.health.status==='verified'?'neutral':'gold',bodyBuilder:()=>reservationHealthExpandedBody(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}))});
 
     const nextFive=renderNextFive(state,currentDate,main), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);
-    makeExpandableCard(nextFive,{host:main,title:'Upcoming Reservations · All Categories',tone:'blue',bodyBuilder:()=>nextUpcomingExpandedBody(stateService.snapshot(),currentDate,id=>openEditor(id,'blue'))});
-    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked by Category',tone:'violet',bodyBuilder:()=>bookedTotalExpandedBody(stateService.snapshot())});
+    makeExpandableCard(nextFive,{host:main,title:'Upcoming Reservations · All Categories',tone:'sky',bodyBuilder:()=>nextUpcomingExpandedBody(stateService.snapshot(),currentDate,id=>openEditor(id,'blue'))});
+    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked by Category',tone:'sky',bodyBuilder:()=>bookedTotalExpandedBody(stateService.snapshot())});
     contentGrid.append(left,rail); main.append(contentGrid);
 
     const pending = state.ui?.pendingOpen;

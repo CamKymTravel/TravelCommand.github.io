@@ -302,7 +302,7 @@ function showQuickLook(host, stay, navigate = null) {
     body.append(node('p','eyebrow','CURRENT DESTINATION · OFFLINE'),node('h3','','No current destination'),node('p','','Add a dated destination in Itinerary. Once its dates include today, this card becomes your Current Destination and opens its offline Country Quick Look.'));
     const actions=[{label:'Close',onClick:d=>d.close()}];
     if(typeof navigate==='function') actions.unshift({label:'Open Itinerary',onClick:d=>{d.close();queueMicrotask(()=>navigate('itinerary'));}});
-    const dialog=createModal({title:'Current Destination',body,actions,className:'tone-teal'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+    const dialog=createModal({title:'Current Destination',body,actions,className:'tcc-expanded-modal tcc-expanded-inherits-source tone-sky'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
     return;
   }
   const country=departureCountry(stay); const key=slug(country); const facts=COUNTRY_QUICK_LOOK[key] || q(country||'Current destination',['Food','Offline Quick Look is not available for this destination.'],['Wildlife','Offline Quick Look is not available for this destination.'],['Plants & gardens','Offline Quick Look is not available for this destination.'],['History','Offline Quick Look is not available for this destination.']);
@@ -321,7 +321,7 @@ function showQuickLook(host, stay, navigate = null) {
     node('span','',context?.politeSay?`Say: ${context.politeSay}`:'Practical language details are stored separately from the Phrase Helper.')
   );
   const practical=node('section','home-helper-lower home-helper-practical'); practical.append(node('p','eyebrow','PRACTICAL ESSENTIALS'),node('h4','','Useful offline basics')); const essentialGrid=node('div','home-helper-essential-grid'); const essentials=context?[['Capital',context.capital],['Calling code',context.calling],['Plug / power',context.plug],['Drive',context.drive],['Payments',context.payments],['Tipping',context.tipping]]:[['Language',phrase?.language||'—'],['Currency',stay?.localCurrency||'—'],['Offline note','Detailed practical essentials are not yet available for this country.']]; for(const [label,value] of essentials){ const item=node('div','home-helper-essential'); item.append(node('span','',label),node('strong','',value)); essentialGrid.append(item); } practical.append(essentialGrid); lower.append(languageCard,practical); body.append(lower);
-  dialog=createModal({title:`Country Quick Look · ${facts.display}`,body,actions:[],className:'tone-teal home-helper-modal home-helper-quick-modal',showCloseButton:true}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  dialog=createModal({title:`Country Quick Look · ${facts.display}`,body,actions:[],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-sky home-helper-modal home-helper-quick-modal',showCloseButton:true}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
 }
 
 function showToilet(host, stay, navigate = null){
@@ -374,7 +374,7 @@ function showHomeDetail(host,{title,tone='blue',items=[],actions=[]}={}){
     list.append(row);
   }
   body.append(list);
-  const dialog=createModal({title:title||'Details',body,className:`tcc-expanded-modal tone-${tone}`,actions:[...actions,{label:'Close',onClick:d=>d.close()}]});
+  const dialog=createModal({title:title||'Details',body,className:`tcc-expanded-modal tcc-expanded-inherits-source tone-${tone}`,actions:[...actions,{label:'Close',onClick:d=>d.close()}]});
   host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
 }
 
@@ -382,6 +382,9 @@ function renderHero(model, state, host, navigate){
   const hero=node('section','home-reference-hero'); applyStayHeaderImage(hero,model.currentStay);
   const currentWrap=node('div','home-destination-hero-wrap');
   const current=node('div','home-stay-card home-destination-hero-card');
+  current.dataset.expandable='true';
+  current.dataset.expandTone='sky';
+  current.dataset.expandableMode='self';
   current.tabIndex=0; current.setAttribute('role','button');
   current.setAttribute('aria-label',model.currentStay?['Open current destination quick look',model.currentStay.title,model.currentStay.country,model.currentStay.dates].filter(Boolean).join(' · '):'Open Current Destination setup');
   if(model.currentStay){
@@ -505,10 +508,32 @@ function upcomingDetailItems(event,state){
   return items;
 }
 
+function compactAlertParts(alert){
+  const raw=String(alert?.message||alert?.title||'').replace(/\.$/,'').trim();
+  const segments=raw.split(' · ').map(part=>part.trim()).filter(Boolean);
+  const genericSubject=segments.length>1?segments[0]:String(alert?.title||segments[0]||'Alert');
+  const time=(raw.match(/\b\d{1,2}:\d{2}\b/)||[])[0]||'';
+  const due=String(alert?.displayDueDate||'');
+  const compactLabelMap={
+    'To Book':'TO BOOK','To Book Overdue':'OVERDUE','Checklist Readiness':'CHECKLIST',
+    'Checklist Needs Setup':'CHECKLIST SETUP','Destination Budget Needs Setup':'BUDGET SETUP',
+    'Missing Coverage':'COVERAGE','Date Overlap':'DATE OVERLAP','Expense Routing Repair':'EXPENSE REPAIR',
+    'Destination Budget Repair':'BUDGET REPAIR','Vault Expiry':'VAULT EXPIRY','Vault PIN Recovery':'VAULT PIN',
+    'Schengen Warning':'SCHENGEN','Schengen Must Leave By':'SCHENGEN'
+  };
+  const label=compactLabelMap[alert?.title]||String(alert?.title||'ALERT').toUpperCase();
+  if(alert?.title==='Checklist Readiness'){
+    const match=raw.match(/^(\d+) required task(?:s)? remain before (.+)$/i);
+    return{subject:'Checklist Readiness',detail:match?`${match[1]} required · ${match[2]}`:raw};
+  }
+  if(alert?.title==='Checklist Needs Setup')return{subject:'Checklist Needs Setup',detail:raw.replace(/^Add required checklist items for /i,'').replace(/\.$/,'')};
+  const detail=[label,due,time].filter(Boolean).join(' · ');
+  return{subject:genericSubject,detail:detail||raw};
+}
 function compactAlerts(model,host,navigate){
   const panel=node('section','home-mini-panel home-mini-alerts'); const head=node('div','home-mini-head'); const title=node('h2','','Alerts'); if(model.alerts.length) title.append(node('span','home-alert-count',String(model.alerts.length))); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,title); panel.append(head);
   const list=node('div','home-mini-list'); if(!model.alerts.length) list.append(node('p','home-mini-empty','No alerts'));
-  model.alerts.slice(0,3).forEach(alert=>{ const item=node('div',`home-mini-row home-alert-row home-alert-priority-${alert.priority}`); item.setAttribute('aria-hidden','true'); item.append(node('span','home-alert-dot',''),node('strong','',alert.message||alert.title)); list.append(item); });
+  model.alerts.slice(0,3).forEach(alert=>{ const item=node('div',`home-mini-row home-alert-row home-alert-priority-${alert.priority}`); item.setAttribute('aria-hidden','true'); const compact=compactAlertParts(alert); const copy=node('span','home-alert-compact-copy'); copy.append(node('strong','',compact.subject),node('small','',compact.detail)); item.append(node('span','home-alert-dot',''),copy); list.append(item); });
   if(model.alerts.length>3) list.append(node('div','home-mini-more',`+${model.alerts.length-3} more · tap Alerts to view all`)); panel.append(list); return panel;
 }
 function compactUpcoming(model,host,state,navigate){
@@ -773,7 +798,7 @@ export function renderHomeScreen({stateService,currentDate,navigate}){
     makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'violet',bodyBuilder:()=>buildDestinationExpanded(model,navigate)});
     makeExpandableCard(annual,{host:main,title:'Annual Position',tone:'gold',bodyBuilder:()=>buildAnnualExpanded(model,currentDate,state,navigate)});
     makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'blue',bodyBuilder:()=>buildUpcomingExpanded(model,currentDate,navigate)});
-    makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'orange',bodyBuilder:()=>buildAlertsExpanded(model,navigate,stateService,currentDate)});
+    makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'red',bodyBuilder:()=>buildAlertsExpanded(model,navigate,stateService,currentDate)});
     makeExpandableCard(schengen,{host:main,title:'Schengen Status',tone:model.schengen.status==='not-allowed'?'red':model.schengen.status==='allowed'?'green':'gold',bodyBuilder:()=>buildSchengenExpanded(model,stateService)});
     makeExpandableCard(timeline,{host:main,title:'Trip Timeline',tone:'violet',bodyBuilder:()=>buildTimelineExpanded(state,currentDate,navigate)});
     // Global Search is the final fixed row. Home deliberately ends here: no

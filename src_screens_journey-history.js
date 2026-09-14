@@ -325,7 +325,7 @@ function journeyLinkedSpendBreakdown(state, itineraryId, attributedReservationId
 function journeyRecordTone(row){
   if(row?.travelType==='motorhome'||row?.travelType==='rv') return 'orange';
   if(row?.travelType==='cruise') return 'violet';
-  return 'blue';
+  return 'sky';
 }
 
 function openJourneyRecordDetail(host,row,state,navigate){
@@ -363,7 +363,7 @@ function openJourneyRecordDetail(host,row,state,navigate){
   const actions=[];
   if(typeof navigate==='function')actions.push({label:'Open Original Itinerary Stay',onClick:d=>{d.close();queueMicrotask(()=>navigate('itinerary',{collection:'itinerary',id:row.id}));}});
   actions.push({label:'Close',onClick:d=>d.close()});
-  const dialog=createModal({title:`${row.name} · Journey Detail`,body,className:`tcc-expanded-modal journey-record-detail-modal tone-${journeyRecordTone(row)}`,actions});
+  const dialog=createModal({title:`${row.name} · Journey Detail`,body,className:`tcc-expanded-modal tcc-expanded-inherits-source journey-record-detail-modal tone-${journeyRecordTone(row)}`,actions});
   host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
 }
 
@@ -384,9 +384,11 @@ function renderRows(model, navigate, options, updateOptions, state) {
   table.append(header);
   if (!rows.length) table.append(node('p', 'journey-empty', 'No entries yet'));
   for (const row of rows) {
-    const button = node('button', 'journey-row journey-record-row');
+    const rowTone=journeyRecordTone(row);
+    const button = node('button', `journey-row journey-record-row journey-record-tone-${rowTone}`);
     button.type = 'button';
     button.dataset.recordId = row.id;
+    button.dataset.expandTone = rowTone;
     const destination = node('span', 'journey-destination');
     const destinationFlag=node('span','journey-destination-flag',countryFlagEmoji(row.flagCountry||row.country||'')); destinationFlag.setAttribute('aria-hidden','true');
     const destinationCopy=node('span','journey-destination-copy'); destinationCopy.append(node('strong', '', row.name), node('small', '', [row.country, row.travelYearLabel || ''].filter(Boolean).join(' · ')));
@@ -627,7 +629,8 @@ function renderTopDestinations(model){
 function renderHealth(model) {
   const panel = node('section', `journey-panel journey-health journey-health-${model.health.status}`);
   const head = node('div', 'journey-section-head');
-  head.append(node('h2', '', 'Journey Check'), node('strong', 'journey-health-status', model.health.status === 'verified' ? 'Verified' : 'Needs Attention'));
+  head.append(node('h2', '', 'Journey Check'));
+  if (model.health.status !== 'verified') head.append(node('strong', 'journey-health-status', 'Needs Attention'));
   panel.append(head);
   if (!model.health.issues.length) panel.append(node('p', 'journey-health-copy', 'Completed journey records and map relationships are consistent.'));
   else {
@@ -716,7 +719,7 @@ function journeyHealthExpandedBody(model){
   const body=node('section','journey-insight-expanded journey-health-expanded');
   const verified=model.health.status==='verified';
   const stats=node('div','journey-expanded-stat-grid');stats.append(
-    journeyExpandedStat('STATUS',verified?'VERIFIED':'NEEDS ATTENTION',verified?'completed journey relationships are consistent':'one or more journey relationships need review',verified?'green':'gold'),
+    journeyExpandedStat('STATUS',verified?'CLEAR':'NEEDS ATTENTION',verified?'completed journey relationships are consistent':'one or more journey relationships need review',verified?'green':'gold'),
     journeyExpandedStat('ISSUES',integer(model.health.issues.length),verified?'no detected journey issues':'items requiring review',model.health.issues.length?'red':'green'),
     journeyExpandedStat('COMPLETED STAYS',integer(model.rows.length),'records checked','blue'),
     journeyExpandedStat('RECORDED DISTANCE',kilometres(model.totalKilometres),'journey distance checked','teal')
@@ -806,12 +809,12 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     }
     const journeyExpanders=[
       ['.journey-map-panel','Journey Map','sky'],
-      ['.journey-spend-panel','Lifetime Travel Spend','blue'],
-      ['.journey-snapshot-panel','Journey Snapshot','orange'],
-      ['.journey-milestones-panel','Milestones','teal'],
-      ['.journey-top-destinations','Destination Totals','gold'],
-      ['.journey-mix-panel','Travel Mix','violet'],
-      ['.journey-health','Journey Check','green']
+      ['.journey-spend-panel','Lifetime Travel Spend','magenta'],
+      ['.journey-snapshot-panel','Journey Snapshot','blue'],
+      ['.journey-milestones-panel','Milestones','gold'],
+      ['.journey-top-destinations','Destination Totals','orange'],
+      ['.journey-mix-panel','Travel Mix','indigo'],
+      ['.journey-health','Journey Check','neutral']
     ];
     for(const [selector,title,tone] of journeyExpanders){
       const card=main.querySelector(selector);

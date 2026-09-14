@@ -151,7 +151,7 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
       const active = body.dataset.listType === listType;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.listType = listType; renderTypes(); updateDestinationHint(); if (existing) setModalTone(modal, currentEditorTone()); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.listType = listType; renderTypes(); updateDestinationHint(); }));
       typeTiles.append(button);
     }
   }
@@ -178,8 +178,7 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
       checkboxField('Required for Ready to Move', 'required', saved.required),
       textAreaField('Notes', 'notes', saved.notes)
     );
-    fields.querySelector('[name="owner"]')?.addEventListener('change', () => { if (existing) setModalTone(modal, currentEditorTone()); });
-    setModalTone(modal, existing ? currentEditorTone() : 'sky');
+    fields.querySelector('[name="owner"]')?.addEventListener('change', () => { /* owner identity stays inside the form; editor shell remains neutral */ });
   }
   populate(savedValue);
 
@@ -249,8 +248,8 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
     }}
   );
 
-  const resolvedEditorTone = editorTone || (savedValue.owner === 'kym' ? 'magenta' : savedValue.owner === 'cameron' ? 'blue' : (savedValue.listType === 'destination' ? 'sky' : 'green'));
-  modal = createModal({ title:existing ? 'Edit Checklist Item' : 'Add Checklist Item', body, actions, className:`tcc-editor-modal tcc-checklist-editor-modal tone-${existing ? resolvedEditorTone : 'sky'}` });
+  modal = createModal({ title:existing ? 'Edit Checklist Item' : 'Add Checklist Item', body, actions, className:'tcc-editor-modal tcc-checklist-editor-modal tone-neutral' });
+  setModalTone(modal,'neutral');
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -276,10 +275,10 @@ function renderChecklistRow(item, stateService, openEditor, compact = false, sco
   if (item.completed) toggle.append(createLineIcon('check'));
   toggle.setAttribute('aria-label', [`${item.completed ? 'Mark incomplete' : 'Mark complete'}: ${item.title}`, exactContext].filter(Boolean).join(' · '));
   toggle.setAttribute('aria-pressed', String(item.completed));
-  toggle.addEventListener('click', () => stateService.commit(draft => toggleChecklistItemDraft(draft, item.id, !item.completed, { now:stateService.now, scopeItineraryId })));
+  toggle.addEventListener('click', () => { const dialog=toggle.closest('dialog'); stateService.commit(draft => toggleChecklistItemDraft(draft, item.id, !item.completed, { now:stateService.now, scopeItineraryId })); if(dialog?.open)dialog.close(); });
   const edit = node('button', 'checklist-row-copy');
   edit.type = 'button';
-  edit.addEventListener('click', () => openEditor(item.id));
+  edit.addEventListener('click', () => { const dialog=edit.closest('dialog'); if(dialog?.open)dialog.close(); queueMicrotask(()=>openEditor(item.id)); });
   edit.append(node('strong', '', item.title));
   const meta = [item.displayDueDate ? `Due ${item.displayDueDate}` : '', item.overdue ? 'Overdue' : '', !item.required ? 'Optional' : ''].filter(Boolean).join(' · ');
   if (meta) edit.append(node('small', item.overdue ? 'checklist-overdue' : '', meta));
@@ -445,7 +444,7 @@ function ownerExpandedBody({title,subtitle,items,tone,stateService,openEditor,sc
   const body=node('section',`checklist-owner-expanded checklist-owner-${tone}`);
   const head=node('div','checklist-expanded-head');
   const copy=node('div');copy.append(node('p','eyebrow',subtitle),node('h2','',title));
-  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.addEventListener('click',()=>addItem?.());
+  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem?.());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
   if(!items.length)list.append(node('p','checklist-empty','No optional items in this stage'));
@@ -458,7 +457,7 @@ function checklistExpandedBody({title,subtitle,items,stateService,openEditor,add
   const body=node('section','checklist-expanded-list-body');
   const head=node('div','checklist-expanded-head');
   const copy=node('div');copy.append(node('h2','',title),node('p','',subtitle));
-  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.disabled=Boolean(disabled);add.title=add.disabled?disabledReason:'';if(!add.disabled)add.addEventListener('click',addItem);
+  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.disabled=Boolean(disabled);add.title=add.disabled?disabledReason:'';if(!add.disabled)add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
   if(!items.length)list.append(node('p','checklist-empty','No items in this stage'));
@@ -613,7 +612,7 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     primary.append(ready,stages,owners);
     const hisCard=owners.querySelector('.checklist-owner-his');
     const hersCard=owners.querySelector('.checklist-owner-hers');
-    if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'blue',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','blue')})});
+    if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'sky',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','blue')})});
     if(hersCard)makeExpandableCard(hersCard,{host:main,title:'Her Needs & Wants',tone:'magenta',bodyBuilder:()=>ownerExpandedBody({title:'HERS',subtitle:'NEEDS & WANTS',items:model.hers,tone:'hers',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('kym','magenta')})});
     const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'green'}),model.activeDestinationId);
     const destinationScopeLabel=model.nextDestination?'Tasks specific to the next destination.':model.checklistDestination?'Tasks specific to the current destination.':'Tasks for a planned destination.';
@@ -623,7 +622,7 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     makeExpandableCard(destinationPanel,{host:main,title:'Destination Checklist',tone:'sky',bodyBuilder:()=>checklistExpandedBody({title:'Destination Checklist',subtitle:destinationScopeLabel,items:model.stageDestination,stateService,openEditor:openDestination,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'sky'}),scopeItineraryId:model.activeDestinationId,disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'})});
     primary.append(requiredGrid);
     const overview=renderOverview(model), nextDestination=renderNextDestinationCard(model,navigate);
-    makeExpandableCard(overview,{host:main,title:'Checklist Overview',tone:'teal',bodyBuilder:()=>overviewExpandedBody(model)});
+    makeExpandableCard(overview,{host:main,title:'Checklist Overview',tone:'neutral',bodyBuilder:()=>overviewExpandedBody(model)});
     if(model.nextDestination) makeExpandableCard(nextDestination,{host:main,title:'Next Destination',tone:'indigo',bodyBuilder:()=>nextDestinationExpandedBody(model,stateService,openDestination,navigate)});
     const rail=node('aside','checklist-reference-rail'); rail.setAttribute('aria-label','Checklist summary'); rail.append(overview,nextDestination);
     const layout=node('section','checklist-layout-grid'); layout.append(primary,rail);

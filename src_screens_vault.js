@@ -133,7 +133,7 @@ function openUnlockDialog({ stateService, host, access, requestRender }) {
   const field = inputField('Vault PIN', 'pin', 'password', '');
   const input = field.querySelector('input'); input.inputMode = 'numeric'; input.autocomplete = 'one-time-code'; input.pattern='[0-9]*'; input.maxLength = 8; input.classList.add('tcc-pin-input');
   const error = node('p', 'vault-form-error'); body.append(field, error);
-  const modal = createModal({ title:'Unlock The Vault', body, className:'tone-blue', actions:[
+  const modal = createModal({ title:'Unlock The Vault', body, className:'tone-neutral', actions:[
     { label:'Cancel', onClick:dialog => dialog.close() },
     { label:'Unlock', onClick:async dialog => {
       try {
@@ -166,13 +166,10 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
   function populate(v) {
     error.textContent='';
     fields.replaceChildren(selectField('Category','category',CATEGORY_OPTIONS,v.category), inputField('Title','title','text',v.title), selectField('Owner','owner',OWNER_OPTIONS,v.owner), inputField('Reference / Number','reference','text',v.reference), inputField('Issue / Start Date','issueDate','date',v.issueDate), inputField('Expiry / End Date','expiryDate','date',v.expiryDate), textAreaField('Details','details',v.details), textAreaField('Notes','notes',v.notes));
-    const categorySelect=fields.querySelector('[name="category"]');
-    categorySelect?.addEventListener('change',()=>{ setModalTone(modal,VAULT_TONES[categorySelect.value]||editorTone||'blue'); });
-    setModalTone(modal,VAULT_TONES[v.category] || editorTone || 'blue');
   }
   populate(saved);
   const actions=[];
-  if (existing) actions.push({ label:'Delete', kind:'danger', onClick:dialog => confirmDestructive({ title:'Delete Vault record', message:`Delete ${vaultRecordContext(existing,{includeCategory:true})} and its screenshot attachments? This cannot be undone.`, tone:VAULT_TONES[body.querySelector('[name="category"]')?.value || saved.category] || editorTone || 'blue', onConfirm:() => { const assetKeys=stateService.snapshot().attachments.filter(item=>item.vaultRecordId===existing.id).map(item=>item.assetKey).filter(Boolean); stateService.commit(draft => deleteVaultRecordDraft(draft, existing.id)); void stateService.removeVaultAssets?.(assetKeys); if (dialog.isConnected && dialog.open) dialog.close(); } }) });
+  if (existing) actions.push({ label:'Delete', kind:'danger', onClick:dialog => confirmDestructive({ title:'Delete Vault record', message:`Delete ${vaultRecordContext(existing,{includeCategory:true})} and its screenshot attachments? This cannot be undone.`, tone:'red', onConfirm:() => { const assetKeys=stateService.snapshot().attachments.filter(item=>item.vaultRecordId===existing.id).map(item=>item.assetKey).filter(Boolean); stateService.commit(draft => deleteVaultRecordDraft(draft, existing.id)); void stateService.removeVaultAssets?.(assetKeys); if (dialog.isConnected && dialog.open) dialog.close(); } }) });
   actions.push(
     { label:'Undo Changes', onClick:() => populate(session.undo()) },
     { label:'Cancel', onClick:dialog => { session.cancel(); dialog.close(); } },
@@ -195,7 +192,8 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
     } }
 
   );
-  modal = createModal({ title:existing?'Edit Vault Record':'Add Vault Record', body, actions, className:`tcc-editor-modal tcc-vault-editor-modal tone-${VAULT_TONES[saved.category] || editorTone || 'blue'}` });
+  modal = createModal({ title:existing?'Edit Vault Record':'Add Vault Record', body, actions, className:'tcc-editor-modal tcc-vault-editor-modal tone-neutral' });
+  setModalTone(modal,'neutral');
   modalHost(host, modal);
 }
 
@@ -225,7 +223,7 @@ function openAttachmentPicker({ stateService, host, record }) {
       const list=node('div','vault-attachment-stage-list');
       for(const item of prepared){const row=node('div','vault-attachment-stage-row');const img=document.createElement('img');img.src=item.dataUrl;img.alt='';row.append(img,node('span','',item.name));list.append(row);} body.append(list);
       const error=node('p','vault-form-error'); body.append(error);
-      const modal=createModal({title:'Add Screenshots',body,className:`tcc-editor-modal tcc-vault-editor-modal tone-${VAULT_TONES[record.category] || 'blue'}`,actions:[
+      const modal=createModal({title:'Add Screenshots',body,className:'tcc-editor-modal tcc-vault-editor-modal tone-neutral',actions:[
         {label:'Cancel',onClick:d=>d.close()},
         {label:'Save Screenshots',onClick:async d=>{
           const staged=[];
@@ -270,9 +268,9 @@ function openStreamingEditor({ stateService, host, recordId = null, editorTone =
   const capture=()=>({service:value('service'),owner:value('owner'),username:value('username'),password:value('password'),notes:value('notes')});
   const populate=v=>{error.textContent='';fields.replaceChildren(inputField('Service','service','text',v.service),selectField('Owner','owner',OWNER_OPTIONS,v.owner),inputField('Username / Login','username','text',v.username),inputField('Password','password','password',v.password),textAreaField('Notes','notes',v.notes));}; populate(saved);
   const actions=[];
-  if(existing) actions.push({label:'Delete',kind:'danger',onClick:dialog=>confirmDestructive({title:'Delete Streaming record',message:`Delete ${existing.service} · ${existing.owner || 'Shared'}${existing.username ? ` · ${existing.username}` : ''}? This cannot be undone.`,tone:editorTone || 'violet',onConfirm:()=>{stateService.commit(draft=>deleteStreamingDraft(draft,existing.id));if(dialog.isConnected&&dialog.open)dialog.close();}})});
+  if(existing) actions.push({label:'Delete',kind:'danger',onClick:dialog=>confirmDestructive({title:'Delete Streaming record',message:`Delete ${existing.service} · ${existing.owner || 'Shared'}${existing.username ? ` · ${existing.username}` : ''}? This cannot be undone.`,tone:'neutral',onConfirm:()=>{stateService.commit(draft=>deleteStreamingDraft(draft,existing.id));if(dialog.isConnected&&dialog.open)dialog.close();}})});
   actions.push({label:'Undo Changes',onClick:()=>populate(session.undo())},{label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},{label:'Save',onClick:dialog=>{try{const draftValue=session.update(draft=>Object.assign(draft,capture()));stateService.commit(draft=>saveStreamingDraft(draft,{recordId:existing?.id||null,fields:draftValue},{now:stateService.now}));session.markSaved(draftValue);if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}});
-  modalHost(host,createModal({title:existing?'Edit Streaming':'Add Streaming',body,actions,className:`tcc-editor-modal tcc-vault-editor-modal tone-${editorTone || 'violet'}`}));
+  modalHost(host,createModal({title:existing?'Edit Streaming':'Add Streaming',body,actions,className:'tcc-editor-modal tcc-vault-editor-modal tone-neutral'}));
 }
 
 function openEmailEditor({ stateService, host, recordId = null }) {
@@ -283,9 +281,9 @@ function openEmailEditor({ stateService, host, recordId = null }) {
   const capture=()=>({owner:value('owner'),email:value('email'),notes:value('notes')});
   const populate=v=>{error.textContent='';fields.replaceChildren(selectField('Owner','owner',OWNER_OPTIONS,v.owner),inputField('Email Address','email','email',v.email),textAreaField('Notes','notes',v.notes));}; populate(saved);
   const actions=[];
-  if(existing) actions.push({label:'Delete',kind:'danger',onClick:dialog=>confirmDestructive({title:'Delete protected email',message:`Delete ${existing.email}? This cannot be undone.`,tone:'magenta',onConfirm:()=>{stateService.commit(draft=>deleteProtectedEmailDraft(draft,existing.id));if(dialog.isConnected&&dialog.open)dialog.close();}})});
+  if(existing) actions.push({label:'Delete',kind:'danger',onClick:dialog=>confirmDestructive({title:'Delete protected email',message:`Delete ${existing.email}? This cannot be undone.`,tone:'neutral',onConfirm:()=>{stateService.commit(draft=>deleteProtectedEmailDraft(draft,existing.id));if(dialog.isConnected&&dialog.open)dialog.close();}})});
   actions.push({label:'Undo Changes',onClick:()=>populate(session.undo())},{label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},{label:'Save',onClick:dialog=>{try{const draftValue=session.update(draft=>Object.assign(draft,capture()));stateService.commit(draft=>saveProtectedEmailDraft(draft,{recordId:existing?.id||null,fields:draftValue},{now:stateService.now}));session.markSaved(draftValue);if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}});
-  modalHost(host,createModal({title:existing?'Edit Protected Email':'Add Protected Email',body,actions,className:'tcc-editor-modal tcc-vault-editor-modal tone-magenta'}));
+  modalHost(host,createModal({title:existing?'Edit Protected Email':'Add Protected Email',body,actions,className:'tcc-editor-modal tcc-vault-editor-modal tone-neutral'}));
 }
 
 function renderLocked(main, stateService, access, requestRender) {
@@ -416,12 +414,12 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const emergency=node('section','vault-emergency-card vault-emergency-travel-card'); emergency.append(node('h2','','Emergency Travel Card'));
   const countryFact=node('div','vault-travel-fact vault-travel-country');const countryCopy=node('span','vault-travel-fact-copy');countryCopy.append(node('small','','CURRENT COUNTRY'),node('strong','',currentCountry));countryFact.append(countryCopy);emergency.append(countryFact,travelFact('LOCAL EMERGENCY',localEmergency,'Not stored'),travelFact('AUSTRALIAN EMBASSY / CONSULATE',embassy,'Not stored'),travelFact('INSURANCE ASSISTANCE',insuranceAssist,'Not stored'));lower.append(emergency);
   const contacts=node('section','vault-emergency-contacts');const contactHead=node('div','vault-section-head');contactHead.append(node('h2','','Emergency Contacts'),node('span','vault-count',String(allEmergencyRecords.length)));contacts.append(contactHead);const contactList=node('div','vault-emergency-contact-list');if(!allEmergencyRecords.length)contactList.append(node('p','vault-empty','No emergency contacts stored'));for(const r of allEmergencyRecords.slice(0,4)){const row=node('button','vault-emergency-contact-row');row.type='button';const icon=vaultCategoryIcon('emergency');const copy=node('span','vault-emergency-contact-copy');copy.append(node('strong','',r.title),node('small','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(icon,copy);row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(r));contactList.append(row);}contacts.append(contactList);lower.append(contacts);main.append(lower);
-  const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'indigo'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
-  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'gold',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
+  const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'neutral'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
+  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
   makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'red',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
-  makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'indigo',bodyBuilder:()=>vaultActivityExpandedBody(state)});
+  makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'sky',bodyBuilder:()=>vaultActivityExpandedBody(state)});
 }
-function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tone-blue'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
+function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tone-neutral'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
 
 function renderCategory(main,stateService,access,requestRender){
   const state=stateService.snapshot();const model=buildVaultViewModel(state,{unlocked:true,activeSection:access.activeSection});const category=access.activeSection;
@@ -499,9 +497,9 @@ function openStreamingDetail({ stateService, host, recordId }) {
   body.append(hero,facts);
   if(record.notes){const notes=node('div','vault-streaming-detail-notes');notes.append(node('small','','Notes'),node('p','',record.notes));body.append(notes);}
   const dialog=createModal({title:'TV & Movies',body,actions:[
-    {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openStreamingEditor({stateService,host,recordId:record.id,editorTone:'violet'}));}},
+    {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openStreamingEditor({stateService,host,recordId:record.id,editorTone:'neutral'}));}},
     {label:'Close',onClick:d=>d.close()}
-  ],className:'tcc-expanded-modal tone-violet vault-streaming-detail-modal'});
+  ],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-neutral vault-streaming-detail-modal'});
   modalHost(host,dialog);
 }
 
@@ -518,7 +516,7 @@ function renderStreaming(main,stateService,access,requestRender){
     const tile=node('button',`vault-streaming-tile${record?' is-stored':' is-empty'}`);tile.type='button';
     tile.append(streamingServiceMark(service),node('span','vault-streaming-tile-name',service),node('small','vault-streaming-tile-status',record?`${record.owner||'Shared'} · STORED`:'ADD LOGIN'));
     tile.setAttribute('aria-label',record?`Open saved ${streamingRecordContext(record)}`:`Add streaming login for ${service}`);
-    tile.addEventListener('click',()=>record?openStreamingDetail({stateService,host:main,recordId:record.id}):openStreamingEditor({stateService,host:main,presetService:service,editorTone:'violet'}));
+    tile.addEventListener('click',()=>record?openStreamingDetail({stateService,host:main,recordId:record.id}):openStreamingEditor({stateService,host:main,presetService:service,editorTone:'neutral'}));
     grid.append(tile);
   }
   main.append(grid);

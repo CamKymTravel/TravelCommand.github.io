@@ -36,7 +36,7 @@ function openGeneralEditor({stateService,host,currentDate}) {
   const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
   const capture=()=>({journeyStartDate:value('journeyStartDate')||null,defaultCurrency:value('defaultCurrency'),annualBudgetAUD:value('annualBudgetAUD'),annualBudgetYear:saved.annualBudgetYear});
   const populate=v=>{error.textContent='';fields.replaceChildren(inputField('Journey Start','journeyStartDate','date',v.journeyStartDate),inputField('Default Currency','defaultCurrency','text',v.defaultCurrency),inputField(`Annual Budget ${saved.annualBudgetYear} (AUD)`,'annualBudgetAUD','number',v.annualBudgetAUD));const currency=fields.querySelector('[name="defaultCurrency"]');currency.maxLength=3;currency.autocapitalize='characters';const budget=fields.querySelector('[name="annualBudgetAUD"]');budget.min='0';budget.step='0.01';};populate(saved);
-  const modal=createModal({title:'Travel & Budget Defaults',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-blue',actions:[
+  const modal=createModal({title:'Travel & Budget Defaults',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
     {label:'Undo Changes',onClick:()=>populate(session.undo())},
     {label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},
     {label:'Save',onClick:dialog=>{try{const draftValue=session.update(draft=>Object.assign(draft,capture()));stateService.commit(draft=>saveGeneralSettingsDraft(draft,draftValue));session.markSaved(draftValue);if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
@@ -51,7 +51,7 @@ function openSchengenEditor({stateService,host}) {
   for(const name of ['daysUsed','daysRemaining']){const input=fields.querySelector(`[name="${name}"]`);input.min='0';input.max='90';input.step='1';}
   const noteWrap=node('label','settings-field settings-field-wide');noteWrap.append(node('span','','Notes'));const note=document.createElement('textarea');note.name='note';note.rows=3;note.value=saved.note;noteWrap.append(note);fields.append(noteWrap);
   const capture=()=>Object.fromEntries(['status','daysUsed','daysRemaining','entryDate','plannedExitDate','mustLeaveByDate','lastCheckedDate','note'].map(name=>[name,body.querySelector(`[name="${name}"]`)?.value??'']));
-  const modal=createModal({title:'Schengen Status · Manual / Offline',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-teal',actions:[{label:'Cancel',onClick:d=>d.close()},{label:'Save',onClick:d=>{try{stateService.commit(draft=>saveSchengenSettingsDraft(draft,capture()));if(d.isConnected&&d.open)d.close();}catch(err){error.textContent=err.message;}}}]});modalHost(host,modal);
+  const modal=createModal({title:'Schengen Status · Manual / Offline',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[{label:'Cancel',onClick:d=>d.close()},{label:'Save',onClick:d=>{try{stateService.commit(draft=>saveSchengenSettingsDraft(draft,capture()));if(d.isConnected&&d.open)d.close();}catch(err){error.textContent=err.message;}}}]});modalHost(host,modal);
 }
 
 function schengenFact(label,value){const display=value==null||value===''?'—':value;return node('div','settings-fact',`${label}
@@ -64,7 +64,7 @@ function openPinEditor({stateService,host}) {
   const body=node('div','settings-editor');const fields=node('div','settings-form-grid settings-pin-grid');const error=node('p','settings-form-error');body.append(fields,error);
   if(enabled)fields.append(pinInput('Current PIN','currentPin'));
   fields.append(pinInput('New PIN','newPin'),pinInput('Confirm New PIN','confirmPin'));
-  const modal=createModal({title:enabled?'Change PIN':'Set PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-indigo',actions:[
+  const modal=createModal({title:enabled?'Change PIN':'Set PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
     {label:'Cancel',onClick:dialog=>dialog.close()},
     {label:'Save PIN',onClick:async dialog=>{try{const current=body.querySelector('[name="currentPin"]')?.value||'';const next=body.querySelector('[name="newPin"]').value;const confirm=body.querySelector('[name="confirmPin"]').value;if(enabled&&!(await verifyPin(current,state.settings.pinHash)))throw new Error('Current PIN is incorrect');if(next!==confirm)throw new Error('New PIN entries do not match');const hashed=await hashPin(next);stateService.commit(draft=>enablePinDraft(draft,hashed));if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
   ]});modalHost(host,modal);
@@ -72,7 +72,7 @@ function openPinEditor({stateService,host}) {
 
 function openDisablePin({stateService,host}) {
   const state=stateService.snapshot();const body=node('div','settings-editor');const field=pinInput('Current PIN','currentPin');const error=node('p','settings-form-error');body.append(field,error);
-  const modal=createModal({title:'Disable PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-indigo',actions:[
+  const modal=createModal({title:'Disable PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
     {label:'Cancel',onClick:dialog=>dialog.close()},
     {label:'Disable PIN',kind:'danger',onClick:async dialog=>{try{const current=body.querySelector('[name="currentPin"]').value;if(!(await verifyPin(current,state.settings.pinHash)))throw new Error('Current PIN is incorrect');stateService.commit(draft=>disablePinDraft(draft));if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
   ]});modalHost(host,modal);
@@ -137,9 +137,14 @@ function renderHealth(stateService,currentDate,host){
   const scoreCopy=node('span','settings-health-score-copy');scoreCopy.append(node('strong','',scoreTitle),node('small','',`${model.verifiedCount}/${model.checks.length} · ${scoreLabel}`));
   const pulse=document.createElementNS('http://www.w3.org/2000/svg','svg');pulse.setAttribute('class','settings-health-pulse-line');pulse.setAttribute('viewBox','0 0 90 32');pulse.setAttribute('aria-hidden','true');const pulsePath=document.createElementNS('http://www.w3.org/2000/svg','path');pulsePath.setAttribute('d','M2 18h18l5-9 7 18 8-25 10 28 8-12h30');pulse.append(pulsePath);
   score.append(scoreIcon,scoreCopy,pulse);hero.append(healthBrand,score);panel.append(hero);
-  const run=node('button',`settings-health-run settings-health-run-${displayStatus}`); run.type='button'; run.append(createLineIcon(!recheckOnly&&model.status==='verified'?'check':'plus'),document.createTextNode(' CHECK THE WHOLE APP')); run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();const checked=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});if(checked.status!=='needs-attention')stateService.markAppHealthChecked?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
-  const healthTones=['teal','blue','indigo','violet','orange','green','magenta','gold','sky'];
+  const run=node('button',`settings-health-run settings-health-run-${displayStatus}`); run.type='button';
+  const runLabel=node('span','settings-health-run-label','CHECK THE WHOLE APP');
+  const runPulse=document.createElementNS('http://www.w3.org/2000/svg','svg');runPulse.setAttribute('class','settings-health-run-pulse');runPulse.setAttribute('viewBox','0 0 170 30');runPulse.setAttribute('aria-hidden','true');
+  const runPulsePath=document.createElementNS('http://www.w3.org/2000/svg','path');runPulsePath.setAttribute('d','M2 17h32l7-10 9 20 9-26 13 29 10-13h22l7-8 8 16 8-22 11 25 9-11h22');runPulse.append(runPulsePath);
+  run.append(createLineIcon(!recheckOnly&&model.status==='verified'?'check':'plus'),runLabel,runPulse);
+  run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.classList.add('is-running');runLabel.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();const checked=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});if(checked.status!=='needs-attention')stateService.markAppHealthChecked?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
   const grid=node('div','settings-health-grid');for(const [index,item] of model.checks.entries()){
+    const healthTone=item.status==='verified'?'green':item.status==='not-configured'?'gold':'red';
     const card=node('article',`settings-health-card settings-health-card-${item.status}`);
     const icon=node('span','settings-health-icon'); icon.append(createLineIcon(HEALTH_ICONS[item.label]||'check'));
     const cardCopy=node('div','settings-health-card-copy');cardCopy.append(node('strong','',item.label),node('p','',item.summary));
@@ -147,7 +152,7 @@ function renderHealth(stateService,currentDate,host){
     card.append(icon,cardCopy,status);
     if(item.issues.length>1){const details=document.createElement('details');const summary=node('summary','',`${item.issues.length} details`);details.append(summary);const list=document.createElement('ul');for(const issue of item.issues){const li=document.createElement('li');li.textContent=issue;list.append(li);}details.append(list);card.append(details);}
     grid.append(card);
-    makeExpandableCard(card,{host,title:item.label,tone:healthTones[index]||'blue'});
+    makeExpandableCard(card,{host,title:item.label,tone:healthTone});
   }panel.append(grid);return panel;
 }
 
@@ -243,11 +248,11 @@ export function renderSettingsScreen({stateService,currentDate,vaultAccessSessio
   // information groups stay local to Settings and enlarge read-only; explicit
   // Edit/Backup actions retain their existing semantics inside the snapshot.
   const settingsExpanders=[
-    [defaults,'Travel & Budget Defaults','blue','defaults'],
-    [schengen,'Schengen Status','teal','schengen'],
+    [defaults,'Travel & Budget Defaults','sky','defaults'],
+    [schengen,'Schengen Status','green','schengen'],
     [security,'Security','indigo','security'],
-    [backup,'Backup & Restore','gold','backup'],
-    [info,'App Status','slate','application']
+    [backup,'Backup & Restore','teal','backup'],
+    [info,'App Status','neutral','application']
   ];
   for(const [panel,title,tone,kind] of settingsExpanders) makeExpandableCard(panel,{host:main,title,tone,bodyBuilder:()=>settingsExpandedBody(kind,state,currentDate)});
   return main;

@@ -2,11 +2,11 @@ import { toISODate } from './src_core_dates.js';
 
 const DEFAULTS = Object.freeze({
   mode:'production',
-  storageKey:'tcc:v1:state',
+  storageKey:'./v1:state',
   currentDate:null,
   fixtureUrl:null,
   seedIfEmpty:false,
-  serviceWorkerUrl:'./sw.js?v=56-r7.2-forward-continuity-regression-2026-09-13-s24'
+  serviceWorkerUrl:'./sw.js?v=57-r7.2-forward-preipad-simulation-2026-09-14-s37'
 });
 
 export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? null) {
