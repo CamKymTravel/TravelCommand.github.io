@@ -1,27 +1,27 @@
 {
-  "contractVersion": "V60-R7.3-S39-screen-closure-2026-09-15",
-  "packageRole": "S39 fully screen-rechecked physical-iPad acceptance candidate — NOT FINAL MASTER until all remaining real-iPad gates are passed.",
-  "principle": "S39 is the forward-only authority. S38/S37/S36/S35/S34/S33 are historical inputs only. Never replace current S39 fixes with an older checkpoint.",
+  "contractVersion": "V60-R7.4-S40-physical-ipad-closure-2026-09-15",
+  "packageRole": "S40 forward correction candidate after Cameron’s 15 September physical-iPad review — NOT FINAL MASTER until the corrected screens and behaviours are rechecked on the iPad.",
+  "principle": "S40 is the forward-only authority. S39 and all earlier checkpoints are historical inputs only. Never replace current S40 fixes with an older checkpoint.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
-    "maxFiles": 103,
+    "maxFiles": 104,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s38-real-ipad",
+    "storageKey": "tcc:v1:istanbul-full-simulation-s40-real-ipad",
     "manifestId": "./tokyo-4year-full-simulation-s38",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v60-r7.3-screen-closure-2026-09-15-s39",
-    "appVersion": "1.2.0-v60-r7.3-simulation-s39",
-    "buildMarker": "v60-r7.3-screen-closure-2026-09-15-s39"
+    "cacheName": "tcc-v1-v60-r7.4-physical-ipad-closure-2026-09-15-s40",
+    "appVersion": "1.2.0-v60-r7.4-simulation-s40",
+    "buildMarker": "v60-r7.4-physical-ipad-closure-2026-09-15-s40"
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s38-real-ipad",
-    "cacheName": "tcc-v1-v60-r7.3-screen-closure-2026-09-15-s39",
-    "buildMarker": "v60-r7.3-screen-closure-2026-09-15-s39",
-    "serviceWorkerUrl": "./sw.js?v=60-r7.3-screen-closure-2026-09-15-s39"
+    "storageKey": "tcc:v1:istanbul-full-simulation-s40-real-ipad",
+    "cacheName": "tcc-v1-v60-r7.4-physical-ipad-closure-2026-09-15-s40",
+    "buildMarker": "v60-r7.4-physical-ipad-closure-2026-09-15-s40",
+    "serviceWorkerUrl": "./sw.js?v=60-r7.4-physical-ipad-closure-2026-09-15-s40"
   },
   "sourceAuthority": {
-    "authority": "S39 screen-by-screen current-source closure authority, fixed forward from the sealed S38 real-iPad correction baseline on 15 September 2026",
+    "authority": "S40 physical-iPad review correction authority, fixed forward from the S39 screen-closure source on 15 September 2026",
     "forwardOnly": true,
     "predecessorsAreHistory": [
       "S38",
@@ -31,7 +31,7 @@
       "S34",
       "S33"
     ],
-    "provenance": "S39 continues forward from S38 and incorporates current-source closure of all nine screens, Home stillness software lock, viewport-based colour uniqueness, App Health red-to-green behaviour, direct one-tap Itinerary editing, accessibility corrections, data-safety assurance, and full post-change regression. The PWA cache/build identity is advanced to v60 so the real-iPad acceptance run cannot reuse an earlier S39 candidate; storage key and manifest id remain intentionally stable for continuity."
+    "provenance": "S40 continues forward from S39 and incorporates Cameron’s physical-iPad review corrections: stronger coloured Reservations/Vault category tiles with white counts; read-only Home Trip Timeline expansion; editable manual bank accounts; removal of Reservations Health and Calendar Sync Check; Home-only Schengen; calmer Calendar agenda rails; calmer Itinerary and Journey History rows; category-coloured lifetime-spend bars; fuller automatic milestones; Ready-to-Move hierarchy/progress corrections; viewport colour redistribution; and portrait-only icon navigation while landscape retains icon + text labels. Storage is intentionally isolated to the S40 Istanbul simulation during acceptance testing."
   },
   "hardVisualRules": [
     "Every expanded widget preserves the same colour family as its collapsed/original widget.",
@@ -55,11 +55,23 @@
     "All photographic page headers use one consistent physical height across iPad screens; only image/title/content identity changes.",
     "Within any single visible viewport, top-level widgets/cards visible together must have clearly distinct colour identities; the same or near-same colour may be reused only when those widgets cannot be visible together.",
     "App Health detail cards use distinct visual card identities while their status dots/labels remain semantic green/amber/red; expanded App Health cards preserve their source card identity.",
-    "Home is a fixed one-screen command centre: the normal main canvas must not document-scroll or drift; only intentionally expanded modal content may scroll internally."
+    "Home is a fixed one-screen command centre: the normal main canvas must not document-scroll or drift; only intentionally expanded modal content may scroll internally.",
+    "In portrait/upright iPad mode the fixed sidebar is icon-only to reclaim form width; in landscape the same sidebar retains both icons and visible text labels.",
+    "Itinerary Upcoming and Completed rows stay predominantly dark/neutral with one restrained identity accent; normal budget amounts are white and only Budget Not Set/setup-required states use amber.",
+    "Journey History Completed Stays & Trips follows the same calm, high-contrast row language as Itinerary, with restrained travel-type accents rather than multiple competing coloured labels/values.",
+    "Booked Reservations and The Vault top category cards use Journey History-strength coloured card/icon identities while their large numeric counts remain white.",
+    "Home Trip Timeline expands only into the full forward read-only timeline; it does not offer nested itinerary editing/navigation from the Home widget.",
+    "Budget Accounts is a manual/offline snapshot with Add/Edit/Delete available from the enlarged Accounts manager; transfers and live bank connections remain out of scope.",
+    "Reservation Health Check is not shown on Reservations; whole-app App Health exists only in Settings.",
+    "Calendar has no Sync Check panel; Agenda rows use one destination/travel colour marker only, with event kind conveyed by text/icon semantics.",
+    "Schengen Status exists only on Home. Settings must not duplicate a Schengen Status card or editor.",
+    "Expanded Lifetime Travel Spend uses a distinct category colour for each category bar instead of one outer-widget colour for every bar.",
+    "Journey milestones are automatic and information-rich enough to fill their card without a manual favourite-destination field.",
+    "Ready to Move uses explicit semantic hierarchy: overall not-ready red/coral, remaining work amber, completed/zero-overdue green, active-stage informational blue, plus a visible readiness progress summary."
   ],
   "screenClosureRegister": {
     "Home": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "all main widgets",
         "all expanders",
@@ -67,29 +79,31 @@
         "Phrase Helper",
         "Alerts",
         "Upcoming Events",
-        "timeline detail",
-        "search/global navigation",
+        "Home-only Schengen",
+        "read-only full Trip Timeline",
+        "global search",
         "1024 clipping lock",
-        "launch underlay",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     },
     "Itinerary": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "Standard",
         "Home Visit",
         "Motorhome",
         "Cruise",
         "row detail",
-        "destination colours",
+        "calm neutral Upcoming rows",
+        "calm neutral Completed rows",
+        "Budget Not Set amber-only state",
         "year/search/filter/pagination",
         "edit/undo/delete",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     },
     "Budget": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "Destination Budget",
         "Destination Budgets manager",
@@ -98,53 +112,58 @@
         "living categories",
         "annual overview",
         "reservations detail",
-        "Accounts read-only",
+        "Accounts manual Add/Edit/Delete manager",
         "charts",
         "Recent Expense Entries",
         "summary glyph clipping lock",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     },
     "Reservations": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
-        "8 category tiles",
+        "8 category tiles with white counts",
         "Completed",
         "Next 5",
         "Add/Edit/Undo/Delete",
         "allocation routing",
         "AUD conversion",
-        "Reservation Health Check",
-        "current-source viewport colour uniqueness"
+        "Reservation Health removed",
+        "viewport colour uniqueness"
       ]
     },
     "Calendar": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "month",
         "agenda",
+        "single agenda colour marker",
         "day view",
-        "destination/travel rails",
+        "destination/travel identity",
         "event/reminder/note detail",
         "add/edit",
         "legend",
+        "Sync Check removed",
         "44px day/legend controls",
         "navigation",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     },
     "Journey History": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
-        "rows",
-        "travel-mode detail colours",
+        "summary",
+        "fuller automatic milestones",
+        "category-coloured lifetime-spend expansion",
+        "calm Completed Stays rows",
         "search/filter/pagination",
         "journey map/detail",
-        "current-source viewport colour uniqueness"
+        "travel-mode identity",
+        "viewport colour uniqueness"
       ]
     },
     "Checklist": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "Permanent",
         "Destination",
@@ -153,74 +172,73 @@
         "Both",
         "task edit/actions",
         "stage controls",
-        "Ready-to-Move",
+        "Ready-to-Move semantic cards/progress",
         "Next Destination",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     },
     "The Vault": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "locked state",
         "three-tap unlock entry",
         "unlocked main",
-        "all categories",
+        "five stronger category tiles with white counts",
         "All Records",
         "Streaming",
         "record editor",
         "attachments",
-        "44px hero controls",
-        "baked-status mask",
-        "current-source viewport colour uniqueness"
+        "Emergency cards",
+        "viewport colour uniqueness"
       ]
     },
     "Settings": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
         "defaults",
-        "Schengen",
         "PIN entry",
         "backup/export/restore entry",
-        "App Health 9 cards",
+        "App Health only here",
+        "Schengen removed",
         "status-colour expansion",
-        "launch/runtime identity",
-        "current-source viewport colour uniqueness"
+        "runtime identity",
+        "viewport colour uniqueness"
       ]
     },
     "Global": {
-      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
+      "status": "IMPLEMENTED_S40_PENDING_FINAL_REGRESSION",
       "coverage": [
-        "sidebar/navigation",
+        "landscape sidebar icon + text",
+        "portrait sidebar icon-only",
         "runtime/cache identity",
         "PWA shell",
         "expanded colour matrix",
         "touch targets",
         "overflow",
         "clipping",
-        "dead space",
         "hidden editors",
         "non-widget controls",
         "launch transition",
-        "current-source viewport colour uniqueness"
+        "viewport colour uniqueness"
       ]
     }
   },
   "latestSoftwareEvidence": {
-    "exactSource": "56/56 PASS in the final current-S39 exact-source run after Phase 7 fixes.",
-    "targeted": "16/16 PASS in the final current-S39 targeted matrix.",
-    "priority": "4/4 PASS in the final current-S39 priority interaction lock.",
-    "expandedColour": "71/71 at 1024×768 and 71/71 at 1194×834; every expanded state matches its source tone in browser_s38.",
-    "touchTargets": "Zero visible action controls below the 44px iPad floor in the final current-S39 two-size browser gate.",
-    "mainOverflow": "Zero document-level horizontal overflow across all nine screens at both approved sizes.",
-    "expandedGeometry": "71/71 expanded/custom states contained at each approved size with zero horizontal modal overflow.",
-    "deadSpace": "Journey History desktop-iPad paired panels now stretch to matched row height; no known dead-slab regression remains.",
-    "hiddenEditors": "26 hidden editor/detail captures completed across the approved sizes with zero failures.",
-    "textClipping": "No known operational clipping remaining in the final current-S39 browser closure.",
-    "nonWidgetControls": "Reservations/Vault category icon tiles verified from exact-source render at both approved sizes.",
-    "launch": "v60 S39 cache/worker/build identities agree; stable storage key and manifest id intentionally retained for continuity; cold installed-iPad launch still requires physical confirmation.",
-    "postSealForensic": "Phase 35 current-source screen-by-screen closure: 123 software/render rules verified, 16 physical-iPad rules remain, 2 locked references.",
-    "screenByScreen": "All nine screens re-run current-source after final colour changes at 1024×768 and 1194×834; every screen-specific closure gate passes.",
-    "viewportColour": "Viewport-based colour uniqueness enforced across all nine screens; no same/near-same top-level widget identity visible together in audited viewports; expanded states retain source identity."
+    "exactSource": "S40 source guard PASS after the full current-chat correction set.",
+    "targeted": "S40 targeted source assertions PASS for all physical-iPad review corrections.",
+    "priority": "Core interaction regression PASS for fixture/view-model construction and Accounts Add/Edit/Delete mutation round trip.",
+    "expandedColour": "S40 source rules preserve expanded-source colour identity and add category-specific Lifetime Travel Spend bars; final two-size rerender pending.",
+    "touchTargets": "44px global touch-target lock retained; portrait sidebar navigation remains 56px high.",
+    "mainOverflow": "Portrait width reclamation implemented through a 76px icon-only sidebar; final full-screen overflow rerun pending.",
+    "expandedGeometry": "Existing expanded-modal geometry protections retained; final S40 matrix rerun pending.",
+    "deadSpace": "Journey Milestones increased to a 12-fact automatic grid and Ready-to-Move top hero uses its previous empty right side for readiness progress.",
+    "hiddenEditors": "Account Add/Edit/Delete added without changing Save/Cancel/Undo conventions; full hidden-editor rerun pending.",
+    "textClipping": "S40 calm-row changes and portrait sidebar were implemented specifically to improve scan/readability; final clipping matrix pending.",
+    "nonWidgetControls": "Reservations/Vault category tiles now retain coloured card identities with white counts.",
+    "launch": "S40 runtime/cache/build identities agree and all APP_SHELL references resolve; installed-iPad cold launch still requires recheck.",
+    "postSealForensic": "Working S40 source is sealed after guard, JS syntax, core model, account mutation and offline-shell checks. Final rendered matrix remains pending.",
+    "screenByScreen": "All user-identified corrections are represented in current source; final screen-by-screen regression is still required before another simulation handoff.",
+    "viewportColour": "S40 reduces Itinerary/Journey row colour noise and redistributes Settings/Vault/Checklist visible-card identities by viewport."
   },
   "physicalIpadAcceptance": [
     {
@@ -246,76 +264,126 @@
     {
       "id": "RES-009",
       "name": "Booked Reservations category icons use Journey History inset icon-tile benchmark with category-specific colours.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "CAL-005",
       "name": "Each day can display up to about five entries before overflow indicator; week/day height grows vertically.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "CAL-006",
       "name": "Dense reservations remain readable without crushed text.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "JH-003",
       "name": "Journey History map/year filters remain usable and consistent with the shared offline-map and travel-year filtering rules.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "JH-007",
       "name": "Lower analytics widgets use tight deliberate spacing with no large black gaps.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-005",
       "name": "Category icons use Journey History inset icon-tile benchmark with five distinct category colours.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-006",
       "name": "Locked and unlocked header use unified 230px rhythm.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-007",
       "name": "Unlocked action/status rail stays fully inside header bounds, no bottom cropping.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-008",
       "name": "Privacy/lock status is obvious and no sensitive content leaks while locked.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-009",
       "name": "PIN optional; three-tap/unlock flow behaves as approved.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "VAULT-011",
       "name": "Attachments/screenshots are understandable and usable offline.",
-      "status": "NOT_RUN"
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     },
     {
       "id": "SET-009",
       "name": "Backup/restore requires explicit replace-data confirmation and is safe.",
       "status": "NOT_RUN"
+    },
+    {
+      "id": "NAV-001",
+      "name": "Portrait/upright sidebar shows icons only and materially increases working width; landscape keeps icons plus text labels.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "HOME-015",
+      "name": "Trip Timeline opens only its full forward read-only timeline and does not route to an itinerary editor/detail action.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "BUD-010",
+      "name": "Accounts manager supports Add/Edit/Delete of manual balances; no transfers or live bank connection exist.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "RES-010",
+      "name": "Reservation Health Check is absent from Reservations; App Health remains Settings-only.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "CAL-007",
+      "name": "Agenda rows show one clear destination/travel colour marker only and Calendar contains no Sync Check panel.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "ITIN-010",
+      "name": "Upcoming and Completed Itinerary rows use calm neutral bodies, restrained identity accents, white normal budget values and amber only for Budget Not Set.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "JH-008",
+      "name": "Completed Stays matches the calmer Itinerary readability; Lifetime Travel Spend bars use category colours; Milestones is adequately filled with automatic facts.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "CHK-010",
+      "name": "Ready to Move uses clear semantic colour meaning and visible progress without dead space or competing purple wash.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "SET-010",
+      "name": "Schengen Status appears only on Home; Settings contains App Health, security, backup/restore and app status without duplicate Schengen UI.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
+    },
+    {
+      "id": "COL-001",
+      "name": "Visible adjacent widgets across affected screens do not duplicate the same or near-same colour identity in one viewport.",
+      "status": "RECHECK_REQUIRED_AFTER_S40"
     }
   ],
   "promotion": {
     "finalMaster": "BLOCKED",
-    "reason": "S39 is software-closed and screen-by-screen rechecked, but still requires the 16 physical-iPad acceptance rules before FINAL MASTER promotion."
+    "reason": "S40 contains the full physical-iPad review correction set but must be regression-tested and rechecked on the actual iPad before FINAL MASTER promotion."
   },
-  "handoffInstruction": "Continue only from this S39 source. Do not return to S38/S37/S36/S35/S34/S33. If any iPad gate fails, fix forward from S39, rerun the full regression protocol, reseal hashes, then repeat the failed iPad gate and dependent gates.",
+  "handoffInstruction": "Continue only from this S40 source. Do not return to S39/S38/S37/S36/S35/S34/S33. If any regression or iPad recheck fails, fix forward from S40, rerun the full regression protocol, reseal hashes, and repeat the failed gate plus dependent gates.",
   "knownExternalLimitations": [
     "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
   "sourceSeal": {
-    "algorithm": "sha256",
+    "identity": "v60-r7.4-physical-ipad-closure-2026-09-15-s40",
     "files": {
-      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "67705e0daeea5d82fcf2d9c55b765ab4021c64b85fce9f6cc1d65908899c3354",
+      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "945bba9d7ebc1c14c70fd68bb34903f6c1955cd5f6b23ed24ab0c5474266a325",
       "app-icon.png": "8d1fc2690d7ecec030092b0ab24f149eca21c4aaf38473e8c9984b6a4616ea25",
       "brand-bank-anz.png": "5f92a6b998b2306d9897b0a8490acab04963b56e28fa86a63b57d93bffdf746d",
       "brand-bank-commonwealth.png": "8352c7a15a7173711f40c4f6a8e6025d6320bf6114ac2edcd7f935d2977ba103",
@@ -340,8 +408,9 @@
       "brand-stream-youtube.png": "35e44729b587f99b9fc04b7ad491ccdf50bc1cf9aeeb5adb52a42f6a84048155",
       "header-assets.bin": "a71b391502c75b51e527924ae63cd34fcc4dabcecace811ca98fb311911da472",
       "header-index.json": "38b022200803f483f9bddbe3030f4162e1e96b5ac2a7e9ded9bd01498a9cc760",
-      "index.html": "490a8cb49354446da3b2bd3f8e1d7df5d861547b302e117bea7e88a041ceb2bc",
-      "manifest.webmanifest": "7b1c0047326fb38d8f7fedf671c6f6ff6d81995a45da44bd54a76d0ee60a7351",
+      "index.html": "279399377a32b716cfa75539a1456eb63d18cf3f1fe924fbc6bc43c9867665d9",
+      "istanbul-4year-simulation-fixture.json": "e7a40b5cccdde7f0a410d3d4e4db669557e6f9de24b4266b8e05581c75b31d74",
+      "manifest.webmanifest": "ef16e1daedb42084f2d3b2e752f1e6af5d3cf715b92189025ab32f15c2ca72e8",
       "src_components_confirmation.js": "132a3cd95febaf7794dfe1254fe5c80728b6de9bbbc5687798ab926e2101fe07",
       "src_components_country.js": "efc16620d8bcb97cb33e0741c93a5c431fdd2533f3d3f2345aa253d15cfba72c",
       "src_components_form-session.js": "481a117b89f925553e9e9ceac96f13ddcd634b4fdd663614b770ae3d00c9877d",
@@ -367,7 +436,7 @@
       "src_core_entities.js": "5394cde626c7113b4e23ef4d53e5fa05b05ec0fa6e3b8cc9fb7e0c7e4dbc43be",
       "src_core_expense-mutations.js": "0fb0c52fd5cf8175fc7747d4fd77c71f1b949e9b4293560217fcb19641ac062d",
       "src_core_global-search.js": "d522a0f7f7ba396a8977c2b74d75e9133b2b61a4635abd9a292b1b7c3a9bc1f6",
-      "src_core_home-alerts.js": "8c64ab934bfb0cbd2904cf79a170353aa5e6072428c7c9c81fb6805d7c429b07",
+      "src_core_home-alerts.js": "c2a4a31c1d2874b9910f16794ec8b44abb12186046b3ad5f784a306592baaaee",
       "src_core_home-view-model.js": "614eec955bc2462ac922adf41b5aad3f11789cc23673647c3513998daad255cc",
       "src_core_ids.js": "6c842e8d3a6c2320bd85da2f3d06df73a55fae700984821d605ca8a8dd59e085",
       "src_core_itinerary-mutations.js": "aa57c0a9b5625af0d265478e14d14eaf095152b9bd009e71ca3312c41b4c909e",
@@ -382,7 +451,7 @@
       "src_core_reservation-mutations.js": "4fa296e048ab41d8aa8e759fb004f1605446c2440b726e6ee84be1d62b6020c7",
       "src_core_reservations-view-model.js": "5cc2ea9cf2eac29795f9cc24410461f3ebe0940de55b82127bc27f8c0bfb6af0",
       "src_core_restore.js": "264270bbe8f4da5981bfd10dcceb2f98ca1a33a7314e75497ff7a4f9f51dd89b",
-      "src_core_runtime-config.js": "155e43ed8e9ca6c30e5c3767ca5cbd650f62472644d3876ac06ba0300b02ef06",
+      "src_core_runtime-config.js": "2e4e57ce3b29aac69c4b7d8a2e385f2e13d4a25a85d468ecef074ba5303b768f",
       "src_core_schema.js": "a96c8ba448f7cf88d78f40bda1e49ef788195da961294dda6a2ff74700097f19",
       "src_core_schengen.js": "4eba8372eb779430afa2f2b66b4a74ab65142b31718af9606d412fe522f909ee",
       "src_core_settings-mutations.js": "5a0b9f77161470062317d02aecc3dd918c882a54bdfdb54a0f3a9706980ac1d6",
@@ -397,44 +466,42 @@
       "src_design_app.css": "2826f7f3c20d2fe95b5a8089e26e1a89866ae5937a9bbe73fbb2f77f46db4b50",
       "src_design_components.css": "bb7e057c7aab13acb302810892613e879540a324512c78f31f009e862fb34738",
       "src_design_finish-pass.css": "a7369aede6c8db9b03ce64cc77eba53a853f1dc234443800b3aa6a363967ce2b",
-      "src_design_locked_contract.css": "0199049e3fa211809a396f825f467871f78eb887c415e81eba5624dcf594b3b1",
+      "src_design_locked_contract.css": "64335806825c35e08acff131346ee8050904ea4a836a0d4f0cb4f86bbbd761fd",
       "src_design_reference-pass.css": "cb5b02ec7917ecca9f564008474e7a6ce1e4dab9c642ca0c7371b9ff458cd5e0",
       "src_design_reset.css": "8be44e4016b1e6f22ec110d7a8e59f1863c191280746a9369e69a0ac02b61dae",
       "src_design_screens.css": "90be72002426b72336c50f846b775ba7b9969619a0c9b683c4547b073c51401f",
       "src_design_tokens.css": "24557420215f36757406eeba64792ae0bd561dfe64928e090224603d63926d64",
-      "src_main.js": "d26158053340e3a6c9869213f87e0bdb49d1f4f933325ea37f6264387d0bcb03",
-      "src_screens_budget.js": "106a2850d608aa05c9a84b01b4a7f6606c77870f7a1d39ebb4ac699a99e2f806",
-      "src_screens_calendar.js": "4e355062b45dfa30f1c44cf032dc0ebe03c662db0db8bba4c61ce40da342ca55",
-      "src_screens_checklist.js": "96bcbca216abbd0c5d737ba36ee9fc46d5632acaf61cebb8581d39d583f5ee0f",
-      "src_screens_home.js": "4daea332df799565dbca27d3a762a2f6fcb76b9492d8d72c5c2b00a13e123684",
+      "src_main.js": "efb51171ae59cb195727f188c52711342daa3639812d5a5f2aeaf8e9e5ddba26",
+      "src_screens_budget.js": "0617595a05fd9783953bb7de175e67aee4bb3879cdb9cb897d3370d56972fb59",
+      "src_screens_calendar.js": "227e3ef3a33eaa1e38e18241bc84716287679fc5235247b254bdd292721befe7",
+      "src_screens_checklist.js": "7a474db8e9987e1d54698fb66a2eddb525b9ff3b99c074b4ac421d2fcfa75f95",
+      "src_screens_home.js": "6bf42d5789841231ec23dce5e600e93593f60ff7bdbcbad4b9e68ccff5cce63a",
       "src_screens_itinerary.js": "b51eaa02de0178bbd98c4e1429d8c5ece48ac45e669f40ad85139caa74d79f91",
-      "src_screens_journey-history.js": "5bdad8c5949cc48c8957163355e9ce834a499d63ce3b5bd9385c82ddb56c492d",
+      "src_screens_journey-history.js": "7c4f3e624a4aa77039e79acda9277a507d6de91d1d84e43321d4e8047b1197d5",
       "src_screens_registry.js": "a6d185e952dcdab139093ca779d4787189edcd0a40343d3c10974802dfbe1404",
-      "src_screens_reservations.js": "9285e6b1c1e086f33594ccba980954ce8a5a38d3c0404d6f44b98cdbd1366ab4",
-      "src_screens_settings.js": "2d518825457322a38f4f4bc4b5c93bbc1ab6b2f9f6195ac0d3c3ee2b12f3f14b",
+      "src_screens_reservations.js": "554a563aafd9651d43613fbe320559f467836911a0771f103c786a93a1bce948",
+      "src_screens_settings.js": "6961eb09cf92155cb55658a2522159e0e8a1b97a57368961a4ca67bd3959437b",
       "src_screens_vault.js": "2898c7db03189667eb65cc3c190bfedf31ab94ffd8143af9a62d10a8d57e79a7",
       "startup-ipad-1024-landscape.png": "ad30b2ce2984a53e1249a71f7b284c2ac6094a661048d54a9b5ec07f49d5034e",
       "startup-ipad-1194-landscape.png": "20b883f742b7602e62de298a9cc1415282c1d38ee977f94fead182651a0e33b5",
-      "sw.js": "d5784f572bf6aa6f0e9434767df9198bdd2af10c65469b62e9355458f7ea48fa",
+      "sw.js": "95af10acb3fc70a977f94f7253d478de8e624cb9b9d6f07e59e8a85ba2fd8c08",
       "tokyo-4year-simulation-fixture.json": "cde66ac75c2b3531ae297c18f1b45ae5413eebfe2ca5c698ffd86506bd5fdd8c"
     },
-    "digest": "078c7f448117b337ef04ac3fb4a6f357e848a40f4919b8de456541d5f6f09a21",
-    "sealedAt": "2026-09-15",
-    "identity": "v60-r7.3-screen-closure-2026-09-15-s39"
+    "digest": "b7d625f17bed5eb255f1626efdc6a84c4a4de9a02c8597840bebb5b8c1606c26"
   },
   "regressionEvidence": {
-    "phase": "36-v60-continuity-package",
-    "exactSource": "56/56 PASS",
-    "targeted": "16/16 PASS",
-    "priorityInteractions": "4/4 PASS",
-    "hiddenEditors": "26/26 PASS",
-    "expanded1024": "71/71 PASS; 0 colour/geometry/overflow/touch/runtime failures",
-    "expanded1194": "71/71 PASS; 0 colour/geometry/overflow/touch/runtime failures",
-    "mainScreens": "18/18 PASS",
-    "staticIntegrity": "PASS",
-    "physicalProtocolConsistency": "PASS — 123 software / 16 physical / 2 locked",
-    "serviceWorkerTransition": "6/6 PASS; 103 shell entries",
-    "pwaPreflight": "STATIC PASS; dynamic local-origin install check blocked by execution environment and remains a physical-iPad gate",
-    "runtimeIdentityTest": "PASS — revision-proof coherence against release-contract runtimeIdentity"
+    "phase": "S40-physical-ipad-review-correction-working-seal",
+    "exactSource": "PASS — S40 continuity guard verifies every correction requested in the current physical-iPad review chat at source level.",
+    "targeted": "PASS — placement, colour, portrait-nav, Accounts, Trip Timeline, Agenda, Journey and Checklist assertions are present in the S40 guard.",
+    "priorityInteractions": "PASS at core/source level — Accounts Add/Edit/Delete mutation round trip and all core screen view-model builds completed without error.",
+    "hiddenEditors": "SOURCE PASS — Add/Edit Account is present and Save/Undo/Cancel/Delete conventions remain intact; full rendered hidden-editor matrix still pending.",
+    "expanded1024": "PENDING FINAL S40 BROWSER RERUN",
+    "expanded1194": "PENDING FINAL S40 BROWSER RERUN",
+    "mainScreens": "PENDING FINAL S40 BROWSER RERUN",
+    "staticIntegrity": "PASS — node --check across all top-level JS, fixture validateState, all core view models and offline import graph.",
+    "physicalProtocolConsistency": "PASS — S40-specific physical recheck gates are registered and FINAL MASTER remains blocked.",
+    "serviceWorkerTransition": "STATIC PASS — S40 cache identity is coherent; 103 APP_SHELL entries resolve to files, including account-mutations.",
+    "pwaPreflight": "STATIC PASS — runtime identity, manifest orientation:any and offline shell references verified; installed-iPad cold launch remains a physical gate.",
+    "runtimeIdentityTest": "PASS — index, service worker, runtime config, App Health build marker and release-contract agree on S40 identity."
   }
 }

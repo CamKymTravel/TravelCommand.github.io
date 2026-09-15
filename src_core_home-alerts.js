@@ -57,8 +57,8 @@ export function buildHomeAlerts(state,currentDate){
   if(state.settings?.pinRecoveryNotice)alerts.push(alert('vault-pin-recovery','Vault PIN Recovery',state.settings.pinRecoveryNotice,'high',{screen:'settings',collection:null,id:null}));
 
   const sch=state.settings?.schengen||{};
-  if(sch.status==='not-allowed')alerts.push(alert('schengen:not-allowed','Schengen Warning','Manual Schengen status is Not Allowed.','critical',{screen:'settings',collection:null,id:null},sch.mustLeaveByDate||null));
-  if(sch.mustLeaveByDate){const days=daysUntil(sch.mustLeaveByDate,today);if(days<0)alerts.push(alert('schengen:past','Schengen Must Leave By','The manual Must Leave By date has passed.','critical',{screen:'settings',collection:null,id:null},sch.mustLeaveByDate));else if(days<=14){const timing=days===0?'today':`in ${days} day${days===1?'':'s'}`;alerts.push(alert('schengen:soon','Schengen Must Leave By',`Manual Must Leave By is ${timing}.`,'high',{screen:'settings',collection:null,id:null},sch.mustLeaveByDate));}}
+  if(sch.status==='not-allowed')alerts.push(alert('schengen:not-allowed','Schengen Warning','Manual Schengen status is Not Allowed.','critical',{screen:'home',collection:null,id:null},sch.mustLeaveByDate||null));
+  if(sch.mustLeaveByDate){const days=daysUntil(sch.mustLeaveByDate,today);if(days<0)alerts.push(alert('schengen:past','Schengen Must Leave By','The manual Must Leave By date has passed.','critical',{screen:'home',collection:null,id:null},sch.mustLeaveByDate));else if(days<=14){const timing=days===0?'today':`in ${days} day${days===1?'':'s'}`;alerts.push(alert('schengen:soon','Schengen Must Leave By',`Manual Must Leave By is ${timing}.`,'high',{screen:'home',collection:null,id:null},sch.mustLeaveByDate));}}
   const dismissed = new Set(Array.isArray(state.ui?.dismissedHomeAlertIds) ? state.ui.dismissedHomeAlertIds : []);
   return sortAlerts(alerts.filter(item => !dismissed.has(item.id)));
 }

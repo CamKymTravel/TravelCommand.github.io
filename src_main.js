@@ -121,7 +121,7 @@ if (!stateService.isRecoveryMode()) {
 // R40 build-health gate: every newly installed/updated build must visibly
 // require one whole-app verification. The marker is local to this build and
 // does not keep re-dirtying the app after Kym successfully verifies R40.
-const APP_HEALTH_BUILD_MARKER='v60-r7.3-screen-closure-2026-09-15-s39';
+const APP_HEALTH_BUILD_MARKER='v60-r7.4-physical-ipad-closure-2026-09-15-s40';
 if (!stateService.isRecoveryMode()) {
   const markerKey=`${runtimeConfig.storageKey}:app-health-build-marker`;
   let installedMarker=null;

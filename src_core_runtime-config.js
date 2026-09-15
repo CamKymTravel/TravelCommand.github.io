@@ -6,7 +6,7 @@ const DEFAULTS = Object.freeze({
   currentDate:null,
   fixtureUrl:null,
   seedIfEmpty:false,
-  serviceWorkerUrl:'./sw.js?v=60-r7.3-screen-closure-2026-09-15-s39'
+  serviceWorkerUrl:'./sw.js?v=60-r7.4-physical-ipad-closure-2026-09-15-s40'
 });
 
 export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? null) {

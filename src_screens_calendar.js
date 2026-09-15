@@ -493,13 +493,12 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
     monthNav.append(today, previous, label, next);
 
     const inlineActions = node('div', 'calendar-inline-actions');
-    const local = node('span', 'calendar-local-status', 'Sync Check · Local Only');
     const add = node('button', 'button calendar-add');
     add.append(createLineIcon('plus'), document.createTextNode(' NOTE'));
     add.type = 'button';
     add.setAttribute('aria-label', 'Add reminder or note');
     add.addEventListener('click', () => openPersonalEventEditor({ stateService, host:main, currentDate }));
-    inlineActions.append(local, add);
+    inlineActions.append(add);
 
     const viewSwitch = node('div', 'calendar-view-switch');
     viewSwitch.setAttribute('role', 'group');

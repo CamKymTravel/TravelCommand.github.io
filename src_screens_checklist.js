@@ -481,12 +481,16 @@ function readyExpandedBody(model,navigate=null){
   const icon=node('span','checklist-expanded-status-icon');icon.append(createLineIcon(model.ready.status==='ready'?'check':'warning'));
   const copy=node('div','checklist-expanded-status-copy');copy.append(node('p','eyebrow','READY TO MOVE'),node('h2','',readyLabel(model.ready.status)),node('strong','',destination?`${destination.name}${destination.country?`, ${destination.country}`:''}`:'No future destination planned'));
   if(destination)copy.append(node('span','',`${destination.displayStartDate} – ${destination.displayEndDate} · ${destination.durationDays} days`));
-  hero.append(icon,copy);body.append(hero);
+  const requiredPercent=model.ready.total>0?Math.round((Number(model.ready.completed||0)/Number(model.ready.total||1))*100):(model.ready.status==='ready'?100:0);
+  const readiness=node('div','checklist-expanded-status-progress');
+  readiness.append(node('span','','REQUIRED COMPLETE'),node('strong','',`${requiredPercent}%`),node('small','',`${model.ready.completed} of ${model.ready.total} required tasks`));
+  const progressTrack=node('span','checklist-expanded-status-track');const progressFill=node('i','checklist-expanded-status-fill');progressFill.style.width=`${Math.max(0,Math.min(100,requiredPercent))}%`;progressTrack.append(progressFill);readiness.append(progressTrack);
+  hero.append(icon,copy,readiness);body.append(hero);
   const stats=node('div','checklist-expanded-stat-grid');
   stats.append(
     checklistSummaryStat('REQUIRED COMPLETE',model.ready.completed,`${model.ready.total} pre-travel required tasks`,'green'),
     checklistSummaryStat('REQUIRED REMAINING',model.ready.remaining,model.ready.remaining===1?'task still blocks readiness':'tasks still block readiness',model.ready.remaining?'gold':'green'),
-    checklistSummaryStat('OVERDUE',model.ready.overdue,'required tasks past due',model.ready.overdue?'red':'green'),
+    checklistSummaryStat('OVERDUE',model.ready.overdue,'required tasks past due',model.ready.overdue?'red':'slate'),
     checklistSummaryStat('ACTIVE STAGE',STAGE_META[model.activeStage]?.label||model.activeStage,'automatic stage follows the journey','sky')
   );
   body.append(stats);
@@ -496,7 +500,12 @@ function readyExpandedBody(model,navigate=null){
     const meta=STAGE_META[stage.stage]||{label:stage.stage};
     const row=node('div',`checklist-expanded-stage-row${stage.stage===model.activeStage?' is-active':''}`);
     const stageCopy=node('span','checklist-expanded-stage-copy');stageCopy.append(node('strong','',meta.label),node('small','',`${stage.progress.completed} of ${stage.progress.total} complete`));
-    row.append(stageCopy,node('b',stage.requiredRemaining?'is-watch':'is-good',stage.requiredRemaining?`${stage.requiredRemaining} REQUIRED`:'CLEAR'));
+    const stageProgress=node('span','checklist-expanded-stage-progress');
+    const stageFill=node('i','checklist-expanded-stage-progress-fill');
+    stageFill.style.width=`${Math.max(0,Math.min(100,Number(stage.progress.percent||0)))}%`;
+    stageProgress.append(stageFill);
+    const stageStatus=node('b',stage.requiredRemaining?'is-watch':'is-good',stage.requiredRemaining?`${stage.requiredRemaining} REQUIRED`:'CLEAR');
+    row.append(stageCopy,stageProgress,stageStatus);
     list.append(row);
   }
   section.append(list);body.append(section);
@@ -515,7 +524,7 @@ function overviewExpandedBody(model){
   stats.append(
     checklistSummaryStat('COMPLETED',model.overview.completed,`${model.overview.percent}% overall`,'green'),
     checklistSummaryStat('PENDING',model.overview.remaining,'all active checklist items','gold'),
-    checklistSummaryStat('OVERDUE',model.overview.overdue,'items needing attention',model.overview.overdue?'red':'green'),
+    checklistSummaryStat('OVERDUE',model.overview.overdue,'items needing attention',model.overview.overdue?'red':'slate'),
     checklistSummaryStat('DESTINATION',model.checklistDestination?.name||'—',model.checklistDestination?.displayEndDate?`through ${model.checklistDestination.displayEndDate}`:'no active checklist destination','indigo')
   );
   body.append(stats);

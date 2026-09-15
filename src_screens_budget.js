@@ -12,6 +12,7 @@ import { formatAUDate, toISODate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
 import { countryFlagEmoji } from './src_components_country.js';
 import { saveGeneralSettingsDraft } from './src_core_settings-mutations.js';
+import { saveAccountDraft, deleteAccountDraft } from './src_core_account-mutations.js';
 import { canonicalCountrySlug } from './src_core_entities.js';
 
 const CATEGORY_LABELS = Object.freeze({
@@ -1199,43 +1200,96 @@ function accountBrandIcon(name){
   const wrap=node('span','budget-account-brand');const img=document.createElement('img');img.src=match[1];img.alt='';img.loading='eager';img.decoding='async';wrap.append(img);wrap.setAttribute('aria-hidden','true');return wrap;
 }
 
-function openAccountsViewer({model,host}){
+function openAccountEditor({stateService,host,accountId=null}){
+  const state=stateService.snapshot();
+  const existing=accountId?(state.accounts||[]).find(record=>record.id===accountId):null;
+  if(accountId&&!existing)return;
+  const saved={name:existing?.name||'',currency:existing?.currency||'AUD',balance:existing?.balance??''};
+  const session=new FormSession(saved);
+  const body=node('div','budget-account-editor');
+  const fields=node('div','budget-account-editor-grid');
+  const error=node('p','budget-form-error');
+  body.append(fields,error);
+  const capture=()=>({
+    name:body.querySelector('[name="name"]')?.value??'',
+    currency:body.querySelector('[name="currency"]')?.value??'AUD',
+    balance:body.querySelector('[name="balance"]')?.value??''
+  });
+  const populate=value=>{
+    error.textContent='';
+    fields.replaceChildren(
+      inputField('Account name','name','text',value.name),
+      inputField('Currency','currency','text',value.currency),
+      inputField('Balance','balance','number',value.balance)
+    );
+  };
+  populate(saved);
+  const actions=[];
+  if(existing)actions.push({label:'Delete',kind:'danger',onClick:dialog=>confirmDestructive({
+    title:'Delete account',
+    message:`Delete ${existing.name}? This removes the saved manual balance only.`,
+    tone:'gold',
+    onConfirm:()=>{stateService.commit(draft=>deleteAccountDraft(draft,existing.id));if(dialog.isConnected&&dialog.open)dialog.close();}
+  })});
+  actions.push(
+    {label:'Undo Changes',onClick:()=>populate(session.undo())},
+    {label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},
+    {label:'Save',onClick:dialog=>{
+      try{
+        const draftValue=session.update(draft=>Object.assign(draft,capture()));
+        stateService.commit(draft=>saveAccountDraft(draft,{accountId:existing?.id||null,fields:draftValue},{now:stateService.now}));
+        session.markSaved(draftValue);
+        if(dialog.isConnected&&dialog.open)dialog.close();
+      }catch(err){error.textContent=err.message;}
+    }}
+  );
+  const dialog=createModal({title:existing?'Edit Account':'Add Account',body,actions,className:'tcc-editor-modal budget-account-editor-modal tone-gold'});
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+
+function openAccountsViewer({stateService,host}){
+  const state=stateService.snapshot();
+  const accounts=[...(state.accounts||[])];
+  const audTotal=accounts.filter(record=>String(record.currency||'AUD').toUpperCase()==='AUD').reduce((sum,record)=>sum+Number(record.balance||0),0);
   const body=node('div','budget-accounts-manager budget-accounts-viewer');
   const intro=node('section','budget-accounts-manager-summary');
   intro.append(
     node('p','eyebrow','ACCOUNT SNAPSHOT'),
-    node('strong','',signedMoney(model.accounts.audTotal,'AUD')),
-    node('span','',`${model.accounts.records.length} saved ${model.accounts.records.length===1?'account':'accounts'} · AUD subtotal only · other currencies stay separate`),
-    node('small','budget-accounts-readonly-note','Read-only travel-money snapshot · no transfers · no live bank connection')
+    node('strong','',signedMoney(audTotal,'AUD')),
+    node('span','',`${accounts.length} saved ${accounts.length===1?'account':'accounts'} · AUD subtotal only · other currencies stay separate`),
+    node('small','budget-accounts-readonly-note','Manual travel-money snapshot · no transfers · no live bank connection')
   );
+  const add=node('button','button budget-account-add','+ ADD ACCOUNT');
+  add.type='button';
+  add.addEventListener('click',()=>{dialog.close();queueMicrotask(()=>openAccountEditor({stateService,host}));});
+  intro.append(add);
   body.append(intro);
   const list=node('div','budget-account-manager-list');
-  if(!model.accounts.records.length){
-    list.append(node('p','budget-muted','No entries yet'));
-  }
-  for(const account of model.accounts.records){
-    const row=node('div','budget-list-row budget-account-row budget-account-manager-row');
+  if(!accounts.length)list.append(node('p','budget-muted','No entries yet'));
+  for(const account of accounts){
+    const row=node('button','budget-list-row budget-account-row budget-account-manager-row');
+    row.type='button';
     const rowCopy=node('span','budget-account-row-copy');
-    rowCopy.append(node('strong','',account.name),node('small','',`${account.currency} balance`));
+    rowCopy.append(node('strong','',account.name),node('small','',`${account.currency} balance · tap to edit`));
     const amount=node('span','budget-account-row-amount');
     amount.append(node('strong','',signedMoney(account.balance,account.currency)));
     const brand=accountBrandIcon(account.name);
-    if(brand) row.append(brand);
+    if(brand)row.append(brand);
     row.append(rowCopy,amount);
+    row.setAttribute('aria-label',`Edit account ${account.name}`);
+    row.addEventListener('click',()=>{dialog.close();queueMicrotask(()=>openAccountEditor({stateService,host,accountId:account.id}));});
     list.append(row);
   }
   body.append(list);
   const dialog=createModal({title:'Accounts',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-gold budget-accounts-manager-modal'});
-  host.append(dialog);
-  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
-  dialog.showModal();
+  host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
 }
 
 function renderAccounts(model, stateService, host) {
   const panel = node('button', 'budget-panel budget-accounts budget-accounts-summary-card');panel.type='button';
   const head=node('div','budget-section-head budget-accounts-head');
   const copy=node('div','budget-accounts-title');
-  copy.append(node('h2','','Accounts'),node('small','',`${model.accounts.records.length} account${model.accounts.records.length===1?'':'s'} · AUD ${signedMoney(model.accounts.audTotal, 'AUD')} subtotal · read-only`));
+  copy.append(node('h2','','Accounts'),node('small','',`${model.accounts.records.length} account${model.accounts.records.length===1?'':'s'} · AUD ${signedMoney(model.accounts.audTotal, 'AUD')} subtotal · manual balances`));
   head.append(copy);panel.append(head);
   const list = node('div', 'budget-list budget-account-list');
   if (!model.accounts.records.length) list.append(node('p', 'budget-muted', 'No entries yet'));
@@ -1247,8 +1301,8 @@ function renderAccounts(model, stateService, host) {
   }
   if(model.accounts.records.length>5)list.append(node('p','budget-account-more',`+${model.accounts.records.length-5} more · tap to view all`));
   panel.append(list);
-  panel.setAttribute('aria-description','Tap to enlarge the read-only Accounts snapshot. No transfers or account editing are available.');
-  panel.addEventListener('click',()=>openAccountsViewer({model,host}));
+  panel.setAttribute('aria-description','Tap to view, add or edit manual account balances. No transfers or live bank connection.');
+  panel.addEventListener('click',()=>openAccountsViewer({stateService,host}));
   return panel;
 }
 
@@ -1395,7 +1449,8 @@ function renderMonthlySpendHistory(model, currentDate, initialYear = null) {
     history.months.forEach((month, index) => {
       const column = node('article', 'budget-history-month');
       if (history.year === currentYear && month.month === currentMonth) column.dataset.current = 'true';
-      const amount = node('strong', 'budget-history-amount', signedMoney(month.amountAUD, 'AUD'));
+      const chartAmount=signedMoney(month.amountAUD,'AUD').replace(/\.00$/,'');
+      const amount = node('strong', 'budget-history-amount', chartAmount);
       const track = node('div', 'budget-history-track');
       track.style.setProperty('--history-target', `${targetPercent}%`);
       const fill = node('span', `budget-history-fill budget-history-fill-${(index % 6) + 1}`);

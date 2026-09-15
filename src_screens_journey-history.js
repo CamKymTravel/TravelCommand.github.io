@@ -584,25 +584,37 @@ function renderSnapshot(state, model) {
   panel.append(distance);
   return panel;
 }
-function renderMilestones(model){
-  const panel=node('section','journey-panel journey-milestones-panel');
-  const head=node('div','journey-section-head'); head.append(node('h2','','Milestones · Automatic')); panel.append(head);
-  const rows=model.rows; const cruises=rows.filter(r=>r.travelType==='cruise').length; const motorhomes=rows.filter(r=>r.travelType==='motorhome').length;
+function journeyMilestoneFacts(model){
+  const rows=model.rows||[];
+  const cruises=rows.filter(r=>r.travelType==='cruise');
+  const motorhomes=rows.filter(r=>r.travelType==='motorhome'||r.travelType==='rv');
   const km=model.totalKilometres||rows.reduce((sum,row)=>sum+Number(row.kilometresTravelled||0),0);
   const spend=Number(model.summary.lifetimeTravelSpendAUD||0);
-  const grid=node('div','journey-milestones-grid');
-  const items=[
+  const chronological=[...rows].sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||'')));
+  const first=chronological[0]||null;
+  const longest=[...rows].sort((a,b)=>Number(b.days||0)-Number(a.days||0))[0]||null;
+  const highest=[...rows].sort((a,b)=>Number(b.livingCostPerDayAUD||0)-Number(a.livingCostPerDayAUD||0))[0]||null;
+  return [
     ['1st',model.journeyStartDate?formatAUDate(model.journeyStartDate):'—','First journey'],
+    [first?.country||'—','First country','visited'],
     [integer(model.summary.countriesVisited),'Countries','visited'],
     [integer(model.summary.destinationsCompleted||rows.length),'Completed','stays & trips'],
     [integer(model.summary.daysTravelled),'Travel','days'],
     [kilometres(km).replace(' km',''),'Recorded km','travelled'],
-    [integer(cruises),'Cruises','completed'],
-    [integer(motorhomes),'Motorhome','trips'],
+    [integer(cruises.length),'Cruises','completed'],
+    [integer(motorhomes.length),'Motorhome','trips'],
     [String(Math.floor(model.summary.yearsOnRoad)),'Full travel','years'],
-    [spend>=1000?`$${Math.round(spend/1000)}k`:formatMoney(spend,'AUD'),'Lifetime','spend · AUD']
+    [spend>=1000?`$${Math.round(spend/1000)}k`:formatMoney(spend,'AUD'),'Lifetime','spend · AUD'],
+    [longest?.name||'—','Longest stay',longest?`${integer(longest.days)} days`:'No completed stay'],
+    [highest?.name||'—','Highest living / day',highest?`${formatMoney(highest.livingCostPerDayAUD,'AUD')}/day`:'No completed stay']
   ];
-  for(const [value,label,sub] of items){ const m=node('article','journey-milestone'); m.append(node('strong','',value),node('span','',label),node('small','',sub)); grid.append(m); }
+}
+
+function renderMilestones(model){
+  const panel=node('section','journey-panel journey-milestones-panel');
+  const head=node('div','journey-section-head'); head.append(node('h2','','Milestones · Automatic')); panel.append(head);
+  const grid=node('div','journey-milestones-grid');
+  for(const [value,label,sub] of journeyMilestoneFacts(model)){ const m=node('article','journey-milestone'); m.append(node('strong','',value),node('span','',label),node('small','',sub)); grid.append(m); }
   panel.append(grid); return panel;
 }
 function renderTravelMix(model){
@@ -686,17 +698,10 @@ function journeySnapshotExpandedBody(state,model){
 
 function journeyMilestonesExpandedBody(model){
   const body=node('section','journey-insight-expanded journey-milestones-expanded');
-  const rows=model.rows||[];const cruises=rows.filter(r=>r.travelType==='cruise').length;const motorhomes=rows.filter(r=>r.travelType==='motorhome'||r.travelType==='rv').length;
-  const stats=node('div','journey-expanded-stat-grid');
-  stats.append(
-    journeyExpandedStat('JOURNEY START',model.journeyStartDate?formatAUDate(model.journeyStartDate):'—','first day of retirement travel','sky'),
-    journeyExpandedStat('COUNTRIES VISITED',integer(model.summary.countriesVisited),'automatic from completed/current travel','teal'),
-    journeyExpandedStat('DESTINATIONS COMPLETED',integer(model.summary.destinationsCompleted),'completed stays & trips','blue'),
-    journeyExpandedStat('DAYS TRAVELLED',integer(model.summary.daysTravelled),'including current stay','green'),
-    journeyExpandedStat('CRUISES COMPLETED',integer(cruises),'completed cruise trips','violet'),
-    journeyExpandedStat('MOTORHOME TRIPS',integer(motorhomes),'completed motorhome / RV trips','orange'),
-    journeyExpandedStat('YEARS ON THE ROAD',String(model.summary.yearsOnRoad),'journey duration to date','gold')
-  );body.append(stats,node('p','journey-expanded-callout','Milestones are calculated automatically from Itinerary, Reservations, Expenses and Journey History. There is no manual favourite-destination field to maintain.'));return body;
+  const tones=['sky','teal','blue','green','orange','violet','gold','indigo','magenta','copper','lime','maroon'];
+  const stats=node('div','journey-expanded-stat-grid journey-expanded-milestone-grid');
+  journeyMilestoneFacts(model).forEach(([value,label,sub],index)=>stats.append(journeyExpandedStat(label.toUpperCase(),value,sub,tones[index%tones.length])));
+  body.append(stats,node('p','journey-expanded-callout','Milestones are calculated automatically from Itinerary, Reservations, Expenses and Journey History. There is no manual favourite-destination field to maintain.'));return body;
 }
 
 function journeyTravelMixExpandedBody(model){

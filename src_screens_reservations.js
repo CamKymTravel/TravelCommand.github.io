@@ -551,50 +551,6 @@ function listPanel(title, records, className, openEditor, emptyText = 'No entrie
   return panel;
 }
 
-function healthPanel(model) {
-  const panel = node('section', `reservation-panel reservation-health reservation-health-${model.health.status}`);
-  const head = node('div', 'reservation-section-head');
-  head.append(node('h2', '', 'Reservation Health Check'));
-  if (model.health.status !== 'verified') head.append(node('strong', 'reservation-health-status', 'Needs Attention'));
-  panel.append(head);
-  if (!model.health.issues.length) panel.append(node('p', 'reservation-health-copy', 'No duplicate, overdue To Book, Destination Budget repair, or missing AUD-equivalent issues detected.'));
-  else {
-    const list = node('ul', 'reservation-health-issues');
-    for (const issue of model.health.issues) list.append(node('li', '', issue));
-    panel.append(list);
-  }
-  return panel;
-}
-
-
-function reservationHealthExpandedBody(model) {
-  const health=model.health;
-  const body=node('div','reservation-expanded-detail reservation-health-expanded');
-  const summary=node('div','reservation-expanded-summary');
-  const duplicates=health.duplicateGroups?.length||0;
-  summary.append(
-    node('strong','',health.status==='verified'?'All checks clear':'Needs Attention'),
-    node('span','',`${duplicates} duplicate group${duplicates===1?'':'s'}`),
-    node('span','',`${health.overdueToBookCount||0} overdue To Book`),
-    node('small','',`Destination Budget repair ${health.needsBudgetRepairCount||0} · Missing AUD equivalent ${health.missingAudEquivalentCount||0}`)
-  );
-  body.append(summary);
-  const section=node('section','reservation-expanded-list-section');
-  const head=node('div','reservation-section-head');
-  head.append(node('h3','','Operational checks'),node('span','reservation-count',String(health.issues?.length||0)));
-  section.append(head);
-  if(!health.issues?.length){
-    section.append(node('p','reservation-health-copy','No duplicate, overdue To Book, Destination Budget repair, or missing AUD-equivalent issues detected.'));
-  }else{
-    const list=node('ul','reservation-health-issues');
-    for(const issue of health.issues)list.append(node('li','',issue));
-    section.append(list);
-  }
-  body.append(section);
-  return body;
-}
-
-
 function reservationPanelExpandedBody(title, records, openEditor) {
   const body=node('div','reservation-expanded-detail');
   const trusted=records.filter(record=>!record.needsBudgetRepair);
@@ -915,9 +871,6 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     const toBookPanel=listPanel('Future Bookings / To Book', filteredToBook, 'reservation-to-book', id=>openEditor(id,'copper'), 'No matching To Book entries yet');
     left.append(toBookPanel);
     makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'copper',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'copper'))});
-
-    const health=healthPanel(model); left.append(health);
-    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:model.health.status==='verified'?'lime':'maroon',bodyBuilder:()=>reservationHealthExpandedBody(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}))});
 
     const nextFive=renderNextFive(state,currentDate,main), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);

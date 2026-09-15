@@ -4,10 +4,10 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "any",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline iPad Travel Command Centre S39 physical-acceptance candidate for Cameron & Kym. Local-only simulation data is retained for device acceptance testing.",
+  "description": "Offline iPad Travel Command Centre S40 Tokyo full populated simulation for Cameron & Kym. Local-only simulation data for physical review.",
   "icons": [
     {
       "src": "./app-icon.png",
@@ -16,5 +16,5 @@
       "purpose": "any"
     }
   ],
-  "id": "./tokyo-4year-full-simulation-s38"
+  "id": "./tokyo-full-simulation-s40-2030-02-20-v1"
 }
