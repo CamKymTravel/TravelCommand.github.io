@@ -375,10 +375,12 @@ function renderMonth(model, handlers) {
     const events = node('div', 'calendar-day-events');
     if (!datedEvents.length && !periodEvents.length && cell.inMonth) events.append(node('span', 'calendar-day-empty', ''));
 
-    // Month view stays calm and scan-friendly: show the first two dated items,
-    // then open the complete day from one explicit +more control. Destination
-    // and travel periods remain as thin colour rails at the top of the cell.
-    const visibleEvents = datedEvents.slice(0, 2);
+    // Real-iPad closure: Kym needs to see the day's useful content without
+    // opening a detail view for ordinary busy days. Show up to five dated
+    // items and let the week row grow vertically; only overflow beyond five
+    // collapses behind the explicit +more control. Destination/travel periods
+    // remain thin colour rails at the top of the cell.
+    const visibleEvents = datedEvents.slice(0, 5);
     for (const event of visibleEvents) events.append(monthEventButton(event, handlers));
     const hiddenCount = Math.max(0, datedEvents.length - visibleEvents.length);
     if (hiddenCount) {

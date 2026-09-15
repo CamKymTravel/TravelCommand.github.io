@@ -1,6 +1,6 @@
 import { createLineIcon } from './src_components_icons.js';
 
-const MODAL_TONES = Object.freeze(['neutral','sky','blue','indigo','teal','green','magenta','violet','red','orange','gold']);
+const MODAL_TONES = Object.freeze(['neutral','sky','blue','indigo','teal','green','magenta','violet','red','orange','gold','lime','silver','copper','maroon']);
 let modalSequence = 0;
 let expandedSnapshotSequence = 0;
 
@@ -98,7 +98,7 @@ export function createModal({ title, body, actions = [], className = '', showClo
   // as standard expandable cards. Stamp the declared tone into data/CSS so
   // every expanded path has one machine-verifiable source-colour identity.
   if (isExpandedModal && modalClasses.includes('tcc-expanded-inherits-source')) {
-    const inheritedTone = modalClasses.map(value => value.match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
+    const inheritedTone = modalClasses.map(value => value.match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold|lime|silver|copper|maroon)$/)?.[1]).find(Boolean);
     if (inheritedTone) {
       dialog.dataset.sourceWidgetTone = inheritedTone;
       const inheritedRgb = EXPANDED_TONE_RGB[inheritedTone];
@@ -330,7 +330,11 @@ const EXPANDED_TONE_RGB = Object.freeze({
   violet:[184,109,255],
   red:[255,111,131],
   orange:[255,154,90],
-  gold:[255,209,91]
+  gold:[255,209,91],
+  lime:[166,211,83],
+  silver:[174,184,194],
+  copper:[199,131,87],
+  maroon:[185,79,112]
 });
 
 function rgbFromCssColor(value) {

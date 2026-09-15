@@ -489,6 +489,7 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     const textarea=document.createElement('textarea');
     textarea.name='notes';
     textarea.rows=3;
+    textarea.setAttribute('aria-label','Planning note');
     textarea.placeholder='Add anything useful for this stay or route';
     textarea.value=String(savedFields.notes || '');
     wrap.append(textarea);
@@ -972,7 +973,7 @@ function renderEntry(record, openDetail) {
   const budgetAmounts=itineraryBudgetAmounts(record); const budget=node('span',`itinerary-entry-budget${budgetAmounts.configured?'':' is-unset'}`); budget.append(node('small','','DESTINATION BUDGET'),node('strong','',budgetAmounts.primary)); if(budgetAmounts.secondary)budget.append(node('em','',budgetAmounts.secondary));
   button.append(dates,copy,plan,budget);
   button.setAttribute('aria-label',[
-    'Enlarge itinerary stay details',
+    'Edit itinerary stay',
     record.name,
     record.country,
     record.displayDates,
@@ -1068,7 +1069,7 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     const statsPanel=renderStats(model);
     main.append(coveragePanel,statsPanel);
     makeExpandableCard(coveragePanel,{host:main,title:'Forward Coverage',tone:'indigo',bodyBuilder:()=>itineraryCoverageExpandedBody(state,currentDate,options.coverageMonths,id=>{const item=[...model.upcoming,...model.completed].find(record=>record.id===id);if(item)openItineraryEntryDetail({host:main,stateService,record:item,openEditor});})});
-    const statTones={countries:'teal',routes:'indigo',stops:'blue',gaps:'gold',stays:'orange',overlaps:'red'};
+    const statTones={countries:'lime',routes:'magenta',stops:'teal',gaps:'gold',stays:'silver',overlaps:'red'};
     for(const stat of statsPanel.querySelectorAll('.itinerary-stat')){
       const kind=[...stat.classList].find(name=>name.startsWith('itinerary-stat-'))?.replace('itinerary-stat-','')||'blue';
       makeExpandableCard(stat,{
@@ -1104,18 +1105,18 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     const upcomingHead = node('div', 'itinerary-section-head');
     upcomingHead.append(node('h2', '', 'Upcoming Itinerary'), node('span', 'itinerary-count', String(model.upcoming.length)));
     upcomingPanel.append(upcomingHead);
-    const upcomingPaged=itineraryPagedList(model.upcoming,options.upcomingPage,item=>openItineraryEntryDetail({host:main,stateService,record:item,openEditor}),page=>{options={...options,upcomingPage:page};rememberOptions();renderContent();});
+    const upcomingPaged=itineraryPagedList(model.upcoming,options.upcomingPage,item=>openEditor(item.id,itineraryDetailTone(item)),page=>{options={...options,upcomingPage:page};rememberOptions();renderContent();});
     options={...options,upcomingPage:upcomingPaged.page};
     upcomingPanel.append(upcomingPaged.list,upcomingPaged.pager);
     main.append(upcomingPanel);
-    makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'blue',bodyBuilder:()=>itineraryUpcomingExpandedBody(model,item=>openItineraryEntryDetail({host:main,stateService,record:item,openEditor}))});
+    makeExpandableCard(upcomingPanel,{host:main,title:'Upcoming Itinerary',tone:'copper',bodyBuilder:()=>itineraryUpcomingExpandedBody(model,item=>openEditor(item.id,itineraryDetailTone(item)))});
 
     const completed = document.createElement('details');
     completed.className = 'itinerary-panel itinerary-completed';
     completed.open = options.completedOpen;
     const summary = node('summary', '', `Completed Itinerary (${model.completed.length})`);
     completed.append(summary);
-    const completedPaged=itineraryPagedList(model.completed,options.completedPage,item=>openItineraryEntryDetail({host:main,stateService,record:item,openEditor}),page=>{options={...options,completedPage:page};rememberOptions();renderContent();});
+    const completedPaged=itineraryPagedList(model.completed,options.completedPage,item=>openEditor(item.id,itineraryDetailTone(item)),page=>{options={...options,completedPage:page};rememberOptions();renderContent();});
     options={...options,completedPage:completedPaged.page};
     completed.append(completedPaged.list,completedPaged.pager);
     completed.addEventListener('toggle', () => { options = { ...options, completedOpen:completed.open }; rememberOptions(); if (stateService.snapshot().ui?.itineraryCompletedOpen === completed.open) return; stateService.commit(draft => { draft.ui.itineraryCompletedOpen = completed.open; }); });

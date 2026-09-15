@@ -94,7 +94,7 @@
   background:radial-gradient(circle at 90% 0%,rgba(174,184,194,.08),transparent 52%),linear-gradient(145deg,rgba(57,65,74,.58),rgba(12,22,33,.96)) !important;
   filter:none !important;
 }
-[data-screen="reservations"] .reservation-tab-completed .reservation-tab-icon {
+html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-completed .reservation-tab-icon {
   border-color:rgba(174,184,194,.38) !important;
   background:rgba(92,101,111,.16) !important;
   color:#d5dde4 !important;
@@ -1228,4 +1228,1513 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
   }
 }
 
+}
+
+/* ========================================================================
+   S38 REAL-IPAD CORRECTION — 14 SEP 2026
+   Physical iPad screenshots are the authority for this pass. The goals are:
+   information-first money entry, stronger but balanced colour, larger calendar
+   day capacity, fuller account previews, compact Journey History analytics,
+   cleaner Checklist hierarchy, and consistent photographic headers.
+   ======================================================================== */
+
+/* Stronger approved baby/metallic blue. The S37 value read almost white on the
+   real iPad and made the primary Add/Save controls look washed out. */
+:root {
+  --tcc-baby-blue-top:#92def7 !important;
+  --tcc-baby-blue-mid:#5fc4ea !important;
+  --tcc-baby-blue-bottom:#309ed0 !important;
+  --tcc-baby-blue-ink:#041d31 !important;
+}
+
+/* One header rhythm across the app. The artwork changes; the physical header
+   height does not. Locked Vault is intentionally excluded from this generic
+   rule because its privacy state has its own composition. */
+[data-screen="home"] > .home-reference-hero,
+[data-screen="itinerary"] > .tcc-stay-banner,
+[data-screen="budget"] > .tcc-stay-banner,
+[data-screen="reservations"] > .tcc-stay-banner,
+[data-screen="calendar"] > .tcc-stay-banner,
+[data-screen="journey-history"] > .tcc-page-hero,
+[data-screen="checklist"] > .tcc-page-hero,
+[data-screen="settings"] > .tcc-page-hero,
+[data-screen="vault"]:not(.vault-screen-locked) > .tcc-page-hero {
+  height:214px !important;
+  min-height:214px !important;
+  max-height:214px !important;
+}
+[data-screen="journey-history"] > .tcc-page-hero .tcc-page-hero-copy,
+[data-screen="checklist"] > .tcc-page-hero .tcc-page-hero-copy,
+[data-screen="settings"] > .tcc-page-hero .tcc-page-hero-copy,
+[data-screen="vault"]:not(.vault-screen-locked) > .tcc-page-hero .tcc-page-hero-copy {
+  max-width:620px !important;
+}
+
+/* Primary Add/Save controls: deeper baby-blue so they read as deliberate
+   controls rather than pale decorative strips. */
+[data-screen="budget"] .budget-add-expense-bar,
+[data-screen="reservations"] .reservation-add-bar,
+[data-screen="itinerary"] .itinerary-add-bar,
+.tcc-editor-modal .tcc-modal-actions .button-primary,
+.tcc-editor-modal .tcc-modal-actions button:last-child {
+  background:linear-gradient(180deg,#92def7 0%,#5fc4ea 52%,#309ed0 100%) !important;
+  border-color:rgba(126,218,248,.9) !important;
+  color:#041d31 !important;
+  box-shadow:inset 0 1px rgba(255,255,255,.62),0 8px 20px rgba(32,140,190,.18) !important;
+}
+
+/* ------------------------------------------------------------------------
+   HOME — smaller iPad readability beats squeezing four dense mini cards into
+   one row. Two-by-two keeps dates, alerts and Schengen data legible.
+   ------------------------------------------------------------------------ */
+@media (max-width:1050px) {
+  [data-screen="home"] .home-ref-value-xl { font-size:28px !important; line-height:1.02 !important; }
+  [data-screen="home"] .home-ref-value-lg { font-size:25px !important; line-height:1.03 !important; }
+  [data-screen="home"] .home-ref-stats { grid-template-columns:1fr 1fr !important; gap:10px !important; }
+  [data-screen="home"] .home-ref-annual { grid-column:1 / -1 !important; }
+  [data-screen="home"] .home-ref-minis { grid-template-columns:1fr 1fr !important; gap:10px !important; }
+  [data-screen="home"] .home-mini-panel { min-height:210px !important; }
+  [data-screen="home"] .home-mini-head h2 { font-size:14px !important; }
+  [data-screen="home"] .home-mini-row strong { font-size:11.5px !important; }
+  [data-screen="home"] .home-mini-row span,
+  [data-screen="home"] .home-mini-row small { font-size:10px !important; }
+}
+
+/* ------------------------------------------------------------------------
+   BUDGET — annual budget is a setting/reference widget, not another dashboard.
+   The main card is a large single value. Expanded view is year management.
+   ------------------------------------------------------------------------ */
+[data-screen="budget"] .budget-annual-planning-card {
+  align-content:start !important;
+  min-height:250px !important;
+  border-color:rgba(255,196,72,.48) !important;
+  background:radial-gradient(circle at 90% 4%,rgba(255,196,72,.18),transparent 45%),linear-gradient(145deg,#342b1b,#111c2c 72%) !important;
+}
+[data-screen="budget"] .budget-annual-main-value {
+  margin-top:14px !important;
+  padding:20px 18px !important;
+  border:1px solid rgba(255,196,72,.30) !important;
+  border-radius:16px !important;
+  background:linear-gradient(145deg,rgba(62,49,22,.62),rgba(11,25,42,.92)) !important;
+}
+[data-screen="budget"] .budget-annual-main-value > small { color:#ffd66f !important; }
+[data-screen="budget"] .budget-annual-main-value > strong { font-size:38px !important; line-height:1 !important; color:#fff3cb !important; }
+[data-screen="budget"] .budget-annual-main-note { color:#bdc9d5 !important; font-size:13px !important; line-height:1.35 !important; }
+[data-screen="budget"] .budget-annual-manager {
+  gap:16px !important;
+  background:linear-gradient(145deg,rgba(45,36,18,.72),rgba(7,20,34,.96)) !important;
+}
+[data-screen="budget"] .budget-annual-manager-list { gap:10px !important; }
+[data-screen="budget"] .budget-annual-manager-row {
+  min-height:76px !important;
+  border-color:rgba(255,196,72,.24) !important;
+  background:rgba(6,20,34,.72) !important;
+}
+[data-screen="budget"] .budget-annual-manager-row.is-current {
+  border-color:rgba(255,196,72,.58) !important;
+  background:linear-gradient(145deg,rgba(86,64,19,.44),rgba(10,27,45,.90)) !important;
+}
+[data-screen="budget"] .budget-annual-manager-value > strong { font-size:25px !important; }
+
+/* Year Forecast is information, not a green decorative slab. Keep green only
+   for the ON TRACK status and positive values. */
+[data-screen="budget"] .budget-forecast,
+[data-screen="budget"] .budget-annual-forecast,
+[data-screen="budget"] .budget-forecast-panel {
+  border-color:rgba(93,141,255,.42) !important;
+  background:radial-gradient(circle at 90% 4%,rgba(93,141,255,.14),transparent 46%),linear-gradient(145deg,#172b4a,#0a1c31) !important;
+}
+
+/* Accounts should use the available vertical space rather than hiding two of
+   five accounts behind +more on the main Budget page. */
+[data-screen="budget"] .budget-accounts-summary-card { min-height:420px !important; }
+[data-screen="budget"] .budget-account-list { gap:10px !important; }
+[data-screen="budget"] .budget-account-row { min-height:66px !important; }
+
+/* Add Expense — the entered local amount and AUD equivalent are the task. They
+   must dominate the form. Route/rate context is deliberately quieter. */
+.tcc-budget-editor-modal .budget-editor-step {
+  border-color:rgba(106,174,214,.28) !important;
+  background:linear-gradient(145deg,rgba(20,42,59,.84),rgba(8,24,39,.95)) !important;
+}
+.tcc-budget-editor-modal .budget-editor-step-head { color:#dcebf5 !important; }
+.tcc-budget-editor-modal .budget-editor-step-number {
+  background:#2f8fb8 !important;
+  border-color:#75cce9 !important;
+  color:#f4fbff !important;
+}
+.tcc-budget-editor-modal .budget-category-tile {
+  border-color:rgba(139,170,193,.22) !important;
+  background:rgba(4,16,29,.70) !important;
+  color:#c6d2dc !important;
+}
+.tcc-budget-editor-modal .budget-category-groceries[data-active="true"] { border-color:#4fd3c6 !important; background:linear-gradient(145deg,rgba(35,132,122,.34),rgba(7,29,40,.90)) !important; }
+.tcc-budget-editor-modal .budget-category-eating-out[data-active="true"] { border-color:#ff9a5a !important; background:linear-gradient(145deg,rgba(181,82,36,.30),rgba(39,24,25,.90)) !important; }
+.tcc-budget-editor-modal .budget-category-transport[data-active="true"] { border-color:#58c7ff !important; background:linear-gradient(145deg,rgba(33,115,171,.32),rgba(9,28,48,.90)) !important; }
+.tcc-budget-editor-modal .budget-category-entertainment[data-active="true"] { border-color:#dc67c0 !important; background:linear-gradient(145deg,rgba(156,47,128,.30),rgba(37,20,48,.90)) !important; }
+.tcc-budget-editor-modal .budget-category-shopping[data-active="true"] { border-color:#ff7085 !important; background:linear-gradient(145deg,rgba(180,55,76,.30),rgba(44,20,34,.90)) !important; }
+.tcc-budget-editor-modal .budget-category-miscellaneous[data-active="true"] { border-color:#ffd15b !important; background:linear-gradient(145deg,rgba(151,111,25,.30),rgba(43,34,18,.90)) !important; }
+.tcc-budget-editor-modal .budget-routing-status.is-ok {
+  border-color:rgba(88,199,255,.34) !important;
+  background:linear-gradient(145deg,rgba(27,77,111,.24),rgba(6,25,40,.76)) !important;
+  box-shadow:none !important;
+}
+.tcc-budget-editor-modal .budget-routing-status.is-ok strong { color:#93dfff !important; }
+.tcc-budget-editor-modal .budget-expense-local-money-grid,
+.tcc-budget-editor-modal .budget-editor-local-money-grid {
+  grid-template-columns:minmax(0,1.35fr) minmax(150px,.5fr) minmax(250px,.86fr) !important;
+  gap:12px !important;
+  align-items:stretch !important;
+}
+.tcc-budget-editor-modal .budget-expense-amount-field {
+  padding:12px 14px !important;
+  border:1px solid rgba(88,199,255,.34) !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg,rgba(12,43,67,.72),rgba(4,17,30,.92)) !important;
+}
+.tcc-budget-editor-modal .budget-expense-amount-field > span { color:#99c8df !important; font-size:13px !important; }
+.tcc-budget-editor-modal .budget-expense-amount-field input {
+  min-height:62px !important;
+  padding:0 14px !important;
+  border-color:rgba(88,199,255,.22) !important;
+  background:#061829 !important;
+  color:#ffffff !important;
+  font-size:32px !important;
+  font-weight:850 !important;
+  letter-spacing:.01em !important;
+}
+.tcc-budget-editor-modal .budget-expense-locked-currency {
+  border-color:rgba(184,109,255,.34) !important;
+  background:linear-gradient(145deg,rgba(82,49,126,.22),rgba(8,21,36,.90)) !important;
+}
+.tcc-budget-editor-modal .budget-expense-locked-currency > strong { color:#d8c8ff !important; font-size:27px !important; }
+.tcc-budget-editor-modal .budget-expense-auto-conversion {
+  border:1px solid rgba(255,196,72,.34) !important;
+  background:linear-gradient(145deg,rgba(99,71,18,.22),rgba(7,22,37,.93)) !important;
+  box-shadow:none !important;
+}
+.tcc-budget-editor-modal .budget-expense-auto-kicker { color:#e2c06b !important; font-size:10px !important; }
+.tcc-budget-editor-modal .budget-expense-auto-conversion > strong {
+  color:#ffffff !important;
+  font-size:27px !important;
+  line-height:1.05 !important;
+}
+.tcc-budget-editor-modal .budget-expense-auto-conversion > small {
+  color:#ffd978 !important;
+  font-size:16px !important;
+  font-weight:800 !important;
+  line-height:1.2 !important;
+}
+
+/* ------------------------------------------------------------------------
+   ADD RESERVATION — same information-first hierarchy. Money figures are larger
+   than explanatory routing blocks; destination matching is contextual, not a
+   full green banner competing with the price.
+   ------------------------------------------------------------------------ */
+.tcc-reservation-editor-modal .reservation-editor-simple-section {
+  border-color:rgba(106,174,214,.28) !important;
+  background:linear-gradient(145deg,rgba(19,40,58,.84),rgba(7,23,38,.95)) !important;
+}
+.tcc-reservation-editor-modal .reservation-editor-cost-grid {
+  grid-template-columns:minmax(0,1.05fr) minmax(150px,.5fr) minmax(0,.92fr) !important;
+  gap:12px !important;
+  align-items:stretch !important;
+}
+.tcc-reservation-editor-modal .reservation-money-field {
+  padding:10px 12px !important;
+  border:1px solid rgba(88,199,255,.26) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(12,42,65,.64),rgba(5,18,31,.92)) !important;
+}
+.tcc-reservation-editor-modal .reservation-money-field > span { color:#9ec9df !important; font-size:13px !important; }
+.tcc-reservation-editor-modal .reservation-money-field input {
+  min-height:60px !important;
+  background:#061829 !important;
+  color:#fff !important;
+  font-size:29px !important;
+  font-weight:850 !important;
+}
+.tcc-reservation-editor-modal .reservation-money-currency { border-color:rgba(184,109,255,.32) !important; }
+.tcc-reservation-editor-modal .reservation-money-currency input { color:#d7c7ff !important; }
+.tcc-reservation-editor-modal .reservation-money-aud {
+  border-color:rgba(255,196,72,.42) !important;
+  background:linear-gradient(145deg,rgba(93,67,17,.24),rgba(5,18,31,.92)) !important;
+}
+.tcc-reservation-editor-modal .reservation-money-aud input {
+  color:#ffe28b !important;
+  font-size:31px !important;
+}
+.tcc-reservation-editor-modal .reservation-destination-preview:not(.is-warning) {
+  border-color:rgba(88,199,255,.30) !important;
+  background:linear-gradient(145deg,rgba(28,73,104,.22),rgba(6,24,39,.82)) !important;
+}
+.tcc-reservation-editor-modal .reservation-destination-preview-label { color:#8bdcff !important; }
+.tcc-reservation-editor-modal .reservation-editor-auto-route {
+  border-color:rgba(151,185,211,.20) !important;
+  background:rgba(6,20,34,.68) !important;
+  color:#c8d5df !important;
+}
+.tcc-reservation-editor-modal .reservation-editor-auto-route > :is(svg,.tcc-line-icon) { color:#89bcd5 !important; }
+.tcc-reservation-editor-modal .reservation-conversion-hint,
+.tcc-reservation-editor-modal .reservation-editor-conversion-hint {
+  color:#d7e2ea !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+}
+
+/* ------------------------------------------------------------------------
+   CALENDAR — show ordinary busy days directly. Five event chips are allowed;
+   the week row grows to fit them rather than clipping them inside a fixed day.
+   ------------------------------------------------------------------------ */
+[data-screen="calendar"] .calendar-grid { grid-auto-rows:minmax(205px,auto) !important; align-items:stretch !important; }
+[data-screen="calendar"] .calendar-day {
+  min-height:205px !important;
+  height:auto !important;
+  overflow:visible !important;
+  align-self:stretch !important;
+}
+[data-screen="calendar"] .calendar-day-events { overflow:visible !important; max-height:none !important; }
+[data-screen="calendar"] .calendar-event-chip { min-height:44px !important; }
+[data-screen="calendar"] .calendar-more-button { min-height:44px !important; }
+@media (max-width:1050px) {
+  [data-screen="calendar"] .calendar-grid { grid-auto-rows:minmax(198px,auto) !important; }
+  [data-screen="calendar"] .calendar-day { min-height:198px !important; }
+}
+
+/* ------------------------------------------------------------------------
+   CHECKLIST — rebalance away from green. Permanent is warm gold, destination
+   stays sky blue, His/Hers remain distinct, Overview becomes blue/indigo, and
+   the overall layout is tighter with less dead black between columns.
+   ------------------------------------------------------------------------ */
+[data-screen="checklist"] .checklist-layout-grid {
+  grid-template-columns:minmax(0,1fr) 310px !important;
+  gap:14px !important;
+  align-items:start !important;
+}
+[data-screen="checklist"] .checklist-reference-primary { gap:12px !important; }
+[data-screen="checklist"] .checklist-required-grid { gap:12px !important; align-items:start !important; }
+[data-screen="checklist"] .checklist-column-permanent {
+  border-color:rgba(255,196,72,.54) !important;
+  background:radial-gradient(circle at 92% 0,rgba(255,196,72,.18),transparent 48%),linear-gradient(145deg,#3e321c,#111f2e) !important;
+}
+[data-screen="checklist"] .checklist-column-permanent .checklist-column-icon,
+[data-screen="checklist"] .checklist-column-permanent .checklist-next-task > span { color:#ffd66f !important; }
+[data-screen="checklist"] .checklist-column-destination {
+  border-color:rgba(88,199,255,.52) !important;
+  background:radial-gradient(circle at 92% 0,rgba(88,199,255,.17),transparent 48%),linear-gradient(145deg,#173c58,#0b2034) !important;
+}
+[data-screen="checklist"] .checklist-owner-his {
+  border-color:rgba(93,141,255,.52) !important;
+  background:radial-gradient(circle at 90% 0,rgba(93,141,255,.18),transparent 48%),linear-gradient(145deg,#1c3760,#0c1f38) !important;
+}
+[data-screen="checklist"] .checklist-owner-hers {
+  border-color:rgba(241,101,189,.54) !important;
+  background:radial-gradient(circle at 90% 0,rgba(241,101,189,.19),transparent 48%),linear-gradient(145deg,#482845,#171c33) !important;
+}
+[data-screen="checklist"] .checklist-overview-card {
+  border-color:rgba(128,109,255,.50) !important;
+  background:radial-gradient(circle at 86% 4%,rgba(128,109,255,.18),transparent 48%),linear-gradient(145deg,#252c55,#111c33) !important;
+}
+[data-screen="checklist"] .checklist-overview-ring {
+  background:radial-gradient(circle at center,#101f36 0 55%,transparent 56%),conic-gradient(#58c7ff 0 var(--checklist-progress),#b86dff var(--checklist-progress) 82%,rgba(255,255,255,.12) 82% 100%) !important;
+  box-shadow:0 0 24px rgba(128,109,255,.12) !important;
+}
+[data-screen="checklist"] .checklist-overview-ring span { color:#a9dfff !important; }
+[data-screen="checklist"] .checklist-next-card {
+  border-color:rgba(184,109,255,.52) !important;
+  background:radial-gradient(circle at 90% 0,rgba(184,109,255,.20),transparent 48%),linear-gradient(145deg,#372a59,#151b34) !important;
+}
+[data-screen="checklist"] .checklist-shared-extras {
+  border-color:rgba(174,184,194,.30) !important;
+  background:linear-gradient(145deg,rgba(42,49,57,.42),rgba(8,20,34,.90)) !important;
+}
+[data-screen="checklist"] .checklist-row {
+  border-color:rgba(157,185,207,.18) !important;
+  background:rgba(5,19,32,.58) !important;
+}
+[data-screen="checklist"] .checklist-column-list,
+[data-screen="checklist"] .checklist-owner-list { gap:9px !important; }
+[data-screen="checklist"] .checklist-stage-tab[data-active="true"] {
+  border-color:rgba(93,141,255,.58) !important;
+  background:linear-gradient(145deg,rgba(42,77,137,.62),rgba(13,35,65,.92)) !important;
+}
+@media (max-width:1050px) {
+  [data-screen="checklist"] .checklist-layout-grid { grid-template-columns:minmax(0,1fr) !important; }
+  [data-screen="checklist"] .checklist-reference-rail { grid-template-columns:1fr 1fr !important; display:grid !important; gap:12px !important; }
+  [data-screen="checklist"] .checklist-owner-grid { grid-template-columns:1fr 1fr !important; gap:12px !important; }
+}
+
+/* ------------------------------------------------------------------------
+   JOURNEY HISTORY — remove the visually dead lower half. The two large
+   analytics cards share a stronger colour identity, then Milestones,
+   Destination Totals and Travel Mix form a dense balanced row with no giant
+   black slabs between differently-height cards.
+   ------------------------------------------------------------------------ */
+[data-screen="journey-history"] .journey-analytics-two {
+  gap:14px !important;
+  align-items:stretch !important;
+}
+[data-screen="journey-history"] .journey-spend-panel {
+  border-color:rgba(241,101,189,.48) !important;
+  background:radial-gradient(circle at 92% 0,rgba(241,101,189,.16),transparent 46%),linear-gradient(145deg,#35253c,#0d1c30) !important;
+}
+[data-screen="journey-history"] .journey-snapshot-panel {
+  border-color:rgba(93,141,255,.48) !important;
+  background:radial-gradient(circle at 92% 0,rgba(93,141,255,.17),transparent 46%),linear-gradient(145deg,#1c3158,#0b1d34) !important;
+}
+[data-screen="journey-history"] .journey-insight-three {
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+  align-items:stretch !important;
+}
+[data-screen="journey-history"] .journey-milestones-panel,
+[data-screen="journey-history"] .journey-top-destinations,
+[data-screen="journey-history"] .journey-mix-panel {
+  min-height:0 !important;
+  height:auto !important;
+  align-self:stretch !important;
+}
+[data-screen="journey-history"] .journey-milestones-panel {
+  border-color:rgba(255,196,72,.50) !important;
+  background:radial-gradient(circle at 92% 0,rgba(255,196,72,.16),transparent 46%),linear-gradient(145deg,#3b311d,#101d2e) !important;
+}
+[data-screen="journey-history"] .journey-top-destinations {
+  border-color:rgba(185,79,112,.52) !important;
+  background:radial-gradient(circle at 92% 0,rgba(185,79,112,.18),transparent 46%),linear-gradient(145deg,#482637,#101a2c) !important;
+}
+[data-screen="journey-history"] .journey-mix-panel {
+  grid-column:1 / -1 !important;
+  border-color:rgba(184,109,255,.50) !important;
+  background:radial-gradient(circle at 92% 0,rgba(184,109,255,.17),transparent 46%),linear-gradient(145deg,#30284e,#101b31) !important;
+}
+[data-screen="journey-history"] .journey-milestones-grid { grid-auto-rows:minmax(76px,auto) !important; }
+[data-screen="journey-history"] .journey-milestone:nth-child(3n+1) strong { color:#ffd66f !important; }
+[data-screen="journey-history"] .journey-milestone:nth-child(3n+2) strong { color:#7ad7ff !important; }
+[data-screen="journey-history"] .journey-milestone:nth-child(3n+3) strong { color:#d6b6ff !important; }
+[data-screen="journey-history"] .journey-top-item > b { color:#ffbd8a !important; }
+[data-screen="journey-history"] .journey-record-row .journey-cost,
+[data-screen="journey-history"] .journey-record-row [data-field="living-cost"] { color:#f4f7fa !important; }
+@media (max-width:1050px) {
+  [data-screen="journey-history"] .journey-analytics-two,
+  [data-screen="journey-history"] .journey-insight-three { grid-template-columns:1fr !important; }
+  [data-screen="journey-history"] .journey-mix-panel { grid-column:auto !important; }
+}
+
+
+/* Phase 31 Journey History viewport-colour closure — visible sibling widgets must
+   not share or nearly share a colour identity. Journey Check is semantic green
+   when clear; Destination Totals is maroon to separate it from gold Milestones. */
+[data-screen="journey-history"] .journey-health-verified {
+  border-color:rgba(87,214,155,.48) !important;
+  background:radial-gradient(circle at 92% 0,rgba(87,214,155,.16),transparent 46%),linear-gradient(145deg,#183b32,#0b1d2b) !important;
+}
+[data-screen="journey-history"] .journey-health-needs-attention {
+  border-color:rgba(255,209,91,.50) !important;
+  background:radial-gradient(circle at 92% 0,rgba(255,209,91,.16),transparent 46%),linear-gradient(145deg,#3b321e,#101d2e) !important;
+}
+
+/* ------------------------------------------------------------------------
+   General colour restraint. Green is primarily semantic (safe/verified/on
+   track), not the default decorative choice.
+   ------------------------------------------------------------------------ */
+[data-screen="settings"] .settings-health-card:not(.settings-health-card-needs-setup):not(.settings-health-card-needs-attention),
+[data-screen="settings"] .settings-health-tile:not(.needs-setup):not(.needs-attention) {
+  border-color:rgba(88,199,255,.28) !important;
+  background:linear-gradient(145deg,rgba(23,50,75,.76),rgba(8,22,36,.94)) !important;
+}
+
+
+/* ========================================================================
+   S38 REAL-IPAD CLOSURE 2 — evidence-driven finishing corrections.
+   ======================================================================== */
+
+/* The same large header box on every principal screen. 230px also prevents
+   the real Home hero content from being clipped inside a 214px fixed box. */
+[data-screen="home"] > .home-reference-hero,
+[data-screen="itinerary"] > .tcc-stay-banner,
+[data-screen="budget"] > .tcc-stay-banner,
+[data-screen="reservations"] > .tcc-stay-banner,
+[data-screen="calendar"] > .tcc-stay-banner,
+[data-screen="journey-history"] > .tcc-page-hero,
+[data-screen="checklist"] > .tcc-page-hero,
+[data-screen="settings"] > .tcc-page-hero,
+[data-screen="vault"]:not(.vault-screen-locked) > .tcc-page-hero {
+  height:230px !important;
+  min-height:230px !important;
+  max-height:230px !important;
+}
+
+/* Home 1024: preserve the approved one-screen dashboard, but do not solve a
+   width problem by stacking the three headline cards and then clipping their
+   content vertically. Three compact readable columns + four minis fit. */
+@media (max-width:1050px) {
+  [data-screen="home"].home-screen {
+    grid-template-rows:230px 176px minmax(0,1fr) 52px !important;
+    gap:10px !important;
+    padding-top:12px !important;
+    padding-bottom:12px !important;
+  }
+  [data-screen="home"] .home-ref-stats {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,.94fr) !important;
+    gap:8px !important;
+  }
+  [data-screen="home"] .home-ref-annual { grid-column:auto !important; }
+  [data-screen="home"] .home-ref-card {
+    padding:8px 9px !important;
+    gap:3px !important;
+    overflow:hidden !important;
+  }
+  [data-screen="home"] .home-ref-kicker { font-size:9px !important; letter-spacing:.12em !important; }
+  [data-screen="home"] .home-card-label { font-size:9px !important; line-height:1.04 !important; }
+  [data-screen="home"] .home-ref-value,
+  [data-screen="home"] .home-ref-value-xl,
+  [data-screen="home"] .home-ref-value-lg { font-size:24px !important; line-height:1 !important; }
+  [data-screen="home"] .home-ref-secondary { font-size:11px !important; }
+  [data-screen="home"] .home-ref-lines { gap:2px !important; }
+  [data-screen="home"] .home-ref-lines > div { padding-top:2px !important; font-size:8.5px !important; }
+  [data-screen="home"] .home-ref-lines strong { font-size:8.5px !important; }
+  [data-screen="home"] .home-budget-lower,
+  [data-screen="home"] .home-annual-deltas,
+  [data-screen="home"] .home-annual-progress { gap:2px !important; }
+  [data-screen="home"] .home-ref-minis {
+    grid-template-columns:minmax(0,1.02fr) minmax(0,1.08fr) minmax(0,1fr) minmax(0,1.08fr) !important;
+    gap:7px !important;
+  }
+  [data-screen="home"] .home-mini-panel { min-height:0 !important; }
+  [data-screen="home"] .home-mini-head { min-height:34px !important; padding:6px 7px !important; }
+  [data-screen="home"] .home-mini-head h2 { font-size:12.5px !important; }
+  [data-screen="home"] .home-mini-list { gap:3px !important; padding:5px 6px !important; }
+  [data-screen="home"] .home-mini-row { padding:4px 5px !important; }
+}
+
+/* Expense conversion: the AUD result is now a decision figure, not footnote
+   copy. Local input remains the primary editable figure; AUD is the immediate
+   confirmation beside it. */
+.tcc-budget-editor-modal .budget-expense-auto-conversion {
+  align-content:center !important;
+  gap:5px !important;
+  padding:12px 14px !important;
+}
+.tcc-budget-editor-modal .budget-expense-auto-kicker {
+  color:#ffd66f !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  letter-spacing:.13em !important;
+}
+.tcc-budget-editor-modal .budget-expense-auto-conversion > .budget-expense-aud-equivalent {
+  color:#ffe48f !important;
+  font-size:30px !important;
+  font-weight:950 !important;
+  line-height:1 !important;
+  letter-spacing:-.02em !important;
+}
+.tcc-budget-editor-modal .budget-expense-auto-conversion > small {
+  color:#c8d6df !important;
+  font-size:12px !important;
+  font-weight:700 !important;
+  line-height:1.2 !important;
+}
+
+/* Journey paired sections had align-self:start from an older pass, leaving
+   black slabs beneath the shorter panel even though the parent grid stretched. */
+[data-screen="journey-history"] .journey-spend-panel,
+[data-screen="journey-history"] .journey-snapshot-panel,
+[data-screen="journey-history"] .journey-milestones-panel,
+[data-screen="journey-history"] .journey-top-destinations {
+  align-self:stretch !important;
+  height:100% !important;
+}
+
+/* Checklist permanent is deliberately gold rather than green. Make the
+   progress/edge treatment follow that identity too; green remains completion. */
+[data-screen="checklist"] .checklist-column-permanent progress { accent-color:#ffd15b !important; }
+[data-screen="checklist"] .checklist-column-permanent progress::-webkit-progress-value { background:#ffd15b !important; }
+[data-screen="checklist"] .checklist-column-permanent .checklist-column-icon { border-color:rgba(255,209,91,.46) !important; }
+
+/* S38 REAL-IPAD CLOSURE 3 — layer-safe Journey History geometry.
+   Important declarations inside the earlier layered screen stylesheet outrank
+   unlayered important declarations, so the physical-iPad spacing correction
+   is repeated in the first-declared tccLocks layer. */
+@layer tccLocks {
+  [data-screen="journey-history"] .journey-insight-three {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:14px !important;
+    align-items:stretch !important;
+  }
+  [data-screen="journey-history"] .journey-milestones-panel,
+  [data-screen="journey-history"] .journey-top-destinations {
+    align-self:stretch !important;
+    height:100% !important;
+    min-height:0 !important;
+  }
+  [data-screen="journey-history"] .journey-mix-panel {
+    grid-column:1 / -1 !important;
+    align-self:stretch !important;
+    height:auto !important;
+    min-height:0 !important;
+  }
+  @media (max-width:1050px) {
+    [data-screen="journey-history"] .journey-insight-three { grid-template-columns:1fr !important; }
+    [data-screen="journey-history"] .journey-mix-panel { grid-column:auto !important; }
+  }
+}
+
+/* S38 REAL-IPAD CLOSURE 4 — money-readability authority.
+   The older screens-layer compact rule was shrinking the AUD confirmation to
+   14–15px. This is one of Kym's primary decision figures and must stay large. */
+@layer tccLocks {
+  [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-auto-conversion > .budget-expense-aud-equivalent {
+    color:#ffe48f !important;
+    font-size:30px !important;
+    font-weight:950 !important;
+    line-height:1 !important;
+    letter-spacing:-.02em !important;
+  }
+  [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-auto-conversion > .budget-expense-auto-kicker {
+    color:#ffd66f !important;
+    font-size:11px !important;
+    font-weight:950 !important;
+    letter-spacing:.13em !important;
+  }
+  [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-auto-conversion > small {
+    color:#c8d6df !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
+  }
+  @media (max-width:1050px) {
+    [data-screen="budget"] .tcc-budget-editor-modal .budget-expense-auto-conversion > .budget-expense-aud-equivalent { font-size:27px !important; }
+  }
+}
+
+/* S38 REAL-IPAD CLOSURE 5 — Journey History icon-tile authority.
+   Reservations and Vault must use the same premium inset icon language as the
+   Journey History headline cards: category colour, dark inset fill, clear
+   outline and restrained glow. Completed remains the silver exception. */
+@layer tccLocks {
+  html body [data-screen="reservations"] .reservation-tabs .reservation-tab .reservation-tab-icon {
+    width:40px !important;
+    height:40px !important;
+    display:grid !important;
+    place-items:center !important;
+    border:1px solid rgba(var(--reservation-rgb,126,218,248),.62) !important;
+    border-radius:12px !important;
+    background:linear-gradient(145deg,rgba(var(--reservation-rgb,126,218,248),.18),rgba(4,15,28,.42)) !important;
+    color:rgb(var(--reservation-rgb,126,218,248)) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px rgba(var(--reservation-rgb,126,218,248),.16) !important;
+  }
+  html body [data-screen="reservations"] .reservation-tabs .reservation-tab .reservation-tab-icon .tcc-line-icon {
+    width:22px !important;
+    height:22px !important;
+  }
+  html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reservation-tab-completed .reservation-tab-icon {
+    border-color:rgba(174,184,194,.56) !important;
+    background:linear-gradient(145deg,rgba(174,184,194,.15),rgba(4,15,28,.42)) !important;
+    color:#d5dde4 !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.09),0 0 14px rgba(174,184,194,.10) !important;
+  }
+
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon,
+  html body [data-screen="vault"] .vault-all-records .vault-category-icon {
+    width:43px !important;
+    height:43px !important;
+    display:grid !important;
+    place-items:center !important;
+    border:1px solid color-mix(in srgb,var(--vault-accent,#80d9ff) 64%,transparent) !important;
+    border-radius:12px !important;
+    background:linear-gradient(145deg,color-mix(in srgb,var(--vault-accent,#80d9ff) 20%,transparent),rgba(4,15,28,.44)) !important;
+    color:var(--vault-accent,#80d9ff) !important;
+    filter:none !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px color-mix(in srgb,var(--vault-accent,#80d9ff) 17%,transparent) !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon .tcc-line-icon,
+  html body [data-screen="vault"] .vault-all-records .vault-category-icon .tcc-line-icon {
+    width:24px !important;
+    height:24px !important;
+  }
+  @media (max-width:1050px) {
+    html body [data-screen="reservations"] .reservation-tabs .reservation-tab .reservation-tab-icon {
+      width:38px !important;
+      height:38px !important;
+    }
+    html body [data-screen="vault"] .vault-category-card .vault-category-icon,
+    html body [data-screen="vault"] .vault-all-records .vault-category-icon {
+      width:40px !important;
+      height:40px !important;
+    }
+  }
+}
+
+/* S38 POST-SEAL FORENSIC CLOSURE — Vault header rhythm and live-rail fit.
+   The locked Vault is still the Vault screen, so its picture header follows the
+   same 230px rhythm as every other principal screen. In the unlocked state the
+   live status/action rail must fit wholly inside that header rather than losing
+   its bottom edge to overflow:hidden. */
+@layer tccLocks {
+  html body [data-screen="vault"].vault-screen-locked > .vault-locked-reference-hero {
+    height:230px !important;
+    min-height:230px !important;
+    max-height:230px !important;
+  }
+  html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero .vault-hero-actions {
+    margin:8px 12px 8px 0 !important;
+    height:calc(100% - 16px) !important;
+    max-height:calc(100% - 16px) !important;
+    align-self:start !important;
+  }
+}
+
+/* ========================================================================
+   S39 PHASE 4 — premium spacing / lower-half closure (15 Sep 2026)
+   Acceptance targets: CHK-007, JH-007/JH-008/JH-009 and G-028.
+   Keep the approved structure. Reduce artificial vertical waste on scan cards,
+   restore the locked Checklist identity palette, and make Journey row money
+   follow travel-mode identity instead of reading as success-green.
+   ======================================================================== */
+@layer tccLocks {
+  /* Checklist: five unmistakable identities. */
+  html body [data-screen="checklist"] .checklist-column-destination {
+    border-color:rgba(70,217,202,.54) !important;
+    background:radial-gradient(circle at 92% 0,rgba(70,217,202,.18),transparent 48%),linear-gradient(145deg,#153f45,#0a2231) !important;
+  }
+  html body [data-screen="checklist"] .checklist-column-destination .checklist-column-icon,
+  html body [data-screen="checklist"] .checklist-column-destination .checklist-next-task > span {
+    color:#70eadc !important;
+    border-color:rgba(70,217,202,.46) !important;
+  }
+  html body [data-screen="checklist"] .checklist-column-destination progress {
+    accent-color:#46d9ca !important;
+  }
+  html body [data-screen="checklist"] .checklist-column-destination progress::-webkit-progress-value {
+    background:#46d9ca !important;
+  }
+  html body [data-screen="checklist"] .checklist-shared-extras {
+    border-color:rgba(128,109,255,.44) !important;
+    background:radial-gradient(circle at 92% 0,rgba(128,109,255,.13),transparent 50%),linear-gradient(145deg,#252b4b,#0c1b31) !important;
+  }
+  html body [data-screen="checklist"] .checklist-shared-extras > strong {
+    color:#cbbfff !important;
+  }
+
+  /* Journey History: living-cost money is data, not a success state. Tie the
+     emphasis to the trip type so Standard / Motorhome / Cruise scan together
+     with the type icon and Travel Mix identity. */
+  html body [data-screen="journey-history"] .journey-destination-cost {
+    text-shadow:none !important;
+  }
+  html body [data-screen="journey-history"] .journey-record-tone-sky .journey-destination-cost {
+    color:#8fdcff !important;
+  }
+  html body [data-screen="journey-history"] .journey-record-tone-orange .journey-destination-cost {
+    color:#ffbd8a !important;
+  }
+  html body [data-screen="journey-history"] .journey-record-tone-violet .journey-destination-cost {
+    color:#d3b4ff !important;
+  }
+
+  /* The three lower analytics sections keep distinct material identities, but
+     share one spacing rhythm so the lower half reads as a deliberate group. */
+  html body [data-screen="journey-history"] .journey-insight-three {
+    margin-top:2px !important;
+  }
+  html body [data-screen="journey-history"] :is(.journey-milestones-panel,.journey-top-destinations,.journey-mix-panel) {
+    padding-top:16px !important;
+    padding-bottom:16px !important;
+  }
+}
+
+/* S39 PHASE 4 — Home 1024 internal fit.
+   Event titles may use two lines, but date/time/type metadata is a single scan
+   line. This prevents compact rows from internally overflowing while keeping
+   all three upcoming events visible in the approved one-screen dashboard. */
+@layer tccLocks {
+  @media (max-width:1050px) {
+    html body [data-screen="home"] .home-mini-upcoming .home-event-copy {
+      min-width:0 !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="home"] .home-mini-upcoming .home-event-copy > small {
+      display:block !important;
+      max-width:100% !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+  }
+}
+
+/* S39 PHASE 4 — Checklist density without losing note data.
+   Main Permanent/Destination cards are scan surfaces: title + due/status stay
+   visible, while the saved note remains available on tap and in the expanded
+   card/editor. This removes repeated simulation-note lines that were creating
+   artificial dead vertical space between unequal task counts. */
+@layer tccLocks {
+  html body [data-screen="checklist"] .checklist-column-list .checklist-note {
+    display:none !important;
+  }
+}
+
+/* S39 PHASE 4 — use the existing empty History state to close the wide-iPad
+   summary-rail void. Populated history remains the normal full-width history
+   section; only the genuinely empty state is compacted into the rail. */
+@layer tccLocks {
+  html body [data-screen="checklist"] .checklist-history-compact-empty {
+    min-height:112px !important;
+    align-self:start !important;
+  }
+  @media (max-width:1050px) {
+    html body [data-screen="checklist"] .checklist-reference-rail > .checklist-history-compact-empty {
+      grid-column:1 / -1 !important;
+    }
+  }
+}
+
+
+/* S39 HOME STILLNESS LOCK — real-iPad one-screen command centre.
+   Home is intentionally a fixed dashboard. On iPad it must not vertically
+   scroll, rubber-band, or drift when the user swipes the main canvas. Expanded
+   cards/search results own their own contained scrolling; other screens keep
+   their normal document scrolling. */
+html:has(body [data-screen="home"].home-screen) {
+  height:100% !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has([data-screen="home"].home-screen) {
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has([data-screen="home"].home-screen) .app-shell {
+  height:100dvh !important;
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
+  height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px)) !important;
+  min-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px)) !important;
+  max-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px)) !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+
+
+/* S39 PHASE 25 — Home distinct premium widget palette.
+   Cameron & Kym's Home must read as one coherent premium command centre while
+   every widget has a deliberately different colour identity. Semantic colours
+   remain authoritative: Alerts stay red, Schengen stays green/red/amber by
+   status, Annual stays gold, and Search stays neutral silver. */
+@layer tccLocks {
+  /* Headline trio: turquoise / magenta-plum / gold. */
+  html body [data-screen="home"] .home-ref-daily {
+    border-color:rgba(66,219,206,.52) !important;
+    background:radial-gradient(circle at 91% 5%,rgba(66,219,206,.18),transparent 46%),linear-gradient(145deg,#113d45,#0a2734 62%,#071a29) !important;
+    box-shadow:0 14px 30px rgba(0,0,0,.22),0 0 18px rgba(66,219,206,.055),inset 0 1px rgba(255,255,255,.045) !important;
+  }
+  html body [data-screen="home"] .home-ref-daily :is(.home-budget-diamond,.home-ref-kicker) { color:#86eee5 !important; }
+
+  html body [data-screen="home"] .home-ref-destination {
+    border-color:rgba(241,101,189,.50) !important;
+    background:radial-gradient(circle at 91% 5%,rgba(241,101,189,.17),transparent 46%),linear-gradient(145deg,#45213e,#28182f 62%,#111827) !important;
+    box-shadow:0 14px 30px rgba(0,0,0,.22),0 0 18px rgba(241,101,189,.055),inset 0 1px rgba(255,255,255,.045) !important;
+  }
+  html body [data-screen="home"] .home-ref-destination :is(.home-budget-diamond,.home-ref-kicker) { color:#ffadd9 !important; }
+
+  html body [data-screen="home"] .home-ref-annual {
+    border-color:rgba(255,209,91,.50) !important;
+    background:radial-gradient(circle at 91% 5%,rgba(255,209,91,.17),transparent 46%),linear-gradient(145deg,#3c351f,#202a28 62%,#0b1b29) !important;
+    box-shadow:0 14px 30px rgba(0,0,0,.22),0 0 18px rgba(255,209,91,.05),inset 0 1px rgba(255,255,255,.045) !important;
+  }
+  html body [data-screen="home"] .home-ref-annual :is(.home-budget-diamond,.home-ref-kicker) { color:#ffe08c !important; }
+
+  /* Lower row: copper / crimson-maroon / emerald / violet. */
+  html body [data-screen="home"] .home-mini-upcoming {
+    border-color:rgba(246,156,92,.50) !important;
+    background:radial-gradient(circle at 88% 0%,rgba(246,156,92,.145),transparent 48%),linear-gradient(145deg,#422b20,#24202a 62%,#081b2a) !important;
+    box-shadow:0 13px 28px rgba(0,0,0,.21),0 0 17px rgba(246,156,92,.05),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="home"] .home-mini-upcoming :is(.home-mini-diamond,.home-mini-head h2) { color:#ffc095 !important; }
+  html body [data-screen="home"] .home-mini-upcoming .home-date-badge {
+    border-color:rgba(246,156,92,.34) !important;
+    background:rgba(91,52,34,.42) !important;
+  }
+
+  html body [data-screen="home"] .home-mini-alerts {
+    border-color:rgba(255,111,131,.54) !important;
+    background:radial-gradient(circle at 88% 0%,rgba(255,111,131,.15),transparent 48%),linear-gradient(145deg,#43212f,#251923 62%,#081927) !important;
+    box-shadow:0 13px 28px rgba(0,0,0,.21),0 0 18px rgba(255,111,131,.06),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="home"] .home-mini-alerts :is(.home-mini-diamond,.home-mini-head h2) { color:#ff9aab !important; }
+
+  html body [data-screen="home"] .home-mini-schengen:not(.is-not-allowed):not(.is-not-checked) {
+    border-color:rgba(87,214,155,.50) !important;
+    background:radial-gradient(circle at 86% 0%,rgba(87,214,155,.13),transparent 48%),linear-gradient(145deg,#123d35,#0a292d 62%,#071a27) !important;
+    box-shadow:0 13px 28px rgba(0,0,0,.21),0 0 17px rgba(87,214,155,.05),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="home"] .home-mini-schengen:not(.is-not-allowed):not(.is-not-checked) :is(.home-mini-diamond,.home-mini-head h2) { color:#a6efd0 !important; }
+
+  html body [data-screen="home"] .home-mini-schengen.is-not-checked {
+    border-color:rgba(255,209,91,.46) !important;
+    background:radial-gradient(circle at 86% 0%,rgba(255,209,91,.11),transparent 48%),linear-gradient(145deg,#3a321d,#25241f 62%,#071a27) !important;
+  }
+  html body [data-screen="home"] .home-mini-schengen.is-not-checked :is(.home-mini-diamond,.home-mini-head h2) { color:#ffe08a !important; }
+
+  html body [data-screen="home"] .home-mini-schengen.is-not-allowed {
+    border-color:rgba(183,73,102,.58) !important;
+    background:radial-gradient(circle at 86% 0%,rgba(183,73,102,.17),transparent 48%),linear-gradient(145deg,#461d2b,#271923 62%,#071925) !important;
+  }
+  html body [data-screen="home"] .home-mini-schengen.is-not-allowed :is(.home-mini-diamond,.home-mini-head h2) { color:#f49ab1 !important; }
+
+  html body [data-screen="home"] .home-mini-timeline {
+    border-color:rgba(184,109,255,.50) !important;
+    background:radial-gradient(circle at 88% 0%,rgba(184,109,255,.15),transparent 48%),linear-gradient(145deg,#3c2756,#231d3d 62%,#0a192b) !important;
+    box-shadow:0 13px 28px rgba(0,0,0,.21),0 0 17px rgba(184,109,255,.055),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="home"] .home-mini-timeline :is(.home-mini-diamond,.home-mini-head h2) { color:#d4b4ff !important; }
+  html body [data-screen="home"] .home-mini-timeline .home-timeline-icon {
+    border-color:rgba(184,109,255,.34) !important;
+    background:rgba(64,40,91,.36) !important;
+    color:#d4b4ff !important;
+  }
+
+  /* Expanded cards must keep the collapsed source colour identity. */
+  html body [data-screen="home"] .tcc-modal.tcc-expanded-modal.tone-magenta {
+    --tcc-expanded-rgb:241,101,189 !important;
+    --tcc-expanded-deep:#562446 !important;
+    --tcc-expanded-mid:#381d3a !important;
+    --tcc-expanded-base:#211527 !important;
+  }
+  html body [data-screen="home"] .tcc-modal.tcc-expanded-modal.tone-orange {
+    --tcc-expanded-rgb:246,156,92 !important;
+    --tcc-expanded-deep:#5b3422 !important;
+    --tcc-expanded-mid:#3b251f !important;
+    --tcc-expanded-base:#24191c !important;
+  }
+}
+
+
+/* S39 PHASE 26 — Itinerary distinct premium widget palette.
+   Preserve the approved planning layout while separating adjacent widgets with
+   a broader restrained colour array: current teal, next copper, map sky,
+   coverage indigo, upcoming magenta and completed silver. Destination-row and
+   travel-mode colours remain data identity, not competing panel themes. */
+@layer tccLocks {
+  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-current {
+    border-color:rgba(70,217,202,.46) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(70,217,202,.14),transparent 48%),linear-gradient(145deg,rgba(12,57,61,.88),rgba(5,23,36,.91)) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 18px rgba(70,217,202,.045) !important;
+  }
+  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-current .eyebrow { color:#8eeee4 !important; }
+
+  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-next {
+    border-color:rgba(246,156,92,.46) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(246,156,92,.14),transparent 48%),linear-gradient(145deg,rgba(65,39,28,.88),rgba(25,22,32,.91)) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 18px rgba(246,156,92,.045) !important;
+  }
+  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-next .eyebrow { color:#ffc095 !important; }
+
+  html body [data-screen="itinerary"] .itinerary-map-panel {
+    --comfort-accent:#58c7ff !important;
+    border-color:rgba(88,199,255,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(88,199,255,.12),transparent 48%),linear-gradient(145deg,#12364d,#092438 62%,#071a29) !important;
+    box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(88,199,255,.045),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-map-panel :is(.eyebrow,.itinerary-map-title-row h2) { color:#a8e6ff !important; }
+
+  html body [data-screen="itinerary"] .itinerary-coverage-reference {
+    --comfort-accent:#806dff !important;
+    border-color:rgba(128,109,255,.42) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(128,109,255,.14),transparent 47%),linear-gradient(145deg,#2e2851,#1b1c3a 62%,#09192b) !important;
+    box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(128,109,255,.045),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-coverage-reference .itinerary-section-head h2 { color:#c1b7ff !important; }
+
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel {
+    --comfort-accent:#f165bd !important;
+    border-color:rgba(241,101,189,.43) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(241,101,189,.13),transparent 47%),linear-gradient(145deg,#3f203b,#24182f 62%,#091a2a) !important;
+    box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(241,101,189,.045),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:#ffb2dc !important; }
+
+  html body [data-screen="itinerary"] .itinerary-completed {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.30) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(174,184,194,.08),transparent 47%),linear-gradient(145deg,rgba(48,55,64,.54),rgba(9,20,32,.96)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-completed > summary { color:#d5dde4 !important; }
+
+  /* The secondary add-home action is deliberately warm so it does not read as
+     another blue command next to the primary Add Destination action. */
+  html body [data-screen="itinerary"] .itinerary-add-home {
+    border-color:rgba(255,209,91,.38) !important;
+    background:linear-gradient(145deg,rgba(70,57,28,.54),rgba(13,28,39,.92)) !important;
+    color:#ffe29a !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:#ffe29a !important; }
+}
+
+
+/* S39 PHASE 27 — Itinerary viewport colour uniqueness.
+   Cameron's locked rule is viewport-based: widgets that can be seen together
+   must not repeat or visually collapse into the same colour family. The six
+   statistics therefore use green / magenta / teal / gold / silver / red while
+   the simultaneously-visible map stays sky and coverage stays indigo. */
+@layer tccLocks {
+  html body [data-screen="itinerary"] .itinerary-stat-countries {
+    border-color:rgba(166,211,83,.42) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(166,211,83,.16),transparent 46%),linear-gradient(145deg,rgba(50,67,28,.95),rgba(22,31,25,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-countries :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#c8ea87 !important; }
+
+  html body [data-screen="itinerary"] .itinerary-stat-routes {
+    border-color:rgba(241,101,189,.42) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(241,101,189,.16),transparent 46%),linear-gradient(145deg,rgba(72,27,61,.95),rgba(31,20,40,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-routes :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#ffb3df !important; }
+
+  html body [data-screen="itinerary"] .itinerary-stat-stops {
+    border-color:rgba(70,217,202,.40) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(70,217,202,.15),transparent 46%),linear-gradient(145deg,rgba(13,62,66,.95),rgba(7,28,37,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-stops :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#93efe7 !important; }
+
+  html body [data-screen="itinerary"] .itinerary-stat-gaps {
+    border-color:rgba(255,209,91,.40) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(255,209,91,.15),transparent 46%),linear-gradient(145deg,rgba(64,52,24,.95),rgba(30,27,21,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-gaps :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#ffe39a !important; }
+
+  html body [data-screen="itinerary"] .itinerary-stat-stays {
+    border-color:rgba(174,184,194,.38) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(174,184,194,.13),transparent 46%),linear-gradient(145deg,rgba(51,59,67,.95),rgba(23,29,36,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-stays :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#d8e0e6 !important; }
+
+  html body [data-screen="itinerary"] .itinerary-stat-overlaps {
+    border-color:rgba(226,72,98,.46) !important;
+    background:radial-gradient(circle at 90% 5%,rgba(226,72,98,.17),transparent 46%),linear-gradient(145deg,rgba(72,27,40,.95),rgba(31,19,28,.97)) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-stat-overlaps :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:#ff9daf !important; }
+
+  /* Silver is a first-class expanded-card tone for the Missing Stays tile. */
+  html body .tcc-modal.tcc-expanded-modal.tone-lime {
+    --tcc-expanded-rgb:166,211,83 !important;
+    --tcc-expanded-deep:#3b4a24 !important;
+    --tcc-expanded-mid:#2a351f !important;
+    --tcc-expanded-base:#1b231d !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal.tone-lime > form > header h2 { color:#c8ea87 !important; }
+
+  html body .tcc-modal.tcc-expanded-modal.tone-silver {
+    --tcc-expanded-rgb:174,184,194 !important;
+    --tcc-expanded-deep:#343b43 !important;
+    --tcc-expanded-mid:#252c34 !important;
+    --tcc-expanded-base:#171d24 !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal.tone-silver > form > header h2 { color:#d8e0e6 !important; }
+
+  /* Upcoming may share copper with the far-away Next Destination card because
+     those two widgets cannot occupy the same iPad viewport. Copper stays well
+     separated from the simultaneously visible gold statistic. */
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.44) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(199,131,87,.14),transparent 47%),linear-gradient(145deg,#422d25,#2a2025 62%,#091a2a) !important;
+    box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(199,131,87,.045),inset 0 1px rgba(255,255,255,.04) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:#e8ad86 !important; }
+  html body .tcc-modal.tcc-expanded-modal.tone-copper {
+    --tcc-expanded-rgb:199,131,87 !important;
+    --tcc-expanded-deep:#4a3126 !important;
+    --tcc-expanded-mid:#32231f !important;
+    --tcc-expanded-base:#20191b !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal.tone-copper > form > header h2 { color:#e8ad86 !important; }
+}
+
+
+/* S39 PHASE 28 — Budget viewport colour uniqueness.
+   The Budget screen keeps one premium dark material language, but adjacent
+   information widgets must be immediately distinguishable. Reuse is allowed
+   only when two same-family panels cannot occupy one iPad viewport. */
+@layer tccLocks {
+  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-current {
+    border-color:rgba(214,111,167,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(214,111,167,.13),transparent 48%),linear-gradient(145deg,rgba(70,32,55,.88),rgba(25,21,35,.92)) !important;
+  }
+  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-current .eyebrow { color:#f0add0 !important; }
+  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-next {
+    border-color:rgba(199,131,87,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.13),transparent 48%),linear-gradient(145deg,rgba(64,42,31,.88),rgba(27,22,31,.92)) !important;
+  }
+  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-next .eyebrow { color:#e8ad86 !important; }
+
+  html body [data-screen="budget"] .budget-destination-card {
+    --comfort-accent:#58c7ff !important;
+    border-color:rgba(88,199,255,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(88,199,255,.15),transparent 48%),linear-gradient(145deg,#123b50,#0a2637 62%,#071a29) !important;
+  }
+  html body [data-screen="budget"] .budget-pace-card {
+    --comfort-accent:#57d69b !important;
+    border-color:rgba(87,214,155,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(87,214,155,.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
+  }
+  html body [data-screen="budget"] .budget-destination-budgets-card {
+    --comfort-accent:#a67cff !important;
+    border-color:rgba(166,124,255,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(166,124,255,.15),transparent 48%),linear-gradient(145deg,#352a55,#211d3d 62%,#09192b) !important;
+  }
+  html body [data-screen="budget"] .budget-destination-budgets-card :is(.budget-card-kicker,h2,strong) { color:#d1bcff !important; }
+
+  html body [data-screen="budget"] .budget-chart-panel {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.43) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#402d27,#282027 62%,#091a2a) !important;
+  }
+  html body [data-screen="budget"] .budget-chart-panel .budget-section-head h2 { color:#e8ad86 !important; }
+
+  html body [data-screen="budget"] .budget-forecast-panel {
+    --comfort-accent:#f165bd !important;
+    border-color:rgba(241,101,189,.43) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(241,101,189,.13),transparent 48%),linear-gradient(145deg,#40213d,#25192f 62%,#091a2a) !important;
+  }
+  html body [data-screen="budget"] .budget-forecast-panel .budget-section-head h2 { color:#ffb2dc !important; }
+
+  html body [data-screen="budget"] .budget-monthly-history {
+    --comfort-accent:#5d8dff !important;
+    border-color:rgba(93,141,255,.43) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(93,141,255,.14),transparent 48%),linear-gradient(145deg,#172f55,#101f3c 62%,#081829) !important;
+  }
+  html body [data-screen="budget"] .budget-monthly-history .budget-section-head h2 { color:#b8c9ff !important; }
+
+  html body [data-screen="budget"] .budget-living-panel {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.38) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(174,184,194,.11),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
+  }
+  html body [data-screen="budget"] .budget-living-panel .budget-section-head h2 { color:#d8e0e6 !important; }
+
+  html body [data-screen="budget"] .budget-reservations-panel {
+    --comfort-accent:#57d69b !important;
+    border-color:rgba(87,214,155,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(87,214,155,.12),transparent 48%),linear-gradient(145deg,#173b31,#0d292d 62%,#081925) !important;
+  }
+  html body [data-screen="budget"] .budget-reservations-panel .budget-section-head h2 { color:#a8f0cb !important; }
+
+  html body [data-screen="budget"] .budget-accounts-summary-card {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.12),transparent 48%),linear-gradient(145deg,#3c3420,#28271f 62%,#091925) !important;
+  }
+  html body [data-screen="budget"] .budget-accounts-summary-card .budget-section-head h2 { color:#ffe39a !important; }
+
+  html body [data-screen="budget"] .budget-recent {
+    --comfort-accent:#b94f70 !important;
+    border-color:rgba(185,79,112,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.14),transparent 48%),linear-gradient(145deg,#412331,#291c29 62%,#091824) !important;
+  }
+  html body [data-screen="budget"] .budget-recent .budget-section-head h2 { color:#e7a5bb !important; }
+
+  /* Six Living Expense category cards remain visibly different from each
+     other inside the same viewport. */
+  html body [data-screen="budget"] .budget-category-groceries,
+  .tcc-modal .budget-category-groceries { --choice-rgb:87,214,155 !important; }
+  html body [data-screen="budget"] .budget-category-eating-out,
+  .tcc-modal .budget-category-eating-out { --choice-rgb:226,132,78 !important; }
+  html body [data-screen="budget"] .budget-category-transport,
+  .tcc-modal .budget-category-transport { --choice-rgb:88,199,255 !important; }
+  html body [data-screen="budget"] .budget-category-entertainment,
+  .tcc-modal .budget-category-entertainment { --choice-rgb:166,124,255 !important; }
+  html body [data-screen="budget"] .budget-category-shopping,
+  .tcc-modal .budget-category-shopping { --choice-rgb:226,72,98 !important; }
+  html body [data-screen="budget"] .budget-category-miscellaneous,
+  .tcc-modal .budget-category-miscellaneous { --choice-rgb:255,209,91 !important; }
+
+  html body .tcc-modal.tcc-expanded-modal.tone-maroon {
+    --tcc-expanded-rgb:185,79,112 !important;
+    --tcc-expanded-deep:#492636 !important;
+    --tcc-expanded-mid:#321e2d !important;
+    --tcc-expanded-base:#211720 !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal.tone-maroon > form > header h2 { color:#e7a5bb !important; }
+}
+
+/* S39 PHASE 29 — Reservations viewport colour uniqueness.
+   Every major Reservations widget that can coexist in one iPad viewport has
+   its own unmistakable colour identity. Category semantics remain intact;
+   distant header/health colours may be reused only when they cannot be seen
+   together. */
+@layer tccLocks {
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-current {
+    border-color:rgba(166,211,83,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(166,211,83,.14),transparent 48%),linear-gradient(145deg,rgba(48,61,28,.90),rgba(22,29,27,.94)) !important;
+  }
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-current .eyebrow { color:#d7f09a !important; }
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-next {
+    border-color:rgba(148,58,86,.48) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(148,58,86,.16),transparent 48%),linear-gradient(145deg,rgba(67,26,41,.92),rgba(29,20,31,.95)) !important;
+  }
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-next .eyebrow { color:#e69bb2 !important; }
+
+  /* To Book keeps an amber status language inside, while the containing panel
+     is copper so it does not duplicate the Hotels tile visible above it. */
+  html body [data-screen="reservations"] .reservation-to-book {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+  }
+  html body [data-screen="reservations"] .reservation-to-book > h2,
+  html body [data-screen="reservations"] .reservation-to-book .reservation-panel-title { color:#e8ad86 !important; }
+
+  html body [data-screen="reservations"] .reservation-next-five {
+    --comfort-accent:#5d8dff !important;
+    border-color:rgba(93,141,255,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(93,141,255,.14),transparent 48%),linear-gradient(145deg,#172f55,#101f3c 62%,#081829) !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five h2 { color:#b8c9ff !important; }
+
+  html body [data-screen="reservations"] .reservation-booked-total {
+    --comfort-accent:#57d69b !important;
+    border-color:rgba(87,214,155,.43) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(87,214,155,.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
+  }
+  html body [data-screen="reservations"] .reservation-booked-total :is(.reservation-total-value,.reservation-total-label,h2) { color:#a8f0cb !important; }
+
+  /* Verified Reservation Health is lime rather than silver, because Completed
+     is visible in nearby viewports. Needs Attention becomes deep maroon: still
+     a warning, but clearly separate from coral Tickets and amber To Book. */
+  html body [data-screen="reservations"] .reservation-health.reservation-health-verified {
+    --comfort-accent:#a6d353 !important;
+    border-color:rgba(166,211,83,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(166,211,83,.13),transparent 48%),linear-gradient(145deg,#314126,#202c28 62%,#081924) !important;
+    color:#e9f4d2 !important;
+  }
+  html body [data-screen="reservations"] .reservation-health.reservation-health-needs-attention {
+    --comfort-accent:#b94f70 !important;
+    border-color:rgba(185,79,112,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
+  }
+  html body [data-screen="reservations"] .reservation-health.reservation-health-needs-attention .reservation-health-status { color:#efb0c4 !important; }
+}
+
+/* S39 PHASE 30 — Calendar viewport colour uniqueness.
+   Utility chrome and the month grid stay neutral so event coding remains easy
+   to read. The visible header and three source-summary widgets each have a
+   clearly different premium identity. Repeated event colours are semantic
+   source/destination coding, not duplicate widget decoration. */
+@layer tccLocks {
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-current {
+    border-color:rgba(255,209,91,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.14),transparent 48%),linear-gradient(145deg,rgba(61,51,27,.90),rgba(27,28,28,.94)) !important;
+  }
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-current .eyebrow { color:#ffe39a !important; }
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-next {
+    border-color:rgba(185,79,112,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.15),transparent 48%),linear-gradient(145deg,rgba(65,32,46,.92),rgba(29,21,32,.95)) !important;
+  }
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-next .eyebrow { color:#e7a5bb !important; }
+
+  html body [data-screen="calendar"] .calendar-legend-item.calendar-legend-periods {
+    --comfort-accent:#46d9ca !important;
+    border-color:rgba(70,217,202,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(70,217,202,.13),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
+  }
+  html body [data-screen="calendar"] .calendar-legend-item.calendar-legend-reservations {
+    --comfort-accent:#5d8dff !important;
+    border-color:rgba(93,141,255,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(93,141,255,.13),transparent 48%),linear-gradient(145deg,#172e53,#101f3d 62%,#081829) !important;
+  }
+  html body [data-screen="calendar"] .calendar-legend-item.calendar-legend-personal {
+    --comfort-accent:#b86dff !important;
+    border-color:rgba(184,109,255,.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(184,109,255,.13),transparent 48%),linear-gradient(145deg,#35264f,#231b3b 62%,#09192a) !important;
+  }
+}
+
+/* S39 PHASE 31 — Journey History viewport colour uniqueness.
+   Palette is assigned by overlapping viewport bands, not by section alone.
+   This prevents a partially visible upper widget from duplicating the colour
+   of the next band as it scrolls into view. */
+@layer tccLocks {
+  html body [data-screen="journey-history"] .journey-spend-panel {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+  }
+  html body [data-screen="journey-history"] .journey-spend-panel .journey-section-head h2 { color:#ffe39a !important; }
+
+  html body [data-screen="journey-history"] .journey-snapshot-panel {
+    --comfort-accent:#b94f70 !important;
+    border-color:rgba(185,79,112,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
+  }
+  html body [data-screen="journey-history"] .journey-snapshot-panel .journey-section-head h2 { color:#e7a5bb !important; }
+
+  html body [data-screen="journey-history"] .journey-milestones-panel {
+    --comfort-accent:#46d9ca !important;
+    border-color:rgba(70,217,202,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(70,217,202,.14),transparent 48%),linear-gradient(145deg,#153d3c,#0c292f 62%,#081925) !important;
+  }
+  html body [data-screen="journey-history"] .journey-milestones-panel .journey-section-head h2 { color:#9cefe7 !important; }
+
+  html body [data-screen="journey-history"] .journey-top-destinations {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+  }
+  html body [data-screen="journey-history"] .journey-top-destinations .journey-section-head h2 { color:#e8ad86 !important; }
+
+  html body [data-screen="journey-history"] .journey-mix-panel {
+    --comfort-accent:#b86dff !important;
+    border-color:rgba(184,109,255,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(184,109,255,.14),transparent 48%),linear-gradient(145deg,#35264f,#231b3b 62%,#09192a) !important;
+  }
+  html body [data-screen="journey-history"] .journey-mix-panel .journey-section-head h2 { color:#d8b3ff !important; }
+
+  html body [data-screen="journey-history"] .journey-record-filter-panel {
+    --comfort-accent:#f165bd !important;
+    border-color:rgba(241,101,189,.43) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(241,101,189,.13),transparent 48%),linear-gradient(145deg,#40213d,#25192f 62%,#091a2a) !important;
+  }
+
+  html body [data-screen="journey-history"] .journey-health-verified {
+    --comfort-accent:#57d69b !important;
+    border-color:rgba(87,214,155,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(87,214,155,.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
+  }
+  html body [data-screen="journey-history"] .journey-health-needs-attention {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+  }
+}
+
+/* S39 PHASE 32 — Checklist viewport colour uniqueness.
+   Keep the approved Checklist structure and owner/list identities, but ensure
+   every top-level card visible in one viewport reads as a different material. */
+@layer tccLocks {
+  html body [data-screen="checklist"] .checklist-ready-banner[data-ready-status="not-ready"],
+  html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-not-ready {
+    --comfort-accent:#df526b !important;
+    border-color:rgba(223,82,107,.48) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(223,82,107,.16),transparent 48%),linear-gradient(145deg,#472532,#2b1d29 62%,#091824) !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner[data-ready-status="not-ready"] .checklist-ready-ring,
+  html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-not-ready .checklist-ready-ring {
+    border-color:#df526b !important;
+    color:#ff9caf !important;
+  }
+
+  html body [data-screen="checklist"] .checklist-overview-card {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(174,184,194,.13),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-card .eyebrow { color:#d8e0e6 !important; }
+  html body [data-screen="checklist"] .checklist-overview-ring {
+    background:radial-gradient(circle at center,#101f36 0 55%,transparent 56%),conic-gradient(#57d69b 0 var(--checklist-progress),#aeb8c2 var(--checklist-progress) 100%) !important;
+    box-shadow:0 0 24px rgba(174,184,194,.10) !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring span { color:#e0e6eb !important; }
+
+  html body [data-screen="checklist"] .checklist-next-card {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-card .eyebrow,
+  html body [data-screen="checklist"] .checklist-next-card .checklist-next-icon { color:#e8ad86 !important; }
+
+  html body [data-screen="checklist"] .checklist-shared-extras {
+    --comfort-accent:#9b70e8 !important;
+    border-color:rgba(155,112,232,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(155,112,232,.15),transparent 48%),linear-gradient(145deg,#342850,#221d3a 62%,#09192a) !important;
+  }
+  html body [data-screen="checklist"] .checklist-shared-extras > strong { color:#d7bfff !important; }
+
+  html body [data-screen="checklist"] .checklist-history {
+    --comfort-accent:#97aa4d !important;
+    border-color:rgba(151,170,77,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(151,170,77,.14),transparent 48%),linear-gradient(145deg,#343b22,#252a22 62%,#091924) !important;
+  }
+  html body [data-screen="checklist"] .checklist-history .checklist-section-head h2 { color:#d8e29a !important; }
+}
+
+/* S39 PHASE 33 — Vault viewport colour uniqueness.
+   The unlocked overview is audited by overlapping viewport bands. Category
+   identities stay intact, while overview/status cards use separate premium
+   families so no two top-level widgets visible together read as duplicates. */
+@layer tccLocks {
+  html body [data-screen="vault"] .vault-all-records {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(174,184,194,.12),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
+  }
+  html body [data-screen="vault"] .vault-all-records .vault-category-icon {
+    --vault-accent:#d5dde4 !important;
+  }
+
+  html body [data-screen="vault"] .vault-summary-card {
+    --comfort-accent:#57d69b !important;
+    border-color:rgba(87,214,155,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(87,214,155,.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
+  }
+  html body [data-screen="vault"] .vault-summary-card > h2 { color:#a8f0cb !important; }
+
+  html body [data-screen="vault"] .vault-expiry-card {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+  }
+  html body [data-screen="vault"] .vault-expiry-card > h2 { color:#ffe39a !important; }
+
+  html body [data-screen="vault"] .vault-emergency-travel-card {
+    --comfort-accent:#df526b !important;
+    border-color:rgba(223,82,107,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(223,82,107,.15),transparent 48%),linear-gradient(145deg,#472532,#2b1d29 62%,#091824) !important;
+    box-shadow:inset 3px 0 rgba(223,82,107,.74),var(--tcc-material-shadow) !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-travel-card > h2 { color:#ff9caf !important; }
+
+  html body [data-screen="vault"] .vault-emergency-contacts {
+    --comfort-accent:#8e4565 !important;
+    border-color:rgba(142,69,101,.52) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(142,69,101,.17),transparent 48%),linear-gradient(145deg,#38202f,#251a28 62%,#091824) !important;
+    box-shadow:inset 3px 0 rgba(142,69,101,.78),var(--tcc-material-shadow) !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-contacts h2 { color:#dfa3bd !important; }
+
+  html body [data-screen="vault"] .vault-activity-compact {
+    --comfort-accent:#58c7ff !important;
+    border-color:rgba(88,199,255,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(88,199,255,.13),transparent 48%),linear-gradient(145deg,#17364b,#102736 62%,#081925) !important;
+  }
+  html body [data-screen="vault"] .vault-activity-compact .vault-section-head h2 { color:#bcecff !important; }
+}
+
+/* S39 PHASE 33A — Final Vault overlap tuning.
+   Header status already owns semantic green in the top band. Document Summary
+   therefore uses maroon; Emergency Contacts uses positive lime (available/
+   stored contacts) so it stays distinct from the red Emergency Travel Card. */
+@layer tccLocks {
+  html body [data-screen="vault"] .vault-summary-card {
+    --comfort-accent:#b94f70 !important;
+    border-color:rgba(185,79,112,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
+  }
+  html body [data-screen="vault"] .vault-summary-card > h2 { color:#e7a5bb !important; }
+
+  html body [data-screen="vault"] .vault-emergency-contacts {
+    --comfort-accent:#a6d353 !important;
+    border-color:rgba(166,211,83,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(166,211,83,.14),transparent 48%),linear-gradient(145deg,#314126,#202c28 62%,#081924) !important;
+    box-shadow:inset 3px 0 rgba(166,211,83,.72),var(--tcc-material-shadow) !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-contacts h2 { color:#d7f09a !important; }
+}
+
+/* S39 PHASE 34 — Settings viewport colour uniqueness.
+   App Health status remains semantic in its small dot/label and the primary
+   whole-app bar remains red-before-check / green-after-clear. The individual
+   health cards use independent visual identities so verified cards do not all
+   read as the same green widget. Lower Settings panels are likewise distinct
+   in every overlapping iPad viewport. Expanded states inherit these tones. */
+@layer tccLocks {
+  html body [data-screen="settings"] .settings-health-card-tone-silver {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(174,184,194,.13),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-gold {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-copper {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-teal {
+    --comfort-accent:#46d9ca !important;
+    border-color:rgba(70,217,202,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(70,217,202,.14),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-lime {
+    --comfort-accent:#97aa4d !important;
+    border-color:rgba(151,170,77,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(151,170,77,.14),transparent 48%),linear-gradient(145deg,#343b22,#252a22 62%,#091924) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-blue {
+    --comfort-accent:#5d8dff !important;
+    border-color:rgba(93,141,255,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(93,141,255,.14),transparent 48%),linear-gradient(145deg,#172f55,#101f3c 62%,#081829) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-violet {
+    --comfort-accent:#9b70e8 !important;
+    border-color:rgba(155,112,232,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(155,112,232,.15),transparent 48%),linear-gradient(145deg,#342850,#221d3a 62%,#09192a) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-magenta {
+    --comfort-accent:#e15faa !important;
+    border-color:rgba(225,95,170,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(225,95,170,.15),transparent 48%),linear-gradient(145deg,#48243e,#2c1c31 62%,#091824) !important;
+  }
+  html body [data-screen="settings"] .settings-health-card-tone-maroon {
+    --comfort-accent:#913c5a !important;
+    border-color:rgba(145,60,90,.50) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(145,60,90,.16),transparent 48%),linear-gradient(145deg,#3a2130,#271b29 62%,#091824) !important;
+  }
+
+  /* Status dots/labels remain semantic regardless of the card material. */
+  html body [data-screen="settings"] .settings-health-card-verified .settings-health-card-status { color:#8ee9b9 !important; }
+  html body [data-screen="settings"] .settings-health-card-verified .settings-health-dot { background:#57d69b !important; box-shadow:0 0 10px rgba(87,214,155,.46) !important; }
+  html body [data-screen="settings"] .settings-health-card-not-configured .settings-health-card-status { color:#ffe08a !important; }
+  html body [data-screen="settings"] .settings-health-card-not-configured .settings-health-dot { background:#ffd15b !important; box-shadow:0 0 10px rgba(255,209,91,.42) !important; }
+  html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-card-status { color:#ff9caf !important; }
+  html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-dot { background:#df526b !important; box-shadow:0 0 10px rgba(223,82,107,.46) !important; }
+
+  html body [data-screen="settings"] .settings-defaults {
+    --comfort-accent:#07608c !important;
+    border-color:rgba(7,96,140,.70) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(42,157,210,.16),transparent 48%),linear-gradient(145deg,#123550,#10283d 62%,#081824) !important;
+  }
+  html body [data-screen="settings"] .settings-defaults .settings-section-head h2 { color:#83d6ff !important; }
+
+  html body [data-screen="settings"] .settings-schengen {
+    --comfort-accent:#0abf28 !important;
+    border-color:rgba(10,191,40,.52) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(10,191,40,.14),transparent 48%),linear-gradient(145deg,#173b27,#102b27 62%,#081925) !important;
+  }
+  html body [data-screen="settings"] .settings-schengen .settings-section-head h2 { color:#8deb9c !important; }
+
+  html body [data-screen="settings"] .settings-security {
+    --comfort-accent:#ffd15b !important;
+    border-color:rgba(255,209,91,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(255,209,91,.13),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+  }
+  html body [data-screen="settings"] .settings-security .settings-section-head h2 { color:#ffe39a !important; }
+
+  html body [data-screen="settings"] .settings-backup {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(199,131,87,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(199,131,87,.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+  }
+  html body [data-screen="settings"] .settings-backup .settings-section-head h2,
+  html body [data-screen="settings"] .settings-backup > h2 { color:#e8ad86 !important; }
+
+  html body [data-screen="settings"] .settings-info {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(174,184,194,.12),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
+  }
+  html body [data-screen="settings"] .settings-info > h2 { color:#d8e0e6 !important; }
 }

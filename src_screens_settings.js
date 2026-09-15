@@ -121,19 +121,21 @@ const HEALTH_ICONS=Object.freeze({
 function renderHealth(stateService,currentDate,host){
   const model=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});
   const dirty=Boolean(stateService.isAppHealthDirty?.());
-  // A changed-but-otherwise-healthy app needs a red re-check. Real setup or
-  // integrity states keep their own amber/red traffic-light meaning instead of
-  // being visually overwritten by the dirty marker.
-  const recheckOnly=dirty && model.status==='verified';
-  const displayStatus=recheckOnly ? 'needs-attention' : model.status;
+  // The primary App Health control is deliberately binary. Until a whole-app
+  // verification has cleared the current build/data state it is RED. A clean
+  // verification makes it GREEN. Setup-only findings stay amber in their own
+  // detail cards and must never turn the primary control amber.
+  const needsPrimaryCheck=dirty || model.status==='needs-attention';
+  const recheckOnly=dirty && model.status!=='needs-attention';
+  const displayStatus=needsPrimaryCheck ? 'needs-attention' : 'verified';
   const panel=node('section',`settings-health settings-health-${displayStatus}${recheckOnly?' settings-health-dirty':''}`);const hero=node('div','settings-health-hero');const copy=node('div','settings-health-copy');
-  const healthState=recheckOnly?'Check Required':statusLabel(model.status);
-  const healthSummary=recheckOnly?'Saved travel data has changed since the last whole-app verification. Run the check before relying on the verified state.':model.status==='verified'?'All central integrity checks are clear.':model.status==='needs-setup'?'Core integrity is clear; one or more setup items remain.':`${model.issueCount} integrity issue${model.issueCount===1?'':'s'} need attention.`;
+  const healthState=needsPrimaryCheck?'Check Required':'Verified';
+  const healthSummary=needsPrimaryCheck?(model.status==='needs-attention'?`${model.issueCount} integrity issue${model.issueCount===1?'':'s'} need attention.`:'Saved travel data has changed since the last whole-app verification. Run the check before relying on the verified state.'):(model.status==='needs-setup'?'Core integrity is clear; setup items remain listed below.':'All central integrity checks are clear.');
   const healthEyebrow=node('p','eyebrow settings-health-eyebrow','FULL APP CHECK');
   copy.append(healthEyebrow,node('h2','','APP HEALTH'),node('p','',healthSummary));
   const healthBrand=node('div','settings-health-brand');const ambulance=node('span','settings-health-ambulance');ambulance.append(createLineIcon('ambulance'));healthBrand.append(ambulance,copy);
-  const score=node('div',`settings-health-score settings-health-score-${displayStatus}`);const scoreLabel=recheckOnly?'RE-CHECK REQUIRED':model.status==='verified'?'VERIFIED':model.status==='needs-setup'?'SETUP NEEDED':'ATTENTION NEEDED';const scoreTitle=recheckOnly?'CHECK REQUIRED':model.status==='verified'?'ALL GOOD':model.status==='needs-setup'?'SETUP NEEDED':'CHECK REQUIRED';
-  const scoreIcon=node('span','settings-health-score-icon');scoreIcon.append(createLineIcon(model.status==='verified'&&!recheckOnly?'check':'plus'));
+  const score=node('div',`settings-health-score settings-health-score-${displayStatus}`);const scoreLabel=needsPrimaryCheck?(recheckOnly?'RE-CHECK REQUIRED':'ATTENTION NEEDED'):'VERIFIED';const scoreTitle=needsPrimaryCheck?'CHECK REQUIRED':'ALL GOOD';
+  const scoreIcon=node('span','settings-health-score-icon');scoreIcon.append(createLineIcon(!needsPrimaryCheck?'check':'plus'));
   const scoreCopy=node('span','settings-health-score-copy');scoreCopy.append(node('strong','',scoreTitle),node('small','',`${model.verifiedCount}/${model.checks.length} · ${scoreLabel}`));
   const pulse=document.createElementNS('http://www.w3.org/2000/svg','svg');pulse.setAttribute('class','settings-health-pulse-line');pulse.setAttribute('viewBox','0 0 90 32');pulse.setAttribute('aria-hidden','true');const pulsePath=document.createElementNS('http://www.w3.org/2000/svg','path');pulsePath.setAttribute('d','M2 18h18l5-9 7 18 8-25 10 28 8-12h30');pulse.append(pulsePath);
   score.append(scoreIcon,scoreCopy,pulse);hero.append(healthBrand,score);panel.append(hero);
@@ -141,11 +143,25 @@ function renderHealth(stateService,currentDate,host){
   const runLabel=node('span','settings-health-run-label','CHECK THE WHOLE APP');
   const runPulse=document.createElementNS('http://www.w3.org/2000/svg','svg');runPulse.setAttribute('class','settings-health-run-pulse');runPulse.setAttribute('viewBox','0 0 170 30');runPulse.setAttribute('aria-hidden','true');
   const runPulsePath=document.createElementNS('http://www.w3.org/2000/svg','path');runPulsePath.setAttribute('d','M2 17h32l7-10 9 20 9-26 13 29 10-13h22l7-8 8 16 8-22 11 25 9-11h22');runPulse.append(runPulsePath);
-  run.append(createLineIcon(!recheckOnly&&model.status==='verified'?'check':'plus'),runLabel,runPulse);
+  run.append(createLineIcon(!needsPrimaryCheck?'check':'plus'),runLabel,runPulse);
   run.addEventListener('click',async()=>{const focusBeforeCheck=captureLocalFocus();run.classList.add('is-running');runLabel.textContent='CHECKING…';run.disabled=true;try{await stateService.cleanupOrphanVaultAssets?.();await stateService.auditVaultAssets?.();const checked=buildAppHealth(stateService.snapshot(),currentDate,{vaultAssetIssues:stateService.vaultAssetIssues||[]});if(checked.status!=='needs-attention')stateService.markAppHealthChecked?.();}catch{}setTimeout(()=>{if(!panel.isConnected)return;const replacement=renderHealth(stateService,currentDate,host);panel.replaceWith(replacement);restoreLocalFocus(focusBeforeCheck,{fallbackSelector:'.settings-health-run'});},120);}); panel.append(run);
+  const HEALTH_CARD_TONES=Object.freeze({
+    'Data Integrity':'silver',
+    'Budget':'gold',
+    'Reservations':'copper',
+    'Calendar':'teal',
+    'Journey History':'lime',
+    'Checklist':'blue',
+    'The Vault':'violet',
+    'Backup & Restore':'magenta',
+    'Cross-Screen Routing':'maroon'
+  });
   const grid=node('div','settings-health-grid');for(const [index,item] of model.checks.entries()){
-    const healthTone=item.status==='verified'?'green':item.status==='not-configured'?'gold':'red';
-    const card=node('article',`settings-health-card settings-health-card-${item.status}`);
+    // Card colour is a visual identity; the dot/label below remains semantic.
+    // This prevents nine green health widgets from reading as duplicates while
+    // keeping verified / needs-setup / needs-attention meaning unchanged.
+    const healthTone=HEALTH_CARD_TONES[item.label]||'silver';
+    const card=node('article',`settings-health-card settings-health-card-${item.status} settings-health-card-tone-${healthTone}`);
     const icon=node('span','settings-health-icon'); icon.append(createLineIcon(HEALTH_ICONS[item.label]||'check'));
     const cardCopy=node('div','settings-health-card-copy');cardCopy.append(node('strong','',item.label),node('p','',item.summary));
     const status=node('div','settings-health-card-status');status.append(node('span','settings-health-dot',''),node('small','',statusLabel(item.status)));
@@ -250,9 +266,9 @@ export function renderSettingsScreen({stateService,currentDate,vaultAccessSessio
   const settingsExpanders=[
     [defaults,'Travel & Budget Defaults','sky','defaults'],
     [schengen,'Schengen Status','green','schengen'],
-    [security,'Security','indigo','security'],
-    [backup,'Backup & Restore','teal','backup'],
-    [info,'App Status','neutral','application']
+    [security,'Security','gold','security'],
+    [backup,'Backup & Restore','copper','backup'],
+    [info,'App Status','silver','application']
   ];
   for(const [panel,title,tone,kind] of settingsExpanders) makeExpandableCard(panel,{host:main,title,tone,bodyBuilder:()=>settingsExpandedBody(kind,state,currentDate)});
   return main;

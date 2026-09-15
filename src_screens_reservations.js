@@ -423,11 +423,13 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     const costHead = node('div', 'reservation-editor-simple-head');
     costHead.append(node('strong', '', 'COST & BUDGET'));
     const costGrid = node('div', 'reservation-editor-cost-grid');
-    costGrid.append(
-      inputField('Amount', 'originalAmount', 'number', saved.originalAmount),
-      inputField('Currency', 'originalCurrency', 'text', saved.originalCurrency),
-      inputField('AUD equivalent', 'audAmount', 'number', saved.audAmount)
-    );
+    const amountField=inputField('Amount', 'originalAmount', 'number', saved.originalAmount);
+    const currencyField=inputField('Currency', 'originalCurrency', 'text', saved.originalCurrency);
+    const audField=inputField('AUD equivalent', 'audAmount', 'number', saved.audAmount);
+    amountField.classList.add('reservation-money-field','reservation-money-original');
+    currencyField.classList.add('reservation-money-field','reservation-money-currency');
+    audField.classList.add('reservation-money-field','reservation-money-aud');
+    costGrid.append(amountField,currencyField,audField);
     const autoRoute = node('div', 'reservation-editor-auto-route');
     const allocationLabel = saved.budgetScope === 'destination' ? 'DESTINATION BUDGET' : 'ANNUAL BUDGET';
     autoRoute.append(createLineIcon('check'), node('span', 'reservation-auto-route-label', allocationLabel), node('small', '', allocationLabel === 'DESTINATION BUDGET' ? 'Matched to the exact dated stay.' : 'Counted once against the calendar-year Annual Budget.'));
@@ -774,7 +776,7 @@ function renderNextFive(state,currentDate,host){
       if (!host) return;
       const body=reservationPanelExpandedBody('Next 5 Upcoming',records,()=>{});
       for (const button of body.querySelectorAll('button')) { button.disabled=true; button.setAttribute('aria-disabled','true'); }
-      const dialog=createModal({title:'Next 5 Upcoming',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-next-five-expanded-modal tone-sky',actions:[{label:'Close',onClick:d=>d.close()}]});
+      const dialog=createModal({title:'Next 5 Upcoming',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-next-five-expanded-modal tone-blue',actions:[{label:'Close',onClick:d=>d.close()}]});
       host.append(dialog); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); dialog.showModal();
     }); list.append(row);
   }
@@ -910,17 +912,17 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     left.append(reservationControlsBar(controls,()=>preserveLocalFocus(renderContent)));
 
     const filteredToBook=applyReservationControls(model.allToBook,controls);
-    const toBookPanel=listPanel('Future Bookings / To Book', filteredToBook, 'reservation-to-book', id=>openEditor(id,'gold'), 'No matching To Book entries yet');
+    const toBookPanel=listPanel('Future Bookings / To Book', filteredToBook, 'reservation-to-book', id=>openEditor(id,'copper'), 'No matching To Book entries yet');
     left.append(toBookPanel);
-    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'gold'))});
+    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'copper',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'copper'))});
 
     const health=healthPanel(model); left.append(health);
-    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:model.health.status==='verified'?'neutral':'gold',bodyBuilder:()=>reservationHealthExpandedBody(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}))});
+    makeExpandableCard(health,{host:main,title:'Reservation Health Check',tone:model.health.status==='verified'?'lime':'maroon',bodyBuilder:()=>reservationHealthExpandedBody(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}))});
 
     const nextFive=renderNextFive(state,currentDate,main), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);
-    makeExpandableCard(nextFive,{host:main,title:'Upcoming Reservations · All Categories',tone:'sky',bodyBuilder:()=>nextUpcomingExpandedBody(stateService.snapshot(),currentDate,id=>openEditor(id,'blue'))});
-    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked by Category',tone:'sky',bodyBuilder:()=>bookedTotalExpandedBody(stateService.snapshot())});
+    makeExpandableCard(nextFive,{host:main,title:'Upcoming Reservations · All Categories',tone:'blue',bodyBuilder:()=>nextUpcomingExpandedBody(stateService.snapshot(),currentDate,id=>openEditor(id,'blue'))});
+    makeExpandableCard(bookedTotal,{host:main,title:'Total Booked by Category',tone:'green',bodyBuilder:()=>bookedTotalExpandedBody(stateService.snapshot())});
     contentGrid.append(left,rail); main.append(contentGrid);
 
     const pending = state.ui?.pendingOpen;

@@ -333,16 +333,16 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
       const validAmount=Number.isFinite(amount)&&amount>=0;
       if(annual&&validAmount){
         conversionHintBox.append(
-          node('span','budget-expense-auto-kicker','DIRECT TO ANNUAL BUDGET · NO CONVERSION'),
-          node('strong','',`${formatMoney(amount,'AUD')} AUD expense`),
-          node('small','','Stored directly in AUD · Annual Budget only.')
+          node('span','budget-expense-auto-kicker','AUD AMOUNT'),
+          node('strong','budget-expense-aud-equivalent',`AUD ${formatMoney(amount,'AUD')}`),
+          node('small','','Annual Budget · stored directly in AUD.')
         );
       }else if(stay?.localCurrency&&Number(stay.fixedLocalPerAUD)>0&&validAmount){
         const converted=localToAUD(amount,stay.fixedLocalPerAUD);
         conversionHintBox.append(
-          node('span','budget-expense-auto-kicker','AUTOMATIC · NO CURRENCY CONVERSION TO ENTER HERE'),
-          node('strong','',`${formatMoney(amount,stay.localCurrency)} expense`),
-          node('small','',`AUD ${formatMoney(converted,'AUD')} equivalent · ${stay.name} fixed rate.`)
+          node('span','budget-expense-auto-kicker','AUD EQUIVALENT'),
+          node('strong','budget-expense-aud-equivalent',`AUD ${formatMoney(converted,'AUD')}`),
+          node('small','',`${formatMoney(amount,stay.localCurrency)} · ${stay.name} fixed rate · ${fixedRateLabel(stay)}`)
         );
       }else{
         conversionHintBox.append(
@@ -408,6 +408,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     amountHead.querySelector('.budget-editor-step-copy').append(node('strong', '', 'How much did you spend?'));
     const amountGrid = node('div', 'budget-editor-local-money-grid');
     const amountField=inputField(currentScope()==='annual' ? 'Amount (AUD)' : 'Amount in destination currency', 'originalAmount', 'number', saved.originalAmount);
+    amountField.classList.add('budget-expense-amount-field');
     const lockedCurrency=node('div','budget-expense-locked-currency');
     const automaticConversion=node('div','budget-expense-auto-conversion');
     amountGrid.append(amountField,lockedCurrency,automaticConversion);
@@ -604,37 +605,50 @@ function renderPaceSummaryExpanded(model) {
   section.append(node('p',`budget-expanded-callout ${pace.forecastStatus==='over'?'is-bad':pace.forecastStatus==='under'?'is-good':''}`,status));body.append(section);return body;
 }
 
-function renderAnnualSummaryExpanded(model, {stateService=null,host=null} = {}) {
-  const body=node('div','budget-expanded-dashboard budget-annual-expanded');const annual=model.annual;
-  if(!annual){body.append(node('p','budget-expanded-empty','Annual Budget data is unavailable.'));return body;}
-  const bufferHealthy=annual.forecastVarianceAUD>=0;
-  const spentPercent=annual.budgetAUD>0?(annual.spentAUD/annual.budgetAUD)*100:0;
-  const committedPercent=annual.budgetAUD>0?((annual.spentAUD+annual.committedAUD)/annual.budgetAUD)*100:0;
-  const stats=node('div','budget-expanded-grid budget-expanded-grid-eight');
-  stats.append(
-    budgetExpandedMetric('ANNUAL BUDGET',signedMoney(annual.budgetAUD,'AUD'),`${annual.year} · AUD`,'magenta'),
-    budgetExpandedMetric('SPENT SO FAR',signedMoney(annual.spentAUD,'AUD'),'actual spend','blue'),
-    budgetExpandedMetric('FUTURE COMMITMENTS',signedMoney(annual.committedAUD,'AUD'),'booked future costs','violet'),
-    budgetExpandedMetric('AFTER COMMITMENTS',signedMoney(annual.afterCommitmentsAUD,'AUD'),'available annual buffer','teal'),
-    budgetExpandedMetric('PROJECTED YEAR-END',signedMoney(annual.forecastAUD,'AUD'),'current pace projection','gold'),
-    budgetExpandedMetric('PROJECTED BUFFER',signedMoney(Math.abs(annual.forecastVarianceAUD),'AUD'),bufferHealthy?'under annual budget':'over annual budget',bufferHealthy?'green':'red'),
-    budgetExpandedMetric('YEAR ELAPSED',`${annual.progress}%`,`Day ${annual.elapsedDays} of ${annual.daysInYear}`,'sky'),
-    budgetExpandedMetric('SPEND USED',`${Math.round(spentPercent)}%`,`${Math.round(committedPercent)}% after future commitments`,'indigo')
+function renderAnnualSummaryExpanded(model, {state=null,stateService=null,host=null} = {}) {
+  const body=node('div','budget-annual-manager');
+  const snapshot=state || stateService?.snapshot?.() || null;
+  const currentYear=Number(model.annual?.year || new Date().getFullYear());
+  const configuredYears=Object.keys(snapshot?.settings?.annualBudgetsAUD || {}).map(Number).filter(Number.isFinite);
+  const lastYear=Math.max(currentYear + 5, ...configuredYears.filter(year=>year>=currentYear));
+  const years=[currentYear - 1];
+  for(let year=currentYear; year<=lastYear; year+=1) years.push(year);
+
+  const intro=node('div','budget-annual-manager-intro');
+  intro.append(
+    node('p','budget-card-kicker','ANNUAL BUDGETS'),
+    node('h2','budget-annual-manager-title','Budget by Calendar Year'),
+    node('p','budget-annual-manager-copy','Set the annual spending limit for each calendar year. Destination budgets, spending graphs and travel pace are managed elsewhere.')
   );
-  body.append(stats);
-  const section=node('section','budget-expanded-section');section.append(node('h3','','ANNUAL PACE'),budgetExpandedProgress('Year elapsed',annual.progress,'gold'),budgetExpandedProgress('Spent so far',spentPercent,bufferHealthy?'green':'red'),budgetExpandedProgress('Spent + commitments',committedPercent,committedPercent<=100?'teal':'red'));
-  const note=annual.forecastStatus==='needs-setup'?'Set the Annual Budget before year-end pace is assessed.':`${signedMoney(Math.abs(annual.forecastVarianceAUD),'AUD')} projected ${bufferHealthy?'under':'over'} the Annual Budget at the current pace.`;
-  section.append(node('p',`budget-expanded-callout ${annual.forecastStatus==='over'?'is-bad':annual.forecastStatus==='under'?'is-good':''}`,note));body.append(section);
-  if(stateService&&host){
-    const edit=node('button','button budget-annual-edit budget-expanded-manage');
-    edit.type='button';
-    edit.append(createLineIcon('edit'),document.createTextNode(' EDIT ANNUAL BUDGET'));
-    edit.addEventListener('click',()=>{
-      edit.closest('dialog')?.close();
-      queueMicrotask(()=>openAnnualBudgetEditor({stateService,host,budgetYear:annual.year}));
-    });
-    body.append(edit);
+  body.append(intro);
+
+  const list=node('div','budget-annual-manager-list');
+  for(const year of years){
+    const amount=annualBudgetForYear(snapshot?.settings || {},year);
+    const row=node('div',`budget-annual-manager-row${year===currentYear?' is-current':year<currentYear?' is-history':' is-future'}`);
+    const yearCopy=node('div','budget-annual-manager-year');
+    yearCopy.append(
+      node('small','',year===currentYear?'CURRENT YEAR':year<currentYear?'PREVIOUS YEAR':'FUTURE YEAR'),
+      node('strong','',String(year))
+    );
+    const value=node('div','budget-annual-manager-value');
+    value.append(
+      node('strong','',amount>0?signedMoney(amount,'AUD'):'Not set'),
+      node('small','',amount>0?'AUD annual budget':'No annual budget set')
+    );
+    row.append(yearCopy,value);
+    if(stateService&&host&&year>=currentYear){
+      const edit=node('button','button budget-annual-manager-edit',amount>0?'Edit':'Set');
+      edit.type='button';
+      edit.addEventListener('click',()=>{
+        edit.closest('dialog')?.close();
+        queueMicrotask(()=>openAnnualBudgetEditor({stateService,host,budgetYear:year}));
+      });
+      row.append(edit);
+    }
+    list.append(row);
   }
+  body.append(list);
   return body;
 }
 
@@ -653,39 +667,21 @@ function openAnnualBudgetEditor({stateService,host,budgetYear}) {
   host.append(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
 }
 
-function renderAnnualSummary(model, state, { stateService = null, host = null } = {}) {
-  const card = node('section', 'budget-summary-card budget-annual-card budget-annual-planning-card');
-  const currentYear = Number(model.annual?.year || new Date().getFullYear());
-  const previousYear = currentYear - 1;
-  const nextYear = currentYear + 1;
-  const currentBudget = annualBudgetForYear(state.settings, currentYear);
-  const previousBudget = annualBudgetForYear(state.settings, previousYear);
-  const nextBudget = annualBudgetForYear(state.settings, nextYear);
-  card.append(node('p', 'budget-card-kicker', 'ANNUAL BUDGETS'), node('h2', 'budget-card-title', 'Calendar-Year Planning'));
-  const rows = node('div', 'budget-annual-plan-rows');
-  const planRow = (year, label, amount, tone = '') => {
-    const row = node('div', `budget-annual-plan-row${tone ? ` is-${tone}` : ''}`);
-    const copy = node('span', 'budget-annual-plan-copy');
-    copy.append(node('small', '', label), node('strong', '', String(year)));
-    const value = node('span', 'budget-annual-plan-value');
-    value.append(node('strong', '', amount > 0 ? signedMoney(amount, 'AUD') : 'Not set'), node('small', '', 'AUD'));
-    row.append(copy, value);
-    if (stateService && host && year >= currentYear) {
-      const edit = node('button', 'button budget-annual-plan-edit', amount > 0 ? 'Edit' : 'Set');
-      edit.type = 'button';
-      edit.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); openAnnualBudgetEditor({ stateService, host, budgetYear:year }); });
-      row.append(edit);
-    }
-    return row;
-  };
-  rows.append(
-    planRow(currentYear, 'CURRENT YEAR', currentBudget, 'current'),
-    planRow(nextYear, 'NEXT YEAR', nextBudget, 'next'),
-    planRow(previousYear, 'PREVIOUS YEAR', previousBudget, 'history')
+function renderAnnualSummary(model, state) {
+  const card=node('section','budget-summary-card budget-annual-card budget-annual-planning-card');
+  const currentYear=Number(model.annual?.year || new Date().getFullYear());
+  const currentBudget=annualBudgetForYear(state.settings,currentYear);
+  card.append(
+    node('p','budget-card-kicker','ANNUAL BUDGET'),
+    node('h2','budget-card-title',`${currentYear} Annual Budget`)
   );
-  card.append(rows);
-  const note = node('p', 'budget-annual-plan-note', 'Each Annual Budget belongs to its calendar year. Destination Budgets remain separate dated stay budgets.');
-  card.append(note);
+  const amount=node('div','budget-annual-main-value');
+  amount.append(
+    node('small','',`CURRENT CALENDAR YEAR · ${currentYear}`),
+    node('strong','',currentBudget>0?signedMoney(currentBudget,'AUD'):'NOT SET'),
+    node('span','',currentBudget>0?'AUD':'Tap to set annual budgets by year')
+  );
+  card.append(amount,node('p','budget-annual-main-note','Tap this widget to view annual budgets by year and set future years.'));
   return card;
 }
 
@@ -894,7 +890,7 @@ function openDestinationBudgetsManager({stateService,host,currentDate,initialFil
     );
     const openItinerary=node('button','button budget-destination-open-itinerary','OPEN ITINERARY'); openItinerary.type='button';
     firstUse.append(icon,copy,openItinerary); body.append(firstUse);
-    const dialog=createModal({title:'Destination Budgets',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-teal budget-destination-manager-modal budget-destination-first-use-modal'});
+    const dialog=createModal({title:'Destination Budgets',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-violet budget-destination-manager-modal budget-destination-first-use-modal'});
     openItinerary.addEventListener('click',()=>{
       if(dialog.open)dialog.close();
       queueMicrotask(()=>stateService.commit(draft=>{draft.ui.activeScreen='itinerary';}));
@@ -979,11 +975,11 @@ function openDestinationBudgetsManager({stateService,host,currentDate,initialFil
   }
   body.append(filters,list);
   renderRows();
-  const dialog=createModal({title:'Destination Budgets',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-teal budget-destination-manager-modal'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+  const dialog=createModal({title:'Destination Budgets',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-violet budget-destination-manager-modal'}); host.append(dialog); dialog.showModal(); dialog.addEventListener('close',()=>dialog.remove(),{once:true});
 }
 
 function renderDestinationBudgets(model,state,{stateService,host,currentDate}){
-  const status=destinationBudgetStatus(state); const card=node('button','budget-summary-card budget-destination-budgets-card'); card.type='button'; card.dataset.expandable='true'; card.dataset.expandTone='teal';
+  const status=destinationBudgetStatus(state); const card=node('button','budget-summary-card budget-destination-budgets-card'); card.type='button'; card.dataset.expandable='true'; card.dataset.expandTone='violet';
   card.append(node('p','budget-card-kicker','ITINERARY BUDGET COVERAGE'),node('h2','budget-card-title','Destination Budgets'));
   if(model.currentDestination){
     const current=node('div','budget-destination-current-strip');
@@ -1229,7 +1225,7 @@ function openAccountsViewer({model,host}){
     list.append(row);
   }
   body.append(list);
-  const dialog=createModal({title:'Accounts',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-neutral budget-accounts-manager-modal'});
+  const dialog=createModal({title:'Accounts',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-gold budget-accounts-manager-modal'});
   host.append(dialog);
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});
   dialog.showModal();
@@ -1243,13 +1239,13 @@ function renderAccounts(model, stateService, host) {
   head.append(copy);panel.append(head);
   const list = node('div', 'budget-list budget-account-list');
   if (!model.accounts.records.length) list.append(node('p', 'budget-muted', 'No entries yet'));
-  for (const account of model.accounts.records.slice(0,3)) {
+  for (const account of model.accounts.records.slice(0,5)) {
     const row = node('div', 'budget-list-row budget-account-row');
     const rowCopy=node('span','budget-account-row-copy');rowCopy.append(node('strong','',account.name),node('small','',`${account.currency} balance`));
     const amount=node('span','budget-account-row-amount');amount.append(node('strong','',signedMoney(account.balance, account.currency)));
     const brand=accountBrandIcon(account.name); if(brand) row.append(brand); row.append(rowCopy,amount);list.append(row);
   }
-  if(model.accounts.records.length>3)list.append(node('p','budget-account-more',`+${model.accounts.records.length-3} more · tap to view all`));
+  if(model.accounts.records.length>5)list.append(node('p','budget-account-more',`+${model.accounts.records.length-5} more · tap to view all`));
   panel.append(list);
   panel.setAttribute('aria-description','Tap to enlarge the read-only Accounts snapshot. No transfers or account editing are available.');
   panel.addEventListener('click',()=>openAccountsViewer({model,host}));
@@ -1520,24 +1516,24 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   addExpenseBar.addEventListener('click',()=>openNewExpense('groceries','sky'));
   main.append(addExpenseBar);
 
-  const annualSummary=renderAnnualSummary(model,state,{stateService,host:main}), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
+  const annualSummary=renderAnnualSummary(model,state), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
   const planning=node('section','budget-reference-planning'); planning.append(annualSummary,destinationBudgets); main.append(planning);
-  makeExpandableCard(annualSummary,{host:main,title:`${model.annual?.year || ''} Annual Budget`.trim(),tone:'gold',bodyBuilder:()=>renderAnnualSummaryExpanded(model,{stateService,host:main})});
-  makeExpandableCard(destinationBudgets,{host:main,title:'Destination Budgets',tone:'teal'});
+  makeExpandableCard(annualSummary,{host:main,title:`${model.annual?.year || ''} Annual Budget`.trim(),tone:'gold',bodyBuilder:()=>renderAnnualSummaryExpanded(model,{state,stateService,host:main})});
+  makeExpandableCard(destinationBudgets,{host:main,title:'Destination Budgets',tone:'violet'});
   const categoryChart=renderCategoryChart(model), annualForecast=renderAnnualForecast(model);
   const charts=node('section','budget-reference-charts'); charts.append(categoryChart,annualForecast); main.append(charts);
-  makeExpandableCard(categoryChart,{host:main,title:'Budget by Category',tone:'neutral',bodyBuilder:()=>renderCategoryChart(model,categoryChart.dataset.periodMode)});
-  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'green'});
+  makeExpandableCard(categoryChart,{host:main,title:'Budget by Category',tone:'copper',bodyBuilder:()=>renderCategoryChart(model,categoryChart.dataset.periodMode)});
+  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'magenta'});
   const monthlyHistory=renderMonthlySpendHistory(model,currentDate); main.append(monthlyHistory);
   makeExpandableCard(monthlyHistory,{host:main,title:'Monthly Spend History',tone:'blue',bodyBuilder:()=>renderMonthlySpendHistory(model,currentDate,monthlyHistory.dataset.selectedYear)});
   const livingExpenses=renderLivingExpenses(model); main.append(livingExpenses);
-  makeExpandableCard(livingExpenses,{host:main,title:'Living Expenses',tone:'neutral',bodyBuilder:()=>livingExpensesExpandedBody(model,state,currentDate,openNewExpense,openExistingExpense)});
+  makeExpandableCard(livingExpenses,{host:main,title:'Living Expenses',tone:'silver',bodyBuilder:()=>livingExpensesExpandedBody(model,state,currentDate,openNewExpense,openExistingExpense)});
   const reservationsPanel=renderReservations(model,main,navigate), accountsPanel=renderAccounts(model,stateService,main);
   const middle=node('section','budget-two-column'); middle.append(reservationsPanel,accountsPanel); main.append(middle);
-  makeExpandableCard(reservationsPanel,{host:main,title:'Reservations',tone:'sky'});
+  makeExpandableCard(reservationsPanel,{host:main,title:'Reservations',tone:'green'});
   const recentExpenses=renderRecentExpenses(model,openExistingExpense);
   main.append(recentExpenses);
-  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'neutral',bodyBuilder:()=>recentExpensesExpandedBody(state,currentDate,openExistingExpense)});
+  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'maroon',bodyBuilder:()=>recentExpensesExpandedBody(state,currentDate,openExistingExpense)});
 
   const pending = state.ui?.pendingOpen;
   if (pending?.collection === 'expenses' && pending.id && state.expenses.some(record => record.id === pending.id)) {
@@ -1552,4 +1548,3 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   }
   return main;
 }
-

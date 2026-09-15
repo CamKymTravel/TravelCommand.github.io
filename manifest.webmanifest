@@ -1,13 +1,13 @@
 {
-  "name": "Travel Command Centre — Tokyo 4-Year Simulation S37",
-  "short_name": "TCC Tokyo S37",
+  "name": "Travel Command Centre",
+  "short_name": "Travel Command",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline Tokyo four-year full-data S37 pre-iPad simulation for Cameron & Kym. Includes the forward screen-by-screen colour, clipping, touch-target, editor/detail, reservation-completed, itinerary-readability, logic and continuity fixes.",
+  "description": "Offline iPad Travel Command Centre S39 physical-acceptance candidate for Cameron & Kym. Local-only simulation data is retained for device acceptance testing.",
   "icons": [
     {
       "src": "./app-icon.png",
@@ -16,5 +16,5 @@
       "purpose": "any"
     }
   ],
-  "id": "./tokyo-4year-full-simulation-s37"
+  "id": "./tokyo-4year-full-simulation-s38"
 }

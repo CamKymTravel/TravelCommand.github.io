@@ -3,7 +3,7 @@
 // cache identity is mandatory so activate() can actually see the predecessor
 // cache and run the busy-dialog/picker hand-off instead of misclassifying an
 // already-installed V50 app as a first install.
-const CACHE_NAME = 'tcc-v1-v57-r7.2-forward-preipad-simulation-2026-09-14-s37';
+const CACHE_NAME = 'tcc-v1-v60-s39-istanbul-full-simulation-2029-09-15';
 const CACHE_PREFIX = 'tcc-v1-';
 const APP_SHELL = [
   './',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './release-contract.json',
   './tokyo-4year-simulation-fixture.json',
+  './istanbul-4year-simulation-fixture.json',
   './app-icon.png',
   './startup-ipad-1024-landscape.png',
   './startup-ipad-1194-landscape.png',

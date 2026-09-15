@@ -809,17 +809,17 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     }
     const journeyExpanders=[
       ['.journey-map-panel','Journey Map','sky'],
-      ['.journey-spend-panel','Lifetime Travel Spend','magenta'],
-      ['.journey-snapshot-panel','Journey Snapshot','blue'],
-      ['.journey-milestones-panel','Milestones','gold'],
-      ['.journey-top-destinations','Destination Totals','orange'],
-      ['.journey-mix-panel','Travel Mix','indigo'],
+      ['.journey-spend-panel','Lifetime Travel Spend','gold'],
+      ['.journey-snapshot-panel','Journey Snapshot','maroon'],
+      ['.journey-milestones-panel','Milestones','teal'],
+      ['.journey-top-destinations','Destination Totals','copper'],
+      ['.journey-mix-panel','Travel Mix','violet'],
       ['.journey-health','Journey Check','neutral']
     ];
     for(const [selector,title,tone] of journeyExpanders){
       const card=main.querySelector(selector);
       if(!card)continue;
-      const resolvedTone=selector==='.journey-health'&&card.classList.contains('journey-health-needs-attention')?'gold':tone;
+      const resolvedTone=selector==='.journey-health'?(card.classList.contains('journey-health-needs-attention')?'gold':'green'):tone;
       const bodyBuilder=selector==='.journey-top-destinations'?()=>destinationTotalsExpandedBody(lifetimeModel)
         :selector==='.journey-map-panel'?()=>journeyMapExpandedBody(state,currentDate,mapOptions)
         :selector==='.journey-spend-panel'?()=>journeySummaryExpandedBody('spend',lifetimeModel,state,currentDate)

@@ -1,35 +1,37 @@
 {
-  "contractVersion": "V57-R7.2-S37-pre-ipad-simulation-2026-09-14",
-  "packageRole": "S37 pre-iPad simulation candidate — NOT FINAL MASTER until IPAD-01 through IPAD-07 pass on Cameron’s real iPad",
-  "principle": "S37 is the forward-only authority. S36/S35/S34/S33 are historical inputs only. Never replace current S37 screen/widget/colour/interaction fixes with an older checkpoint.",
+  "contractVersion": "V60-R7.3-S39-screen-closure-2026-09-15",
+  "packageRole": "S39 fully screen-rechecked physical-iPad acceptance candidate — NOT FINAL MASTER until all remaining real-iPad gates are passed.",
+  "principle": "S39 is the forward-only authority. S38/S37/S36/S35/S34/S33 are historical inputs only. Never replace current S39 fixes with an older checkpoint.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
     "maxFiles": 103,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s37-preipad",
-    "manifestId": "./tokyo-4year-full-simulation-s37",
+    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s38-real-ipad",
+    "manifestId": "./tokyo-4year-full-simulation-s38",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
-    "appVersion": "1.2.0-v57-r7.2-simulation-s37",
-    "buildMarker": "v57-r7.2-forward-preipad-simulation-2026-09-14-s37"
+    "cacheName": "tcc-v1-v60-r7.3-screen-closure-2026-09-15-s39",
+    "appVersion": "1.2.0-v60-r7.3-simulation-s39",
+    "buildMarker": "v60-r7.3-screen-closure-2026-09-15-s39"
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s37-preipad",
-    "cacheName": "tcc-v1-v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
-    "buildMarker": "v57-r7.2-forward-preipad-simulation-2026-09-14-s37",
-    "serviceWorkerUrl": "./sw.js?v=57-r7.2-forward-preipad-simulation-2026-09-14-s37"
+    "storageKey": "tcc:v1:tokyo-4year-full-simulation-s38-real-ipad",
+    "cacheName": "tcc-v1-v60-r7.3-screen-closure-2026-09-15-s39",
+    "buildMarker": "v60-r7.3-screen-closure-2026-09-15-s39",
+    "serviceWorkerUrl": "./sw.js?v=60-r7.3-screen-closure-2026-09-15-s39"
   },
   "sourceAuthority": {
-    "authority": "S37 pre-iPad simulation source, fixed forward from S36 and sealed 14 September 2026",
+    "authority": "S39 screen-by-screen current-source closure authority, fixed forward from the sealed S38 real-iPad correction baseline on 15 September 2026",
     "forwardOnly": true,
     "predecessorsAreHistory": [
+      "S38",
+      "S37",
       "S36",
       "S35",
       "S34",
       "S33"
     ],
-    "provenance": "S37 continues forward from the verified S36 source. Fixes added before this simulation: 1024 Itinerary Destination Budget width, Add Expense Description 44px touch floor, corrected editor-colour brace/cascade, exact expanded blue/indigo/green family matching, completed reservation rows/statuses silver inside category expansions, and 1024 Itinerary country/type two-line readability. Runtime/cache identity was then bumped to S37 so Safari cannot reuse stale S36 cached files."
+    "provenance": "S39 continues forward from S38 and incorporates current-source closure of all nine screens, Home stillness software lock, viewport-based colour uniqueness, App Health red-to-green behaviour, direct one-tap Itinerary editing, accessibility corrections, data-safety assurance, and full post-change regression. The PWA cache/build identity is advanced to v60 so the real-iPad acceptance run cannot reuse an earlier S39 candidate; storage key and manifest id remain intentionally stable for continuity."
   },
   "hardVisualRules": [
     "Every expanded widget preserves the same colour family as its collapsed/original widget.",
@@ -41,16 +43,23 @@
     "Budget Destination Budgets source and manager stay teal; Add/Edit Destination Budget editor stays sky.",
     "Calendar editor shells remain neutral; exact record details preserve destination plus event-type identity.",
     "Checklist and Vault editors remain neutral even when their source widget uses a semantic colour.",
-    "App Health expanded cards inherit their actual status colour (green/amber/red), not generic sky.",
     "Home Alerts use red/amber/green traffic-light severity; expanded Alerts remain concise and Remove-only.",
     "All interactive controls on approved iPad layouts retain at least 44px effective touch targets.",
     "Home 1024 compact Alerts and Trip Timeline dates must remain fully readable without making Home scroll.",
     "Vault header must mask obsolete baked status text/count/date at both approved iPad widths.",
-    "Destination Budget manager summary values must not crop 22px currency glyphs."
+    "Destination Budget manager summary values must not crop 22px currency glyphs.",
+    "Journey History summary-card icon tiles are the benchmark for Booked Reservations and The Vault category icons: category-specific colour, dark inset tile, stronger contrast, consistent size/padding/border/glow; Completed remains silver.",
+    "Calendar month days may display up to five dated items and the week row grows vertically before +more is used.",
+    "Annual Budget main card is display-only; year-by-year annual budget Set/Edit belongs only inside the expanded Annual Budget manager.",
+    "Add Expense and Add Reservation prioritise the entered amount and AUD equivalent over helper text; blanket green is not used as general decoration.",
+    "All photographic page headers use one consistent physical height across iPad screens; only image/title/content identity changes.",
+    "Within any single visible viewport, top-level widgets/cards visible together must have clearly distinct colour identities; the same or near-same colour may be reused only when those widgets cannot be visible together.",
+    "App Health detail cards use distinct visual card identities while their status dots/labels remain semantic green/amber/red; expanded App Health cards preserve their source card identity.",
+    "Home is a fixed one-screen command centre: the normal main canvas must not document-scroll or drift; only intentionally expanded modal content may scroll internally."
   ],
   "screenClosureRegister": {
     "Home": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "all main widgets",
         "all expanders",
@@ -61,11 +70,12 @@
         "timeline detail",
         "search/global navigation",
         "1024 clipping lock",
-        "launch underlay"
+        "launch underlay",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Itinerary": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "Standard",
         "Home Visit",
@@ -74,11 +84,12 @@
         "row detail",
         "destination colours",
         "year/search/filter/pagination",
-        "edit/undo/delete"
+        "edit/undo/delete",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Budget": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "Destination Budget",
         "Destination Budgets manager",
@@ -90,11 +101,12 @@
         "Accounts read-only",
         "charts",
         "Recent Expense Entries",
-        "summary glyph clipping lock"
+        "summary glyph clipping lock",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Reservations": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "8 category tiles",
         "Completed",
@@ -102,11 +114,12 @@
         "Add/Edit/Undo/Delete",
         "allocation routing",
         "AUD conversion",
-        "Reservation Health Check"
+        "Reservation Health Check",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Calendar": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "month",
         "agenda",
@@ -116,20 +129,22 @@
         "add/edit",
         "legend",
         "44px day/legend controls",
-        "navigation"
+        "navigation",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Journey History": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "rows",
         "travel-mode detail colours",
         "search/filter/pagination",
-        "journey map/detail"
+        "journey map/detail",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Checklist": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "Permanent",
         "Destination",
@@ -139,11 +154,12 @@
         "task edit/actions",
         "stage controls",
         "Ready-to-Move",
-        "Next Destination"
+        "Next Destination",
+        "current-source viewport colour uniqueness"
       ]
     },
     "The Vault": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "locked state",
         "three-tap unlock entry",
@@ -154,11 +170,12 @@
         "record editor",
         "attachments",
         "44px hero controls",
-        "baked-status mask"
+        "baked-status mask",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Settings": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "defaults",
         "Schengen",
@@ -166,11 +183,12 @@
         "backup/export/restore entry",
         "App Health 9 cards",
         "status-colour expansion",
-        "launch/runtime identity"
+        "launch/runtime identity",
+        "current-source viewport colour uniqueness"
       ]
     },
     "Global": {
-      "status": "PASS_SOFTWARE_PRE_IPAD_S37",
+      "status": "VERIFIED_SOFTWARE_RENDER_S39_PHASE35",
       "coverage": [
         "sidebar/navigation",
         "runtime/cache identity",
@@ -182,75 +200,122 @@
         "dead space",
         "hidden editors",
         "non-widget controls",
-        "launch transition"
+        "launch transition",
+        "current-source viewport colour uniqueness"
       ]
     }
   },
   "latestSoftwareEvidence": {
-    "exactSource": "56/56 PASS in the final post-seal S37 pre-iPad simulation regression.",
-    "targeted": "16/16 PASS in the final post-seal S37 pre-iPad simulation regression.",
-    "priority": "4/4 PASS in the final post-seal S37 pre-iPad simulation regression.",
-    "expandedColour": "71/71 at 1024×768 and 71/71 at 1194×834 exact collapsed→expanded family match in the S37 colour closure audit.",
-    "touchTargets": "Main screens and hidden editors: zero visible controls below the 44px iPad floor in the real-CSS-order S37 audit.",
-    "mainOverflow": "9/9 screens at both approved sizes: zero document horizontal overflow.",
-    "expandedGeometry": "71/71 expanded/custom states clean at both approved sizes in the S37 closure audit.",
-    "deadSpace": "No new dead/empty panel regression found in final S37 screen sweeps.",
-    "hiddenEditors": "17/17 core hidden editor/detail states at each approved size plus custom route/category/day/Vault states; zero effective touch-target failures.",
-    "textClipping": "0 genuine operational clipping remaining after S37 Itinerary fixes; dense Calendar month cards intentionally clamp long titles and open full detail on tap.",
-    "nonWidgetControls": "9/9 screens at both approved sizes; zero actionable unnamed controls and no dead created buttons.",
-    "launch": "Brand → active Japan/Tokyo → rendered Home transition software-verified at both approved iPad sizes; physical IPAD-01 remains NOT_RUN."
+    "exactSource": "56/56 PASS in the final current-S39 exact-source run after Phase 7 fixes.",
+    "targeted": "16/16 PASS in the final current-S39 targeted matrix.",
+    "priority": "4/4 PASS in the final current-S39 priority interaction lock.",
+    "expandedColour": "71/71 at 1024×768 and 71/71 at 1194×834; every expanded state matches its source tone in browser_s38.",
+    "touchTargets": "Zero visible action controls below the 44px iPad floor in the final current-S39 two-size browser gate.",
+    "mainOverflow": "Zero document-level horizontal overflow across all nine screens at both approved sizes.",
+    "expandedGeometry": "71/71 expanded/custom states contained at each approved size with zero horizontal modal overflow.",
+    "deadSpace": "Journey History desktop-iPad paired panels now stretch to matched row height; no known dead-slab regression remains.",
+    "hiddenEditors": "26 hidden editor/detail captures completed across the approved sizes with zero failures.",
+    "textClipping": "No known operational clipping remaining in the final current-S39 browser closure.",
+    "nonWidgetControls": "Reservations/Vault category icon tiles verified from exact-source render at both approved sizes.",
+    "launch": "v60 S39 cache/worker/build identities agree; stable storage key and manifest id intentionally retained for continuity; cold installed-iPad launch still requires physical confirmation.",
+    "postSealForensic": "Phase 35 current-source screen-by-screen closure: 123 software/render rules verified, 16 physical-iPad rules remain, 2 locked references.",
+    "screenByScreen": "All nine screens re-run current-source after final colour changes at 1024×768 and 1194×834; every screen-specific closure gate passes.",
+    "viewportColour": "Viewport-based colour uniqueness enforced across all nine screens; no same/near-same top-level widget identity visible together in audited viewports; expanded states retain source identity."
   },
   "physicalIpadAcceptance": [
     {
-      "id": "IPAD-01",
-      "name": "Add to Home Screen + launch transition",
+      "id": "G-020",
+      "name": "Backup is one full JSON; restore replaces current data only after explicit confirmation.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-02",
-      "name": "Full offline relaunch + local persistence",
+      "id": "G-027",
+      "name": "Launch transitions smoothly from app brand/icon to current country/flag/city without flash/blank/jump.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-03",
-      "name": "Map pinch/zoom/pan and no accidental expansion",
+      "id": "HOME-013",
+      "name": "Phrase Helper audio is easy for Kym to follow; “Where’s the toilet?” normal is noticeably slower and Slow is much slower.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-04",
-      "name": "PIN masking/unlock + Vault relock/privacy on background/app switch",
+      "id": "HOME-014",
+      "name": "Home is a completely still one-screen command centre: no vertical/horizontal document scroll, swipe drift or rubber-band movement on the main canvas at either approved iPad size.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-05",
-      "name": "Manual backup export → restore commit → state verification",
+      "id": "RES-009",
+      "name": "Booked Reservations category icons use Journey History inset icon-tile benchmark with category-specific colours.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-06",
-      "name": "Production CRUD smoke across live screens",
+      "id": "CAL-005",
+      "name": "Each day can display up to about five entries before overflow indicator; week/day height grows vertically.",
       "status": "NOT_RUN"
     },
     {
-      "id": "IPAD-07",
-      "name": "Final visual sweep at real iPad landscape sizes including launch/header artwork",
+      "id": "CAL-006",
+      "name": "Dense reservations remain readable without crushed text.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "JH-003",
+      "name": "Journey History map/year filters remain usable and consistent with the shared offline-map and travel-year filtering rules.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "JH-007",
+      "name": "Lower analytics widgets use tight deliberate spacing with no large black gaps.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-005",
+      "name": "Category icons use Journey History inset icon-tile benchmark with five distinct category colours.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-006",
+      "name": "Locked and unlocked header use unified 230px rhythm.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-007",
+      "name": "Unlocked action/status rail stays fully inside header bounds, no bottom cropping.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-008",
+      "name": "Privacy/lock status is obvious and no sensitive content leaks while locked.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-009",
+      "name": "PIN optional; three-tap/unlock flow behaves as approved.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "VAULT-011",
+      "name": "Attachments/screenshots are understandable and usable offline.",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "SET-009",
+      "name": "Backup/restore requires explicit replace-data confirmation and is safe.",
       "status": "NOT_RUN"
     }
   ],
   "promotion": {
     "finalMaster": "BLOCKED",
-    "reason": "IPAD-01 through IPAD-07 are NOT_RUN; S37 is a pre-iPad simulation candidate, not FINAL MASTER."
+    "reason": "S39 is software-closed and screen-by-screen rechecked, but still requires the 16 physical-iPad acceptance rules before FINAL MASTER promotion."
   },
-  "handoffInstruction": "Continue only from this S37 package. Do not return to S36/S35/S34/S33. If any iPad gate fails, fix forward from S37, rerun the full regression protocol, reseal hashes, then repeat the failed iPad gate and dependent gates.",
+  "handoffInstruction": "Continue only from this S39 source. Do not return to S38/S37/S36/S35/S34/S33. If any iPad gate fails, fix forward from S39, rerun the full regression protocol, reseal hashes, then repeat the failed iPad gate and dependent gates.",
   "knownExternalLimitations": [
     "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
   "sourceSeal": {
-    "algorithm": "SHA-256",
-    "scope": "all app-source top-level files except release-contract.json",
-    "digest": "a6c0e2399890317400e13b3a0153cb339088fc6ac53720fb74f639b4a9f099b9",
+    "algorithm": "sha256",
     "files": {
-      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "5f2b8b920eba5ad4f7ca4040237074a200d02fa1feb5cdfcd49598088c95a79d",
+      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "67705e0daeea5d82fcf2d9c55b765ab4021c64b85fce9f6cc1d65908899c3354",
       "app-icon.png": "8d1fc2690d7ecec030092b0ab24f149eca21c4aaf38473e8c9984b6a4616ea25",
       "brand-bank-anz.png": "5f92a6b998b2306d9897b0a8490acab04963b56e28fa86a63b57d93bffdf746d",
       "brand-bank-commonwealth.png": "8352c7a15a7173711f40c4f6a8e6025d6320bf6114ac2edcd7f935d2977ba103",
@@ -275,13 +340,13 @@
       "brand-stream-youtube.png": "35e44729b587f99b9fc04b7ad491ccdf50bc1cf9aeeb5adb52a42f6a84048155",
       "header-assets.bin": "a71b391502c75b51e527924ae63cd34fcc4dabcecace811ca98fb311911da472",
       "header-index.json": "38b022200803f483f9bddbe3030f4162e1e96b5ac2a7e9ded9bd01498a9cc760",
-      "index.html": "c6be9e6e4478fdb7d7adfc7fa0801c8694d79783bad138f750ede7a801c5a568",
-      "manifest.webmanifest": "5355b2520849fef11d9c24d8fcd72285014cabe3fa2792a620feb7dab344426b",
+      "index.html": "490a8cb49354446da3b2bd3f8e1d7df5d861547b302e117bea7e88a041ceb2bc",
+      "manifest.webmanifest": "7b1c0047326fb38d8f7fedf671c6f6ff6d81995a45da44bd54a76d0ee60a7351",
       "src_components_confirmation.js": "132a3cd95febaf7794dfe1254fe5c80728b6de9bbbc5687798ab926e2101fe07",
       "src_components_country.js": "efc16620d8bcb97cb33e0741c93a5c431fdd2533f3d3f2345aa253d15cfba72c",
       "src_components_form-session.js": "481a117b89f925553e9e9ceac96f13ddcd634b4fdd663614b770ae3d00c9877d",
       "src_components_icons.js": "b2d7e57cf9f6cc2659eaffbd8c13a9d012cae3d4db4f1824ae9f76843c03c977",
-      "src_components_modal.js": "675f38cc375152bb220b5a22bf34a2d960ab44b36da3071ef005411f8cf62206",
+      "src_components_modal.js": "f1252ce7492cd4306433cd47d685969da5f09e4ae53aaa8a9e5819f42de8f972",
       "src_components_offline-map.js": "758fd5e2bd6f85c71120fe492ede655cb444c31b7c745fe7b2beb0b9777d7c69",
       "src_components_page-hero.js": "f3b31ed7bd689cd3741132aa5e82a340d99a155c2248e8ac2f91669a031ebe8f",
       "src_components_sidebar.js": "332cca6d8fc0f9443aedd338e638f793a4231a0d29025e242108ef6d7c0a9f56",
@@ -317,7 +382,7 @@
       "src_core_reservation-mutations.js": "4fa296e048ab41d8aa8e759fb004f1605446c2440b726e6ee84be1d62b6020c7",
       "src_core_reservations-view-model.js": "5cc2ea9cf2eac29795f9cc24410461f3ebe0940de55b82127bc27f8c0bfb6af0",
       "src_core_restore.js": "264270bbe8f4da5981bfd10dcceb2f98ca1a33a7314e75497ff7a4f9f51dd89b",
-      "src_core_runtime-config.js": "1817ed76351a9290289ef20083a390ea42798fecc982a7417e85d31e90d6928c",
+      "src_core_runtime-config.js": "155e43ed8e9ca6c30e5c3767ca5cbd650f62472644d3876ac06ba0300b02ef06",
       "src_core_schema.js": "a96c8ba448f7cf88d78f40bda1e49ef788195da961294dda6a2ff74700097f19",
       "src_core_schengen.js": "4eba8372eb779430afa2f2b66b4a74ab65142b31718af9606d412fe522f909ee",
       "src_core_settings-mutations.js": "5a0b9f77161470062317d02aecc3dd918c882a54bdfdb54a0f3a9706980ac1d6",
@@ -331,27 +396,45 @@
       "src_core_year-filters.js": "5f16f14929099810bb07b82656bc9ffc1e22b7a265ef40e77342310680ff4f30",
       "src_design_app.css": "2826f7f3c20d2fe95b5a8089e26e1a89866ae5937a9bbe73fbb2f77f46db4b50",
       "src_design_components.css": "bb7e057c7aab13acb302810892613e879540a324512c78f31f009e862fb34738",
-      "src_design_finish-pass.css": "828ad322a13980ebf8234421f8e4cb8c12eaea907f2422e6b2f3a6a11e363b56",
-      "src_design_locked_contract.css": "0a4dacccdd1359b91089818b294dba426e61148c5bea64aa6e781e2cd2ebf0c4",
+      "src_design_finish-pass.css": "a7369aede6c8db9b03ce64cc77eba53a853f1dc234443800b3aa6a363967ce2b",
+      "src_design_locked_contract.css": "0199049e3fa211809a396f825f467871f78eb887c415e81eba5624dcf594b3b1",
       "src_design_reference-pass.css": "cb5b02ec7917ecca9f564008474e7a6ce1e4dab9c642ca0c7371b9ff458cd5e0",
       "src_design_reset.css": "8be44e4016b1e6f22ec110d7a8e59f1863c191280746a9369e69a0ac02b61dae",
       "src_design_screens.css": "90be72002426b72336c50f846b775ba7b9969619a0c9b683c4547b073c51401f",
       "src_design_tokens.css": "24557420215f36757406eeba64792ae0bd561dfe64928e090224603d63926d64",
-      "src_main.js": "0a1c88392e7477514cc2e4fb15265a7a65020b408a5c485b10cc1d7f41e71906",
-      "src_screens_budget.js": "e3821b37bfe0d0e36d7dc867931bda2991c7c9ed5d6c9f6e788b6dbeda97ecce",
-      "src_screens_calendar.js": "4adaf4b5cc12f429d45d74e74edcc9075c3f10c4925b7cb2c20c95d23eb19cbf",
-      "src_screens_checklist.js": "d3ec85d0f4e89684589c9c67f3c91bc8fb3dc57d9b6f8a4d9bb105d442c859a9",
-      "src_screens_home.js": "80f1807cee82aac4d71ddc9bcc6c933c6f9a8580e9ac1e84fcb2666be6e661e2",
-      "src_screens_itinerary.js": "ada73566e2fbd59db05eeea5ed87dfcc5979627fc263e10c2781601ab5870b6a",
-      "src_screens_journey-history.js": "5b19447b5522c44aa2f3f7d5edd0f55b03bebbe5256698a9f6e861501b5a7957",
+      "src_main.js": "d26158053340e3a6c9869213f87e0bdb49d1f4f933325ea37f6264387d0bcb03",
+      "src_screens_budget.js": "106a2850d608aa05c9a84b01b4a7f6606c77870f7a1d39ebb4ac699a99e2f806",
+      "src_screens_calendar.js": "4e355062b45dfa30f1c44cf032dc0ebe03c662db0db8bba4c61ce40da342ca55",
+      "src_screens_checklist.js": "96bcbca216abbd0c5d737ba36ee9fc46d5632acaf61cebb8581d39d583f5ee0f",
+      "src_screens_home.js": "4daea332df799565dbca27d3a762a2f6fcb76b9492d8d72c5c2b00a13e123684",
+      "src_screens_itinerary.js": "b51eaa02de0178bbd98c4e1429d8c5ece48ac45e669f40ad85139caa74d79f91",
+      "src_screens_journey-history.js": "5bdad8c5949cc48c8957163355e9ce834a499d63ce3b5bd9385c82ddb56c492d",
       "src_screens_registry.js": "a6d185e952dcdab139093ca779d4787189edcd0a40343d3c10974802dfbe1404",
-      "src_screens_reservations.js": "87e2f0f0513381ebe191b69d54286882f1b421a003ab23199f62876394603080",
-      "src_screens_settings.js": "dcab3994318fe4e349876e4aefd53325ab6181d67d13287202d13e6cb933d0a1",
-      "src_screens_vault.js": "9dd0cd694ec9bd7361c032f8eeff1d1464f17f469e5db5737d877c4068d70fcf",
+      "src_screens_reservations.js": "9285e6b1c1e086f33594ccba980954ce8a5a38d3c0404d6f44b98cdbd1366ab4",
+      "src_screens_settings.js": "2d518825457322a38f4f4bc4b5c93bbc1ab6b2f9f6195ac0d3c3ee2b12f3f14b",
+      "src_screens_vault.js": "2898c7db03189667eb65cc3c190bfedf31ab94ffd8143af9a62d10a8d57e79a7",
       "startup-ipad-1024-landscape.png": "ad30b2ce2984a53e1249a71f7b284c2ac6094a661048d54a9b5ec07f49d5034e",
       "startup-ipad-1194-landscape.png": "20b883f742b7602e62de298a9cc1415282c1d38ee977f94fead182651a0e33b5",
-      "sw.js": "3e2967dfb35742a0869f8d5afa4f31ee49ec6aa48927caaef23326f41e728f4e",
+      "sw.js": "d5784f572bf6aa6f0e9434767df9198bdd2af10c65469b62e9355458f7ea48fa",
       "tokyo-4year-simulation-fixture.json": "cde66ac75c2b3531ae297c18f1b45ae5413eebfe2ca5c698ffd86506bd5fdd8c"
-    }
+    },
+    "digest": "078c7f448117b337ef04ac3fb4a6f357e848a40f4919b8de456541d5f6f09a21",
+    "sealedAt": "2026-09-15",
+    "identity": "v60-r7.3-screen-closure-2026-09-15-s39"
+  },
+  "regressionEvidence": {
+    "phase": "36-v60-continuity-package",
+    "exactSource": "56/56 PASS",
+    "targeted": "16/16 PASS",
+    "priorityInteractions": "4/4 PASS",
+    "hiddenEditors": "26/26 PASS",
+    "expanded1024": "71/71 PASS; 0 colour/geometry/overflow/touch/runtime failures",
+    "expanded1194": "71/71 PASS; 0 colour/geometry/overflow/touch/runtime failures",
+    "mainScreens": "18/18 PASS",
+    "staticIntegrity": "PASS",
+    "physicalProtocolConsistency": "PASS — 123 software / 16 physical / 2 locked",
+    "serviceWorkerTransition": "6/6 PASS; 103 shell entries",
+    "pwaPreflight": "STATIC PASS; dynamic local-origin install check blocked by execution environment and remains a physical-iPad gate",
+    "runtimeIdentityTest": "PASS — revision-proof coherence against release-contract runtimeIdentity"
   }
 }

@@ -371,7 +371,7 @@ function renderOwnerCard(title, subtitle, items, tone, stateService, openEditor,
   const stats=node('div','checklist-owner-stats'); stats.append(node('strong','',String(items.length)),node('span','',items.length===1?'item':'items'),node('small','',`${completed} done · ${items.length-completed} pending`));
   head.append(copy,stats); panel.append(head);
   const list=node('div','checklist-owner-list');
-  if(!items.length) list.append(node('p','checklist-empty','No optional items for this stage'));
+  if(!items.length) list.append(node('p','checklist-empty','No entries yet · No optional items for this stage'));
   const ownerEditorTone=tone==='hers'?'magenta':'blue';
   const openOwnerItem=id=>openEditor(id,ownerEditorTone);
   for(const item of items) list.append(renderChecklistRow(item,stateService,openOwnerItem,true,scopeItineraryId));
@@ -411,7 +411,7 @@ function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress
   panel.append(preview);
 
   const list=node('div','checklist-column-list');
-  if(!stageItems.length) list.append(node('p','checklist-empty','No required tasks in this stage'));
+  if(!stageItems.length) list.append(node('p','checklist-empty','No entries yet · No required tasks in this stage'));
   for(const item of stageItems) list.append(renderChecklistRow(item,stateService,openEditor,false,scopeItineraryId));
   panel.append(list);
   return panel;
@@ -447,7 +447,7 @@ function ownerExpandedBody({title,subtitle,items,tone,stateService,openEditor,sc
   const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem?.());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
-  if(!items.length)list.append(node('p','checklist-empty','No optional items in this stage'));
+  if(!items.length)list.append(node('p','checklist-empty','No entries yet · No optional items in this stage'));
   const ownerEditorTone=tone==='hers'?'magenta':'blue';
   for(const item of items)list.append(renderChecklistRow(item,stateService,id=>openEditor(id,ownerEditorTone),false,scopeItineraryId));
   body.append(list);return body;
@@ -460,7 +460,7 @@ function checklistExpandedBody({title,subtitle,items,stateService,openEditor,add
   const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.disabled=Boolean(disabled);add.title=add.disabled?disabledReason:'';if(!add.disabled)add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
-  if(!items.length)list.append(node('p','checklist-empty','No items in this stage'));
+  if(!items.length)list.append(node('p','checklist-empty','No entries yet'));
   for(const item of items)list.append(renderChecklistRow(item,stateService,openEditor,false,scopeItineraryId));
   body.append(list);return body;
 }
@@ -476,7 +476,7 @@ function checklistSummaryStat(label,value,sub='',tone=''){
 function readyExpandedBody(model,navigate=null){
   const body=node('section','checklist-status-expanded checklist-ready-expanded');
   const destination=model.nextDestination;
-  const statusTone=model.ready.status==='ready'?'green':model.ready.status==='not-ready'?'gold':model.ready.status==='needs-setup'?'orange':'indigo';
+  const statusTone=model.ready.status==='ready'?'green':model.ready.status==='not-ready'?'red':model.ready.status==='needs-setup'?'orange':'indigo';
   const hero=node('div',`checklist-expanded-status-hero is-${statusTone}`);
   const icon=node('span','checklist-expanded-status-icon');icon.append(createLineIcon(model.ready.status==='ready'?'check':'warning'));
   const copy=node('div','checklist-expanded-status-copy');copy.append(node('p','eyebrow','READY TO MOVE'),node('h2','',readyLabel(model.ready.status)),node('strong','',destination?`${destination.name}${destination.country?`, ${destination.country}`:''}`:'No future destination planned'));
@@ -548,7 +548,7 @@ function nextDestinationExpandedBody(model,stateService,openEditor,navigate){
   );body.append(stats);
   const section=node('section','checklist-expanded-section');section.append(node('h3','','DESTINATION CHECKLIST'));
   const list=node('div','checklist-expanded-list');
-  if(!destinationItems.length)list.append(node('p','checklist-empty','No destination checklist items yet'));
+  if(!destinationItems.length)list.append(node('p','checklist-empty','No entries yet · No destination checklist items for this destination'));
   for(const item of destinationItems)list.append(renderChecklistRow(item,stateService,openEditor,false,model.activeDestinationId));
   section.append(list);body.append(section);
   if(typeof navigate==='function'){const open=node('button','button checklist-next-open-itinerary','OPEN NEXT DESTINATION IN ITINERARY');open.type='button';open.addEventListener('click',()=>navigate('itinerary',{collection:'itinerary',id:destination.id}));body.append(open);}
@@ -561,7 +561,7 @@ function renderHistory(model, openEditor) {
   head.append(node('h2', '', 'Checklist History'), node('span', 'checklist-count', String(model.history.length)));
   panel.append(head);
   if (!model.history.length) {
-    panel.append(node('p', 'checklist-empty', 'No historical destination checklists yet'));
+    panel.append(node('p', 'checklist-empty', 'No entries yet · No historical destination checklists yet'));
     return panel;
   }
   const groups = node('div', 'checklist-history-groups');
@@ -601,32 +601,39 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     main.append(createPageHero({key:'header-checklist',eyebrow:'TRAVEL PREP · STAY ORGANISED',title:'Checklist',subtitle:'Stay organised and prepared with your personalised travel checklist.',className:'checklist-reference-hero',position:'center center'}));
 
     const openAny=(id,editorTone=null)=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialStage:model.activeStage,editorTone});
-    const openPermanent=id=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialListType:'permanent',initialStage:model.activeStage,editorTone:'green'});
-    const openDestination=id=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialListType:'destination',initialStage:model.activeStage,editorTone:'sky'});
+    const openPermanent=id=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'});
+    const openDestination=id=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'});
 
     const changeStage=stage=>stateService.commit(draft=>{draft.ui.checklistStage=stage;});
     const addOwnerItem=(owner,tone)=>openChecklistEditor({stateService,host:main,currentDate,initialListType:model.checklistDestination?'destination':'permanent',initialStage:model.activeStage,initialOwner:owner,initialRequired:false,editorTone:tone});
     const ready=renderReadyBanner(model,changeStage,navigate), stages=renderStageNavigation(model,changeStage), owners=renderOwnerPanels(model,stateService,openAny);
-    makeExpandableCard(ready,{host:main,title:'Ready to Move',tone:model.ready.status==='ready'?'green':model.ready.status==='not-ready'?'gold':model.ready.status==='needs-setup'?'orange':'indigo',bodyBuilder:()=>readyExpandedBody(model,navigate)});
+    makeExpandableCard(ready,{host:main,title:'Ready to Move',tone:model.ready.status==='ready'?'green':model.ready.status==='not-ready'?'red':model.ready.status==='needs-setup'?'orange':'indigo',bodyBuilder:()=>readyExpandedBody(model,navigate)});
     const primary=node('div','checklist-reference-primary');
     primary.append(ready,stages,owners);
     const hisCard=owners.querySelector('.checklist-owner-his');
     const hersCard=owners.querySelector('.checklist-owner-hers');
     if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'sky',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','blue')})});
     if(hersCard)makeExpandableCard(hersCard,{host:main,title:'Her Needs & Wants',tone:'magenta',bodyBuilder:()=>ownerExpandedBody({title:'HERS',subtitle:'NEEDS & WANTS',items:model.hers,tone:'hers',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('kym','magenta')})});
-    const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'green'}),model.activeDestinationId);
+    const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'}),model.activeDestinationId);
     const destinationScopeLabel=model.nextDestination?'Tasks specific to the next destination.':model.checklistDestination?'Tasks specific to the current destination.':'Tasks for a planned destination.';
-    const destinationPanel=renderListPanel('Destination Checklist',destinationScopeLabel,model.stageDestination,model.stageDestinationProgress,model.destinationProgress,'destination',stateService,openDestination,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'sky'}),model.activeDestinationId,{disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'});
+    const destinationPanel=renderListPanel('Destination Checklist',destinationScopeLabel,model.stageDestination,model.stageDestinationProgress,model.destinationProgress,'destination',stateService,openDestination,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'}),model.activeDestinationId,{disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'});
     const requiredGrid=node('section','checklist-required-grid'); requiredGrid.append(permanentPanel,destinationPanel);
-    makeExpandableCard(permanentPanel,{host:main,title:'Permanent Checklist',tone:'green',bodyBuilder:()=>checklistExpandedBody({title:'Permanent Checklist',subtitle:'Tasks that apply to every destination.',items:model.stagePermanent,stateService,openEditor:openPermanent,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'green'}),scopeItineraryId:model.activeDestinationId})});
-    makeExpandableCard(destinationPanel,{host:main,title:'Destination Checklist',tone:'sky',bodyBuilder:()=>checklistExpandedBody({title:'Destination Checklist',subtitle:destinationScopeLabel,items:model.stageDestination,stateService,openEditor:openDestination,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'sky'}),scopeItineraryId:model.activeDestinationId,disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'})});
+    makeExpandableCard(permanentPanel,{host:main,title:'Permanent Checklist',tone:'gold',bodyBuilder:()=>checklistExpandedBody({title:'Permanent Checklist',subtitle:'Tasks that apply to every destination.',items:model.stagePermanent,stateService,openEditor:openPermanent,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'}),scopeItineraryId:model.activeDestinationId})});
+    makeExpandableCard(destinationPanel,{host:main,title:'Destination Checklist',tone:'teal',bodyBuilder:()=>checklistExpandedBody({title:'Destination Checklist',subtitle:destinationScopeLabel,items:model.stageDestination,stateService,openEditor:openDestination,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'}),scopeItineraryId:model.activeDestinationId,disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'})});
     primary.append(requiredGrid);
     const overview=renderOverview(model), nextDestination=renderNextDestinationCard(model,navigate);
-    makeExpandableCard(overview,{host:main,title:'Checklist Overview',tone:'neutral',bodyBuilder:()=>overviewExpandedBody(model)});
-    if(model.nextDestination) makeExpandableCard(nextDestination,{host:main,title:'Next Destination',tone:'indigo',bodyBuilder:()=>nextDestinationExpandedBody(model,stateService,openDestination,navigate)});
+    makeExpandableCard(overview,{host:main,title:'Checklist Overview',tone:'silver',bodyBuilder:()=>overviewExpandedBody(model)});
+    if(model.nextDestination) makeExpandableCard(nextDestination,{host:main,title:'Next Destination',tone:'copper',bodyBuilder:()=>nextDestinationExpandedBody(model,stateService,openDestination,navigate)});
     const rail=node('aside','checklist-reference-rail'); rail.setAttribute('aria-label','Checklist summary'); rail.append(overview,nextDestination);
     const layout=node('section','checklist-layout-grid'); layout.append(primary,rail);
-    main.append(layout,renderHistory(model,openAny));
+    const history=renderHistory(model,openAny);
+    if(!model.history.length){
+      history.classList.add('checklist-history-compact-empty');
+      rail.append(history);
+      main.append(layout);
+    } else {
+      main.append(layout,history);
+    }
 
     const pending=state.ui?.pendingOpen;
     if(pending?.collection==='checklists'&&pending.id&&state.checklists.some(item=>item.id===pending.id)){
