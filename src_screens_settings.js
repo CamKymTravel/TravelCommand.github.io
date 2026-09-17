@@ -36,7 +36,7 @@ function openGeneralEditor({stateService,host,currentDate}) {
   const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
   const capture=()=>({journeyStartDate:value('journeyStartDate')||null,defaultCurrency:value('defaultCurrency'),annualBudgetAUD:value('annualBudgetAUD'),annualBudgetYear:saved.annualBudgetYear});
   const populate=v=>{error.textContent='';fields.replaceChildren(inputField('Journey Start','journeyStartDate','date',v.journeyStartDate),inputField('Default Currency','defaultCurrency','text',v.defaultCurrency),inputField(`Annual Budget ${saved.annualBudgetYear} (AUD)`,'annualBudgetAUD','number',v.annualBudgetAUD));const currency=fields.querySelector('[name="defaultCurrency"]');currency.maxLength=3;currency.autocapitalize='characters';const budget=fields.querySelector('[name="annualBudgetAUD"]');budget.min='0';budget.step='0.01';};populate(saved);
-  const modal=createModal({title:'Travel & Budget Defaults',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
+  const modal=createModal({title:'Travel & Budget Defaults',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-sky',actions:[
     {label:'Undo Changes',onClick:()=>populate(session.undo())},
     {label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},
     {label:'Save',onClick:dialog=>{try{const draftValue=session.update(draft=>Object.assign(draft,capture()));stateService.commit(draft=>saveGeneralSettingsDraft(draft,draftValue));session.markSaved(draftValue);if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
@@ -50,7 +50,7 @@ function openPinEditor({stateService,host}) {
   const body=node('div','settings-editor');const fields=node('div','settings-form-grid settings-pin-grid');const error=node('p','settings-form-error');body.append(fields,error);
   if(enabled)fields.append(pinInput('Current PIN','currentPin'));
   fields.append(pinInput('New PIN','newPin'),pinInput('Confirm New PIN','confirmPin'));
-  const modal=createModal({title:enabled?'Change PIN':'Set PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
+  const modal=createModal({title:enabled?'Change PIN':'Set PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-gold',actions:[
     {label:'Cancel',onClick:dialog=>dialog.close()},
     {label:'Save PIN',onClick:async dialog=>{try{const current=body.querySelector('[name="currentPin"]')?.value||'';const next=body.querySelector('[name="newPin"]').value;const confirm=body.querySelector('[name="confirmPin"]').value;if(enabled&&!(await verifyPin(current,state.settings.pinHash)))throw new Error('Current PIN is incorrect');if(next!==confirm)throw new Error('New PIN entries do not match');const hashed=await hashPin(next);stateService.commit(draft=>enablePinDraft(draft,hashed));if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
   ]});modalHost(host,modal);
@@ -58,7 +58,7 @@ function openPinEditor({stateService,host}) {
 
 function openDisablePin({stateService,host}) {
   const state=stateService.snapshot();const body=node('div','settings-editor');const field=pinInput('Current PIN','currentPin');const error=node('p','settings-form-error');body.append(field,error);
-  const modal=createModal({title:'Disable PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-neutral',actions:[
+  const modal=createModal({title:'Disable PIN',body,className:'tcc-editor-modal tcc-settings-editor-modal tone-gold',actions:[
     {label:'Cancel',onClick:dialog=>dialog.close()},
     {label:'Disable PIN',kind:'danger',onClick:async dialog=>{try{const current=body.querySelector('[name="currentPin"]').value;if(!(await verifyPin(current,state.settings.pinHash)))throw new Error('Current PIN is incorrect');stateService.commit(draft=>disablePinDraft(draft));if(dialog.isConnected&&dialog.open)dialog.close();}catch(err){error.textContent=err.message;}}}
   ]});modalHost(host,modal);
@@ -80,7 +80,7 @@ function chooseRestoreFile({stateService,host,vaultAccessSession,onBusyChange=nu
     onBusyChange?.(true);
     try{
       const serialized=await file.text();
-      const confirmation=confirmDestructive({title:'Restore Travel Command Centre backup',tone:'teal',message:'Restore will replace all current app data with the selected backup. This cannot be undone unless you have another backup.',confirmLabel:'Restore',onConfirm:async()=>{if(vaultAccessSession)lockVault(vaultAccessSession);await Promise.resolve(restoreBackup(stateService,serialized));}});
+      const confirmation=confirmDestructive({title:'Restore Travel Command Centre backup',tone:'copper',message:'Restore will replace all current app data with the selected backup. This cannot be undone unless you have another backup.',confirmLabel:'Restore',onConfirm:async()=>{if(vaultAccessSession)lockVault(vaultAccessSession);await Promise.resolve(restoreBackup(stateService,serialized));}});
       confirmation?.addEventListener('close',()=>onBusyChange?.(false),{once:true});
     }catch(err){
       onBusyChange?.(false);

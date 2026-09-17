@@ -4,7 +4,7 @@
     "createdAt": "2026-01-14T00:00:00.000Z",
     "modifiedAt": "2029-09-15T09:00:00.000Z",
     "revision": 0,
-    "appVersion": "1.2.0-v56-r7.2-continuity",
+    "appVersion": "1.2.0-v60-r7.4-adversarial-s43",
     "simulationFixtureRevision": "2029-09-15-istanbul-full-multiyear-heavy-v1"
   },
   "settings": {

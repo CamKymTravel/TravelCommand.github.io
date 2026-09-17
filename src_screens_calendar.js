@@ -2,7 +2,7 @@ import { buildCalendarViewModel, shiftCalendarMonth } from './src_core_calendar-
 import { buildHomeViewModel } from './src_core_home-view-model.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { saveCalendarEventDraft, deleteCalendarEventDraft, PERSONAL_CALENDAR_TYPES } from './src_core_calendar-event-mutations.js';
-import { createModal, makeExpandableCard, preserveLocalFocus } from './src_components_modal.js';
+import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
@@ -97,6 +97,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     notes:existing?.notes || existing?.note || ''
   };
   const formSession = new FormSession(savedValue);
+  const resolvedTone = editorTone || 'violet';
 
   const body = node('div', 'calendar-editor');
   const typeTiles = node('div', 'calendar-type-tiles');
@@ -159,6 +160,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     actions.push({ label:'Delete', kind:'danger', onClick:dialog => {
       confirmDestructive({
         title:'Delete calendar event',
+        tone:resolvedTone,
         message:`Delete ${existing.title}${existingDeleteContext ? ` · ${existingDeleteContext}` : ''}? This cannot be undone.`,
         onConfirm:() => {
           stateService.commit(draft => deleteCalendarEventDraft(draft, existing.id));
@@ -184,7 +186,8 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     }}
   );
 
-  modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:'tcc-editor-modal tcc-calendar-editor-modal tone-neutral' });
+  modal = createModal({ title:existing ? 'Edit Calendar Event' : 'Add Reminder / Note', body, actions, className:`tcc-editor-modal tcc-calendar-editor-modal tone-${resolvedTone}` });
+  setModalTone(modal,resolvedTone);
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();

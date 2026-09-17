@@ -4,7 +4,7 @@ import { createStayBanner } from './src_components_page-hero.js';
 import { createModal, makeExpandableCard, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { saveReservationDraft, deleteReservationDraft } from './src_core_reservation-mutations.js';
 import { localToAUD, formatMoney } from './src_core_currency.js';
-import { staysCoveringDate, sameDayHandoffCandidates, isDestinationBudgetUsable } from './src_core_budget.js';
+import { staysCoveringDate, sameDayHandoffCandidates, isDestinationBudgetUsable, canonicalAUDAmount } from './src_core_budget.js';
 import { formatAUDate } from './src_core_dates.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
@@ -147,7 +147,8 @@ function existingAnnualReservationUsesManualAUD(record, state) {
   const stay=(state.itinerary || []).find(item=>item.id===record.itineraryId) || null;
   if (!stay || !isDestinationBudgetUsable(stay)) return true;
   if (currency !== String(stay.localCurrency || '').trim().toUpperCase()) return true;
-  const expected=Math.round((localToAUD(Number(record.originalAmount || 0), stay.fixedLocalPerAUD) + Number.EPSILON) * 100) / 100;
+  const original=Number(record.originalAmount || 0);
+  const expected=canonicalAUDAmount(localToAUD(original, stay.fixedLocalPerAUD), original);
   return Math.abs(Number(record.audAmount) - expected) > 0.005;
 }
 
@@ -175,6 +176,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     itineraryId:existing?.budgetScope === 'destination' ? (existing?.itineraryId || null) : null
   };
   const formSession = new FormSession(savedValue);
+  const resolvedTone = editorTone || 'sky';
   let modal = null;
   const body = node('div', 'reservation-editor');
   body.dataset.audAuto = 'false';
@@ -230,7 +232,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       button.addEventListener('click', () => preserveLocalFocus(() => {
         const previousType = body.dataset.type;
         body.dataset.type = type;
-        setModalTone(modal, 'sky');
+        setModalTone(modal, resolvedTone);
         renderTypes(); renderFlightScope(); renderAllocation(); updateRoutingPreview();
       }));
       typeTiles.append(button);
@@ -361,8 +363,12 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     if(route.destinationAllocation && route.stay) body.dataset.destinationItineraryId=route.stay.id;
     else if(!route.destinationAllocation || (!route.handoffCandidates && !route.stay)) body.dataset.destinationItineraryId='';
     const currencyInput = fields.querySelector('[name="originalCurrency"]');
-    const stay = route.error ? null : route.stay;
-    if (stay && body.dataset.currencyAuto === 'true' && currencyInput) currencyInput.value = String(stay.localCurrency || defaultCurrency).toUpperCase();
+    // Currency identity belongs to the dated itinerary stay even when that stay's
+    // Destination Budget is not yet usable. A missing budget/rate is a setup
+    // warning; it must never make the editor retain the previous stay's currency.
+    const matchedStay = route.stay || null;
+    const conversionStay = route.error ? null : matchedStay;
+    if (matchedStay && body.dataset.currencyAuto === 'true' && currencyInput) currencyInput.value = String(matchedStay.localCurrency || defaultCurrency).toUpperCase();
     const currency = value('originalCurrency').trim().toUpperCase();
     const amount = Number(value('originalAmount'));
     const audInput = fields.querySelector('[name="audAmount"]');
@@ -377,11 +383,11 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       if (audInput) audInput.readOnly = false;
       body.dataset.audAuto = 'false';
       conversionHint.textContent = 'This Annual Budget booking has a saved manual AUD equivalent. It stays manual even if a later itinerary correction makes the booking currency match the stay currency.';
-    } else if (stay?.localCurrency === currency && stay?.fixedLocalPerAUD && validAmount) {
-      const converted = Math.round((localToAUD(amount, stay.fixedLocalPerAUD) + Number.EPSILON) * 100) / 100;
+    } else if (conversionStay?.localCurrency === currency && conversionStay?.fixedLocalPerAUD && validAmount) {
+      const converted = canonicalAUDAmount(localToAUD(amount, conversionStay.fixedLocalPerAUD), amount);
       if (audInput) { audInput.readOnly = true; audInput.value = String(converted); }
       body.dataset.audAuto = 'true';
-      conversionHint.textContent = `${formatMoney(amount, currency)} = AUD ${formatMoney(converted, 'AUD')} at ${stay.name}'s fixed stay rate.`;
+      conversionHint.textContent = `${formatMoney(amount, currency)} = AUD ${formatMoney(converted, 'AUD')} at ${conversionStay.name}'s fixed stay rate.`;
     } else {
       if (audInput) {
         audInput.readOnly = false;
@@ -404,7 +410,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     body.dataset.budgetScope = saved.budgetScope === 'destination' ? 'destination' : 'annual';
     body.dataset.flightScope = saved.flightScope || '';
     body.dataset.destinationItineraryId = saved.itineraryId || '';
-    setModalTone(modal, 'sky');
+    setModalTone(modal, resolvedTone);
     renderTypes();
     renderFlightScope();
     renderAllocation();
@@ -471,7 +477,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       const existingAmount=formatMoney(existing.originalAmount,existing.originalCurrency || 'AUD');
       confirmDestructive({
         title:'Delete reservation',
-        tone:'sky',
+        tone:resolvedTone,
         message:`Delete ${existing.title} · ${existingType} · ${existingWhen} · ${existingStatus} · ${existingAmount}? This cannot be undone.`,
         onConfirm:() => {
           stateService.commit(draft => deleteReservationDraft(draft, existing.id));
@@ -503,7 +509,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     }}
   );
 
-  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:'tcc-editor-modal tcc-reservation-editor-modal tone-sky' });
+  modal = createModal({ title:existing ? 'Edit Reservation' : 'Add Reservation', body, actions, className:`tcc-editor-modal tcc-reservation-editor-modal tone-${resolvedTone}` });
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -701,10 +707,10 @@ function openCompletedReservations({ stateService, host, currentDate }) {
   let dialog=null;
   const openRecord=id=>{
     if(dialog?.open) dialog.close();
-    queueMicrotask(()=>{const liveHost=document.querySelector('[data-screen="reservations"]');if(liveHost)openReservationEditor({stateService,host:liveHost,currentDate,reservationId:id,initialType:'flight',editorTone:'blue'});});
+    queueMicrotask(()=>{const liveHost=document.querySelector('[data-screen="reservations"]');if(liveHost)openReservationEditor({stateService,host:liveHost,currentDate,reservationId:id,initialType:'flight',editorTone:'silver'});});
   };
   const body=reservationPanelExpandedBody('Completed Reservations',model.allCompleted,openRecord);
-  dialog=createModal({title:'Completed Reservations',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-completed-expanded-modal tone-neutral',actions:[{label:'Close',onClick:d=>d.close()}]});
+  dialog=createModal({title:'Completed Reservations',body,className:'tcc-expanded-modal tcc-expanded-inherits-source reservation-completed-expanded-modal tone-silver',actions:[{label:'Close',onClick:d=>d.close()}]});
   host.append(dialog); dialog.addEventListener('close',()=>dialog.remove(),{once:true}); dialog.showModal();
 }
 

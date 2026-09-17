@@ -124,7 +124,7 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
     if (editorTone) return editorTone;
     const owner = value('owner') || savedValue.owner;
     if (owner === 'kym') return 'magenta';
-    if (owner === 'cameron') return 'blue';
+    if (owner === 'cameron') return 'sky';
     return body.dataset.listType === 'destination' ? 'sky' : 'green';
   }
   function capture() {
@@ -178,7 +178,7 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
       checkboxField('Required for Ready to Move', 'required', saved.required),
       textAreaField('Notes', 'notes', saved.notes)
     );
-    fields.querySelector('[name="owner"]')?.addEventListener('change', () => { /* owner identity stays inside the form; editor shell remains neutral */ });
+    fields.querySelector('[name="owner"]')?.addEventListener('change', () => { if (!editorTone) setModalTone(modal, currentEditorTone()); });
   }
   populate(savedValue);
 
@@ -248,8 +248,9 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
     }}
   );
 
-  modal = createModal({ title:existing ? 'Edit Checklist Item' : 'Add Checklist Item', body, actions, className:'tcc-editor-modal tcc-checklist-editor-modal tone-neutral' });
-  setModalTone(modal,'neutral');
+  const resolvedTone=currentEditorTone();
+  modal = createModal({ title:existing ? 'Edit Checklist Item' : 'Add Checklist Item', body, actions, className:`tcc-editor-modal tcc-checklist-editor-modal tone-${resolvedTone}` });
+  setModalTone(modal,resolvedTone);
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -372,7 +373,7 @@ function renderOwnerCard(title, subtitle, items, tone, stateService, openEditor,
   head.append(copy,stats); panel.append(head);
   const list=node('div','checklist-owner-list');
   if(!items.length) list.append(node('p','checklist-empty','No entries yet · No optional items for this stage'));
-  const ownerEditorTone=tone==='hers'?'magenta':'blue';
+  const ownerEditorTone=tone==='hers'?'magenta':'sky';
   const openOwnerItem=id=>openEditor(id,ownerEditorTone);
   for(const item of items) list.append(renderChecklistRow(item,stateService,openOwnerItem,true,scopeItineraryId));
   panel.append(list);
@@ -621,7 +622,7 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     primary.append(ready,stages,owners);
     const hisCard=owners.querySelector('.checklist-owner-his');
     const hersCard=owners.querySelector('.checklist-owner-hers');
-    if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'sky',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','blue')})});
+    if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'sky',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','sky')})});
     if(hersCard)makeExpandableCard(hersCard,{host:main,title:'Her Needs & Wants',tone:'magenta',bodyBuilder:()=>ownerExpandedBody({title:'HERS',subtitle:'NEEDS & WANTS',items:model.hers,tone:'hers',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('kym','magenta')})});
     const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'}),model.activeDestinationId);
     const destinationScopeLabel=model.nextDestination?'Tasks specific to the next destination.':model.checklistDestination?'Tasks specific to the current destination.':'Tasks for a planned destination.';

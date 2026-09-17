@@ -152,7 +152,11 @@ export function createModal({ title, body, actions = [], className = '', showClo
     button.textContent = action.label;
     button.className = action.kind === 'danger' ? 'button button-danger' : 'button';
     button.addEventListener('click', () => {
-      if (dialog.dataset.actionBusy === 'true') return;
+      // A rapid second activation can still reach a detached footer button in
+      // the same event turn after the first Save has already closed the dialog.
+      // Never run a modal action once its dialog is no longer open; this keeps
+      // Add/Edit Save idempotent under double-tap/double-click stress.
+      if (!dialog.open || dialog.dataset.actionBusy === 'true') return;
       const result = action.onClick?.(dialog);
       if (!result || typeof result.then !== 'function') return;
       dialog.dataset.actionBusy = 'true';

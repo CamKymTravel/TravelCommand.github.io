@@ -7,7 +7,7 @@
   "orientation": "any",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline iPad Travel Command Centre S40 Tokyo full populated simulation for Cameron & Kym. Local-only simulation data for physical review.",
+  "description": "Offline iPad Travel Command Centre for Cameron & Kym. Local-only travel planning, budgeting, reservations and records.",
   "icons": [
     {
       "src": "./app-icon.png",

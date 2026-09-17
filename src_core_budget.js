@@ -4,6 +4,14 @@ import { localToAUD } from './src_core_currency.js';
 
 const roundMoney = value => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 
+export function canonicalAUDAmount(value, originalAmount = 0) {
+  const rounded = roundMoney(value);
+  // A real positive foreign-currency cost must never collapse to AUD 0.00
+  // merely because the converted value is below half a cent. Canonical AUD
+  // records are stored to cents, so preserve the smallest non-zero cent.
+  return Number(originalAmount) > 0 && Number(value) > 0 && rounded === 0 ? 0.01 : rounded;
+}
+
 export function isDestinationBudgetUsable(stay) {
   return Boolean(
     stay &&
@@ -57,12 +65,12 @@ export function deriveAUDForStay({ originalCurrency = 'AUD', originalAmount = 0,
   if (!Number.isFinite(original) || original < 0) throw new Error('Original amount must be zero or greater');
   if (currency === 'AUD') return roundMoney(original);
   if (currency === String(stay?.localCurrency || '').trim().toUpperCase()) {
-    return roundMoney(localToAUD(original, Number(stay.fixedLocalPerAUD)));
+    return canonicalAUDAmount(localToAUD(original, Number(stay.fixedLocalPerAUD)), original);
   }
   const manual = Number(audAmount ?? 0);
   if (!Number.isFinite(manual) || manual < 0) throw new Error('AUD equivalent must be zero or greater');
   if (original > 0 && manual <= 0) throw new Error('Enter the AUD equivalent for this currency');
-  return roundMoney(manual);
+  return canonicalAUDAmount(manual, original);
 }
 
 export function sumAmounts(records, field = 'audAmount') {

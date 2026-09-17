@@ -1,7 +1,7 @@
 import { buildBudgetViewModel } from './src_core_budget-view-model.js';
 import { setDestinationBudgetDraft } from './src_core_itinerary-mutations.js';
 import { saveExpenseDraft, deleteExpenseDraft } from './src_core_expense-mutations.js';
-import { staysCoveringDate, sameDayHandoffCandidates, isDestinationBudgetUsable, annualBudgetForYear } from './src_core_budget.js';
+import { staysCoveringDate, sameDayHandoffCandidates, isDestinationBudgetUsable, annualBudgetForYear, canonicalAUDAmount } from './src_core_budget.js';
 import { localToAUD, audToLocal, formatMoney } from './src_core_currency.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { FormSession } from './src_components_form-session.js';
@@ -339,7 +339,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
           node('small','','Annual Budget · stored directly in AUD.')
         );
       }else if(stay?.localCurrency&&Number(stay.fixedLocalPerAUD)>0&&validAmount){
-        const converted=localToAUD(amount,stay.fixedLocalPerAUD);
+        const converted=canonicalAUDAmount(localToAUD(amount,stay.fixedLocalPerAUD),amount);
         conversionHintBox.append(
           node('span','budget-expense-auto-kicker','AUD EQUIVALENT'),
           node('strong','budget-expense-aud-equivalent',`AUD ${formatMoney(converted,'AUD')}`),
@@ -762,6 +762,7 @@ function destinationHasRateLockingCosts(state,itineraryId){
 }
 
 function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManager,editorTone=null}){
+  const resolvedTone=editorTone||'violet';
   const state=stateService.snapshot();
   const entry=(state.itinerary||[]).find(item=>item.id===itineraryId);
   if(!entry)return;
@@ -867,7 +868,7 @@ function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManage
           if(d.isConnected&&d.open)d.close();else queueReopen();
         }catch(err){error.textContent=err.message;}
       }}
-    ],className:'tcc-editor-modal tcc-budget-destination-editor-modal tone-sky'
+    ],className:`tcc-editor-modal tcc-budget-destination-editor-modal tone-${resolvedTone}`
   });
   host.append(dialog); dialog.showModal();
   dialog.addEventListener('close',()=>{dialog.remove(); queueReopen();},{once:true});
@@ -956,7 +957,7 @@ function openDestinationBudgetsManager({stateService,host,currentDate,initialFil
       row.append(budgetDateTicket(entry,{compact:true}),copy,value);
       row.addEventListener('click',()=>{
         dialog.close();
-        queueMicrotask(()=>openDestinationBudgetEditor({stateService,host,itineraryId:entry.id,reopenManager:()=>{const liveHost=document.querySelector('[data-screen="budget"]');if(liveHost)openDestinationBudgetsManager({stateService,host:liveHost,currentDate,initialFilter:activeFilter});}}));
+        queueMicrotask(()=>openDestinationBudgetEditor({stateService,host,itineraryId:entry.id,editorTone:'violet',reopenManager:()=>{const liveHost=document.querySelector('[data-screen="budget"]');if(liveHost)openDestinationBudgetsManager({stateService,host:liveHost,currentDate,initialFilter:activeFilter});}}));
       });
       list.append(row);
     }
@@ -1178,7 +1179,7 @@ function renderReservations(model, host, navigate) {
       const actions=[];
       if(typeof navigate==='function')actions.push({label:'Open in Reservations',onClick:d=>{d.close();queueMicrotask(()=>navigate('reservations',{collection:'reservations',id:record.id}));}});
       actions.push({label:'Close',onClick:d=>d.close()});
-      const dialog=createModal({title:record.title,body,className:'tcc-expanded-modal tcc-expanded-inherits-source tone-sky',actions});
+      const dialog=createModal({title:record.title,body,className:'tcc-expanded-modal tcc-expanded-inherits-source tone-green',actions});
       host.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
     });
     list.append(row);

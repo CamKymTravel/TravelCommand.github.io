@@ -1,6 +1,6 @@
 import { buildItineraryViewModel } from './src_core_itinerary-view-model.js';
 import { saveItineraryDraft, deleteItineraryDraft } from './src_core_itinerary-mutations.js';
-import { createModal, makeExpandableCard, materialToneFromRenderedSurface, preserveLocalFocus, setModalTone } from './src_components_modal.js';
+import { createModal, makeExpandableCard, materialToneFromContext, materialToneFromRenderedSurface, preserveLocalFocus, setModalTone } from './src_components_modal.js';
 import { FormSession } from './src_components_form-session.js';
 import { confirmDestructive } from './src_components_confirmation.js';
 import { formatMoney } from './src_core_currency.js';
@@ -180,7 +180,7 @@ function hasMapCoordinates(record) {
 }
 
 
-function openHomeVisitEditor({ stateService, host, currentDate, prepareRecordVisibility = null, entryId = null }) {
+function openHomeVisitEditor({ stateService, host, currentDate, prepareRecordVisibility = null, entryId = null, editorTone = 'gold' }) {
   const state=stateService.snapshot();
   const existing=entryId ? state.itinerary.find(item=>item.id===entryId) : null;
   if(entryId && !existing) return;
@@ -241,7 +241,7 @@ function openHomeVisitEditor({ stateService, host, currentDate, prepareRecordVis
       } catch (err) { error.textContent=err.message; }
     }}
   );
-  const modal=createModal({title:existing?'Edit Home Visit':'Add Home Visit',body,actions,className:'tcc-editor-modal tcc-itinerary-home-visit-modal tone-sky'});
+  const modal=createModal({title:existing?'Edit Home Visit':'Add Home Visit',body,actions,className:`tcc-editor-modal tcc-itinerary-home-visit-modal tone-${editorTone||'gold'}`});
   host.append(modal);
   modal.addEventListener('close',()=>modal.remove(),{once:true});
   modal.showModal();
@@ -360,7 +360,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
     }});
     map.classList.add('itinerary-route-picker-map');
     pickerBody.append(map);
-    picker=createModal({title:hasMapCoordinates(point)?'Adjust Map Point':'Place Map Point',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-neutral itinerary-route-picker-modal'});
+    const pickerTone=materialToneFromContext(modal, body.dataset.travelType==='motorhome'?'orange':body.dataset.travelType==='cruise'?'violet':'sky');
+    picker=createModal({title:hasMapCoordinates(point)?'Adjust Map Point':'Place Map Point',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:`tcc-expanded-modal tcc-expanded-inherits-source tone-${pickerTone} itinerary-route-picker-modal`});
     host.append(picker);picker.showModal();picker.addEventListener('close',()=>picker.remove(),{once:true});
   }
 
@@ -473,7 +474,8 @@ function openItineraryEditor({ stateService, host, currentDate, entryId = null, 
       picker?.close();
     }});
     map.classList.add('itinerary-route-picker-map'); pickerBody.append(map);
-    picker=createModal({title:mapped?'Adjust Map Location':'Place Map Location',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:'tcc-expanded-modal tone-neutral itinerary-route-picker-modal'});
+    const pickerTone=materialToneFromContext(modal, body.dataset.travelType==='motorhome'?'orange':body.dataset.travelType==='cruise'?'violet':'sky');
+    picker=createModal({title:mapped?'Adjust Map Location':'Place Map Location',body:pickerBody,actions:[{label:'Cancel',onClick:d=>d.close()}],className:`tcc-expanded-modal tcc-expanded-inherits-source tone-${pickerTone} itinerary-route-picker-modal`});
     host.append(picker);picker.showModal();picker.addEventListener('close',()=>picker.remove(),{once:true});
   }
 

@@ -12,6 +12,21 @@ import { countryFlagEmoji } from './src_components_country.js';
 
 const root = document.querySelector('#app');
 
+// S49 physical-iPad add-editor closure retains S48 gesture authority. CSS `touch-action: manipulation` removes
+// tap/double-tap page zoom in current iPad Safari while preserving deliberate
+// pinch/spread. Keep only a harmless dblclick fallback: preventing touchend on
+// rapid taps breaks intentional multi-tap app controls such as Vault unlock.
+const TCC_ZOOM_GESTURE_EXEMPT = '.offline-map-interactive, .itinerary-route-picker-map';
+function isZoomGestureExempt(target) {
+  return target instanceof Element && Boolean(target.closest(TCC_ZOOM_GESTURE_EXEMPT));
+}
+function installNoTapZoomGuard() {
+  document.addEventListener('dblclick', event => {
+    if (!isZoomGestureExempt(event.target)) event.preventDefault();
+  }, { passive:false, capture:true });
+}
+installNoTapZoomGuard();
+
 // Australian date presentation is an app rule, not a browser-locale hint.
 // Safari/Chromium can otherwise render the native date editor using the
 // device/browser pattern (for example MM/DD/YYYY). Keep the native picker and
@@ -121,7 +136,7 @@ if (!stateService.isRecoveryMode()) {
 // R40 build-health gate: every newly installed/updated build must visibly
 // require one whole-app verification. The marker is local to this build and
 // does not keep re-dirtying the app after Kym successfully verifies R40.
-const APP_HEALTH_BUILD_MARKER='v60-r7.4-physical-ipad-closure-2026-09-15-s40';
+const APP_HEALTH_BUILD_MARKER='v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17';
 if (!stateService.isRecoveryMode()) {
   const markerKey=`${runtimeConfig.storageKey}:app-health-build-marker`;
   let installedMarker=null;

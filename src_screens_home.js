@@ -406,15 +406,30 @@ function renderHero(model, state, host, navigate){
   current.addEventListener('click',openCurrent);
   current.addEventListener('keydown',event=>{if(event.target!==current)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();openCurrent();}});
   currentWrap.append(current);
+
+  // S41 post-simulation correction: Home retains the approved two-context
+  // orientation header. Current Destination remains primary on the left while
+  // the next planned destination stays visible on the right without competing
+  // with the budget row below.
+  const next=node('div','home-next-destination-card');
+  next.setAttribute('aria-label',model.nextDestination?`Next destination · ${model.nextDestination.title} · ${model.nextDestination.country||''}`:'Next destination · Nothing planned');
+  const nextTop=node('div','home-next-destination-top');
+  nextTop.append(node('span','home-next-destination-flag',model.nextDestination?flagEmoji(departureCountry(model.nextDestination)):'🧭'),node('p','home-ref-kicker','NEXT DESTINATION'));
+  next.append(nextTop);
+  if(model.nextDestination){
+    const nextTitle=node('div','home-next-destination-title');
+    nextTitle.append(node('strong','home-next-destination-name',model.nextDestination.title),node('span','home-next-destination-country',model.nextDestination.country||''));
+    const nextDates=node('span','home-next-destination-dates',`${formatAUDate(model.nextDestination.startDate)} – ${formatAUDate(model.nextDestination.endDate)}`);
+    const nextDuration=node('span','home-next-destination-duration',`${model.nextDestination.durationDays} day${model.nextDestination.durationDays===1?'':'s'} planned`);
+    next.append(nextTitle,nextDates,nextDuration);
+  }else next.append(node('strong','home-next-destination-name','Nothing planned'));
+  currentWrap.append(next);
+
   // Phrase Helper remains a discreet sidebar-compass secret. Keep a hidden
   // programmatic trigger for src_main's sidebar brand callback, but never show
   // a helper/toilet shortcut inside the Current Destination hero.
   const phraseTrigger=node('button','home-compass home-secret-phrase-trigger'); phraseTrigger.type='button'; phraseTrigger.hidden=true; phraseTrigger.tabIndex=-1; phraseTrigger.setAttribute('aria-hidden','true'); phraseTrigger.addEventListener('click',event=>{event.stopPropagation();showToilet(host,model.currentStay,navigate);});
   hero.append(currentWrap,phraseTrigger);
-
-  // Home is the fixed command-centre view. The current destination is the
-  // sole orientation banner; upcoming travel remains available in Alerts and
-  // Trip Timeline without a competing Next Destination panel.
   return hero;
 }
 
@@ -530,17 +545,20 @@ function compactAlertParts(alert){
   const detail=[label,due,time].filter(Boolean).join(' · ');
   return{subject:genericSubject,detail:detail||raw};
 }
+function homePortraitPreview(){ return typeof window!=='undefined'&&window.matchMedia?.('(max-width: 900px) and (orientation: portrait)').matches; }
 function compactAlerts(model,host,navigate){
   const panel=node('section','home-mini-panel home-mini-alerts'); const head=node('div','home-mini-head'); const title=node('h2','','Alerts'); if(model.alerts.length) title.append(node('span','home-alert-count',String(model.alerts.length))); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,title); panel.append(head);
   const list=node('div','home-mini-list'); if(!model.alerts.length) list.append(node('p','home-mini-empty','No alerts'));
-  model.alerts.slice(0,3).forEach(alert=>{ const item=node('div',`home-mini-row home-alert-row home-alert-priority-${alert.priority}`); item.setAttribute('aria-hidden','true'); const compact=compactAlertParts(alert); const copy=node('span','home-alert-compact-copy'); copy.append(node('strong','',compact.subject),node('small','',compact.detail)); item.append(node('span','home-alert-dot',''),copy); list.append(item); });
-  if(model.alerts.length>3) list.append(node('div','home-mini-more',`+${model.alerts.length-3} more · tap Alerts to view all`)); panel.append(list); return panel;
+  const limit=homePortraitPreview()?5:3;
+  model.alerts.slice(0,limit).forEach(alert=>{ const item=node('div',`home-mini-row home-alert-row home-alert-priority-${alert.priority}`); item.setAttribute('aria-hidden','true'); const compact=compactAlertParts(alert); const copy=node('span','home-alert-compact-copy'); copy.append(node('strong','',compact.subject),node('small','',compact.detail)); item.append(node('span','home-alert-dot',''),copy); list.append(item); });
+  if(model.alerts.length>limit) list.append(node('div','home-mini-more',`+${model.alerts.length-limit} more · tap Alerts to view all`)); panel.append(list); return panel;
 }
 function compactUpcoming(model,host,state,navigate){
   const panel=node('section','home-mini-panel home-mini-upcoming'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Upcoming Events')); panel.append(head); const list=node('div','home-mini-list');
   if(!model.upcomingEvents.length) list.append(node('p','home-mini-empty','No upcoming events'));
-  model.upcomingEvents.slice(0,2).forEach(event=>{ const d=eventDateParts(event.displayDate); const item=node('div',`home-mini-row home-event-row${event.needsBudgetRepair?' is-repair':''}`); item.setAttribute('aria-hidden','true'); const badge=node('span','home-date-badge'); badge.append(node('strong','',d.day),node('small','',d.month)); const copy=node('span','home-event-copy'); const typeLabel=upcomingEventTypeLabel(event); copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · '))); if(event.needsBudgetRepair)copy.append(node('small','home-event-repair','DESTINATION BUDGET REPAIR REQUIRED')); item.append(badge,copy); list.append(item); });
-  if(model.upcomingEvents.length>2) list.append(node('div','home-mini-more',`+${model.upcomingEvents.length-2} more · tap Upcoming Events to view all`)); panel.append(list); return panel;
+  const limit=homePortraitPreview()?4:2;
+  model.upcomingEvents.slice(0,limit).forEach(event=>{ const d=eventDateParts(event.displayDate); const item=node('div',`home-mini-row home-event-row${event.needsBudgetRepair?' is-repair':''}`); item.setAttribute('aria-hidden','true'); const badge=node('span','home-date-badge'); badge.append(node('strong','',d.day),node('small','',d.month)); const copy=node('span','home-event-copy'); const typeLabel=upcomingEventTypeLabel(event); copy.append(node('strong','',event.title),node('small','',[event.displayDate,event.displayTime,typeLabel].filter(Boolean).join(' · '))); if(event.needsBudgetRepair)copy.append(node('small','home-event-repair','DESTINATION BUDGET REPAIR REQUIRED')); item.append(badge,copy); list.append(item); });
+  if(model.upcomingEvents.length>limit) list.append(node('div','home-mini-more',`+${model.upcomingEvents.length-limit} more · tap Upcoming Events to view all`)); panel.append(list); return panel;
 }
 function compactSchengen(model){
   const panel=node('section','home-mini-panel home-mini-schengen'); panel.classList.toggle('is-not-allowed',model.schengen.status==='not-allowed'); panel.classList.toggle('is-not-checked',model.schengen.status==='not-checked'); const head=node('div','home-mini-head'); const marker=node('span','home-mini-diamond'); marker.append(createLineIcon('diamond')); head.append(marker,node('h2','','Schengen Status')); panel.append(head);

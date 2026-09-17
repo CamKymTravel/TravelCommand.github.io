@@ -380,7 +380,7 @@ function renderRows(model, navigate, options, updateOptions, state) {
 
   const table = node('div', 'journey-table');
   const header = node('div', 'journey-row journey-row-header');
-  for (const label of ['Type','Destination','Stay','Days','Living / Day','Living Cost','Kilometres']) header.append(node('span', '', label));
+  for (const [label,shortLabel] of [['Type','Type'],['Destination','Destination'],['Stay','Stay'],['Days','Days'],['Living / Day','Living / Day'],['Living Cost','Living Cost'],['Kilometres','KM']]) { const cell=node('span','',label); cell.dataset.shortLabel=shortLabel; cell.title=label; header.append(cell); }
   table.append(header);
   if (!rows.length) table.append(node('p', 'journey-empty', 'No entries yet'));
   for (const row of rows) {

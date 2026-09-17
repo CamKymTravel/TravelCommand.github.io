@@ -2736,9 +2736,9 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
    review found remaining drift. They are intentionally late in the lock layer.
    ======================================================================== */
 @layer tccLocks {
-  /* Portrait/upright iPad: keep navigation accessible but reclaim width.
-     Landscape keeps the full approved icon + text sidebar. */
-  @media (orientation:portrait) and (max-width:1100px) {
+  /* All approved iPad orientations: icon-only navigation reclaims content
+     width while aria-labels preserve accessible screen names. */
+  @media (max-width:1200px) {
     :root { --sidebar-w:76px !important; }
     html, html body { min-width:0 !important; width:100% !important; max-width:100vw !important; overflow-x:hidden !important; }
     html body .app-shell { padding-left:var(--sidebar-w) !important; }
@@ -2775,6 +2775,14 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
       height:52px !important;
       flex-basis:52px !important;
     }
+  }
+
+  /* S43 adversarial audit: the HTML hidden contract must win over touch/layout
+     sizing rules. These controls are intentionally absent in their hidden state. */
+  html body [data-screen="home"] .home-secret-phrase-trigger[hidden],
+  html body [data-screen="itinerary"] .itinerary-list-pager[hidden],
+  html body .itinerary-upcoming-expanded .itinerary-list-pager[hidden] {
+    display:none !important;
   }
 
   /* Reservations category cards: full Journey-History-strength identities.
@@ -3230,4 +3238,752 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   }
   html body [data-screen="settings"] .settings-backup .settings-section-head h2,
   html body [data-screen="settings"] .settings-backup > h2 { color:#c2ddd6 !important; }
+}
+
+
+/* ========================================================================
+   S41 POST-SIMULATION HOME CLOSURE — PS-01 + PS-03.
+   Physical iPad evidence overrides the S40 current-only hero. Restore the
+   approved current + next destination header, keep the first budget row below
+   it, and use portrait height for useful Home rows instead of four tall voids.
+   ======================================================================== */
+@layer tccLocks {
+[data-screen="home"] .home-destination-hero-wrap {
+  display:grid !important;
+  grid-template-columns:minmax(0,440px) minmax(190px,220px) !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:16px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+[data-screen="home"] .home-destination-hero-card {
+  width:100% !important;
+  max-width:440px !important;
+  min-width:0 !important;
+  max-height:208px !important;
+  overflow:hidden !important;
+}
+[data-screen="home"] .home-next-destination-card {
+  width:100% !important;
+  min-width:0 !important;
+  max-width:220px !important;
+  min-height:142px !important;
+  display:grid !important;
+  align-content:center !important;
+  gap:7px !important;
+  padding:13px 14px !important;
+  border:1px solid rgba(246,156,92,.38) !important;
+  border-radius:17px !important;
+  background:radial-gradient(circle at 92% 4%,rgba(246,156,92,.16),transparent 48%),linear-gradient(145deg,rgba(64,41,31,.88),rgba(7,22,36,.88)) !important;
+  box-shadow:0 12px 28px rgba(0,0,0,.20),inset 0 1px rgba(255,255,255,.055) !important;
+  backdrop-filter:blur(3px) !important;
+}
+[data-screen="home"] .home-next-destination-top {
+  min-width:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+}
+[data-screen="home"] .home-next-destination-top .home-ref-kicker { color:#ffc095 !important; }
+[data-screen="home"] .home-next-destination-flag {
+  flex:0 0 auto !important;
+  font-size:29px !important;
+  line-height:1 !important;
+  filter:drop-shadow(0 4px 7px rgba(0,0,0,.28)) !important;
+}
+[data-screen="home"] .home-next-destination-title { min-width:0 !important; display:grid !important; gap:2px !important; }
+[data-screen="home"] .home-next-destination-name {
+  min-width:0 !important;
+  color:#f7fbff !important;
+  font-size:21px !important;
+  line-height:1.05 !important;
+  overflow-wrap:break-word !important;
+}
+[data-screen="home"] .home-next-destination-country,
+[data-screen="home"] .home-next-destination-dates,
+[data-screen="home"] .home-next-destination-duration {
+  min-width:0 !important;
+  color:#c8d7e5 !important;
+  font-size:11px !important;
+  line-height:1.18 !important;
+  white-space:normal !important;
+  overflow-wrap:break-word !important;
+}
+
+/* The previous max-height rule left a 194px grid track under a forced 230px
+   hero, so the budget row physically overlapped the header on both landscape
+   iPads. The row and the visible hero now agree. */
+@media (max-height:850px) and (orientation:landscape) {
+  [data-screen="home"].home-screen {
+    grid-template-rows:230px 232px minmax(0,1fr) 46px !important;
+    gap:8px !important;
+    padding:8px 10px 9px !important;
+  }
+  [data-screen="home"] .home-reference-hero { height:230px !important; min-height:230px !important; max-height:230px !important; }
+  [data-screen="home"] .home-destination-hero-card { min-height:0 !important; height:206px !important; padding:9px 14px !important; }
+  [data-screen="home"] .home-next-destination-card { min-height:132px !important; padding:11px 13px !important; }
+}
+
+@media (max-width:900px) and (orientation:portrait) {
+  [data-screen="home"] .home-reference-hero {
+    padding:10px 12px !important;
+  }
+  [data-screen="home"] .home-destination-hero-wrap {
+    grid-template-columns:minmax(0,1fr) 210px !important;
+    gap:12px !important;
+  }
+  [data-screen="home"] .home-destination-hero-card {
+    height:208px !important;
+    min-height:0 !important;
+    padding:9px 12px !important;
+  }
+  [data-screen="home"] .home-destination-title .home-stay-name { font-size:28px !important; line-height:.98 !important; }
+  [data-screen="home"] .home-destination-country { font-size:15px !important; }
+  [data-screen="home"] .home-destination-country-outline { width:68px !important; height:82px !important; opacity:.48 !important; }
+  [data-screen="home"] .home-next-destination-card {
+    max-width:210px !important;
+    min-height:150px !important;
+    padding:11px 12px !important;
+    gap:6px !important;
+  }
+  [data-screen="home"] .home-next-destination-name { font-size:19px !important; }
+  [data-screen="home"] .home-ref-minis {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    grid-template-rows:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:8px !important;
+  }
+  [data-screen="home"] .home-mini-panel { min-height:0 !important; }
+  [data-screen="home"] .home-mini-head { min-height:31px !important; padding:5px 7px !important; }
+  [data-screen="home"] .home-mini-head h2 { font-size:12.5px !important; }
+  [data-screen="home"] .home-mini-list { gap:3px !important; padding:4px 6px 5px !important; }
+  [data-screen="home"] .home-mini-row { padding:3px 5px !important; }
+  [data-screen="home"] .home-mini-upcoming .home-event-row { min-height:34px !important; }
+  [data-screen="home"] .home-mini-alerts .home-alert-row { min-height:31px !important; }
+  [data-screen="home"] .home-mini-more { margin-top:0 !important; padding-top:1px !important; font-size:8.5px !important; }
+  [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > strong {
+    -webkit-line-clamp:1 !important; line-clamp:1 !important; max-height:1.18em !important;
+  }
+  [data-screen="home"] .home-mini-alerts .home-alert-row .home-alert-compact-copy > small {
+    display:block !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+  }
+}
+
+}
+
+/* ========================================================================
+   S41 POST-SIMULATION RESERVATIONS CLOSURE — PS-02.
+   The right-side Next 5 rail must stay useful on the wide iPad rather than
+   squeezing titles into one-line ellipses. Give the panel deliberate width,
+   let reservation titles use two clean lines, and preserve date + metadata.
+   ======================================================================== */
+@layer tccLocks {
+  @media (min-width:1101px) and (orientation:landscape) {
+    html body [data-screen="reservations"] .reservation-reference-grid {
+      grid-template-columns:minmax(0,1fr) minmax(390px,400px) !important;
+    }
+  }
+  html body [data-screen="reservations"] .reservation-next-five > .reservation-section-head {
+    min-height:38px !important;
+    padding-bottom:5px !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five > .reservation-section-head h2 {
+    font-size:19px !important;
+    line-height:1.08 !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-list {
+    gap:7px !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-row {
+    display:grid !important;
+    grid-template-columns:50px minmax(0,1fr) 24px !important;
+    align-items:center !important;
+    gap:9px !important;
+    min-height:72px !important;
+    padding:7px 8px !important;
+    min-width:0 !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-date-badge {
+    width:50px !important;
+    min-width:50px !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-copy {
+    min-width:0 !important;
+    width:100% !important;
+    display:grid !important;
+    align-content:center !important;
+    gap:3px !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-copy strong {
+    min-width:0 !important;
+    margin:0 !important;
+    display:-webkit-box !important;
+    -webkit-box-orient:vertical !important;
+    -webkit-line-clamp:2 !important;
+    line-clamp:2 !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    white-space:normal !important;
+    overflow-wrap:break-word !important;
+    font-size:13px !important;
+    line-height:1.16 !important;
+    max-height:2.32em !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-copy small {
+    min-width:0 !important;
+    margin:0 !important;
+    display:block !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:11px !important;
+    line-height:1.18 !important;
+  }
+  html body [data-screen="reservations"] .reservation-next-five .reservation-rail-chevron {
+    width:24px !important;
+    min-width:24px !important;
+    display:grid !important;
+    place-items:center !important;
+  }
+}
+
+/* ========================================================================
+   S41 POST-SIMULATION RESERVATION EDITOR CLOSURE — PS-05 + PS-06.
+   The date-matched stay remains the currency authority even if its Destination
+   Budget still needs setup. Keep the warning/status inside the preview at all
+   approved iPad sizes; never let the status text spill into the date ticket.
+   ======================================================================== */
+@layer tccLocks {
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview {
+    grid-template-columns:minmax(0,1fr) 190px minmax(140px,150px) !important;
+    gap:12px !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview-identity,
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview-copy,
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-date-ticket,
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status {
+    min-width:0 !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview-copy > strong,
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview-copy > small {
+    white-space:normal !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    overflow-wrap:break-word !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview-copy > strong {
+    line-height:1.14 !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status {
+    width:100% !important;
+    justify-items:end !important;
+    align-content:center !important;
+    gap:5px !important;
+    text-align:right !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status span,
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status strong {
+    max-width:100% !important;
+    white-space:normal !important;
+    overflow-wrap:break-word !important;
+    text-align:right !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status span {
+    font-size:11px !important;
+    line-height:1.18 !important;
+    letter-spacing:.08em !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status strong {
+    font-size:13px !important;
+    line-height:1.16 !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview.is-empty.is-warning {
+    grid-template-columns:minmax(0,1fr) !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview.is-empty.is-warning > strong {
+    min-width:0 !important;
+    overflow-wrap:anywhere !important;
+  }
+
+  @media (max-width:900px) {
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview {
+      grid-template-columns:minmax(0,1fr) 176px minmax(136px,148px) !important;
+    }
+  }
+
+  @media (max-width:900px) and (orientation:portrait) {
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-preview:not(.is-empty) {
+      grid-template-columns:minmax(0,1fr) 176px !important;
+      grid-template-rows:auto auto !important;
+      align-items:center !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status {
+      grid-column:1 / -1 !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:space-between !important;
+      gap:12px !important;
+      min-height:34px !important;
+      padding-top:7px !important;
+      border-top:1px solid rgba(255,209,91,.22) !important;
+      text-align:left !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status span,
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-destination-budget-status strong {
+      text-align:left !important;
+    }
+  }
+}
+
+/* ========================================================================
+   S41 POST-SIMULATION CHECKLIST CLOSURE — PS-04.
+   Keep Overview = silver and Next Destination = copper so their expanded
+   states retain source identity, but replace the flat grey/brown slabs with
+   richer metallic materials. The rail owns its natural card heights on the
+   stacked iPad layouts instead of stretching Overview into an empty column.
+   ======================================================================== */
+@layer tccLocks {
+  @media (min-width:1051px) {
+    html body [data-screen="checklist"] .checklist-layout-grid {
+      grid-template-columns:minmax(0,1fr) 330px !important;
+      gap:14px !important;
+    }
+  }
+
+  html body [data-screen="checklist"] .checklist-reference-rail {
+    align-items:start !important;
+    align-content:start !important;
+  }
+  html body [data-screen="checklist"] .checklist-reference-rail > * {
+    height:auto !important;
+    align-self:start !important;
+  }
+
+  /* Brushed blue-steel silver: recognisably silver, but no dull grey slab. */
+  html body [data-screen="checklist"] .checklist-overview-card {
+    --comfort-accent:#aeb8c2 !important;
+    border-color:rgba(174,184,194,.52) !important;
+    background:
+      radial-gradient(circle at 16% 0%,rgba(112,177,214,.17),transparent 46%),
+      radial-gradient(circle at 94% 4%,rgba(174,184,194,.16),transparent 46%),
+      linear-gradient(145deg,#293d4c,#1c2d3a 58%,#081823) !important;
+    box-shadow:0 14px 30px rgba(0,0,0,.22),0 0 20px rgba(112,177,214,.055),inset 0 1px rgba(255,255,255,.055) !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-card .eyebrow {
+    color:#e4edf4 !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring {
+    background:
+      radial-gradient(circle at center,#0d2030 0 55%,transparent 56%),
+      conic-gradient(#57d69b 0 var(--checklist-progress),#b9c6d2 var(--checklist-progress) 100%) !important;
+    box-shadow:inset 0 0 18px rgba(0,0,0,.24),0 0 26px rgba(112,177,214,.12) !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring span { color:#dceaf4 !important; }
+  html body [data-screen="checklist"] .checklist-overview-metric {
+    background:linear-gradient(145deg,rgba(35,55,70,.78),rgba(11,27,40,.88)) !important;
+    border-color:rgba(190,205,217,.16) !important;
+  }
+
+  /* Burnished copper over a cool midnight base: warm destination identity
+     without reverting to the flat brown material rejected in the iPad pass. */
+  html body [data-screen="checklist"] .checklist-next-card {
+    --comfort-accent:#c78357 !important;
+    border-color:rgba(218,139,88,.58) !important;
+    background:
+      radial-gradient(circle at 92% 2%,rgba(226,132,78,.22),transparent 46%),
+      radial-gradient(circle at 8% 100%,rgba(78,112,146,.12),transparent 52%),
+      linear-gradient(145deg,#56352b,#31313a 58%,#091a2a) !important;
+    box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 20px rgba(218,139,88,.06),inset 0 1px rgba(255,255,255,.055) !important;
+    gap:7px !important;
+    padding:14px !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-card .eyebrow,
+  html body [data-screen="checklist"] .checklist-next-card .checklist-next-icon {
+    color:#ffc095 !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-visual {
+    min-height:102px !important;
+    margin-top:2px !important;
+    border-color:rgba(231,153,101,.24) !important;
+    background:linear-gradient(145deg,rgba(76,49,45,.82),rgba(19,30,49,.94)) !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-visual::after {
+    background:linear-gradient(180deg,rgba(8,14,30,.03),rgba(8,16,29,.74)) !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-visual-copy small { color:#ffc095 !important; }
+  html body [data-screen="checklist"] .checklist-next-facts { margin-top:3px !important; }
+  html body [data-screen="checklist"] .checklist-next-facts > span {
+    background:linear-gradient(145deg,rgba(74,52,47,.50),rgba(13,28,43,.72)) !important;
+    border-color:rgba(231,153,101,.16) !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-note {
+    margin:2px 0 0 !important;
+    line-height:1.3 !important;
+  }
+  html body [data-screen="checklist"] .checklist-next-open-itinerary { margin-top:3px !important; }
+
+  /* Empty history is a calm history/completed surface rather than another
+     green/brown card competing with the two right-column identities. */
+  html body [data-screen="checklist"] .checklist-history-compact-empty {
+    --comfort-accent:#8796a5 !important;
+    border-color:rgba(135,150,165,.40) !important;
+    background:
+      radial-gradient(circle at 92% 0%,rgba(135,150,165,.12),transparent 48%),
+      linear-gradient(145deg,#28343f,#1d2933 60%,#091824) !important;
+  }
+  html body [data-screen="checklist"] .checklist-history-compact-empty .checklist-section-head h2 {
+    color:#d5dee6 !important;
+  }
+}
+
+/* ========================================================================
+   S41 FULL-REGRESSION VAULT COLOUR REPAIR — preserve the locked viewport
+   uniqueness rule and expanded-state identity. Document Summary expands with
+   tone-maroon, so its collapsed card returns to the same maroon family rather
+   than duplicating the visible Insurance teal family.
+   ======================================================================== */
+@layer tccLocks {
+  html body [data-screen="vault"] .vault-summary-card {
+    --comfort-accent:#b94f70 !important;
+    border-color:rgba(185,79,112,.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(185,79,112,.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
+  }
+  html body [data-screen="vault"] .vault-summary-card > h2 { color:#e7a5bb !important; }
+}
+
+/* ========================================================================
+   S43 ADVERSARIAL PORTRAIT JOURNEY CLOSURE — control-matrix repair.
+   On 768x1024, the completed-stay filter row and record footer could extend
+   Clear / Next past the usable canvas even though the page itself masked the
+   overflow. Stack the filter/search controls and footer cleanly in portrait.
+   ======================================================================== */
+@layer tccLocks {
+  @media (max-width:900px) and (orientation:portrait) {
+    html body [data-screen="journey-history"] .journey-record-filter-row {
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+      gap:8px !important;
+    }
+    html body [data-screen="journey-history"] .journey-search-wrap {
+      grid-column:1 / -1 !important;
+      width:100% !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-record-select {
+      width:100% !important;
+      max-width:100% !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-clear-button {
+      grid-column:1 / -1 !important;
+      width:100% !important;
+      max-width:100% !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-record-footer {
+      flex-direction:column !important;
+      align-items:stretch !important;
+      justify-content:flex-start !important;
+      gap:10px !important;
+    }
+    html body [data-screen="journey-history"] .journey-record-totals {
+      display:flex !important;
+      flex-wrap:wrap !important;
+      align-items:center !important;
+      gap:6px 12px !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-record-totals > strong {
+      white-space:normal !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-pagination {
+      width:100% !important;
+      min-width:0 !important;
+      justify-content:flex-end !important;
+      flex-wrap:wrap !important;
+      box-sizing:border-box !important;
+    }
+  }
+}
+
+
+/* ========================================================================
+   S44 PHYSICAL-IPAD SCREENSHOT CLOSURE — 16 Sep 2026.
+   Cameron's real 834px portrait iPad evidence exposed three layout gaps that
+   the previous 768px portrait harness could not catch: Home stayed in the
+   four-column landscape mini-card layout, Vault category labels clipped in a
+   five-across strip, and Journey History table headings ellipsised.
+   ======================================================================== */
+@layer tccLocks {
+  @media (max-width:900px) and (orientation:portrait) {
+    /* Vault: portrait has vertical room; use it instead of clipping five cards. */
+    html body [data-screen="vault"] .vault-category-grid {
+      grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+      gap:10px !important;
+    }
+    html body [data-screen="vault"] .vault-category-card {
+      min-width:0 !important;
+      min-height:148px !important;
+      padding:12px 8px !important;
+    }
+    html body [data-screen="vault"] .vault-category-card > strong {
+      max-width:100% !important;
+      font-size:16px !important;
+      line-height:1.08 !important;
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+
+    /* Journey History: all seven columns remain visible, but the headings must
+       read as deliberate labels rather than clipped desktop strings. */
+    html body [data-screen="journey-history"] .journey-row {
+      grid-template-columns:44px minmax(150px,1.5fr) minmax(120px,1.08fr) 46px 84px 90px 70px !important;
+      gap:4px !important;
+    }
+    html body [data-screen="journey-history"] .journey-row-header {
+      font-size:8.4px !important;
+      letter-spacing:.018em !important;
+      line-height:1.08 !important;
+      padding-left:10px !important;
+      padding-right:10px !important;
+    }
+    html body [data-screen="journey-history"] .journey-row-header > span {
+      min-width:0 !important;
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="journey-history"] .journey-row-header > span:last-child {
+      white-space:normal !important;
+      text-align:left !important;
+    }
+    html body [data-screen="journey-history"] .journey-row-header > span:last-child {
+      font-size:0 !important;
+    }
+    html body [data-screen="journey-history"] .journey-row-header > span:last-child::after {
+      content:attr(data-short-label) !important;
+      font-size:8.4px !important;
+    }
+  }
+}
+
+
+/* S44 physical-iPad screenshot closure: source-colour continuity extends to editor shells. */
+html body .tcc-modal.tcc-editor-modal.tone-silver { --tcc-editor-rgb:190,202,214; --tcc-editor-title:#d8e0e6; --tcc-editor-footer:#171d23; --tcc-editor-deep:#39444d; --tcc-editor-mid:#26313a; --tcc-editor-base:#171f27; }
+html body .tcc-modal.tcc-editor-modal.tone-copper { --tcc-editor-rgb:219,143,98; --tcc-editor-title:#e8ad86; --tcc-editor-footer:#241a17; --tcc-editor-deep:#563425; --tcc-editor-mid:#38251f; --tcc-editor-base:#221918; }
+html body .tcc-modal.tcc-editor-modal.tone-lime { --tcc-editor-rgb:168,205,82; --tcc-editor-title:#d5ed9a; --tcc-editor-footer:#1b2115; --tcc-editor-deep:#3f4e24; --tcc-editor-mid:#29351d; --tcc-editor-base:#182118; }
+html body .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-rgb:203,92,122; --tcc-editor-title:#f0afc1; --tcc-editor-footer:#25171d; --tcc-editor-deep:#4f2633; --tcc-editor-mid:#341c28; --tcc-editor-base:#21161d; }
+
+
+/* S44 SUPERSEDING EDITOR COLOUR AUTHORITY
+   Physical-iPad review supersedes the older neutral/always-sky editor locks.
+   Any Add/Edit surface opened from a coloured source retains that source family. */
+html body [data-screen] .tcc-modal.tcc-editor-modal {
+  border-color:rgba(var(--tcc-editor-rgb),.50) !important;
+  background:
+    radial-gradient(circle at 86% -4%,rgba(var(--tcc-editor-rgb),.18),transparent 39%),
+    radial-gradient(circle at 5% 105%,rgba(var(--tcc-editor-rgb),.08),transparent 42%),
+    linear-gradient(145deg,var(--tcc-editor-deep) 0%,var(--tcc-editor-mid) 49%,var(--tcc-editor-base) 100%) !important;
+  box-shadow:0 28px 86px rgba(0,0,0,.57),0 0 30px rgba(var(--tcc-editor-rgb),.09),inset 0 1px rgba(255,255,255,.025) !important;
+}
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > header h2 { color:var(--tcc-editor-title) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,transparent,var(--tcc-editor-footer) 26%) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
+  border-color:rgba(var(--tcc-editor-rgb),.42) !important;
+  background:linear-gradient(180deg,rgba(var(--tcc-editor-rgb),.16),rgba(8,23,39,.94)) !important;
+  color:#eef6ff !important;
+}
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-neutral { --tcc-editor-rgb:174,184,194 !important; --tcc-editor-title:#e1e8ed !important; --tcc-editor-footer:#171d23 !important; --tcc-editor-deep:#26313a !important; --tcc-editor-mid:#18242e !important; --tcc-editor-base:#0b1722 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-sky { --tcc-editor-rgb:88,199,255 !important; --tcc-editor-title:#9de2ff !important; --tcc-editor-footer:#091928 !important; --tcc-editor-deep:#10394d !important; --tcc-editor-mid:#0a283a !important; --tcc-editor-base:#071824 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-blue { --tcc-editor-rgb:93,141,255 !important; --tcc-editor-title:#b7caff !important; --tcc-editor-footer:#0a172a !important; --tcc-editor-deep:#173666 !important; --tcc-editor-mid:#10264a !important; --tcc-editor-base:#081629 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-indigo { --tcc-editor-rgb:128,109,255 !important; --tcc-editor-title:#c7beff !important; --tcc-editor-footer:#10152b !important; --tcc-editor-deep:#312a68 !important; --tcc-editor-mid:#201d49 !important; --tcc-editor-base:#11162c !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-teal { --tcc-editor-rgb:70,217,202 !important; --tcc-editor-title:#9af2e9 !important; --tcc-editor-footer:#092126 !important; --tcc-editor-deep:#0f4d4d !important; --tcc-editor-mid:#0a353b !important; --tcc-editor-base:#071d27 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-green { --tcc-editor-rgb:87,214,155 !important; --tcc-editor-title:#a9f0ca !important; --tcc-editor-footer:#0b211f !important; --tcc-editor-deep:#154b37 !important; --tcc-editor-mid:#0c342d !important; --tcc-editor-base:#081f24 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-magenta { --tcc-editor-rgb:241,101,189 !important; --tcc-editor-title:#ffb7df !important; --tcc-editor-footer:#201525 !important; --tcc-editor-deep:#562446 !important; --tcc-editor-mid:#381d3a !important; --tcc-editor-base:#211527 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-violet { --tcc-editor-rgb:184,109,255 !important; --tcc-editor-title:#ddc0ff !important; --tcc-editor-footer:#1a1528 !important; --tcc-editor-deep:#492866 !important; --tcc-editor-mid:#302044 !important; --tcc-editor-base:#1b162b !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-red { --tcc-editor-rgb:255,111,131 !important; --tcc-editor-title:#ffb5c0 !important; --tcc-editor-footer:#21161f !important; --tcc-editor-deep:#542638 !important; --tcc-editor-mid:#351d30 !important; --tcc-editor-base:#211620 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-orange { --tcc-editor-rgb:255,154,90 !important; --tcc-editor-title:#ffc5a0 !important; --tcc-editor-footer:#241a1b !important; --tcc-editor-deep:#5b3422 !important; --tcc-editor-mid:#3b251f !important; --tcc-editor-base:#24191c !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-gold { --tcc-editor-rgb:255,209,91 !important; --tcc-editor-title:#ffe6a2 !important; --tcc-editor-footer:#211d18 !important; --tcc-editor-deep:#51431d !important; --tcc-editor-mid:#352e1b !important; --tcc-editor-base:#221e19 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-lime { --tcc-editor-rgb:168,205,82 !important; --tcc-editor-title:#d5ed9a !important; --tcc-editor-footer:#1b2115 !important; --tcc-editor-deep:#3f4e24 !important; --tcc-editor-mid:#29351d !important; --tcc-editor-base:#182118 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-silver { --tcc-editor-rgb:190,202,214 !important; --tcc-editor-title:#d8e0e6 !important; --tcc-editor-footer:#171d23 !important; --tcc-editor-deep:#39444d !important; --tcc-editor-mid:#26313a !important; --tcc-editor-base:#171f27 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-copper { --tcc-editor-rgb:219,143,98 !important; --tcc-editor-title:#e8ad86 !important; --tcc-editor-footer:#241a17 !important; --tcc-editor-deep:#563425 !important; --tcc-editor-mid:#38251f !important; --tcc-editor-base:#221918 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-rgb:203,92,122 !important; --tcc-editor-title:#f0afc1 !important; --tcc-editor-footer:#25171d !important; --tcc-editor-deep:#4f2633 !important; --tcc-editor-mid:#341c28 !important; --tcc-editor-base:#21161d !important; }
+
+
+/* S44 LAYER-PRECEDENCE EDITOR AUTHORITY: important tccLocks declarations outrank older important locks inside the same layer by specificity/source order. */
+@layer tccLocks {
+/* S44 SUPERSEDING EDITOR COLOUR AUTHORITY
+   Physical-iPad review supersedes the older neutral/always-sky editor locks.
+   Any Add/Edit surface opened from a coloured source retains that source family. */
+html body [data-screen] .tcc-modal.tcc-editor-modal {
+  border-color:rgba(var(--tcc-editor-rgb),.50) !important;
+  background:
+    radial-gradient(circle at 86% -4%,rgba(var(--tcc-editor-rgb),.18),transparent 39%),
+    radial-gradient(circle at 5% 105%,rgba(var(--tcc-editor-rgb),.08),transparent 42%),
+    linear-gradient(145deg,var(--tcc-editor-deep) 0%,var(--tcc-editor-mid) 49%,var(--tcc-editor-base) 100%) !important;
+  box-shadow:0 28px 86px rgba(0,0,0,.57),0 0 30px rgba(var(--tcc-editor-rgb),.09),inset 0 1px rgba(255,255,255,.025) !important;
+}
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > header h2 { color:var(--tcc-editor-title) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,transparent,var(--tcc-editor-footer) 26%) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
+  border-color:rgba(var(--tcc-editor-rgb),.42) !important;
+  background:linear-gradient(180deg,rgba(var(--tcc-editor-rgb),.16),rgba(8,23,39,.94)) !important;
+  color:#eef6ff !important;
+}
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-neutral { --tcc-editor-rgb:174,184,194 !important; --tcc-editor-title:#e1e8ed !important; --tcc-editor-footer:#171d23 !important; --tcc-editor-deep:#26313a !important; --tcc-editor-mid:#18242e !important; --tcc-editor-base:#0b1722 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-sky { --tcc-editor-rgb:88,199,255 !important; --tcc-editor-title:#9de2ff !important; --tcc-editor-footer:#091928 !important; --tcc-editor-deep:#10394d !important; --tcc-editor-mid:#0a283a !important; --tcc-editor-base:#071824 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-blue { --tcc-editor-rgb:93,141,255 !important; --tcc-editor-title:#b7caff !important; --tcc-editor-footer:#0a172a !important; --tcc-editor-deep:#173666 !important; --tcc-editor-mid:#10264a !important; --tcc-editor-base:#081629 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-indigo { --tcc-editor-rgb:128,109,255 !important; --tcc-editor-title:#c7beff !important; --tcc-editor-footer:#10152b !important; --tcc-editor-deep:#312a68 !important; --tcc-editor-mid:#201d49 !important; --tcc-editor-base:#11162c !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-teal { --tcc-editor-rgb:70,217,202 !important; --tcc-editor-title:#9af2e9 !important; --tcc-editor-footer:#092126 !important; --tcc-editor-deep:#0f4d4d !important; --tcc-editor-mid:#0a353b !important; --tcc-editor-base:#071d27 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-green { --tcc-editor-rgb:87,214,155 !important; --tcc-editor-title:#a9f0ca !important; --tcc-editor-footer:#0b211f !important; --tcc-editor-deep:#154b37 !important; --tcc-editor-mid:#0c342d !important; --tcc-editor-base:#081f24 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-magenta { --tcc-editor-rgb:241,101,189 !important; --tcc-editor-title:#ffb7df !important; --tcc-editor-footer:#201525 !important; --tcc-editor-deep:#562446 !important; --tcc-editor-mid:#381d3a !important; --tcc-editor-base:#211527 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-violet { --tcc-editor-rgb:184,109,255 !important; --tcc-editor-title:#ddc0ff !important; --tcc-editor-footer:#1a1528 !important; --tcc-editor-deep:#492866 !important; --tcc-editor-mid:#302044 !important; --tcc-editor-base:#1b162b !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-red { --tcc-editor-rgb:255,111,131 !important; --tcc-editor-title:#ffb5c0 !important; --tcc-editor-footer:#21161f !important; --tcc-editor-deep:#542638 !important; --tcc-editor-mid:#351d30 !important; --tcc-editor-base:#211620 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-orange { --tcc-editor-rgb:255,154,90 !important; --tcc-editor-title:#ffc5a0 !important; --tcc-editor-footer:#241a1b !important; --tcc-editor-deep:#5b3422 !important; --tcc-editor-mid:#3b251f !important; --tcc-editor-base:#24191c !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-gold { --tcc-editor-rgb:255,209,91 !important; --tcc-editor-title:#ffe6a2 !important; --tcc-editor-footer:#211d18 !important; --tcc-editor-deep:#51431d !important; --tcc-editor-mid:#352e1b !important; --tcc-editor-base:#221e19 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-lime { --tcc-editor-rgb:168,205,82 !important; --tcc-editor-title:#d5ed9a !important; --tcc-editor-footer:#1b2115 !important; --tcc-editor-deep:#3f4e24 !important; --tcc-editor-mid:#29351d !important; --tcc-editor-base:#182118 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-silver { --tcc-editor-rgb:190,202,214 !important; --tcc-editor-title:#d8e0e6 !important; --tcc-editor-footer:#171d23 !important; --tcc-editor-deep:#39444d !important; --tcc-editor-mid:#26313a !important; --tcc-editor-base:#171f27 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-copper { --tcc-editor-rgb:219,143,98 !important; --tcc-editor-title:#e8ad86 !important; --tcc-editor-footer:#241a17 !important; --tcc-editor-deep:#563425 !important; --tcc-editor-mid:#38251f !important; --tcc-editor-base:#221918 !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-rgb:203,92,122 !important; --tcc-editor-title:#f0afc1 !important; --tcc-editor-footer:#25171d !important; --tcc-editor-deep:#4f2633 !important; --tcc-editor-mid:#341c28 !important; --tcc-editor-base:#21161d !important; }
+
+}
+
+/* ========================================================================
+   S49 PHYSICAL-IPAD ADD-EDITOR CLOSURE — 16 Sep 2026
+   Latest real-iPad evidence showed two Safari-only presentation regressions:
+   (1) Add Reservation / Add Expense selector icons were flattening to white,
+       obscuring the approved category identity; and
+   (2) native iPad date/time controls could retain intrinsic widths wider than
+       their CSS grid track, visually overlapping the next field/widget.
+   Category colour belongs in the icon/selection detail, while all editor grid
+   children must be allowed to shrink inside their own track. */
+@layer tccLocks {
+  /* Add Reservation selector icons keep the same semantic colour language as
+     the Reservations category cards without turning the whole editor rainbow. */
+  html body [data-screen="reservations"] .reservation-type-flight { --reservation-choice-rgb:88,199,255 !important; }
+  html body [data-screen="reservations"] .reservation-type-train { --reservation-choice-rgb:70,217,202 !important; }
+  html body [data-screen="reservations"] .reservation-type-cruise { --reservation-choice-rgb:184,109,255 !important; }
+  html body [data-screen="reservations"] .reservation-type-rv { --reservation-choice-rgb:255,154,90 !important; }
+  html body [data-screen="reservations"] .reservation-type-hotel { --reservation-choice-rgb:255,209,91 !important; }
+  html body [data-screen="reservations"] .reservation-type-airbnb { --reservation-choice-rgb:241,101,189 !important; }
+  html body [data-screen="reservations"] .reservation-type-ticket { --reservation-choice-rgb:255,111,131 !important; }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-choice-icon {
+    color:rgb(var(--reservation-choice-rgb)) !important;
+    opacity:1 !important;
+    filter:drop-shadow(0 0 7px rgba(var(--reservation-choice-rgb),.24)) !important;
+  }
+
+  /* Add Expense category icons remain visibly distinct even before selection. */
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-icon {
+    color:rgb(var(--choice-rgb)) !important;
+    opacity:1 !important;
+    filter:drop-shadow(0 0 7px rgba(var(--choice-rgb),.22)) !important;
+  }
+
+  /* Safari/iPad native input intrinsic-width hardening. No Add/Edit grid child
+     may grow through its neighbour. Keep native date pickers fully tappable. */
+  html body [data-screen] .tcc-modal.tcc-editor-modal :is(
+    .reservation-field,.budget-field,.itinerary-field,
+    .reservation-editor-essentials-grid,.reservation-editor-cost-grid,
+    .budget-editor-date-grid,.budget-editor-local-money-grid,
+    .itinerary-home-visit-dates
+  ) {
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  html body [data-screen] .tcc-modal.tcc-editor-modal :is(
+    .reservation-field,.budget-field,.itinerary-field
+  ) > :is(input,select,textarea),
+  html body [data-screen] .tcc-modal.tcc-editor-modal .tcc-au-date-shell,
+  html body [data-screen] .tcc-modal.tcc-editor-modal .tcc-au-date-shell > input[type="date"] {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  html body [data-screen] .tcc-modal.tcc-editor-modal .tcc-au-date-shell {
+    overflow:hidden !important;
+  }
+
+  /* Reservation Date/Time and money rows: zero is intentional here—the grid,
+     not Safari's native control minimum, owns the width. */
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-essentials-grid {
+    grid-template-columns:minmax(0,1.7fr) minmax(0,.72fr) minmax(0,.58fr) !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-cost-grid {
+    grid-template-columns:minmax(0,1.15fr) minmax(0,.55fr) minmax(0,1fr) !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-field input[type="time"] {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+
+  /* Expense routing has a rich flag/date ticket. Let its text column and ticket
+     shrink within the right track instead of pushing back over Expense date. */
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-editor-date-grid > *,
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-status,
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-identity,
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-copy {
+    min-width:0 !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-routing-status {
+    overflow:hidden !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-date-ticket.is-compact {
+    width:auto !important;
+    min-width:132px !important;
+    max-width:42% !important;
+  }
+
+  /* Home Visit is deliberately a two-column date editor in landscape. Native
+     iPad date controls must remain inside those two columns. */
+  html body [data-screen="itinerary"] .tcc-itinerary-home-visit-modal .itinerary-home-visit-dates > * {
+    min-width:0 !important;
+    max-width:100% !important;
+  }
+
+  @media (max-width:980px) {
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-essentials-grid {
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-essentials-grid > :first-child {
+      grid-column:1 / -1 !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-cost-grid {
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-editor-cost-grid > :last-child {
+      grid-column:1 / -1 !important;
+    }
+  }
+}
+
+/* ========================================================================
+   S51 IPAD FOCUS-ZOOM CLOSURE — 16 Sep 2026
+   Real-iPad use showed occasional zoom on ordinary taps. Double-tap page zoom
+   is already suppressed, but iPad Safari can also zoom when focusing editable
+   controls rendered below 16px. Reservation Status and Notes were the only
+   audited Add/Edit controls still resolving to 15px. Keep them at the Safari
+   safe minimum without changing the larger money/date hierarchy. */
+@layer tccLocks {
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal
+    .reservation-field > select[name="status"],
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal
+    .reservation-field > textarea[name="notes"] {
+    font-size:16px !important;
+  }
 }
