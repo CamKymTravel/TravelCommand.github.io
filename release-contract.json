@@ -1,50 +1,33 @@
 {
-  "contractVersion": "V60-R7.4-S53-tiny-currency-ui-2026-09-17",
-  "packageRole": "S53 tiny-currency UI-consistency candidate carried forward from software-closed S52/v16 — NOT FINAL MASTER until remaining physical-iPad acceptance.",
+  "contractVersion": "V60-R7.7-S54-istanbul-simulation-02-2026-09-18",
+  "packageRole": "S54 Istanbul simulation build for physical-iPad review — software closed, NOT FINAL MASTER.",
   "principle": "This exact S53/v17 source is the forward working authority. S52 and earlier checkpoints are provenance/history only; never replace current fixes with an older checkpoint.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
     "maxFiles": 108,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
-    "manifestId": "./tokyo-full-simulation-s40-2030-02-20-v1",
+    "storageKey": "tcc:v1:istanbul-s54-simulation-02-20260918",
+    "manifestId": "./istanbul-s54-simulation-02-2029-09-15",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
+    "cacheName": "tcc-v1-v60-r7.7-s54-istanbul-simulation-02-2026-09-18",
     "appVersion": "1.2.0-v60-r7.4-tiny-currency-ui-s53",
-    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17"
+    "buildMarker": "v60-r7.7-s54-istanbul-simulation-02-2026-09-18"
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
-    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
-    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17",
-    "serviceWorkerUrl": "./sw.js?v=60-r7.4-s53-tiny-currency-ui-2026-09-17-v17"
+    "storageKey": "tcc:v1:istanbul-s54-simulation-02-20260918",
+    "cacheName": "tcc-v1-v60-r7.7-s54-istanbul-simulation-02-2026-09-18",
+    "buildMarker": "v60-r7.7-s54-istanbul-simulation-02-2026-09-18",
+    "serviceWorkerUrl": "./sw.js?v=60-r7.7-s54-istanbul-simulation-02-2026-09-18"
   },
   "sourceAuthority": {
-    "authority": "S53 tiny-currency UI-consistency source, carried forward from software-closed S52/v16 after audit found pre-Save Expense/Reservation conversion displays could show AUD 0.00 while canonical save stored AUD 0.01.",
+    "authority": "S54 Istanbul physical-iPad simulation derived from the exact current S54 working source.",
     "forwardOnly": true,
     "predecessorsAreHistory": [
-      "S51",
-      "S50",
-      "S49",
-      "S48",
-      "S47",
-      "S46",
-      "S45",
-      "S44",
-      "S43",
-      "S42",
-      "S41",
-      "S40",
-      "S39",
-      "S38",
-      "S37",
-      "S36",
-      "S35",
-      "S34",
-      "S33"
+      "S54 Tokyo review identity",
+      "S53 and earlier"
     ],
-    "provenance": "S52 preserves all sealed S51 visual/interaction fixes and storage identity, then makes canonical AUD rounding retain AUD 0.01 for any real positive foreign-currency cost whose converted value would otherwise round to AUD 0.00. Zero remains zero; normal cent rounding is unchanged."
+    "provenance": "Only simulation/runtime identity, manifest install identity and current-country fixture selection differ from the current S54 working source; application layout/logic/style modules otherwise remain the same except identity-bearing runtime modules."
   },
   "hardVisualRules": [
     "Every expanded widget preserves the same colour family as its collapsed/original widget.",
@@ -245,21 +228,12 @@
     }
   },
   "latestSoftwareEvidence": {
-    "exactSource": "PENDING definitive S52 exact-source rerun.",
-    "targeted": "PASS — S52 focused tiny-currency gate; retained S51 editor/device-proxy gates pending definitive rerun.",
-    "priority": "Core interaction regression retained from S50; 56/56 exact-source suite remains clean after S51 focus-size repair.",
-    "expandedColour": "PASS — source/expanded/editor colour continuity retained, including Home Visit gold and category-specific editor identities.",
-    "touchTargets": "44px global touch-target lock retained; portrait sidebar navigation remains 56px high.",
-    "mainOverflow": "PASS — S51 focus-zoom gate and retained Add/Edit overlap gates report no horizontal overflow at the three approved iPad viewports.",
-    "expandedGeometry": "Existing expanded-modal geometry protections retained; final S40 matrix rerun pending.",
-    "deadSpace": "Journey Milestones increased to a 12-fact automatic grid and Ready-to-Move top hero uses its previous empty right side for readiness progress.",
-    "hiddenEditors": "PASS — S51 iPad focus-zoom gate verifies all audited editable controls are 16px or larger at 1194×834, 1024×768 and 768×1024; S50 nested-editor overlap protections retained.",
-    "textClipping": "PASS — S51 Reservation focus-size repair retains S49 Add-editor geometry with no date/time field collision or selector clipping.",
-    "nonWidgetControls": "PASS — Add Reservation type icons and Add Expense category icons retain distinct semantic category colours before and after selection.",
-    "launch": "PASS — S51 launch protections retained; S52 v15→v16 service-worker transition 6/6.",
-    "postSealForensic": "PASS — S51 sealed source guard, active continuity verifier and full package manifest verification pass after handoff conversion.",
-    "screenByScreen": "PASS — affected Reservations Add/Edit layout, selector colour and focus-size checks pass at all three approved viewports; prior full screen closures retained.",
-    "viewportColour": "PASS — prior viewport colour-distribution rules retained; S51 change is control typography only."
+    "exactSource": "PASS — 56/56 current exact-source functional harness checks.",
+    "staticIntegrity": "PASS — 64/64 JavaScript syntax and 8/8 CSS parse.",
+    "currentAmendment": "PASS — S54 physical-iPad amendment gate.",
+    "sourceIntegrity": "PASS — 108/108 canonical app files and local-reference/SW integrity.",
+    "browserDynamic": "Environment-blocked in this runtime; not counted as product failure. Physical-iPad review remains the visual authority.",
+    "physicalIpad": "OPEN — final visual/gesture/offline installed-PWA acceptance still required."
   },
   "physicalIpadAcceptance": [
     {
@@ -400,18 +374,18 @@
   ],
   "promotion": {
     "finalMaster": "BLOCKED",
-    "reason": "S53/v17 fixes the reproduced tiny-currency pre-Save display mismatch. FINAL MASTER remains blocked by required physical-iPad acceptance."
+    "reason": "This is a physical-iPad simulation build. Final Master remains blocked until Cameron accepts the S54 device screenshots and behaviour."
   },
-  "handoffInstruction": "Continue only from this exact S53/v17 source. Do not return to S52/S51/S50/S49/S48/S47/S46/S45/S44/S43/S42/S41/S40/S39/S38/S37/S36/S35/S34/S33. If any regression or later iPad recheck fails, fix forward from S53, rerun the full regression protocol, reseal hashes, and repeat the failed gate plus dependent gates.",
+  "handoffInstruction": "Use this Istanbul simulation only for physical-iPad review. Continue source work from the exact S54 working authority, never from an older build.",
   "knownExternalLimitations": [
     "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
   "sourceSeal": {
-    "identity": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17",
-    "checkpoint": "S53_TINY_CURRENCY_UI_CONSISTENCY_SOFTWARE_CLEAN",
-    "digest": "1438b0e5789398f5bf5fe7a3889a78bfac3c32ac713115633c31f2885e4c7e51",
+    "identity": "v60-r7.7-s54-istanbul-simulation-02-2026-09-18",
+    "checkpoint": "S54_ISTANBUL_SIMULATION_02_SOFTWARE_CLEAN",
+    "digest": "f5d944e496a230d832a91f6f99df42c8bcbad14915f43b172e764d2aeabb4bc5",
     "files": {
-      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "6fef650aaad539fcc5bd1208a816bbc8c8adc2e1b264831278ce13b97796c34e",
+      "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py": "7b20c5699a856dad2681cf3119ab37c43cab0479c9c7badbe1ef733a7469bd6b",
       "app-icon.png": "8d1fc2690d7ecec030092b0ab24f149eca21c4aaf38473e8c9984b6a4616ea25",
       "brand-bank-anz.png": "5f92a6b998b2306d9897b0a8490acab04963b56e28fa86a63b57d93bffdf746d",
       "brand-bank-commonwealth.png": "8352c7a15a7173711f40c4f6a8e6025d6320bf6114ac2edcd7f935d2977ba103",
@@ -436,17 +410,17 @@
       "brand-stream-youtube.png": "35e44729b587f99b9fc04b7ad491ccdf50bc1cf9aeeb5adb52a42f6a84048155",
       "header-assets.bin": "a71b391502c75b51e527924ae63cd34fcc4dabcecace811ca98fb311911da472",
       "header-index.json": "38b022200803f483f9bddbe3030f4162e1e96b5ac2a7e9ded9bd01498a9cc760",
-      "index.html": "b2f870e2240307256fb3295518cc734fca5318638d1bcf85b11b42be9dcf21ae",
+      "index.html": "cf4794410a457afcc627b152d0b005714c0bfa197c5f1fce633c9642e8fa3cec",
       "istanbul-4year-simulation-fixture.json": "68220419b2e52d0b22494f54e56de0f16e080f4b89c4fc5f7c6a3c0a3525eb4e",
-      "manifest.webmanifest": "c18ffb3b8ee7d0314f49a09bc939f5bbdabcfc87d1c8f85497dcf4bf2d77f5f5",
+      "manifest.webmanifest": "c76bb14345e3fedb5ba67557ba0505fce006844ffdc60fc580e5b2ccfb9e22ae",
       "src_components_confirmation.js": "132a3cd95febaf7794dfe1254fe5c80728b6de9bbbc5687798ab926e2101fe07",
       "src_components_country.js": "efc16620d8bcb97cb33e0741c93a5c431fdd2533f3d3f2345aa253d15cfba72c",
       "src_components_form-session.js": "481a117b89f925553e9e9ceac96f13ddcd634b4fdd663614b770ae3d00c9877d",
       "src_components_icons.js": "b2d7e57cf9f6cc2659eaffbd8c13a9d012cae3d4db4f1824ae9f76843c03c977",
       "src_components_modal.js": "c85469fd7f7c0a3189ac5c64db563f8a0a48611ad5f434aa0f5aa59dbc8add83",
       "src_components_offline-map.js": "758fd5e2bd6f85c71120fe492ede655cb444c31b7c745fe7b2beb0b9777d7c69",
-      "src_components_page-hero.js": "f3b31ed7bd689cd3741132aa5e82a340d99a155c2248e8ac2f91669a031ebe8f",
-      "src_components_sidebar.js": "332cca6d8fc0f9443aedd338e638f793a4231a0d29025e242108ef6d7c0a9f56",
+      "src_components_page-hero.js": "8670027cf8e0a50c74cbde9b89f83f3872fcedae7e969b757599f7a7f15736e5",
+      "src_components_sidebar.js": "e12c772d4236894faefeebefd0731ef3e4ef97431b8cc10bb759f0bfe00344a3",
       "src_core_account-mutations.js": "df6cd6f8911bd0ec254d2966388d2ca07366f45a4b83e4d912632f6b86613c34",
       "src_core_app-health.js": "9765330579681ee0b1b57f6407fde74301dc9e0910275e4d2137f0a69d2fa4dc",
       "src_core_backup.js": "e786ef1678071a44441a04e838c3161941cee63a6edc47a06dc21b73f7fada9e",
@@ -479,7 +453,7 @@
       "src_core_reservation-mutations.js": "4fa296e048ab41d8aa8e759fb004f1605446c2440b726e6ee84be1d62b6020c7",
       "src_core_reservations-view-model.js": "5cc2ea9cf2eac29795f9cc24410461f3ebe0940de55b82127bc27f8c0bfb6af0",
       "src_core_restore.js": "264270bbe8f4da5981bfd10dcceb2f98ca1a33a7314e75497ff7a4f9f51dd89b",
-      "src_core_runtime-config.js": "c58ab0a3d8af0b1dcff78aacb098ba14b9df59889434030c96b27a9aebda8d05",
+      "src_core_runtime-config.js": "7b3dfa5fc1194f0bf051284abcdf87c43e761806a4bc251fc40b4dc4aff064c7",
       "src_core_schema.js": "aee3d5a5326ab35f048f1302c31701cff85dede9b04562443bd17a58264a68df",
       "src_core_schengen.js": "4eba8372eb779430afa2f2b66b4a74ab65142b31718af9606d412fe522f909ee",
       "src_core_settings-mutations.js": "5a0b9f77161470062317d02aecc3dd918c882a54bdfdb54a0f3a9706980ac1d6",
@@ -494,12 +468,12 @@
       "src_design_app.css": "2826f7f3c20d2fe95b5a8089e26e1a89866ae5937a9bbe73fbb2f77f46db4b50",
       "src_design_components.css": "bb7e057c7aab13acb302810892613e879540a324512c78f31f009e862fb34738",
       "src_design_finish-pass.css": "2018634a58b21e0ac75f939b2fb8f9046198e74059c0c3dcf0731546c9d3af05",
-      "src_design_locked_contract.css": "13d03d4023cad660c1b2c54c554718af2255a5b64f3d46268c11228a6e34e400",
+      "src_design_locked_contract.css": "a72921a41f28e5112938e5a463ac81b3c27a5d8fbbddac48ffb3c841628422f2",
       "src_design_reference-pass.css": "cb5b02ec7917ecca9f564008474e7a6ce1e4dab9c642ca0c7371b9ff458cd5e0",
       "src_design_reset.css": "8be44e4016b1e6f22ec110d7a8e59f1863c191280746a9369e69a0ac02b61dae",
       "src_design_screens.css": "90be72002426b72336c50f846b775ba7b9969619a0c9b683c4547b073c51401f",
       "src_design_tokens.css": "24557420215f36757406eeba64792ae0bd561dfe64928e090224603d63926d64",
-      "src_main.js": "b7cbcc58dafd53695db8bcff84249c1d3dfea68c6762843217f963c56eec614e",
+      "src_main.js": "d8a8147d3d22618da92afb78bd78fc698a0792ecd074935033193a656ad24cc9",
       "src_screens_budget.js": "46daca1c3230f0a724a7eefe04a8532cb0145c6dadb7a56cf92054cc6e15b1a8",
       "src_screens_calendar.js": "9ea1014cfd4f69c305321303dcd78d9bcb4397b1faa02ebe91237ce403ae0781",
       "src_screens_checklist.js": "fe3aa5a7746a711a317d10539006e4f1b8e7dc1e0d853b0f98736833ee63e1a0",
@@ -516,27 +490,27 @@
       "startup-ipad-1180-portrait.png": "8b23921f4788d69c57ea08b033b2f11b61f96c0436fb63fd760685f32b0fd1fd",
       "startup-ipad-1194-landscape.png": "5479b7f7f4c0ba09fef778dd0f1f86f3a48dccb51efcb6b838a157a3b7da13c8",
       "startup-ipad-1194-portrait.png": "5be9ef8315b9140e0c655c20ce6459669f33a56ccd1d20e924e8a93c5d0c666e",
-      "sw.js": "8f749a60d02e43754306144d42bec1753c203e6409dfbc9c0fa2c4759c6317b9",
+      "sw.js": "13d564e3cf40d71475db5c6fa8aa7c890916e6585283dbeafde4a78b58fc6fdd",
       "tokyo-4year-simulation-fixture.json": "b33fe40515cee826779483ec2047702538affe791f6b87aea6e6d24fada228bd"
     }
   },
   "regressionEvidence": {
-    "phase": "S53-tiny-currency-ui-software-closure",
+    "phase": "S54-istanbul-simulation-02-software-closure",
     "tinyCurrency": "PASS — positive foreign costs that convert below one AUD cent retain AUD 0.01; zero remains zero.",
-    "exactSource": "PASS — 56/56 exact-source checks.",
+    "exactSource": "PASS — 56/56 current exact-source functional harness checks against this simulation source.",
     "targeted": "PASS — 16/16 targeted checks.",
     "priorityInteractions": "PASS — 4/4 priority interaction checks.",
     "forensic": "PASS — 1194×834, 1024×768 and 768×1024 fast forensic sweeps; full landscape screen sweeps 9/9 at both landscape sizes with zero horizontal overflow.",
-    "staticIntegrity": "PASS — 64/64 JavaScript syntax, 8/8 CSS parse, 0 missing local/precache assets.",
+    "staticIntegrity": "PASS — 64/64 JavaScript syntax, 8/8 CSS parse, 108/108 canonical app files.",
     "pwaStatic": "PASS — 107/107 unique shell assets; dynamic localhost browser check environment-blocked, not counted as product failure.",
     "nativeLaunchMatch": "PASS — 6/6 startup-image to HTML initial-frame matches.",
     "serviceWorkerTransition": "PASS — S52/v16→S53/v17 transition 6/6, including cached offline navigation and 108-entry shell population.",
-    "physicalProtocolConsistency": "UNCHANGED — FINAL MASTER remains blocked by the outstanding real-iPad acceptance sheet.",
+    "physicalProtocolConsistency": "OPEN — physical-iPad review required.",
     "tinyCurrencyUI": "PASS targeted — Reservation and Expense pre-Save display now matches canonical AUD 0.01 storage for positive sub-cent foreign conversions.",
-    "fullRegression": "PASS — hardened fail-closed S53/v17 full software regression completed end-to-end on 17/09/2026."
+    "fullRegression": "PASS — simulation sealed guard + functional harness + current S54 amendment gate complete on 18/09/2026."
   },
   "softwareClosure": {
-    "checkpoint": "S53_TINY_CURRENCY_UI_CONSISTENCY_SOFTWARE_CLEAN",
+    "checkpoint": "S54_ISTANBUL_SIMULATION_02_SOFTWARE_CLEAN",
     "softwareStatus": "SOFTWARE_CLOSURE_PASS",
     "physicalStatus": "REQUIRES_IPAD_RECHECK",
     "finalMaster": false,

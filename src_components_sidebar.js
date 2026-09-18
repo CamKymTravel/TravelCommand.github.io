@@ -1,4 +1,26 @@
 import { createLineIcon } from './src_components_icons.js';
+
+let navCueTimer = null;
+function showNavCue(label, anchor) {
+  document.querySelectorAll('.tcc-nav-cue').forEach(node => node.remove());
+  if (navCueTimer) { clearTimeout(navCueTimer); navCueTimer = null; }
+  const cue=document.createElement('div');
+  cue.className='tcc-nav-cue';
+  cue.textContent=label;
+  cue.setAttribute('aria-hidden','true');
+  document.body.append(cue);
+  const rect=anchor.getBoundingClientRect();
+  const maxLeft=Math.max(12,(globalThis.innerWidth||1024)-220);
+  cue.style.left=`${Math.min(maxLeft,Math.round(rect.right+12))}px`;
+  cue.style.top=`${Math.max(12,Math.round(rect.top+(rect.height/2)))}px`;
+  requestAnimationFrame(()=>cue.classList.add('is-visible'));
+  navCueTimer=setTimeout(()=>{
+    cue.classList.remove('is-visible');
+    setTimeout(()=>cue.remove(),220);
+    navCueTimer=null;
+  },900);
+}
+
 export const NAV_ITEMS = Object.freeze([
   ['home', 'Home', 'home'],
   ['itinerary', 'Itinerary', 'itinerary'],
@@ -16,7 +38,7 @@ export function renderSidebar(activeScreen, onNavigate, onBrandActivate = null, 
   const brand=document.createElement('div'); brand.className='sidebar-brand';
   const mark=document.createElement(onBrandActivate?'button':'span'); mark.className=onBrandActivate?'brand-mark brand-mark-button':'brand-mark'; mark.innerHTML='<img class="brand-app-icon" src="./app-icon.png" alt="" aria-hidden="true">'; if(onBrandActivate){mark.type='button';mark.setAttribute('aria-label',activeScreen==='home'?"Where's the toilet?":'Travel Command Centre compass');mark.addEventListener('click',onBrandActivate);} else mark.setAttribute('aria-hidden','true');
   const name=document.createElement('span'); name.className='sidebar-brand-name'; name.innerHTML='<strong>TRAVEL</strong><small>COMMAND CENTRE</small>'; brand.append(mark,name); aside.append(brand);
-  const nav=document.createElement('nav'); nav.setAttribute('aria-label','Primary navigation'); NAV_ITEMS.forEach(([id,label,icon])=>{ const button=document.createElement('button'); button.type='button'; button.className='nav-button'; button.dataset.active=String(id===activeScreen); if(id===activeScreen) button.setAttribute('aria-current','page'); button.setAttribute('aria-label',label); const iconNode=document.createElement('span');iconNode.className='nav-icon';iconNode.append(createLineIcon(icon)); const labelNode=document.createElement('span');labelNode.textContent=label;button.append(iconNode,labelNode);button.addEventListener('click',()=>onNavigate(id));nav.append(button); }); aside.append(nav);
+  const nav=document.createElement('nav'); nav.setAttribute('aria-label','Primary navigation'); NAV_ITEMS.forEach(([id,label,icon])=>{ const button=document.createElement('button'); button.type='button'; button.className='nav-button'; button.dataset.active=String(id===activeScreen); if(id===activeScreen) button.setAttribute('aria-current','page'); button.setAttribute('aria-label',label); const iconNode=document.createElement('span');iconNode.className='nav-icon';iconNode.append(createLineIcon(icon)); const labelNode=document.createElement('span');labelNode.textContent=label;button.append(iconNode,labelNode);button.addEventListener('click',()=>{showNavCue(label,button);onNavigate(id);});nav.append(button); }); aside.append(nav);
   const status=document.createElement('section'); status.className='sidebar-status';
   const modeLabel=runtimeMode==='simulation'?'Offline ready · simulation':'Offline ready · local';
   const statusTitle=document.createElement('strong'); statusTitle.textContent='DATA STATUS'; status.append(statusTitle);

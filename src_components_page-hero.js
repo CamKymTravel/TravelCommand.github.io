@@ -270,6 +270,12 @@ export function createStayBanner({ currentStay = null, nextDestination = null, n
     next.append(identity,date);
     if (Number.isFinite(Number(nextDestination.durationDays))) { const duration=document.createElement('span'); duration.className='tcc-stay-banner-detail'; duration.textContent=`${Number(nextDestination.durationDays)} day${Number(nextDestination.durationDays)===1?'':'s'} planned`; next.append(duration); }
   } else { const empty=document.createElement('strong'); empty.textContent='Nothing planned'; next.append(empty); }
-  section.append(current,next);
+  const photo=document.createElement('div');
+  photo.className='tcc-stay-banner-photo';
+  photo.setAttribute('aria-hidden','true');
+  const strip=document.createElement('div');
+  strip.className='tcc-stay-banner-strip';
+  strip.append(current,next);
+  section.append(photo,strip);
   return section;
 }

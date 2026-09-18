@@ -4541,3 +4541,362 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   0%,100% { transform:translateZ(0) scale(1); filter:brightness(1); }
   50% { transform:translateZ(0) scale(1.008); filter:brightness(1.18); }
 }
+
+/* ========================================================================
+   S54 PHYSICAL-IPAD AMENDMENT — 18 Sep 2026
+   Cameron review: photo-first shared headers, transient icon-menu learning cue,
+   baked header edge cleanup, colour-system freeze, Home Schengen collision fix
+   and Australian Home Visit identity.
+   ======================================================================== */
+@layer tccLocks {
+  /* Itinerary / Budget / Reservations / Calendar: the country photograph owns
+     the header. Current + Next become one thin full-width strip underneath. */
+  html body :is(
+    [data-screen="itinerary"] > .tcc-stay-banner,
+    [data-screen="budget"] > .tcc-stay-banner,
+    [data-screen="reservations"] > .tcc-stay-banner,
+    [data-screen="calendar"] > .tcc-stay-banner
+  ) {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:200px auto !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    gap:8px !important;
+    padding:0 !important;
+    border:0 !important;
+    border-radius:0 !important;
+    overflow:visible !important;
+    background:none !important;
+  }
+  html body :is(
+    [data-screen="itinerary"] > .tcc-stay-banner,
+    [data-screen="budget"] > .tcc-stay-banner,
+    [data-screen="reservations"] > .tcc-stay-banner,
+    [data-screen="calendar"] > .tcc-stay-banner
+  )::before,
+  html body :is(
+    [data-screen="itinerary"] > .tcc-stay-banner,
+    [data-screen="budget"] > .tcc-stay-banner,
+    [data-screen="reservations"] > .tcc-stay-banner,
+    [data-screen="calendar"] > .tcc-stay-banner
+  )::after { display:none !important; content:none !important; }
+
+  html body .tcc-stay-banner-photo {
+    min-width:0 !important;
+    min-height:200px !important;
+    border:1px solid rgba(145,190,216,.30) !important;
+    border-radius:22px !important;
+    overflow:hidden !important;
+    background-color:#081827 !important;
+    background-image:var(--hero-image) !important;
+    background-repeat:no-repeat !important;
+    background-size:cover !important;
+    background-position:var(--hero-position,center center) !important;
+  }
+  html body .tcc-stay-banner-strip {
+    min-width:0 !important;
+    min-height:66px !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    border:1px solid rgba(145,190,216,.28) !important;
+    border-radius:14px !important;
+    overflow:hidden !important;
+    background:linear-gradient(180deg,rgba(18,38,56,.98),rgba(7,20,33,.99)) !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-card {
+    min-width:0 !important;
+    width:auto !important;
+    max-width:none !important;
+    min-height:64px !important;
+    display:grid !important;
+    grid-template-columns:auto minmax(0,1fr) auto !important;
+    grid-template-rows:auto auto !important;
+    align-content:center !important;
+    align-items:center !important;
+    gap:1px 9px !important;
+    padding:7px 12px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    backdrop-filter:none !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-next {
+    border-left:1px solid rgba(145,190,216,.20) !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-card > .eyebrow {
+    grid-column:1 !important;
+    grid-row:1 / 3 !important;
+    align-self:center !important;
+    margin:0 !important;
+    max-width:92px !important;
+    font-size:10px !important;
+    line-height:1.15 !important;
+    letter-spacing:.11em !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-identity {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    gap:7px !important;
+    min-width:0 !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-flag {
+    font-size:22px !important;
+    line-height:1 !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-name {
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:17px !important;
+    line-height:1.05 !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-card > span:not(.tcc-stay-banner-detail):not(.tcc-stay-mode-marker) {
+    grid-column:2 !important;
+    grid-row:2 !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+    font-size:12px !important;
+    line-height:1.1 !important;
+  }
+  html body .tcc-stay-banner-strip .tcc-stay-banner-detail,
+  html body .tcc-stay-banner-strip .tcc-stay-mode-marker {
+    grid-column:3 !important;
+    grid-row:1 !important;
+    justify-self:end !important;
+    white-space:nowrap !important;
+    font-size:12px !important;
+    line-height:1.1 !important;
+  }
+  html body .tcc-stay-banner-strip progress {
+    grid-column:3 !important;
+    grid-row:2 !important;
+    justify-self:end !important;
+    width:92px !important;
+    height:5px !important;
+    margin:0 !important;
+  }
+
+  /* Preserve each screen's orientation identity without covering the photo. */
+  html body [data-screen="itinerary"] .tcc-stay-banner-current .eyebrow { color:#8eeee4 !important; }
+  html body [data-screen="itinerary"] .tcc-stay-banner-next .eyebrow { color:#ffc095 !important; }
+  html body [data-screen="budget"] .tcc-stay-banner-current .eyebrow { color:#f0add0 !important; }
+  html body [data-screen="budget"] .tcc-stay-banner-next .eyebrow { color:#e8ad86 !important; }
+  html body [data-screen="reservations"] .tcc-stay-banner-current .eyebrow { color:#d7f09a !important; }
+  html body [data-screen="reservations"] .tcc-stay-banner-next .eyebrow { color:#e69bb2 !important; }
+  html body [data-screen="calendar"] .tcc-stay-banner-current .eyebrow { color:#ffe39a !important; }
+  html body [data-screen="calendar"] .tcc-stay-banner-next .eyebrow { color:#e7a5bb !important; }
+
+  /* Physical-iPad baked-edge cleanup: one live frame only. Overscan the source
+     artwork by a few pixels so its internal legacy outline is clipped away. */
+  html body [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"],
+  html body [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"],
+  html body [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"] {
+    border:1px solid rgba(145,190,216,.30) !important;
+    border-radius:22px !important;
+    outline:0 !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"]::after,
+  html body [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"]::after {
+    inset:-6px !important;
+    background-image:var(--hero-image) !important;
+    background-size:cover !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+  }
+  html body [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"]::after {
+    inset:-6px !important;
+    background-size:100% 100%,cover !important;
+    background-position:center,center center !important;
+    background-repeat:no-repeat !important;
+  }
+
+  /* Colour work is intentionally frozen after the physical-iPad review.
+     Do not add Checklist/Vault-specific accent rails, coloured border systems,
+     or replacement colour palettes here. Their existing shared app material
+     remains the authority until the later whole-app colour pass. */
+
+  /* Home Schengen compact card: Used + Left share the first row; Must Leave By
+     owns the second row so the prominent days-left ring can never collide. */
+  html body [data-screen="home"] .home-schengen-metrics {
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+    gap:5px !important;
+    align-content:center !important;
+  }
+  html body [data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave {
+    grid-column:1 / -1 !important;
+  }
+
+  /* Home Visit is Australian: deep green material with gold identity, not the
+     generic yellow/brown secondary-action treatment. */
+  html body [data-screen="itinerary"] .itinerary-add-home {
+    border-color:rgba(255,207,64,.52) !important;
+    background:linear-gradient(145deg,rgba(19,88,57,.92),rgba(8,48,39,.96)) !important;
+    color:#ffd75a !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:#ffd75a !important; }
+  html body .tcc-itinerary-home-visit-modal {
+    border-color:rgba(255,207,64,.54) !important;
+    background:radial-gradient(circle at 88% 0%,rgba(255,207,64,.12),transparent 42%),linear-gradient(145deg,#174f3b,#103b31 58%,#081b24) !important;
+  }
+  html body .tcc-itinerary-home-visit-modal > form > header h2 { color:#ffe079 !important; }
+  html body .tcc-itinerary-home-visit-modal .itinerary-home-visit-identity {
+    border-color:rgba(255,207,64,.26) !important;
+    background:linear-gradient(145deg,rgba(18,79,58,.72),rgba(7,37,34,.86)) !important;
+  }
+  html body .tcc-itinerary-home-visit-modal .itinerary-home-visit-copy small { color:#ffe079 !important; }
+
+  @media (max-width:1080px), (max-height:800px) {
+    html body :is(
+      [data-screen="itinerary"] > .tcc-stay-banner,
+      [data-screen="budget"] > .tcc-stay-banner,
+      [data-screen="reservations"] > .tcc-stay-banner,
+      [data-screen="calendar"] > .tcc-stay-banner
+    ) { grid-template-rows:184px auto !important; }
+    html body .tcc-stay-banner-photo { min-height:184px !important; }
+    html body .tcc-stay-banner-strip { min-height:62px !important; }
+    html body .tcc-stay-banner-strip .tcc-stay-banner-card { min-height:60px !important; padding:6px 9px !important; gap:1px 7px !important; }
+    html body .tcc-stay-banner-strip .tcc-stay-banner-card > .eyebrow { max-width:78px !important; font-size:9px !important; }
+    html body .tcc-stay-banner-strip .tcc-stay-banner-flag { font-size:20px !important; }
+    html body .tcc-stay-banner-strip .tcc-stay-banner-name { font-size:15px !important; }
+    html body .tcc-stay-banner-strip .tcc-stay-banner-card > span:not(.tcc-stay-banner-detail):not(.tcc-stay-mode-marker),
+    html body .tcc-stay-banner-strip .tcc-stay-banner-detail,
+    html body .tcc-stay-banner-strip .tcc-stay-mode-marker { font-size:11px !important; }
+    html body .tcc-stay-banner-strip progress { width:78px !important; }
+  }
+}
+
+/* Transient icon-menu learning cue. It is outside #app so navigation re-render
+   cannot remove it before Kym has time to read the selected screen name. */
+.tcc-nav-cue {
+  position:fixed;
+  z-index:2147482000;
+  transform:translateY(-50%) translateX(-8px);
+  min-width:92px;
+  max-width:210px;
+  padding:10px 14px;
+  border:1px solid rgba(120,210,246,.46);
+  border-radius:12px;
+  background:rgba(6,24,39,.96);
+  color:#e9f7ff;
+  font:800 17px/1.1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.02em;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease;
+}
+.tcc-nav-cue.is-visible { opacity:1; transform:translateY(-50%) translateX(0); }
+@media (prefers-reduced-motion:reduce) {
+  .tcc-nav-cue { transition:opacity .08s linear; transform:translateY(-50%); }
+  .tcc-nav-cue.is-visible { transform:translateY(-50%); }
+}
+
+/* ========================================================================
+   S54 APP-WIDE WIDGET CONSISTENCY REPAIR — 18 Sep 2026
+   Physical-iPad correction: Checklist and Vault must use the SAME card
+   construction grammar as the rest of Travel Command Centre. Colour may
+   identify content through text/icon/semantic state, but must not create a
+   different border/accent-rail language on one screen.
+   ======================================================================== */
+@layer tccLocks {
+  /* CHECKLIST — one common dark material. The Ready banner is the only broad
+     semantic state surface; all supporting widgets use the same neutral shell. */
+  html body [data-screen="checklist"] :is(
+    .checklist-overview-card,
+    .checklist-stage-panel,
+    .checklist-owner-card,
+    .checklist-shared-extras,
+    .checklist-column,
+    .checklist-next-card,
+    .checklist-history,
+    .checklist-history-compact-empty
+  ) {
+    border:1px solid rgba(145,190,216,.24) !important;
+    background:linear-gradient(145deg,rgba(18,34,57,.91),rgba(7,18,32,.97)) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner {
+    border-width:1px !important;
+    border-style:solid !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner:not(.is-ready) {
+    border-color:rgba(218,92,111,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(218,92,111,.13),transparent 48%),linear-gradient(145deg,#3f2832 0%,#241f2a 58%,#091827 100%) !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner.is-ready {
+    border-color:rgba(74,178,132,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(74,178,132,.13),transparent 48%),linear-gradient(145deg,#17382f 0%,#112729 58%,#091827 100%) !important;
+  }
+
+  /* Remove the local coloured-rail/border language. Category identity stays in
+     the existing heading/icon/progress colours, not in the card perimeter. */
+  html body [data-screen="checklist"] :is(
+    .checklist-owner-his,
+    .checklist-owner-hers,
+    .checklist-shared-extras,
+    .checklist-column-permanent,
+    .checklist-column-destination,
+    .checklist-next-card,
+    .checklist-overview-card,
+    .checklist-stage-panel,
+    .checklist-history
+  ) {
+    border-left-color:rgba(145,190,216,.24) !important;
+    border-right-color:rgba(145,190,216,.24) !important;
+    border-top-color:rgba(145,190,216,.24) !important;
+    border-bottom-color:rgba(145,190,216,.24) !important;
+  }
+
+  /* VAULT TOP CATEGORIES — use the Journey History summary-card construction
+     exactly: same depth, same border strength, same small framed icon treatment.
+     Only the category hue changes. */
+  html body [data-screen="vault"] .vault-category-card {
+    border:1px solid rgba(var(--vault-rgb),.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--vault-rgb),.17),transparent 49%),linear-gradient(145deg,rgba(var(--vault-rgb),.16),rgba(8,20,33,.98) 70%) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon {
+    width:35px !important;
+    height:35px !important;
+    display:grid !important;
+    place-items:center !important;
+    border:1px solid currentColor !important;
+    border-radius:11px !important;
+    background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(4,15,28,.22)) !important;
+    color:rgb(var(--vault-rgb)) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon .tcc-line-icon {
+    width:22px !important;
+    height:22px !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-count {
+    color:rgb(var(--vault-rgb)) !important;
+    text-shadow:none !important;
+  }
+
+  /* The lower Vault panels keep their approved semantic/category hues, but use
+     the same panel construction grammar: no special rails, no per-screen chrome. */
+  html body [data-screen="vault"] :is(
+    .vault-all-records,
+    .vault-summary-card,
+    .vault-expiry-card,
+    .vault-emergency-card,
+    .vault-emergency-contacts,
+    .vault-activity
+  ) {
+    box-shadow:none !important;
+    filter:none !important;
+  }
+}
