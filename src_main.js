@@ -136,7 +136,7 @@ if (!stateService.isRecoveryMode()) {
 // R40 build-health gate: every newly installed/updated build must visibly
 // require one whole-app verification. The marker is local to this build and
 // does not keep re-dirtying the app after Kym successfully verifies R40.
-const APP_HEALTH_BUILD_MARKER='v60-r7.7-s54-istanbul-simulation-02-2026-09-18';
+const APP_HEALTH_BUILD_MARKER='v60-r7.8-s54-morocco-simulation-04-2026-09-18';
 if (!stateService.isRecoveryMode()) {
   const markerKey=`${runtimeConfig.storageKey}:app-health-build-marker`;
   let installedMarker=null;

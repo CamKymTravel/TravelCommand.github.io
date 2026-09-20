@@ -6,7 +6,7 @@ const DEFAULTS = Object.freeze({
   currentDate:null,
   fixtureUrl:null,
   seedIfEmpty:false,
-  serviceWorkerUrl:'./sw.js?v=60-r7.7-s54-istanbul-simulation-02-2026-09-18'
+  serviceWorkerUrl:'./sw.js?v=v60-r7.8-s54-morocco-simulation-04-2026-09-18'
 });
 
 export function readRuntimeConfig(source = globalThis.__TCC_RUNTIME_CONFIG__ ?? null) {

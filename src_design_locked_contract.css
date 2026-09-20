@@ -4900,3 +4900,250 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     filter:none !important;
   }
 }
+
+
+/* ========================================================================
+   S54 PHYSICAL-IPAD SHELL + CHECKLIST FINAL NORMALISATION — 18 Sep 2026
+   Physical iPad evidence showed two remaining consistency problems:
+   1) Journey History / Vault could inherit a different outer page inset than
+      the normal app shell, making the content appear to move relative to the
+      fixed menu.
+   2) Checklist had accumulated screen-specific coloured card surfaces and
+      edge accents. Supporting Checklist widgets now use the exact same neutral
+      shell. Colour is limited to small labels/icons, selection/progress and
+      genuine semantic states. No per-widget coloured perimeter or surface.
+   ======================================================================== */
+@layer tccLocks {
+  /* The icon menu is a fixed instrument panel. On every supported iPad it has
+     one width, one top origin, one button height and one gap. Screen content
+     cannot scroll, resize or re-space it. */
+  @media (max-width:1200px) {
+    :root { --sidebar-w:76px !important; }
+    html body .app-shell { padding-left:var(--sidebar-w) !important; }
+    html body .sidebar {
+      position:fixed !important;
+      inset:0 auto 0 0 !important;
+      width:var(--sidebar-w) !important;
+      height:100dvh !important;
+      min-height:100dvh !important;
+      padding:10px 8px !important;
+      box-sizing:border-box !important;
+      overflow:hidden !important;
+      transform:none !important;
+    }
+    html body .sidebar-brand {
+      height:72px !important;
+      min-height:72px !important;
+      max-height:72px !important;
+      flex:0 0 72px !important;
+      margin:0 0 8px !important;
+      padding:4px 0 10px !important;
+      box-sizing:border-box !important;
+    }
+    html body .sidebar nav {
+      display:grid !important;
+      grid-template-columns:1fr !important;
+      grid-auto-rows:56px !important;
+      gap:8px !important;
+      align-content:start !important;
+      flex:0 0 auto !important;
+      min-height:0 !important;
+      overflow:hidden !important;
+      padding:0 !important;
+      margin:0 !important;
+    }
+    html body .sidebar .nav-button {
+      width:100% !important;
+      height:56px !important;
+      min-height:56px !important;
+      max-height:56px !important;
+      margin:0 !important;
+      box-sizing:border-box !important;
+      transform:none !important;
+    }
+
+    /* Bring inherited-default pages onto the normal 18/22 app inset used by
+       Itinerary, Budget, Reservations, Checklist and Settings. Calendar keeps
+       its deliberately denser calendar-specific inset. */
+    html body [data-screen="journey-history"].journey-history-screen,
+    html body [data-screen="vault"].vault-screen:not(.vault-screen-locked) {
+      padding:18px 22px 28px !important;
+      gap:12px !important;
+    }
+  }
+
+  /* CHECKLIST — one material, one border, one depth. This deliberately
+     overrides all legacy per-card RGB/tint systems. */
+  html body [data-screen="checklist"] :is(
+    .checklist-overview-card,
+    .checklist-stage-panel,
+    .checklist-owner-card,
+    .checklist-shared-extras,
+    .checklist-column,
+    .checklist-next-card,
+    .checklist-history,
+    .checklist-history-compact-empty
+  ) {
+    border:1px solid rgba(145,190,216,.24) !important;
+    border-left-color:rgba(145,190,216,.24) !important;
+    border-right-color:rgba(145,190,216,.24) !important;
+    border-top-color:rgba(145,190,216,.24) !important;
+    border-bottom-color:rgba(145,190,216,.24) !important;
+    background:linear-gradient(145deg,rgba(18,34,57,.91),rgba(7,18,32,.97)) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+
+  /* Ready to Move is a real state and may remain semantic red/green. */
+  html body [data-screen="checklist"] .checklist-ready-banner {
+    border-width:1px !important;
+    border-style:solid !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner:not(.is-ready) {
+    border-color:rgba(218,92,111,.44) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(218,92,111,.13),transparent 48%),linear-gradient(145deg,#3f2832 0%,#241f2a 58%,#091827 100%) !important;
+  }
+  html body [data-screen="checklist"] .checklist-ready-banner.is-ready {
+    border-color:rgba(74,178,132,.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(74,178,132,.13),transparent 48%),linear-gradient(145deg,#17382f 0%,#112729 58%,#091827 100%) !important;
+  }
+
+  /* VAULT — the five category selectors use the exact Journey History summary
+     tile material and icon geometry. Content layout remains Vault-specific,
+     but there is no separate Vault-only widget chrome. */
+  html body [data-screen="vault"] .vault-category-card {
+    min-height:116px !important;
+    display:grid !important;
+    grid-template-columns:42px minmax(0,1fr) !important;
+    grid-template-rows:auto auto auto !important;
+    align-items:center !important;
+    align-content:center !important;
+    column-gap:10px !important;
+    row-gap:3px !important;
+    padding:15px 14px !important;
+    text-align:left !important;
+    border:1px solid rgba(var(--vault-rgb),.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--vault-rgb),.17),transparent 49%),linear-gradient(145deg,rgba(var(--vault-rgb),.16),rgba(8,20,33,.98) 70%) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon {
+    grid-column:1 !important;
+    grid-row:1 / span 3 !important;
+    width:38px !important;
+    height:38px !important;
+    display:grid !important;
+    place-items:center !important;
+    border:1px solid currentColor !important;
+    border-radius:12px !important;
+    background:rgba(4,15,28,.22) !important;
+    color:rgb(var(--vault-rgb)) !important;
+    box-shadow:none !important;
+    filter:none !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon .tcc-line-icon {
+    width:22px !important;
+    height:22px !important;
+  }
+  html body [data-screen="vault"] .vault-category-card > strong {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    margin:0 !important;
+    text-align:left !important;
+    font-size:15px !important;
+    line-height:1.1 !important;
+  }
+  html body [data-screen="vault"] .vault-category-card .vault-category-count {
+    grid-column:2 !important;
+    grid-row:2 !important;
+    margin:0 !important;
+    color:rgb(var(--vault-rgb)) !important;
+    text-align:left !important;
+    text-shadow:none !important;
+    line-height:1 !important;
+  }
+  html body [data-screen="vault"] .vault-category-card > small {
+    grid-column:2 !important;
+    grid-row:3 !important;
+    margin:0 !important;
+    text-align:left !important;
+  }
+}
+
+/* ========================================================================
+   S54 SETTINGS LOWER-PANEL ROW NORMALISATION — 18 Sep 2026
+   Physical iPad review: the four lower Settings widgets are one peer group.
+   They must read as four compact siblings in a single row, not as four tall
+   full-width sections. This changes layout only; each panel keeps its existing
+   identity, content and actions.
+   ======================================================================== */
+@layer tccLocks {
+  @media (min-width:900px) {
+    html body [data-screen="settings"].settings-screen {
+      grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+      gap:12px !important;
+    }
+    html body [data-screen="settings"] :is(.settings-reference-hero,.settings-health) {
+      grid-column:1 / -1 !important;
+    }
+    html body [data-screen="settings"] :is(.settings-defaults,.settings-security,.settings-backup,.settings-info) {
+      grid-column:auto !important;
+      min-width:0 !important;
+      height:100% !important;
+      align-self:stretch !important;
+      padding:16px !important;
+    }
+    html body [data-screen="settings"] :is(.settings-defaults,.settings-security,.settings-backup,.settings-info) h2 {
+      font-size:18px !important;
+      line-height:1.15 !important;
+    }
+    html body [data-screen="settings"] :is(.settings-defaults,.settings-security,.settings-backup,.settings-info) .settings-section-head {
+      align-items:flex-start !important;
+      gap:8px !important;
+    }
+    html body [data-screen="settings"] .settings-defaults .settings-facts {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:8px !important;
+      margin-top:12px !important;
+    }
+    html body [data-screen="settings"] .settings-defaults .settings-fact {
+      min-height:68px !important;
+      padding:9px 10px !important;
+      font-size:11px !important;
+      line-height:1.35 !important;
+    }
+    html body [data-screen="settings"] .settings-info .settings-info-rows {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:7px !important;
+      margin-top:12px !important;
+    }
+    html body [data-screen="settings"] .settings-info .settings-info-rows > div {
+      padding:8px 9px !important;
+      font-size:10.5px !important;
+      line-height:1.35 !important;
+    }
+    html body [data-screen="settings"] :is(.settings-security,.settings-backup) .settings-panel-copy {
+      font-size:11px !important;
+      line-height:1.4 !important;
+    }
+    html body [data-screen="settings"] :is(.settings-security,.settings-backup) .settings-actions {
+      flex-wrap:wrap !important;
+      gap:7px !important;
+      margin-top:12px !important;
+    }
+    html body [data-screen="settings"] :is(.settings-security,.settings-backup) .settings-actions .button {
+      min-width:0 !important;
+      padding-inline:11px !important;
+      font-size:12px !important;
+    }
+    html body [data-screen="settings"] :is(.settings-pin-status,.settings-local-chip) {
+      flex:0 0 auto !important;
+      max-width:112px !important;
+      white-space:normal !important;
+      text-align:center !important;
+      line-height:1.15 !important;
+    }
+  }
+}
