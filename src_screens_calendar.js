@@ -8,9 +8,11 @@ import { FormSession } from './src_components_form-session.js';
 import { formatAUDate, toISODate } from './src_core_dates.js';
 import { createLineIcon } from './src_components_icons.js';
 import { countryFlagEmoji } from './src_components_country.js';
+import { paletteRgbText, TCC_CANONICAL_PALETTE_RGB } from './src_core_visual-palette.js';
 
 
 const TYPE_LABELS = Object.freeze({ reminder:'Reminder', note:'Note' });
+const PERSONAL_CALENDAR_TONES = Object.freeze({ reminder:'violet', note:'violet' });
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -97,7 +99,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     notes:existing?.notes || existing?.note || ''
   };
   const formSession = new FormSession(savedValue);
-  const resolvedTone = editorTone || 'violet';
+  const resolvedTone = editorTone || PERSONAL_CALENDAR_TONES[type] || 'violet';
 
   const body = node('div', 'calendar-editor');
   const typeTiles = node('div', 'calendar-type-tiles');
@@ -127,7 +129,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
       const active = body.dataset.type === eventType;
       button.dataset.active = String(active);
       button.setAttribute('aria-pressed', String(active));
-      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; renderTypes(); }));
+      button.addEventListener('click', () => preserveLocalFocus(() => { body.dataset.type = eventType; if(modal)setModalTone(modal,PERSONAL_CALENDAR_TONES[eventType]||'violet'); renderTypes(); }));
       typeTiles.append(button);
     }
   }
@@ -135,6 +137,7 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
     body.dataset.type = PERSONAL_CALENDAR_TYPES.includes(saved.type) ? saved.type : 'reminder';
     error.textContent = '';
     renderTypes();
+    if (modal) setModalTone(modal, PERSONAL_CALENDAR_TONES[body.dataset.type] || editorTone || 'violet');
     fields.replaceChildren(
       inputField('Title', 'title', 'text', saved.title),
       inputField('Date', 'date', 'date', saved.date),
@@ -193,10 +196,11 @@ function openPersonalEventEditor({ stateService, host, currentDate, eventId = nu
   modal.showModal();
 }
 
+const CALENDAR_RESERVATION_TONES = Object.freeze({ flight:'blue', train:'teal', cruise:'violet', rv:'copper', hotel:'gold', airbnb:'pink', accommodation:'gold', ticket:'rose' });
 function calendarSourceRgb(event) {
-  if (event?.kind === 'reservation') return ({ flight:'93,141,255', train:'70,217,202', cruise:'184,109,255', rv:'255,154,90', hotel:'240,185,95', airbnb:'241,101,189', accommodation:'240,185,95', ticket:'255,111,131' })[event.reservationType] || '93,141,255';
-  if (event?.kind === 'personal') return event.personalType === 'reminder' ? '255,209,91' : '184,109,255';
-  return event?.rgb || '70,217,202';
+  if (event?.kind === 'reservation') return paletteRgbText(CALENDAR_RESERVATION_TONES[event.reservationType] || 'blue');
+  if (event?.kind === 'personal') return paletteRgbText(PERSONAL_CALENDAR_TONES[event.personalType] || 'violet');
+  return event?.rgb || paletteRgbText('teal');
 }
 
 function setEventColour(element, event) {
@@ -207,10 +211,7 @@ function setEventColour(element, event) {
   if (event?.personalType) element.dataset.sourceType = event.personalType;
 }
 
-const CALENDAR_MATERIAL_RGB = Object.freeze({
-  sky:[88,188,255], blue:[93,141,255], indigo:[128,109,255], teal:[70,217,202], green:[74,210,139],
-  magenta:[241,101,189], violet:[184,109,255], red:[244,101,101], orange:[255,154,90], gold:[255,209,91]
-});
+const CALENDAR_MATERIAL_RGB = TCC_CANONICAL_PALETTE_RGB;
 
 function calendarMaterialTone(event) {
   const values = String(event?.rgb || '').split(',').map(Number);

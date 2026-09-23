@@ -323,9 +323,9 @@ function journeyLinkedSpendBreakdown(state, itineraryId, attributedReservationId
 }
 
 function journeyRecordTone(row){
-  if(row?.travelType==='motorhome'||row?.travelType==='rv') return 'orange';
+  if(row?.travelType==='motorhome'||row?.travelType==='rv') return 'copper';
   if(row?.travelType==='cruise') return 'violet';
-  return 'sky';
+  return 'blue';
 }
 
 function openJourneyRecordDetail(host,row,state,navigate){
@@ -436,34 +436,6 @@ function renderRows(model, navigate, options, updateOptions, state) {
   panel.append(footer);
   return panel;
 }
-
-function renderDestinationTotals(model) {
-  const panel = node('section', 'journey-panel journey-destination-totals');
-  const head = node('div', 'journey-section-head');
-  head.append(node('h2', '', 'Destination Totals'), node('span', 'journey-count', String(model.destinationTotals.length)));
-  panel.append(head);
-  const list = node('div', 'journey-destination-list');
-  if (!model.destinationTotals.length) list.append(node('p', 'journey-empty', 'No entries yet'));
-  for (const total of model.destinationTotals) {
-    const row = node('article', 'journey-destination-total');
-    const copy = node('span', 'journey-destination');
-    const totalFlag=node('span','journey-destination-flag',countryFlagEmoji(total.flagCountry||total.country||'')); totalFlag.setAttribute('aria-hidden','true');
-    const totalCopy=node('span','journey-destination-copy'); totalCopy.append(node('strong', '', total.name), node('small', '', [total.country, `${total.visits} ${total.visits === 1 ? 'visit' : 'visits'}`].filter(Boolean).join(' · ')));
-    copy.append(totalFlag,totalCopy);
-    const metrics = node('span', 'journey-destination-metrics');
-    metrics.append(
-      node('span', '', `${integer(total.days)} days`),
-      node('span', '', formatMoney(total.spendAUD, 'AUD')),
-      node('span', '', `${formatMoney(total.averageCostPerDayAUD, 'AUD')} / day`),
-      node('span', '', kilometres(total.kilometresTravelled))
-    );
-    row.append(copy, metrics);
-    list.append(row);
-  }
-  panel.append(list);
-  return panel;
-}
-
 
 function spendingBreakdown(state, model, currentDate) {
   const totals={ accommodation:0, travel:0, food:0, transport:0, entertainment:0, shopping:0, other:0 };
@@ -678,27 +650,27 @@ function journeySnapshotExpandedBody(state,model){
     journeyExpandedStat('HIGHEST COST / DAY',highest?.name||'—',highest?`${formatMoney(highest.livingCostPerDayAUD,'AUD')} / day`:'No completed stay','gold'),
     journeyExpandedStat('LONGEST STAY / TRIP',longest?.name||'—',longest?`${integer(longest.days)} days`:'No completed stay','violet'),
     journeyExpandedStat('COMPLETED STAYS',integer(rows.length),`${integer(model.summary.countriesVisited)} countries visited`,'blue'),
-    journeyExpandedStat('TOTAL DISTANCE',kilometres(model.totalKilometres),'recorded journey distance','orange')
+    journeyExpandedStat('TOTAL DISTANCE',kilometres(model.totalKilometres),'recorded journey distance','copper')
   );body.append(stats);
   const travelTypes=new Set(['flight','train','cruise','rv']);
   const bookings=(state.reservations||[]).filter(record=>{if(!travelTypes.has(record.type)||record.status==='to-book')return false;const date=String(record.dateTime||'').slice(0,10);return Boolean(date&&date<model.today&&!record.needsBudgetRepair);});
   const bookingSpend=bookings.reduce((sum,record)=>sum+Number(record.audAmount||0),0);
   const section=node('section','journey-expanded-section');section.append(node('h3','','COMPLETED TRAVEL BOOKINGS'),node('p','journey-expanded-intro',`${bookings.length} completed travel bookings · ${formatMoney(bookingSpend,'AUD')}`));
   const groups=[
-    ['International Flights',bookings.filter(r=>r.type==='flight'&&r.flightScope==='international'),'sky'],
+    ['International Flights',bookings.filter(r=>r.type==='flight'&&r.flightScope==='international'),'blue'],
     ['Domestic Flights',bookings.filter(r=>r.type==='flight'&&r.flightScope==='domestic'),'blue'],
-    ['Trains',bookings.filter(r=>r.type==='train'),'green'],
+    ['Trains',bookings.filter(r=>r.type==='train'),'teal'],
     ['Cruises',bookings.filter(r=>r.type==='cruise'),'violet'],
-    ['RV / Motorhome',bookings.filter(r=>r.type==='rv'),'orange']
+    ['RV / Motorhome',bookings.filter(r=>r.type==='rv'),'copper']
   ];
-  const unclassified=bookings.filter(r=>r.type==='flight'&&!r.flightScope);if(unclassified.length)groups.splice(2,0,['Flights · Unclassified',unclassified,'indigo']);
+  const unclassified=bookings.filter(r=>r.type==='flight'&&!r.flightScope);if(unclassified.length)groups.splice(2,0,['Flights · Unclassified',unclassified,'blue']);
   const list=node('div','journey-expanded-booking-grid');
   for(const [label,records,tone] of groups){const item=node('article',`journey-expanded-booking is-${tone}`);item.append(node('span','',label),node('strong','',integer(records.length)),node('b','',formatMoney(records.reduce((sum,r)=>sum+Number(r.audAmount||0),0),'AUD')));list.append(item);}section.append(list);body.append(section);return body;
 }
 
 function journeyMilestonesExpandedBody(model){
   const body=node('section','journey-insight-expanded journey-milestones-expanded');
-  const tones=['sky','teal','blue','green','orange','violet','gold','indigo','magenta','copper','lime','maroon'];
+  const tones=['sky','teal','blue','green','copper','violet','gold','pink','rose','silver','blue','teal'];
   const stats=node('div','journey-expanded-stat-grid journey-expanded-milestone-grid');
   journeyMilestoneFacts(model).forEach(([value,label,sub],index)=>stats.append(journeyExpandedStat(label.toUpperCase(),value,sub,tones[index%tones.length])));
   body.append(stats,node('p','journey-expanded-callout','Milestones are calculated automatically from Itinerary, Reservations, Expenses and Journey History. There is no manual favourite-destination field to maintain.'));return body;
@@ -806,16 +778,16 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     const insightRow=node('section','journey-insight-three'); insightRow.append(renderMilestones(lifetimeModel),renderTopDestinations(lifetimeModel),renderTravelMix(lifetimeModel)); main.append(insightRow);
     main.append(renderRecordFilters(recordsModel, recordOptions, updateRecordOptions), renderRows(recordsModel, navigate, recordOptions, updateRecordOptions, state), renderHealth(lifetimeModel));
 
-    const summaryTones={countries:'teal',destinations:'blue',days:'violet',years:'orange',spend:'magenta'};
+    const summaryTones={countries:'teal',destinations:'blue',days:'violet',years:'copper',spend:'pink'};
     for(const card of main.querySelectorAll('.journey-summary-card')) {
       const kind=[...card.classList].find(name=>name.startsWith('journey-summary-')&&name!=='journey-summary-card')?.replace('journey-summary-','')||'blue';
       const label=card.querySelector('.journey-summary-copy > span')?.textContent||'Journey Summary';
       makeExpandableCard(card,{host:main,title:label,tone:summaryTones[kind]||'blue',bodyBuilder:()=>journeySummaryExpandedBody(kind,lifetimeModel,state,currentDate)});
     }
     const journeyExpanders=[
-      ['.journey-map-panel','Journey Map','sky'],
+      ['.journey-map-panel','Journey Map','neutral'],
       ['.journey-spend-panel','Lifetime Travel Spend','gold'],
-      ['.journey-snapshot-panel','Journey Snapshot','maroon'],
+      ['.journey-snapshot-panel','Journey Snapshot','pink'],
       ['.journey-milestones-panel','Milestones','teal'],
       ['.journey-top-destinations','Destination Totals','copper'],
       ['.journey-mix-panel','Travel Mix','violet'],
@@ -824,7 +796,7 @@ export function renderJourneyHistoryScreen({ stateService, currentDate, navigate
     for(const [selector,title,tone] of journeyExpanders){
       const card=main.querySelector(selector);
       if(!card)continue;
-      const resolvedTone=selector==='.journey-health'?(card.classList.contains('journey-health-needs-attention')?'gold':'green'):tone;
+      const resolvedTone=selector==='.journey-health'?(card.classList.contains('journey-health-needs-attention')?'red':'green'):tone;
       const bodyBuilder=selector==='.journey-top-destinations'?()=>destinationTotalsExpandedBody(lifetimeModel)
         :selector==='.journey-map-panel'?()=>journeyMapExpandedBody(state,currentDate,mapOptions)
         :selector==='.journey-spend-panel'?()=>journeySummaryExpandedBody('spend',lifetimeModel,state,currentDate)

@@ -25,15 +25,15 @@ const CATEGORY_LABELS = Object.freeze({
 });
 
 const CATEGORY_COLOURS = Object.freeze({
-  groceries:'var(--feature-teal)',
-  'eating-out':'var(--feature-blue)',
-  transport:'var(--feature-indigo)',
-  entertainment:'var(--feature-violet)',
-  shopping:'var(--feature-magenta)',
-  miscellaneous:'var(--feature-orange)'
+  groceries:'rgb(var(--tcc-p-teal-rgb))',
+  'eating-out':'rgb(var(--tcc-p-copper-rgb))',
+  transport:'rgb(var(--tcc-p-sky-rgb))',
+  entertainment:'rgb(var(--tcc-p-violet-rgb))',
+  shopping:'rgb(var(--tcc-p-rose-rgb))',
+  miscellaneous:'rgb(var(--tcc-p-gold-rgb))'
 });
 
-const CATEGORY_TONES = Object.freeze({ groceries:'teal', 'eating-out':'orange', transport:'sky', entertainment:'magenta', shopping:'red', miscellaneous:'gold' });
+const CATEGORY_TONES = Object.freeze({ groceries:'teal', 'eating-out':'copper', transport:'sky', entertainment:'violet', shopping:'rose', miscellaneous:'gold' });
 const CATEGORY_ICONS = Object.freeze({ groceries:'groceries', 'eating-out':'restaurant', transport:'transport', entertainment:'entertainment', shopping:'shopping', miscellaneous:'misc' });
 
 const RESERVATION_TYPE_LABELS = Object.freeze({ flight:'Flight', train:'Train', cruise:'Cruise', rv:'RV / Motorhome', hotel:'Hotel', airbnb:'Airbnb', accommodation:'Hotel', ticket:'Tickets & Attractions' });
@@ -360,7 +360,7 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     body.dataset.category = saved.category || 'groceries';
     body.dataset.budgetScope = body.dataset.category === 'miscellaneous' && saved.budgetScope === 'annual' ? 'annual' : 'destination';
     body.dataset.destinationItineraryId = saved.itineraryId || '';
-    setModalTone(modal, 'sky');
+    if (modal) setModalTone(modal, CATEGORY_TONES[body.dataset.category] || editorTone || 'teal');
     renderCategories();
 
     const annualChoiceAllowed=body.dataset.category==='miscellaneous';
@@ -458,8 +458,9 @@ function openExpenseEditor({ stateService, host, currentDate, expenseId = null, 
     }}
   );
 
-  const resolvedTone = 'sky';
+  const resolvedTone = CATEGORY_TONES[savedValue.category] || editorTone || 'teal';
   modal = createModal({ title:existing ? 'Edit Expense' : 'Add Expense', body, actions, className:`tcc-editor-modal tcc-budget-editor-modal tone-${resolvedTone}` });
+  setModalTone(modal, resolvedTone);
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
   modal.showModal();
@@ -519,7 +520,7 @@ function renderPaceSummary(model) {
   const spendPercent=stay.budgetAUD>0?Math.round((stay.spentAUD/stay.budgetAUD)*100):0;
   const projectedOverAUD=Math.max(0,-Number(pace.forecastVarianceAUD||0));
   const projectedOverRatio=stay.budgetAUD>0?projectedOverAUD/stay.budgetAUD:0;
-  const paceTraffic=pace.forecastStatus==='needs-setup'?'amber':pace.forecastStatus==='under'?'green':projectedOverRatio>0.10?'red':'amber';
+  const paceTraffic=pace.forecastStatus==='needs-setup'?'gold':pace.forecastStatus==='under'?'green':projectedOverRatio>0.10?'red':'gold';
   const paceLabel=paceTraffic==='green'?'ON PACE':paceTraffic==='red'?'OVER PACE':pace.forecastStatus==='needs-setup'?'NEEDS SETUP':'WATCH';
   const ring=node('div',`budget-pace-ring budget-pace-ring-${paceTraffic}`); ring.style.setProperty('--pace-value',`${Math.max(0,Math.min(100,spendPercent))}%`); ring.setAttribute('role','progressbar'); ring.setAttribute('aria-label','Destination Budget spend pace'); ring.setAttribute('aria-valuemin','0'); ring.setAttribute('aria-valuemax','100'); ring.setAttribute('aria-valuenow',String(Math.max(0,Math.min(100,spendPercent)))); ring.setAttribute('aria-valuetext',pace.forecastStatus==='needs-setup'?'Destination Budget needs setup':`${spendPercent}% spent · ${pace.progress}% of stay elapsed · ${paceTraffic} pace status`); ring.append(node('strong','',paceLabel),node('span','',pace.forecastStatus==='needs-setup'?'Complete Destination Budget setup':`${spendPercent}% spend · ${pace.progress}% stay`));
   const side=node('div','budget-pace-side'); side.append(paceMetric('Stay elapsed',`${pace.progress}%`),paceMetric('Spend pace',`${spendPercent}%`));
@@ -1114,7 +1115,7 @@ function livingExpensesExpandedBody(model, state, currentDate, openNewExpense, o
     // living expenses must remain addable even while today falls in an itinerary
     // gap; the editor itself blocks Save until the entered date resolves to one
     // fully configured Destination Budget.
-    add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openNewExpense(category,CATEGORY_TONES[category]||'sky'));});
+    add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openNewExpense(category,CATEGORY_TONES[category]||'teal'));});
     head.append(copy,add);card.append(head);
     const list=node('div','budget-living-manager-list');
     if(!records.length)list.append(node('p','budget-muted','No entries yet'));
@@ -1131,7 +1132,7 @@ function livingExpensesExpandedBody(model, state, currentDate, openNewExpense, o
       amount.append(node('strong','',signedMoney(expense.originalAmount,expense.originalCurrency)));
       if(!annual&&(expense.originalCurrency!=='AUD'||Number(expense.originalAmount)!==Number(expense.audAmount)))amount.append(node('small','',`AUD ${signedMoney(expense.audAmount,'AUD')}`));
       row.append(rowCopy,amount);
-      row.addEventListener('click',()=>{const dialog=row.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openExistingExpense(expense.id,CATEGORY_TONES[category]||'sky'));});
+      row.addEventListener('click',()=>{const dialog=row.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openExistingExpense(expense.id,CATEGORY_TONES[category]||'teal'));});
       list.append(row);
     }
     if(records.length>6)list.append(node('p','budget-living-manager-more',`${records.length-6} more ${label.toLowerCase()} ${records.length-6===1?'entry':'entries'} · use Recent Expense Entries to review the full history.`));
@@ -1510,7 +1511,7 @@ function recentExpensesExpandedBody(state, currentDate, openExistingExpense) {
     const amounts=node('div','budget-row-amounts');
     if(expense.needsBudgetRepair){amounts.append(node('strong','budget-expense-repair-amount','REPAIR REQUIRED'),node('small','',signedMoney(expense.originalAmount,expense.originalCurrency)));}
     else {amounts.append(node('strong','',signedMoney(expense.originalAmount,expense.originalCurrency)));if(expense.originalCurrency!=='AUD'||Number(expense.originalAmount)!==Number(expense.audAmount))amounts.append(node('small','',`AUD ${signedMoney(expense.audAmount,'AUD')}`));}
-    row.append(copy,amounts);row.setAttribute('aria-label',[`Open expense`,expense.description||CATEGORY_LABELS[expense.category]||expense.category,dateLabel,expense.needsBudgetRepair?'Expense routing repair required':''].filter(Boolean).join(' · '));row.addEventListener('click',()=>{const dialog=row.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openExistingExpense(expense.id,CATEGORY_TONES[expense.category]||'sky'));});list.append(row);
+    row.append(copy,amounts);row.setAttribute('aria-label',[`Open expense`,expense.description||CATEGORY_LABELS[expense.category]||expense.category,dateLabel,expense.needsBudgetRepair?'Expense routing repair required':''].filter(Boolean).join(' · '));row.addEventListener('click',()=>{const dialog=row.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>openExistingExpense(expense.id,CATEGORY_TONES[expense.category]||'teal'));});list.append(row);
   }
   body.append(list);return body;
 }
@@ -1569,7 +1570,7 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   addExpenseBar.type='button';
   addExpenseBar.append(createLineIcon('plus'),node('span','','ADD EXPENSE'));
   addExpenseBar.setAttribute('aria-label','Add Expense');
-  addExpenseBar.addEventListener('click',()=>openNewExpense('groceries','sky'));
+  addExpenseBar.addEventListener('click',()=>openNewExpense('groceries',null));
   main.append(addExpenseBar);
 
   const annualSummary=renderAnnualSummary(model,state), destinationBudgets=renderDestinationBudgets(model,state,{stateService,host:main,currentDate});
@@ -1579,7 +1580,7 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   const categoryChart=renderCategoryChart(model), annualForecast=renderAnnualForecast(model);
   const charts=node('section','budget-reference-charts'); charts.append(categoryChart,annualForecast); main.append(charts);
   makeExpandableCard(categoryChart,{host:main,title:'Budget by Category',tone:'copper',bodyBuilder:()=>renderCategoryChart(model,categoryChart.dataset.periodMode)});
-  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'magenta'});
+  makeExpandableCard(annualForecast,{host:main,title:'Year Forecast & Budget Summary',tone:'pink'});
   const monthlyHistory=renderMonthlySpendHistory(model,currentDate); main.append(monthlyHistory);
   makeExpandableCard(monthlyHistory,{host:main,title:'Monthly Spend History',tone:'blue',bodyBuilder:()=>renderMonthlySpendHistory(model,currentDate,monthlyHistory.dataset.selectedYear)});
   const livingExpenses=renderLivingExpenses(model); main.append(livingExpenses);
@@ -1589,7 +1590,7 @@ export function renderBudgetScreen({ stateService, currentDate, navigate }) {
   makeExpandableCard(reservationsPanel,{host:main,title:'Reservations',tone:'green'});
   const recentExpenses=renderRecentExpenses(model,openExistingExpense);
   main.append(recentExpenses);
-  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'maroon',bodyBuilder:()=>recentExpensesExpandedBody(state,currentDate,openExistingExpense)});
+  makeExpandableCard(recentExpenses,{host:main,title:'Recent Expense Entries',tone:'pink',bodyBuilder:()=>recentExpensesExpandedBody(state,currentDate,openExistingExpense)});
 
   const pending = state.ui?.pendingOpen;
   if (pending?.collection === 'expenses' && pending.id && state.expenses.some(record => record.id === pending.id)) {

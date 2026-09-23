@@ -17,7 +17,7 @@ import { createLineIcon } from './src_components_icons.js';
 
 const OWNER_OPTIONS = VAULT_OWNERS.map(owner => [owner, owner]);
 const CATEGORY_OPTIONS = VAULT_CATEGORIES.map(category => [category, VAULT_CATEGORY_LABELS[category]]);
-const VAULT_TONES = Object.freeze({ passport:'blue', visa:'violet', insurance:'teal', accommodation:'orange', emergency:'red' });
+const VAULT_TONES = Object.freeze({ passport:'blue', visa:'violet', insurance:'teal', accommodation:'copper', emergency:'pink' });
 
 function vaultRecordContext(record, { includeCategory = false } = {}) {
   return [
@@ -154,7 +154,7 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
   const state = stateService.snapshot();
   const existing = recordId ? state.vault.find(record => record.id === recordId) : null;
   if (recordId && !existing) return;
-  const resolvedTone = editorTone || VAULT_TONES[existing?.category || initialCategory] || 'blue';
+  const resolvedTone = VAULT_TONES[existing?.category || initialCategory] || editorTone || 'blue';
   const saved = {
     category:existing?.category || initialCategory, title:existing?.title || '', owner:existing?.owner || 'Both',
     reference:existing?.reference || '', issueDate:existing?.issueDate || '', expiryDate:existing?.expiryDate || '', details:existing?.details || '', notes:existing?.notes || ''
@@ -166,7 +166,9 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
   function capture() { return { category:value('category'), title:value('title'), owner:value('owner'), reference:value('reference'), issueDate:value('issueDate') || null, expiryDate:value('expiryDate') || null, details:value('details'), notes:value('notes') }; }
   function populate(v) {
     error.textContent='';
+    if(modal)setModalTone(modal,VAULT_TONES[v.category]||editorTone||'blue');
     fields.replaceChildren(selectField('Category','category',CATEGORY_OPTIONS,v.category), inputField('Title','title','text',v.title), selectField('Owner','owner',OWNER_OPTIONS,v.owner), inputField('Reference / Number','reference','text',v.reference), inputField('Issue / Start Date','issueDate','date',v.issueDate), inputField('Expiry / End Date','expiryDate','date',v.expiryDate), textAreaField('Details','details',v.details), textAreaField('Notes','notes',v.notes));
+    fields.querySelector('[name="category"]')?.addEventListener('change',()=>setModalTone(modal,VAULT_TONES[value('category')]||editorTone||'blue'));
   }
   populate(saved);
   const actions=[];
@@ -264,7 +266,7 @@ function openAttachmentPicker({ stateService, host, record, editorTone = null })
 
 function openStreamingEditor({ stateService, host, recordId = null, editorTone = null, presetService = '' }) {
   const state=stateService.snapshot(); const existing=recordId?state.streaming.find(record=>record.id===recordId):null; if(recordId&&!existing)return;
-  const resolvedTone=editorTone||'violet';
+  const resolvedTone=editorTone||'silver';
   const saved={service:existing?.service||presetService||'',owner:existing?.owner||'Both',username:existing?.username||'',password:existing?.password||'',notes:existing?.notes||''}; const session=new FormSession(saved);
   const body=node('div','vault-editor'); const fields=node('div','vault-form-grid'); const error=node('p','vault-form-error'); body.append(fields,error);
   const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
@@ -276,9 +278,9 @@ function openStreamingEditor({ stateService, host, recordId = null, editorTone =
   modalHost(host,createModal({title:existing?'Edit Streaming':'Add Streaming',body,actions,className:`tcc-editor-modal tcc-vault-editor-modal tone-${resolvedTone}`}));
 }
 
-function openEmailEditor({ stateService, host, recordId = null, editorTone = 'copper' }) {
+function openEmailEditor({ stateService, host, recordId = null, editorTone = 'gold' }) {
   const state=stateService.snapshot(); const existing=recordId?state.protectedEmails.find(record=>record.id===recordId):null; if(recordId&&!existing)return;
-  const resolvedTone=editorTone||'copper';
+  const resolvedTone=editorTone||'gold';
   const saved={owner:existing?.owner||'Cameron',email:existing?.email||'',notes:existing?.notes||''}; const session=new FormSession(saved);
   const body=node('div','vault-editor'); const fields=node('div','vault-form-grid'); const error=node('p','vault-form-error'); body.append(fields,error);
   const value=name=>body.querySelector(`[name="${name}"]`)?.value??'';
@@ -357,7 +359,7 @@ function vaultExpiryExpandedBody(expiring,daysUntil){
   const stats=node('div','home-expanded-stats home-expanded-stats-four');
   const within30=expiring.filter(record=>daysUntil(record.expiryDate)<=30).length;
   const within90=expiring.filter(record=>daysUntil(record.expiryDate)<=90).length;
-  stats.append(vaultExpandedStat('EXPIRY WATCH',expiring.length,'within the next 180 days','gold'),vaultExpandedStat('WITHIN 30 DAYS',within30,'highest attention window',within30?'red':'green'),vaultExpandedStat('WITHIN 90 DAYS',within90,'near-term records','orange'),vaultExpandedStat('FURTHEST WATCH',expiring.length?`${daysUntil(expiring[expiring.length-1].expiryDate)} DAYS`:'—','end of current 180-day watch','teal'));
+  stats.append(vaultExpandedStat('EXPIRY WATCH',expiring.length,'within the next 180 days','gold'),vaultExpandedStat('WITHIN 30 DAYS',within30,'highest attention window',within30?'red':'green'),vaultExpandedStat('WITHIN 90 DAYS',within90,'near-term records','copper'),vaultExpandedStat('FURTHEST WATCH',expiring.length?`${daysUntil(expiring[expiring.length-1].expiryDate)} DAYS`:'—','end of current 180-day watch','teal'));
   body.append(stats);
   const section=node('section','home-expanded-section');section.append(node('h3','','ALL EXPIRY REMINDERS'));
   const list=node('div','home-expanded-list');
@@ -376,7 +378,7 @@ function vaultEmergencyExpandedBody(state){
   const records=state.vault.filter(record=>record.category==='emergency');
   const stats=node('div','home-expanded-stats home-expanded-stats-four');
   const cameron=records.filter(record=>record.owner==='Cameron').length,kym=records.filter(record=>record.owner==='Kym').length,shared=records.length-cameron-kym;
-  stats.append(vaultExpandedStat('EMERGENCY CONTACTS',records.length,'all stored emergency records','red'),vaultExpandedStat('CAMERON',cameron,'owned records','blue'),vaultExpandedStat('KYM',kym,'owned records','magenta'),vaultExpandedStat('SHARED',shared,'shared / other records','teal'));body.append(stats);
+  stats.append(vaultExpandedStat('EMERGENCY CONTACTS',records.length,'all stored emergency records','red'),vaultExpandedStat('CAMERON',cameron,'owned records','blue'),vaultExpandedStat('KYM',kym,'owned records','pink'),vaultExpandedStat('SHARED',shared,'shared / other records','teal'));body.append(stats);
   const section=node('section','home-expanded-section');section.append(node('h3','','EMERGENCY TRAVEL CARD'));
   const list=node('div','home-expanded-list');if(!records.length)list.append(node('p','home-expanded-empty','No emergency contacts stored'));
   for(const record of records){const row=node('div','home-expanded-list-row');const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',record.title),node('small','',[record.owner||'Shared',record.reference||record.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(node('span','home-expanded-priority','CONTACT'),copy,node('b','','STORED'));list.append(row);}section.append(list);body.append(section);return body;
@@ -390,7 +392,7 @@ function vaultActivityExpandedBody(state){
     ...state.attachments.map(record=>{const parent=vaultById.get(record.vaultRecordId);return{kind:'SCREENSHOT',title:record.name,subtitle:[parent?.title,parent?.owner||'Shared'].filter(Boolean).join(' · '),modifiedAt:record.modifiedAt};}),
     ...state.streaming.map(record=>({kind:'STREAMING',title:record.service,subtitle:[record.owner||'Shared',record.username].filter(Boolean).join(' · '),modifiedAt:record.modifiedAt}))
   ].sort((a,b)=>String(b.modifiedAt||'').localeCompare(String(a.modifiedAt||'')));
-  const stats=node('div','home-expanded-stats home-expanded-stats-four');stats.append(vaultExpandedStat('ACTIVITY ITEMS',activity.length,'all stored Vault activity','indigo'),vaultExpandedStat('RECORDS',state.vault.length,'protected travel records','teal'),vaultExpandedStat('SCREENSHOTS',state.attachments.length,'local screenshot attachments','sky'),vaultExpandedStat('STREAMING',state.streaming.length,'saved TV & Movies services','violet'));body.append(stats);
+  const stats=node('div','home-expanded-stats home-expanded-stats-four');stats.append(vaultExpandedStat('ACTIVITY ITEMS',activity.length,'all stored Vault activity','violet'),vaultExpandedStat('RECORDS',state.vault.length,'protected travel records','teal'),vaultExpandedStat('SCREENSHOTS',state.attachments.length,'local screenshot attachments','sky'),vaultExpandedStat('STREAMING',state.streaming.length,'saved TV & Movies services','violet'));body.append(stats);
   const section=node('section','home-expanded-section');section.append(node('h3','','FULL ACTIVITY'));
   const list=node('div','home-expanded-list');if(!activity.length)list.append(node('p','home-expanded-empty','No entries yet'));
   for(const item of activity){const row=node('div','home-expanded-list-row');const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',item.title),node('small','',item.subtitle||'Stored locally'));const date=formatLocalActivityDate(item.modifiedAt);row.append(node('span','home-expanded-priority',item.kind),copy,node('b','',date));list.append(row);}section.append(list);body.append(section);return body;
@@ -404,7 +406,7 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const now=String(currentDate||'').slice(0,10); const today=now?new Date(`${now}T00:00:00Z`):new Date(); const daysUntil=value=>Math.ceil((new Date(`${value}T00:00:00Z`)-today)/86400000); const expiring=state.vault.filter(r=>r.expiryDate&&daysUntil(r.expiryDate)>=0&&daysUntil(r.expiryDate)<=180).sort((a,b)=>String(a.expiryDate).localeCompare(String(b.expiryDate))); const expired=state.vault.filter(r=>r.expiryDate&&daysUntil(r.expiryDate)<0); const active=state.vault.length-expired.length;
   const summaryRow=node('section','vault-summary-row'); const summary=node('article','vault-summary-card');summary.append(node('h2','','Document Summary'));const stats=node('div','vault-summary-stats'); for(const [label,value,tone] of [['Total records',state.vault.length,'total'],['Valid / active',active,'active'],['Expiry watch · 180d',expiring.length,'watch'],['Expired',expired.length,'expired']]){const m=node('div',`vault-summary-stat vault-summary-${tone}`);m.append(node('strong','',String(value)),node('span','',label));stats.append(m);}summary.append(stats);
   const expiry=node('article','vault-expiry-card');expiry.append(node('h2','','Expiry Reminders')); if(!expiring.length)expiry.append(node('p','vault-empty','No records expire within 180 days.')); else{const list=node('div','vault-expiry-list');for(const r of expiring.slice(0,4)){const days=daysUntil(r.expiryDate);const countdown=days===0?'Today':`${days} day${days===1?'':'s'}`;const row=node('button','vault-expiry-row');row.type='button';row.append(node('strong','',r.title),node('span','',[r.owner||'Shared',`Expires ${formatAUDate(r.expiryDate)}`].join(' · ')),node('b','',countdown));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})} · Expires ${formatAUDate(r.expiryDate)} · ${countdown}`);row.addEventListener('click',()=>{access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});list.append(row);}expiry.append(list);} summaryRow.append(summary,expiry);main.append(summaryRow);
-  makeExpandableCard(summary,{host:main,title:'Document Summary',tone:'maroon',bodyBuilder:()=>vaultSummaryExpandedBody(state,{active,expiring,expired})});
+  makeExpandableCard(summary,{host:main,title:'Document Summary',tone:'pink',bodyBuilder:()=>vaultSummaryExpandedBody(state,{active,expiring,expired})});
   makeExpandableCard(expiry,{host:main,title:'Expiry Reminders',tone:'gold',bodyBuilder:()=>vaultExpiryExpandedBody(expiring,daysUntil)});
   const allEmergencyRecords=state.vault.filter(r=>r.category==='emergency');
   const currentStay=(state.itinerary||[]).find(stay=>stay?.startDate&&stay?.endDate&&stay.startDate<=now&&now<=stay.endDate)||null;
@@ -418,9 +420,9 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const emergency=node('section','vault-emergency-card vault-emergency-travel-card'); emergency.append(node('h2','','Emergency Travel Card'));
   const countryFact=node('div','vault-travel-fact vault-travel-country');const countryCopy=node('span','vault-travel-fact-copy');countryCopy.append(node('small','','CURRENT COUNTRY'),node('strong','',currentCountry));countryFact.append(countryCopy);emergency.append(countryFact,travelFact('LOCAL EMERGENCY',localEmergency,'Not stored'),travelFact('AUSTRALIAN EMBASSY / CONSULATE',embassy,'Not stored'),travelFact('INSURANCE ASSISTANCE',insuranceAssist,'Not stored'));lower.append(emergency);
   const contacts=node('section','vault-emergency-contacts');const contactHead=node('div','vault-section-head');contactHead.append(node('h2','','Emergency Contacts'),node('span','vault-count',String(allEmergencyRecords.length)));contacts.append(contactHead);const contactList=node('div','vault-emergency-contact-list');if(!allEmergencyRecords.length)contactList.append(node('p','vault-empty','No emergency contacts stored'));for(const r of allEmergencyRecords.slice(0,4)){const row=node('button','vault-emergency-contact-row');row.type='button';const icon=vaultCategoryIcon('emergency');const copy=node('span','vault-emergency-contact-copy');copy.append(node('strong','',r.title),node('small','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(icon,copy);row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(r));contactList.append(row);}contacts.append(contactList);lower.append(contacts);main.append(lower);
-  const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'violet'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
+  const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'silver'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
   makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
-  makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'lime',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
+  makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'green',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
   makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'sky',bodyBuilder:()=>vaultActivityExpandedBody(state)});
 }
 function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-silver'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
@@ -501,9 +503,9 @@ function openStreamingDetail({ stateService, host, recordId }) {
   body.append(hero,facts);
   if(record.notes){const notes=node('div','vault-streaming-detail-notes');notes.append(node('small','','Notes'),node('p','',record.notes));body.append(notes);}
   const dialog=createModal({title:'TV & Movies',body,actions:[
-    {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openStreamingEditor({stateService,host,recordId:record.id,editorTone:'violet'}));}},
+    {label:'Edit',onClick:d=>{d.close();queueMicrotask(()=>openStreamingEditor({stateService,host,recordId:record.id,editorTone:'silver'}));}},
     {label:'Close',onClick:d=>d.close()}
-  ],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-violet vault-streaming-detail-modal'});
+  ],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-neutral vault-streaming-detail-modal'});
   modalHost(host,dialog);
 }
 
@@ -520,7 +522,7 @@ function renderStreaming(main,stateService,access,requestRender){
     const tile=node('button',`vault-streaming-tile${record?' is-stored':' is-empty'}`);tile.type='button';
     tile.append(streamingServiceMark(service),node('span','vault-streaming-tile-name',service),node('small','vault-streaming-tile-status',record?`${record.owner||'Shared'} · STORED`:'ADD LOGIN'));
     tile.setAttribute('aria-label',record?`Open saved ${streamingRecordContext(record)}`:`Add streaming login for ${service}`);
-    tile.addEventListener('click',()=>record?openStreamingDetail({stateService,host:main,recordId:record.id}):openStreamingEditor({stateService,host:main,presetService:service,editorTone:'violet'}));
+    tile.addEventListener('click',()=>record?openStreamingDetail({stateService,host:main,recordId:record.id}):openStreamingEditor({stateService,host:main,presetService:service,editorTone:'silver'}));
     grid.append(tile);
   }
   main.append(grid);

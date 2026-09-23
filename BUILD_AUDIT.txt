@@ -1,0 +1,42 @@
+TRAVEL COMMAND CENTRE — FULLY LOADED MOROCCO SIMULATION
+Build date: 23/09/2026
+Shell fingerprint: 1daeaf522d3a8d78
+Source aggregate: 29/29 PASS
+Simulation guard: 17/17 PASS
+Release layout gate: 72/72 PASS
+Simulation coverage gate: 25/25 PASS
+Build/cache guard: 15/15 PASS
+Physical-iPad static gate: 43/43 PASS
+Expanded widget colour: 93/93 PASS
+Deep screen widget colour: 132/132 PASS
+Viewport colour distribution: 66/66 PASS
+Form/editor colour: 45/45 PASS
+
+NAVIGABLE SCREENS
+Home
+Itinerary
+Budget
+Reservations
+Calendar
+Journey History
+Checklist
+The Vault
+Settings
+
+SIMULATION DATA
+Itinerary stays: 48
+Route points: 24
+Expenses: 269
+Reservations: 78
+Calendar events: 13
+Journey history records: 36
+Checklist items: 59
+Vault records: 9
+Accounts: 5
+Streaming entries: 16
+
+Simulation current date: 15/07/2029
+Current stay: Morocco
+Next stay: Algeria
+
+Package note: runtime-only build. Historical .pre-* forensic backups are intentionally excluded.

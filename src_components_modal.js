@@ -1,6 +1,7 @@
 import { createLineIcon } from './src_components_icons.js';
+import { TCC_PALETTE_RGB } from './src_core_visual-palette.js';
 
-const MODAL_TONES = Object.freeze(['neutral','sky','blue','indigo','teal','green','magenta','violet','red','orange','gold','lime','silver','copper','maroon']);
+const MODAL_TONES = Object.freeze(['neutral','sky','blue','indigo','teal','green','magenta','pink','rose','violet','red','orange','gold','lime','silver','copper','maroon']);
 let modalSequence = 0;
 let expandedSnapshotSequence = 0;
 
@@ -98,7 +99,7 @@ export function createModal({ title, body, actions = [], className = '', showClo
   // as standard expandable cards. Stamp the declared tone into data/CSS so
   // every expanded path has one machine-verifiable source-colour identity.
   if (isExpandedModal && modalClasses.includes('tcc-expanded-inherits-source')) {
-    const inheritedTone = modalClasses.map(value => value.match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold|lime|silver|copper|maroon)$/)?.[1]).find(Boolean);
+    const inheritedTone = modalClasses.map(value => value.match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|pink|rose|violet|red|orange|gold|lime|silver|copper|maroon)$/)?.[1]).find(Boolean);
     if (inheritedTone) {
       dialog.dataset.sourceWidgetTone = inheritedTone;
       const inheritedRgb = EXPANDED_TONE_RGB[inheritedTone];
@@ -323,23 +324,7 @@ function wireSnapshotActions(clone, source, dialog) {
   }
 }
 
-const EXPANDED_TONE_RGB = Object.freeze({
-  neutral:[174,184,194],
-  sky:[88,199,255],
-  blue:[93,141,255],
-  indigo:[128,109,255],
-  teal:[70,217,202],
-  green:[87,214,155],
-  magenta:[241,101,189],
-  violet:[184,109,255],
-  red:[255,111,131],
-  orange:[255,154,90],
-  gold:[255,209,91],
-  lime:[166,211,83],
-  silver:[174,184,194],
-  copper:[199,131,87],
-  maroon:[185,79,112]
-});
+const EXPANDED_TONE_RGB = TCC_PALETTE_RGB;
 
 function rgbFromCssColor(value) {
   const match = String(value || '').match(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?/i);
@@ -370,7 +355,7 @@ export function materialToneFromContext(source = null, fallback = 'sky') {
   const element = source instanceof Element ? source : (document.activeElement instanceof Element ? document.activeElement : null);
   if (!element) return safeFallback;
   const context = element.closest?.('dialog, [data-expand-tone], [data-screen]') || element;
-  const classTone = [...(context.classList || [])].map(value => String(value).match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|violet|red|orange|gold)$/)?.[1]).find(Boolean);
+  const classTone = [...(context.classList || [])].map(value => String(value).match(/^tone-(neutral|sky|blue|indigo|teal|green|magenta|pink|rose|violet|red|orange|gold|lime|silver|copper|maroon)$/)?.[1]).find(Boolean);
   if (classTone) return classTone;
   const expandTone = context.dataset?.expandTone;
   if (MODAL_TONES.includes(expandTone)) return expandTone;

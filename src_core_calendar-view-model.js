@@ -1,21 +1,22 @@
 import { formatAUDate, toISODate } from './src_core_dates.js';
+import { paletteEntry } from './src_core_visual-palette.js';
 
 const DAY_MS = 86_400_000;
 const RESERVATION_COLOURS = Object.freeze({
-  flight:{ color:'#5d8dff', rgb:'93,141,255' },
-  train:{ color:'#46d9ca', rgb:'70,217,202' },
-  cruise:{ color:'#806dff', rgb:'128,109,255' },
-  rv:{ color:'#ff9a5a', rgb:'255,154,90' },
-  hotel:{ color:'#f0b95f', rgb:'240,185,95' },
-  airbnb:{ color:'#f165bd', rgb:'241,101,189' },
-  accommodation:{ color:'#f0b95f', rgb:'240,185,95' },
-  ticket:{ color:'#b784ff', rgb:'183,132,255' }
+  flight:paletteEntry('blue'),
+  train:paletteEntry('teal'),
+  cruise:paletteEntry('violet'),
+  rv:paletteEntry('copper'),
+  hotel:paletteEntry('gold'),
+  airbnb:paletteEntry('pink'),
+  accommodation:paletteEntry('gold'),
+  ticket:paletteEntry('rose')
 });
 const RESERVATION_TYPE_LABELS = Object.freeze({ flight:'Flight', train:'Train', cruise:'Cruise', rv:'RV / Motorhome', hotel:'Hotel', airbnb:'Airbnb', accommodation:'Hotel', ticket:'Tickets & Attractions' });
 const PERSONAL_COLOURS = Object.freeze({
-  reminder:{ color:'#ffd15b', rgb:'255,209,91' },
-  note:{ color:'#b86dff', rgb:'184,109,255' },
-  personal:{ color:'#b86dff', rgb:'184,109,255' }
+  reminder:paletteEntry('gold'),
+  note:paletteEntry('violet'),
+  personal:paletteEntry('violet')
 });
 
 // Curated destination colours: deliberately separated hues that remain lively
@@ -24,18 +25,18 @@ const PERSONAL_COLOURS = Object.freeze({
 // sequence so neighbouring/overlapping stays do not collapse into near-identical
 // blue-grey tones.
 const ITINERARY_COLOUR_PALETTE = Object.freeze([
-  { color:'#46d9ca', rgb:'70,217,202' },   // teal
-  { color:'#f165bd', rgb:'241,101,189' }, // magenta
-  { color:'#ffd15b', rgb:'255,209,91' },  // gold
-  { color:'#5d8dff', rgb:'93,141,255' },  // blue
-  { color:'#ff9a5a', rgb:'255,154,90' },  // orange
-  { color:'#b86dff', rgb:'184,109,255' }, // violet
-  { color:'#57d69b', rgb:'87,214,155' },  // green
-  { color:'#ff6f83', rgb:'255,111,131' }, // red
-  { color:'#58c7ff', rgb:'88,199,255' },  // sky
+  paletteEntry('teal'),
+  paletteEntry('pink'),
+  paletteEntry('gold'),
+  paletteEntry('blue'),
+  paletteEntry('copper'),
+  paletteEntry('violet'),
+  paletteEntry('green'),
+  paletteEntry('red'),
+  paletteEntry('sky'),
   { color:'#e58ad6', rgb:'229,138,214' }, // orchid
   { color:'#f2b85a', rgb:'242,184,90' },  // amber
-  { color:'#806dff', rgb:'128,109,255' }, // indigo
+  paletteEntry('violet'), // indigo slot
   { color:'#75d6b5', rgb:'117,214,181' }, // mint
   { color:'#ff7f6e', rgb:'255,127,110' }  // coral
 ]);

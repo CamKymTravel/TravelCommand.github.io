@@ -3,15 +3,15 @@
 // cache identity is mandatory so activate() can actually see the predecessor
 // cache and run the busy-dialog/picker hand-off instead of misclassifying an
 // already-installed V50 app as a first install.
-const CACHE_NAME = 'tcc-v1-v60-r7.8-s54-morocco-simulation-04-2026-09-18';
+const CACHE_NAME = 'tcc-v1-s54-shell-1daeaf522d3a8d78';
 const CACHE_PREFIX = 'tcc-v1-';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './release-contract.json',
   './tokyo-4year-simulation-fixture.json',
   './istanbul-4year-simulation-fixture.json',
+  './morocco-4year-simulation-fixture.json',
   './app-icon.png',
   './startup-ipad-1024-landscape.png',
   './startup-ipad-1180-landscape.png',
@@ -67,6 +67,7 @@ const APP_SHELL = [
   './src_core_state.js',
   './src_core_storage.js',
   './src_core_upcoming-events.js',
+  './src_core_visual-palette.js',
   './src_core_validation.js',
   './src_core_pin.js',
   './src_core_vault-access.js',
@@ -74,6 +75,7 @@ const APP_SHELL = [
   './src_core_vault-view-model.js',
   './src_core_year-filters.js',
   './src_design_app.css',
+  './src_design_palette_contract.css',
   './src_design_components.css',
   './src_design_reset.css',
   './src_design_screens.css',
@@ -113,7 +115,6 @@ const APP_SHELL = [
   './brand-stream-sbs.png',
   './brand-stream-seven.png',
   './brand-stream-nine.png',
-  './CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py'
 ];
 
 self.addEventListener('install', event => {

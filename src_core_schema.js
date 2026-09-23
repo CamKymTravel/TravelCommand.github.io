@@ -1,5 +1,5 @@
 export const SCHEMA_VERSION = 2;
-export const APP_VERSION = '1.2.0-v60-r7.4-tiny-currency-ui-s53';
+export const APP_VERSION = '1.2.0-v60-s54-shell-1daeaf522d3a8d78';
 
 export const TRAVEL_TYPES = Object.freeze(['standard', 'motorhome', 'cruise']);
 // `accommodation` is retained only as a legacy compatibility value. New/editable

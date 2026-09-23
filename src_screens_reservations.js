@@ -12,7 +12,7 @@ import { createLineIcon } from './src_components_icons.js';
 import { countryFlagEmoji } from './src_components_country.js';
 import { canonicalCountrySlug } from './src_core_entities.js';
 
-const RESERVATION_TONES = Object.freeze({ flight:'sky', train:'teal', cruise:'violet', rv:'orange', hotel:'gold', airbnb:'magenta', accommodation:'gold', ticket:'red' });
+const RESERVATION_TONES = Object.freeze({ flight:'blue', train:'teal', cruise:'violet', rv:'copper', hotel:'gold', airbnb:'pink', accommodation:'gold', ticket:'rose' });
 const RESERVATION_EDITOR_ICONS = Object.freeze({ flight:'flight', train:'train', cruise:'cruise', rv:'rv', hotel:'hotel', airbnb:'airbnb', accommodation:'hotel', ticket:'ticket' });
 const reservationLiveType = type => type === 'accommodation' ? 'hotel' : type;
 const RESERVATION_MONTHS = Object.freeze(['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']);
@@ -176,7 +176,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
     itineraryId:existing?.budgetScope === 'destination' ? (existing?.itineraryId || null) : null
   };
   const formSession = new FormSession(savedValue);
-  const resolvedTone = editorTone || 'sky';
+  const resolvedTone = RESERVATION_TONES[reservationLiveType(existing?.type || initialType)] || editorTone || 'blue';
   let modal = null;
   const body = node('div', 'reservation-editor');
   body.dataset.audAuto = 'false';
@@ -232,7 +232,7 @@ function openReservationEditor({ stateService, host, currentDate, reservationId 
       button.addEventListener('click', () => preserveLocalFocus(() => {
         const previousType = body.dataset.type;
         body.dataset.type = type;
-        setModalTone(modal, resolvedTone);
+        setModalTone(modal, RESERVATION_TONES[type] || editorTone || 'blue');
         renderTypes(); renderFlightScope(); renderAllocation(); updateRoutingPreview();
       }));
       typeTiles.append(button);
@@ -799,7 +799,7 @@ function openReservationCategorySummary({ stateService, host, currentDate, type,
   dialog=createModal({
     title:`${label} · All Bookings`,
     body,
-    className:`tcc-expanded-modal tcc-expanded-inherits-source reservation-category-expanded-modal tone-${RESERVATION_TONES[type]||'sky'}`,
+    className:`tcc-expanded-modal tcc-expanded-inherits-source reservation-category-expanded-modal tone-${RESERVATION_TONES[type]||'blue'}`,
     actions:[{label:'Close',onClick:d=>d.close()}]
   });
   host.append(dialog);
@@ -874,9 +874,9 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
     left.append(reservationControlsBar(controls,()=>preserveLocalFocus(renderContent)));
 
     const filteredToBook=applyReservationControls(model.allToBook,controls);
-    const toBookPanel=listPanel('Future Bookings / To Book', filteredToBook, 'reservation-to-book', id=>openEditor(id,'copper'), 'No matching To Book entries yet');
+    const toBookPanel=listPanel('Future Bookings / To Book', filteredToBook, 'reservation-to-book', id=>openEditor(id,'gold'), 'No matching To Book entries yet');
     left.append(toBookPanel);
-    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'copper',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'copper'))});
+    makeExpandableCard(toBookPanel,{host:main,title:'Future Bookings / To Book',tone:'gold',bodyBuilder:()=>reservationPanelExpandedBody('Future Bookings / To Book',applyReservationControls(buildReservationsViewModel(stateService.snapshot(),currentDate,{activeType:'flight'}).allToBook,controls),id=>openEditor(id,'gold'))});
 
     const nextFive=renderNextFive(state,currentDate,main), bookedTotal=renderBookedTotal(state);
     const rail=node('aside','reservation-reference-rail'); rail.setAttribute('aria-label','Reservation summary'); rail.append(nextFive,bookedTotal);

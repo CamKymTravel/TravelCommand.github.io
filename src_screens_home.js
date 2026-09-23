@@ -634,7 +634,7 @@ function annualMetrics(model,currentDate,state){
 }
 function buildAnnualExpanded(model,currentDate,state,navigate){
   const body=node('div','home-expanded-dashboard home-expanded-annual');if(!(model.annual.budgetAUD>0)){body.append(node('p','home-expanded-empty','Annual Budget needs setup before pace and forecast figures can be trusted.'));const action=expandedRouteAction('OPEN SETTINGS',navigate,'settings');if(action)body.append(action);return body;}const m=annualMetrics(model,currentDate,state);
-  const stats=node('div','home-expanded-stats home-expanded-stats-eight');stats.append(expandedStat('ANNUAL BUDGET',formatMoney(m.budget,'AUD'),`${model.annual.year} · AUD`,'gold'),expandedStat('SPENT SO FAR',formatMoney(m.spent,'AUD'),'actual spend · AUD','sky'),expandedStat('EXPECTED BY TODAY',formatMoney(m.expected,'AUD'),`${Math.round(m.elapsedPct)}% of year elapsed`,'blue'),expandedStat('YTD POSITION',formatMoney(Math.abs(m.position),'AUD'),m.position>=0?'under pace':'over pace',m.position>=0?'green':'red'),expandedStat('PROJECTED YEAR END',formatMoney(m.projected,'AUD'),'AUD','violet'),expandedStat('PROJECTED BUFFER',formatMoney(Math.abs(m.buffer),'AUD'),m.buffer>=0?'under annual budget':'over annual budget',m.buffer>=0?'green':'red'),expandedStat('THIS MONTH · MTD',formatMoney(m.mtd,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.mtd),'AUD')} ${m.monthlyBudget>=m.mtd?'under':'over'} pace`,'teal'),expandedStat('LAST MONTH',formatMoney(m.prevSpend,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.prevSpend),'AUD')} ${m.monthlyBudget>=m.prevSpend?'under':'over'} target`,'indigo'));body.append(stats);
+  const stats=node('div','home-expanded-stats home-expanded-stats-eight');stats.append(expandedStat('ANNUAL BUDGET',formatMoney(m.budget,'AUD'),`${model.annual.year} · AUD`,'gold'),expandedStat('SPENT SO FAR',formatMoney(m.spent,'AUD'),'actual spend · AUD','sky'),expandedStat('EXPECTED BY TODAY',formatMoney(m.expected,'AUD'),`${Math.round(m.elapsedPct)}% of year elapsed`,'blue'),expandedStat('YTD POSITION',formatMoney(Math.abs(m.position),'AUD'),m.position>=0?'under pace':'over pace',m.position>=0?'green':'red'),expandedStat('PROJECTED YEAR END',formatMoney(m.projected,'AUD'),'AUD','violet'),expandedStat('PROJECTED BUFFER',formatMoney(Math.abs(m.buffer),'AUD'),m.buffer>=0?'under annual budget':'over annual budget',m.buffer>=0?'green':'red'),expandedStat('THIS MONTH · MTD',formatMoney(m.mtd,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.mtd),'AUD')} ${m.monthlyBudget>=m.mtd?'under':'over'} pace`,'teal'),expandedStat('LAST MONTH',formatMoney(m.prevSpend,'AUD'),`${formatMoney(Math.abs(m.monthlyBudget-m.prevSpend),'AUD')} ${m.monthlyBudget>=m.prevSpend?'under':'over'} target`,'violet'));body.append(stats);
   const pace=expandedSection('ANNUAL PACE');pace.append(expandedProgress('Year elapsed',m.elapsedPct,'gold'),expandedProgress('Spend vs pace',m.pacePct,m.position>=0?'green':'red'),node('p','home-expanded-callout',`${formatMoney(Math.abs(m.buffer),'AUD')} projected ${m.buffer>=0?'under':'over'} budget.`));body.append(pace);return body;
 }
 const HOME_EXPANDED_PAGE_SIZE=20;
@@ -696,7 +696,7 @@ function buildAlertsExpanded(model,navigate,stateService,currentDate){
     const value=String(priority||'info').toLowerCase();
     if(value==='critical')return{label:'CRITICAL',tone:'red'};
     if(value==='high')return{label:'HIGH',tone:'red'};
-    if(value==='medium')return{label:'WATCH',tone:'amber'};
+    if(value==='medium')return{label:'WATCH',tone:'gold'};
     if(value==='low')return{label:'INFO',tone:'green'};
     return{label:'INFO',tone:'green'};
   };
@@ -706,7 +706,7 @@ function buildAlertsExpanded(model,navigate,stateService,currentDate){
     body.replaceChildren();
     const list=expandedSection('ATTENTION');
     const legend=node('div','home-expanded-alert-legend');
-    for(const [tone,label] of [['red','Urgent'],['amber','Watch'],['green','Information']]){
+    for(const [tone,label] of [['red','Urgent'],['gold','Watch'],['green','Information']]){
       const item=node('span',`home-expanded-alert-legend-item is-${tone}`);
       item.append(node('i','home-expanded-traffic-light',''),node('b','',label));
       legend.append(item);
@@ -812,9 +812,9 @@ export function renderHomeScreen({stateService,currentDate,navigate}){
     const upcoming=compactUpcoming(model,main,state,navigate), alerts=compactAlerts(model,main,navigate), schengen=compactSchengen(model), timeline=compactTimeline(state,currentDate);
     const minis=node('section','home-ref-minis'); minis.append(upcoming,alerts,schengen,timeline); main.append(minis);
     makeExpandableCard(daily,{host:main,title:'Daily Budget',tone:'teal',bodyBuilder:()=>buildDailyExpanded(model,navigate)});
-    makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'magenta',bodyBuilder:()=>buildDestinationExpanded(model,navigate)});
+    makeExpandableCard(destination,{host:main,title:'Destination Budget',tone:'pink',bodyBuilder:()=>buildDestinationExpanded(model,navigate)});
     makeExpandableCard(annual,{host:main,title:'Annual Position',tone:'gold',bodyBuilder:()=>buildAnnualExpanded(model,currentDate,state,navigate)});
-    makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'orange',bodyBuilder:()=>buildUpcomingExpanded(model,currentDate,navigate)});
+    makeExpandableCard(upcoming,{host:main,title:'Upcoming Events',tone:'copper',bodyBuilder:()=>buildUpcomingExpanded(model,currentDate,navigate)});
     makeExpandableCard(alerts,{host:main,title:'Alerts',tone:'red',bodyBuilder:()=>buildAlertsExpanded(model,navigate,stateService,currentDate)});
     makeExpandableCard(schengen,{host:main,title:'Schengen Status',tone:model.schengen.status==='not-allowed'?'red':model.schengen.status==='allowed'?'green':'gold',bodyBuilder:()=>buildSchengenExpanded(model,stateService)});
     makeExpandableCard(timeline,{host:main,title:'Trip Timeline',tone:'violet',bodyBuilder:()=>buildTimelineExpanded(state,currentDate)});

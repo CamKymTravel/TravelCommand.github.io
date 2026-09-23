@@ -9,6 +9,9 @@ const objectUrls = new Map();
 // the shared CSS can fit the full artwork and place one readable live title
 // treatment over the left side without stretching/cropping the image.
 const BAKED_HEADER_ART_KEYS = new Set(['header-journey-history','header-checklist','header-settings','header-vault']);
+// These three were repeatedly showing Safari edge seams when painted through a
+// pseudo-element background. Render them as one real overscanned image layer.
+const FRAMELESS_BAKED_HEADER_KEYS = new Set(['header-journey-history','header-checklist','header-vault']);
 const TRAVEL_MODE_HEADER_KEYS = new Set(['banner-cruise-princess','banner-motorhome-europe','banner-motorhome-usa']);
 
 // Destination photography is deliberately allowed to crop vertically so it
@@ -191,9 +194,26 @@ export function applyHeaderImage(element, key, { position = null } = {}) {
   // the same fitting rule.
   element.dataset.headerFit = isCountryHeaderKey(key) ? 'cover' : 'contain';
   element.style.setProperty('--hero-position', position || defaultHeaderPosition(key));
+  if (FRAMELESS_BAKED_HEADER_KEYS.has(key) && !element.querySelector(':scope > .tcc-baked-hero-image')) {
+    const image = document.createElement('img');
+    image.className = 'tcc-baked-hero-image';
+    image.alt = '';
+    image.setAttribute('aria-hidden','true');
+    image.decoding = 'async';
+    element.prepend(image);
+  }
   headerUrl(key).then(url => {
     if (!url || !element.isConnected || element.dataset.headerKey !== key) return;
-    element.style.setProperty('--hero-image', `url("${url}")`);
+    if (FRAMELESS_BAKED_HEADER_KEYS.has(key)) {
+      // These three physically cropped headers must have one paint path only.
+      // Do not publish --hero-image: legacy pseudo/background rules are then
+      // unable to repaint the same artwork or recreate an edge/frame.
+      element.style.removeProperty('--hero-image');
+      const image = element.querySelector(':scope > .tcc-baked-hero-image');
+      if (image && image.src !== url) image.src = url;
+    } else {
+      element.style.setProperty('--hero-image', `url("${url}")`);
+    }
     element.dataset.imageReady = 'true';
     // Expanded-card snapshots may have been cloned before the packed header
     // finished resolving. Publish one local readiness event so an already-open
@@ -270,12 +290,6 @@ export function createStayBanner({ currentStay = null, nextDestination = null, n
     next.append(identity,date);
     if (Number.isFinite(Number(nextDestination.durationDays))) { const duration=document.createElement('span'); duration.className='tcc-stay-banner-detail'; duration.textContent=`${Number(nextDestination.durationDays)} day${Number(nextDestination.durationDays)===1?'':'s'} planned`; next.append(duration); }
   } else { const empty=document.createElement('strong'); empty.textContent='Nothing planned'; next.append(empty); }
-  const photo=document.createElement('div');
-  photo.className='tcc-stay-banner-photo';
-  photo.setAttribute('aria-hidden','true');
-  const strip=document.createElement('div');
-  strip.className='tcc-stay-banner-strip';
-  strip.append(current,next);
-  section.append(photo,strip);
+  section.append(current,next);
   return section;
 }
