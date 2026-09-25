@@ -667,17 +667,21 @@
 
 /* Expanded screens must continue the parent colour rather than reverting to a
    generic navy sheet. The hue remains restrained over the large surface. */
-.tcc-modal.tcc-expanded-modal {
+.tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) {
   border-color:rgba(var(--tcc-expanded-rgb,88,199,255),.54)!important;
-  background:
-    radial-gradient(circle at 88% -2%,rgba(var(--tcc-expanded-rgb,88,199,255),.20),transparent 45%),
-    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 12%,#132a42),#061421 76%)!important;
+  background-color:#071421!important;
+  background-image:
+    radial-gradient(circle at 88% -2%,rgba(var(--tcc-expanded-rgb,88,199,255),.16),transparent 45%),
+    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 10%,#132a42),#071421 76%)!important;
+  opacity:1!important;
   box-shadow:0 28px 86px rgba(0,0,0,.52),0 0 27px rgba(var(--tcc-expanded-rgb,88,199,255),.09),inset 0 1px rgba(255,255,255,.055)!important;
 }
-.tcc-modal.tcc-expanded-modal .tcc-expanded-card-body {
-  background:
-    radial-gradient(circle at 8% 0%,rgba(var(--tcc-expanded-rgb),.18),transparent 45%),
-    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb)) 10%,var(--tcc-expanded-deep)),var(--tcc-expanded-base) 68%,#061421);
+.tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) :is(.tcc-expanded-card-body,.modal-body) {
+  background-color:#071421!important;
+  background-image:
+    radial-gradient(circle at 8% 0%,rgba(var(--tcc-expanded-rgb),.12),transparent 45%),
+    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb)) 8%,#10243a),#071421 72%)!important;
+  opacity:1!important;
 }
 
 /* Calendar follows the cleaner Build 1 month grammar: a destination is a
@@ -7849,3 +7853,63 @@ html[data-tcc-vault-privacy-lock="true"] body::after {
       #tcc-launch { transition:opacity .18s linear,visibility .18s step-end!important; }
     }
   
+
+
+/* ========================================================================
+   S54 LOWER-LAYER QUARANTINE — SPECIAL HEADERS + EXPANDED OPACITY.
+   Final palette/physical-iPad closure remain authoritative, but these lower
+   fallbacks must also be safe on their own so an import/layer change cannot
+   resurrect the old double-painted headers or see-through expanded sheets.
+   ======================================================================== */
+@layer screens {
+  html body :is(
+    [data-screen="journey-history"],
+    [data-screen="checklist"],
+    [data-screen="vault"]
+  ) > .tcc-page-hero {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    overflow:hidden !important;
+  }
+  html body :is(
+    [data-screen="journey-history"],
+    [data-screen="checklist"],
+    [data-screen="vault"]
+  ) > .tcc-page-hero::before,
+  html body :is(
+    [data-screen="journey-history"],
+    [data-screen="checklist"],
+    [data-screen="vault"]
+  ) > .tcc-page-hero::after {
+    content:none !important;
+    display:none !important;
+    background:none !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+  }
+}
+
+@layer components {
+  html body .tcc-modal.tcc-expanded-modal {
+    background-color:#071421 !important;
+    background-image:
+      radial-gradient(circle at 92% 0%,rgba(var(--tcc-expanded-rgb,88,199,255),.14),transparent 46%),
+      linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 10%,#102230) 0%,#071421 74%) !important;
+    opacity:1 !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal > form {
+    background:#071421 !important;
+    opacity:1 !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal > form > header,
+  html body .tcc-modal.tcc-expanded-modal > form > footer {
+    background-color:#091722 !important;
+    opacity:1 !important;
+  }
+  html body .tcc-modal.tcc-expanded-modal :is(.modal-body,.tcc-expanded-card-body) {
+    background-color:#071421 !important;
+    opacity:1 !important;
+  }
+}

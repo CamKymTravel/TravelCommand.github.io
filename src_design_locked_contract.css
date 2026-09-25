@@ -3817,7 +3817,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal {
   box-shadow:0 28px 86px rgba(0,0,0,.57),0 0 30px rgba(var(--tcc-editor-rgb),.09),inset 0 1px rgba(255,255,255,.025) !important;
 }
 html body [data-screen] .tcc-modal.tcc-editor-modal > form > header h2 { color:var(--tcc-editor-title) !important; }
-html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,transparent,var(--tcc-editor-footer) 26%) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,var(--tcc-editor-footer),var(--tcc-editor-footer) 26%) !important; }
 html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
   border-color:rgba(var(--tcc-editor-rgb),.42) !important;
   background:linear-gradient(180deg,rgba(var(--tcc-editor-rgb),.16),rgba(8,23,39,.94)) !important;
@@ -3854,7 +3854,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal {
   box-shadow:0 28px 86px rgba(0,0,0,.57),0 0 30px rgba(var(--tcc-editor-rgb),.09),inset 0 1px rgba(255,255,255,.025) !important;
 }
 html body [data-screen] .tcc-modal.tcc-editor-modal > form > header h2 { color:var(--tcc-editor-title) !important; }
-html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,transparent,var(--tcc-editor-footer) 26%) !important; }
+html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer { background:linear-gradient(180deg,var(--tcc-editor-footer),var(--tcc-editor-footer) 26%) !important; }
 html body [data-screen] .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
   border-color:rgba(var(--tcc-editor-rgb),.42) !important;
   background:linear-gradient(180deg,rgba(var(--tcc-editor-rgb),.16),rgba(8,23,39,.94)) !important;

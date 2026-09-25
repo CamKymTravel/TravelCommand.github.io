@@ -159,7 +159,7 @@
   .tcc-modal { max-height:calc(100dvh - 34px); overflow-y:auto; overflow-x:hidden; }
   .tcc-modal form { gap:12px; }
   .tcc-modal .modal-body { min-height:0; }
-  .tcc-modal footer { position:sticky; bottom:0; padding-top:9px; background:linear-gradient(180deg,transparent,#0d1b2d 24%); }
+  .tcc-modal footer { position:sticky; bottom:0; padding-top:9px; background:linear-gradient(180deg,#0d1b2d,#0d1b2d 24%); }
 }
 
 @media (max-height: 850px) {
@@ -3216,7 +3216,7 @@
   .tcc-modal.tcc-editor-modal.tone-gold { --tcc-editor-rgb:var(--tcc-p-gold-rgb); --tcc-editor-title:#ffe6a2; --tcc-editor-footer:#211d18; }
   .tcc-modal.tcc-editor-modal > form > header h2 { color:var(--tcc-editor-title); }
   .tcc-modal.tcc-editor-modal > form > footer {
-    background:linear-gradient(180deg,transparent,var(--tcc-editor-footer) 26%);
+    background:linear-gradient(180deg,var(--tcc-editor-footer),var(--tcc-editor-footer) 26%);
   }
   .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
     border-color:rgba(var(--tcc-editor-rgb),.42);
@@ -7417,7 +7417,7 @@
     box-shadow:0 28px 82px rgba(0,0,0,.52),0 0 22px rgba(var(--tcc-editor-rgb),.055),inset 0 1px var(--material-highlight)!important;
   }
   .tcc-modal.tcc-editor-modal > form > footer {
-    background:linear-gradient(180deg,transparent,color-mix(in srgb,rgb(var(--tcc-editor-rgb)) 5%,var(--material-deep)) 26%)!important;
+    background:linear-gradient(180deg,color-mix(in srgb,rgb(var(--tcc-editor-rgb)) 5%,var(--material-deep)),color-mix(in srgb,rgb(var(--tcc-editor-rgb)) 5%,var(--material-deep)) 26%)!important;
   }
   .tcc-modal.tcc-editor-modal > form > footer .button:not(.button-danger) {
     border-color:rgba(var(--tcc-editor-rgb),.34);
@@ -7445,7 +7445,7 @@
     box-shadow:0 18px 46px rgba(0,0,0,.25),0 0 16px rgba(var(--tcc-expanded-rgb),.045),inset 0 1px var(--material-highlight)!important;
   }
   .tcc-modal.tcc-expanded-modal > form > footer {
-    background:linear-gradient(180deg,transparent,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 4%,var(--material-deep)) 28%);
+    background:linear-gradient(180deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 4%,var(--material-deep)),color-mix(in srgb,rgb(var(--tcc-expanded-rgb,88,199,255)) 4%,var(--material-deep)) 28%);
   }
 
   /* Keep focus/selection colour obvious without adding glare to large modals. */

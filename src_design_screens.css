@@ -129,7 +129,7 @@
   [data-screen="itinerary"] .itinerary-empty { margin: 8px 0; color: var(--text-muted); }
   [data-screen="itinerary"] .itinerary-completed summary { cursor: pointer; font-size: 20px; font-weight: 760; }
   [data-screen="itinerary"] .itinerary-completed[open] summary { margin-bottom: 14px; }
-  [data-screen="itinerary"] .tcc-modal { width: min(930px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-violet-rgb),.34); background: radial-gradient(circle at 80% 0%, rgba(var(--tcc-p-violet-rgb),.12), transparent 36%), #0d1b2d; }
+  [data-screen="itinerary"] .tcc-modal { width: min(930px, calc(100vw - 72px)); }
   [data-screen="itinerary"] .itinerary-editor { display: grid; gap: 16px; }
   [data-screen="itinerary"] .itinerary-type-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   [data-screen="itinerary"] .itinerary-type-tile { min-height: 62px; border: 1px solid rgba(var(--tcc-p-violet-rgb),.2); border-radius: 15px; background: rgba(9,19,36,.6); color: var(--text-secondary); cursor: pointer; font-size: 16px; font-weight: 760; }
@@ -229,7 +229,7 @@
   [data-screen="budget"] .budget-donut-center strong { font-size: 15px; }
   [data-screen="budget"] .budget-donut-center small { max-width: 82px; color: var(--text-secondary); font-size: 10px; line-height: 1.2; }
 
-  [data-screen="budget"] .tcc-modal { width: min(900px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-teal-rgb),.3); background: radial-gradient(circle at 80% 0%, rgba(var(--tcc-p-teal-rgb),.09), transparent 35%), #0d1b2d; }
+  [data-screen="budget"] .tcc-modal { width: min(900px, calc(100vw - 72px)); }
   [data-screen="budget"] .budget-expense-editor { display: grid; gap: 16px; }
   [data-screen="budget"] .budget-category-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
   [data-screen="budget"] .budget-category-tile { min-height: 56px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(5,15,28,.5); color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 760; }
@@ -303,7 +303,7 @@
   [data-screen="reservations"] .reservation-health-issues { margin: 0; padding-left: 21px; color: var(--text-secondary); }
   [data-screen="reservations"] .reservation-health-issues li + li { margin-top: 6px; }
 
-  [data-screen="reservations"] .tcc-modal { width: min(920px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-blue-rgb),.3); background: radial-gradient(circle at 82% 0%, rgba(var(--tcc-p-blue-rgb),.1), transparent 36%), #0d1b2d; }
+  [data-screen="reservations"] .tcc-modal { width: min(920px, calc(100vw - 72px)); }
   [data-screen="reservations"] .reservation-editor { display: grid; gap: 16px; }
   [data-screen="reservations"] .reservation-type-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
   [data-screen="reservations"] .reservation-type-tile { min-height: 56px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(5,15,28,.5); color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 760; }
@@ -377,7 +377,7 @@
   [data-screen="calendar"] .calendar-agenda-date { min-width: 138px; justify-items: end; white-space: nowrap; }
   [data-screen="calendar"] .calendar-agenda-date strong { font-size: 12px; }
   [data-screen="calendar"] .calendar-empty { margin: 0; padding: 8px 3px; color: var(--text-muted); }
-  [data-screen="calendar"] .tcc-modal { width: min(830px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-blue-rgb),.3); background: radial-gradient(circle at 82% 0%, rgba(var(--tcc-p-blue-rgb),.1), transparent 36%), #0d1b2d; }
+  [data-screen="calendar"] .tcc-modal { width: min(830px, calc(100vw - 72px)); }
   [data-screen="calendar"] .calendar-editor { display: grid; gap: 15px; }
   [data-screen="calendar"] .calendar-type-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
   [data-screen="calendar"] .calendar-type-tile { min-height: 56px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(5,15,28,.5); color: var(--text-secondary); cursor: pointer; font-size: 15px; font-weight: 760; }
@@ -505,7 +505,7 @@
   [data-screen="checklist"] .checklist-history-item strong { color: var(--text-primary); font-size: 13px; }
   [data-screen="checklist"] .checklist-history-item small { font-size: 11px; }
   [data-screen="checklist"] .checklist-history-tick { color: var(--success); font-weight: 850; text-align: center; }
-  [data-screen="checklist"] .tcc-modal { width: min(800px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-green-rgb),.28); background: radial-gradient(circle at 82% 0%, rgba(var(--tcc-p-green-rgb),.08), transparent 36%), #0d1b2d; }
+  [data-screen="checklist"] .tcc-modal { width: min(800px, calc(100vw - 72px)); }
   [data-screen="checklist"] .checklist-editor { display: grid; gap: 15px; }
   [data-screen="checklist"] .checklist-type-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
   [data-screen="checklist"] .checklist-type-tile { min-height: 56px; border: 1px solid var(--border-soft); border-radius: 14px; background: rgba(5,15,28,.5); color: var(--text-secondary); cursor: pointer; font-size: 15px; font-weight: 760; }
@@ -589,7 +589,7 @@
   [data-screen="vault"] .vault-email-row { min-height: 58px; display: grid; grid-template-columns: 100px minmax(0,1fr); gap: 6px 12px; align-items: center; padding: 10px 12px; border: 1px solid rgba(var(--tcc-p-gold-rgb),.16); border-radius: 12px; background: rgba(3,12,23,.46); color: var(--text-primary); text-align: left; cursor: pointer; }
   [data-screen="vault"] .vault-email-row small { grid-column: 2; color: var(--text-secondary); }
   [data-screen="vault"] .vault-empty { margin: 5px 0; color: var(--text-muted); }
-  [data-screen="vault"] .tcc-modal { width: min(820px, calc(100vw - 72px)); border-color: rgba(var(--tcc-p-pink-rgb),.28); background: radial-gradient(circle at 84% 0%, rgba(var(--tcc-p-pink-rgb),.08), transparent 34%), #0d1b2d; }
+  [data-screen="vault"] .tcc-modal { width: min(820px, calc(100vw - 72px)); }
   [data-screen="vault"] .vault-editor, [data-screen="vault"] .vault-unlock-form { display: grid; gap: 14px; }
   [data-screen="vault"] .vault-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
   [data-screen="vault"] .vault-field { display: grid; gap: 6px; color: var(--text-secondary); font-size: 12px; font-weight: 700; }
@@ -642,7 +642,7 @@
   [data-screen="settings"] .settings-restore-button { border-color: rgba(var(--tcc-p-gold-rgb),.32); background: rgba(var(--tcc-p-gold-rgb),.08); }
   [data-screen="settings"] .settings-info-rows { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; margin-top: 13px; }
   [data-screen="settings"] .settings-info-rows > div { padding: 11px 12px; border-radius: 11px; background: rgba(255,255,255,.025); color: var(--text-secondary); white-space: pre-line; line-height: 1.5; }
-  [data-screen="settings"] .tcc-modal { width: min(720px,calc(100vw - 72px)); border-color: rgba(var(--tcc-p-blue-rgb),.28); background: radial-gradient(circle at 82% 0%, rgba(var(--tcc-p-blue-rgb),.08), transparent 35%), #0d1b2d; }
+  [data-screen="settings"] .tcc-modal { width: min(720px,calc(100vw - 72px)); }
   [data-screen="settings"] .settings-editor { display: grid; gap: 13px; }
   [data-screen="settings"] .settings-form-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 11px; }
   [data-screen="settings"] .settings-pin-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }

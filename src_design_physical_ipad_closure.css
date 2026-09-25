@@ -8,16 +8,16 @@
 /* -------------------------------------------------------------------------
    HEADER CLOSURE
    Journey History / Checklist / Vault: one image paint path, no 18px crop.
-   The 2px seam allowance hides sampling edges without clipping baked copy.
+   The 6px seam allowance hides sampling edges without clipping baked copy.
    ------------------------------------------------------------------------- */
 html body :is(
   [data-screen="journey-history"],
   [data-screen="checklist"],
   [data-screen="vault"]
 ) > .tcc-page-hero > .tcc-baked-hero-image {
-  inset:-2px !important;
-  width:calc(100% + 4px) !important;
-  height:calc(100% + 4px) !important;
+  inset:-6px !important;
+  width:calc(100% + 12px) !important;
+  height:calc(100% + 12px) !important;
   max-width:none !important;
   max-height:none !important;
   border:0 !important;
@@ -31,6 +31,12 @@ html body [data-screen="checklist"] > .tcc-page-hero > .tcc-baked-hero-image {
 }
 html body [data-screen="vault"] > .tcc-page-hero > .tcc-baked-hero-image {
   object-position:center center !important;
+}
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"]
+) > .tcc-page-hero[data-baked-header-art="true"] > .tcc-page-hero-copy {
+  display:none !important;
 }
 html body :is(
   [data-screen="journey-history"],
@@ -250,3 +256,37 @@ html body [data-screen] .tcc-expand-control {
 }
 
 /* S54_PHYSICAL_IPAD_SCREENSHOT_CLOSURE_SENTINEL */
+
+
+/* -------------------------------------------------------------------------
+   GLOBAL MODAL-SURFACE OPACITY — physical iPad authority.
+   The source widget hue remains visible in restrained accents, but no expanded
+   panel may reveal the underlying screen through its shell, header, footer or
+   body. Only dialog::backdrop is allowed to blur/dim the page behind it.
+   ------------------------------------------------------------------------- */
+html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) {
+  background-color:#071421 !important;
+  background-image:
+    radial-gradient(circle at 92% 0%,rgba(var(--tcc-expanded-rgb,var(--tcc-card-rgb)),.14),transparent 46%),
+    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,var(--tcc-card-rgb))) 10%,#102230) 0%,#071421 74%) !important;
+  opacity:1 !important;
+}
+html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) > form {
+  background:#071421 !important;
+  opacity:1 !important;
+}
+html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) > form > header {
+  background:linear-gradient(180deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,var(--tcc-card-rgb))) 9%,#0d1d2a),#091722) !important;
+  opacity:1 !important;
+}
+html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) > form > footer {
+  background:linear-gradient(180deg,#091722,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,var(--tcc-card-rgb))) 7%,#0b1925)) !important;
+  opacity:1 !important;
+}
+html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) :is(.modal-body,.tcc-expanded-card-body,.tcc-expanded-card,.tcc-expanded-card-snapshot,.tcc-expanded-panel) {
+  background-color:#071421 !important;
+  background-image:
+    radial-gradient(circle at 92% 0%,rgba(var(--tcc-expanded-rgb,var(--tcc-card-rgb)),.10),transparent 48%),
+    linear-gradient(145deg,color-mix(in srgb,rgb(var(--tcc-expanded-rgb,var(--tcc-card-rgb))) 7%,#102230) 0%,#071421 74%) !important;
+  opacity:1 !important;
+}

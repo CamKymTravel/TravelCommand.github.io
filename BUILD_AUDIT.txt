@@ -1,17 +1,27 @@
-Travel Command Centre — S54 Morocco Simulation 10
-Built: 25 September 2026
-Source: CURRENT_SOURCE_EXACT from TCC_S54_CONTINUITY_FULL_REGRESSION_FINAL_2026-09-25_1506.zip
+Travel Command Centre — S54 Morocco Simulation 12
+Built: 26 September 2026
+Source: current S54 CURRENT_SOURCE_EXACT working source after the physical-iPad header and global expanded/editor opacity repairs
 Purpose: fresh visual/physical-iPad simulation candidate only; not Final Master.
 
 Source verification before packaging:
-- S54 full visual regression: 23/23 PASS
-- S54 physical screenshot closure: 40/40 PASS
+- S54 physical screenshot closure: 49/49 PASS
+- S54 expanded widget colour gate: 93/93 PASS
+- S54 source integrity: 209/209 PASS
+- S54 full visual regression aggregate: attempted, but exceeded execution timeout; not claimed as passed in this build audit.
+
+Current repairs carried into this candidate include:
+- Expanded/editor modal shells, forms, bodies, headers and footers are opaque across the app while retaining source-widget colour identity.
+- Lower fallback modal layers are also opaque, preventing Safari bleed-through if cascade order changes.
+- Journey History and Checklist baked headers use a single title paint path; legacy duplicate pseudo/live title paths are quarantined.
+- Journey History, Checklist and Vault special headers use the reconciled physical-iPad edge/seam treatment.
+- Vault obsolete baked status/title regions are masked without replacing the approved vault-door artwork.
+- Calendar legacy thin-line paint paths are quarantined in favour of the approved coloured strips.
 
 Simulation identity changes are package-only:
-- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-10-20260925
-- Fresh service-worker cache: tcc-v1-v60-r7.11-s54-morocco-simulation-10-2026-09-25
-- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim10
-- Fresh manifest id: ./morocco-s54-simulation-10-20260925
+- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-12-20260926
+- Fresh service-worker cache: tcc-v1-v60-r7.11-s54-morocco-simulation-12-2026-09-26
+- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim12
+- Fresh manifest id: ./morocco-s54-simulation-12-20260926
 - Fresh App Health build marker for this candidate
 
-No design, layout, colour, widget, data-model, or functional source change was made while creating this simulation candidate.
+No redesign or unrelated feature change was made while creating this simulation candidate.
