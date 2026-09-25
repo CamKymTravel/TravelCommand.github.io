@@ -205,9 +205,9 @@ export function applyHeaderImage(element, key, { position = null } = {}) {
   headerUrl(key).then(url => {
     if (!url || !element.isConnected || element.dataset.headerKey !== key) return;
     if (FRAMELESS_BAKED_HEADER_KEYS.has(key)) {
-      // These three physically cropped headers must have one paint path only.
-      // Do not publish --hero-image: legacy pseudo/background rules are then
-      // unable to repaint the same artwork or recreate an edge/frame.
+      // Physical-iPad closure: these baked headers use one paint path only.
+      // Keeping --hero-image as a second background source can reintroduce a
+      // faint frame/ghost title after cascade changes.
       element.style.removeProperty('--hero-image');
       const image = element.querySelector(':scope > .tcc-baked-hero-image');
       if (image && image.src !== url) image.src = url;
@@ -272,7 +272,7 @@ export function createStayBanner({ currentStay = null, nextDestination = null, n
   if (currentStay) {
     const identity=document.createElement('div'); identity.className='tcc-stay-banner-identity';
     const flag=document.createElement('span'); flag.className='tcc-stay-banner-flag'; flag.textContent=countryFlagEmoji(flagCountryForStay(currentStay)); flag.setAttribute('aria-hidden','true');
-    const name=document.createElement('strong'); name.className='tcc-stay-banner-name'; const currentCountry=flagCountryForStay(currentStay); name.textContent=`${currentStay.name || currentStay.title}${currentCountry ? `, ${currentCountry}` : ''}`;
+    const name=document.createElement('strong'); name.className='tcc-stay-banner-name'; const currentCountry=flagCountryForStay(currentStay); const currentName=String(currentStay.name || currentStay.title || '').trim(); const showCountry=currentCountry && currentCountry.trim().toLowerCase()!==currentName.toLowerCase(); name.textContent=`${currentName}${showCountry ? `, ${currentCountry}` : ''}`;
     identity.append(flag,name);
     const dates=document.createElement('span'); dates.textContent=currentStay.dates || (currentStay.startDate&&currentStay.endDate?`${formatAUDate(currentStay.startDate)} – ${formatAUDate(currentStay.endDate)}`:'');
     current.append(identity,dates);

@@ -393,7 +393,7 @@ function renderHero(model, state, host, navigate){
       hero.classList.add('home-reference-hero-route');
     }
     const top=node('div','home-destination-hero-top'); top.append(node('span','home-destination-flag',flagEmoji(departureCountry(model.currentStay))),node('p','home-ref-kicker','CURRENT DESTINATION')); if(model.currentStay.travelType==='cruise'||model.currentStay.travelType==='motorhome'||model.currentStay.travelType==='rv'){ const mode=node('span','home-route-mode'); mode.append(createLineIcon(model.currentStay.travelType==='cruise'?'cruise':'rv'),node('span','',model.currentStay.travelType==='cruise'?'Cruise':'Motorhome')); top.append(mode); }
-    const title=node('div','home-destination-title'); title.append(node('strong','home-stay-name',model.currentStay.title),node('span','home-destination-country',model.currentStay.country));
+    const title=node('div','home-destination-title'); const stayTitle=String(model.currentStay.title||'').trim(); const stayCountry=String(model.currentStay.country||'').trim(); title.append(node('strong','home-stay-name',stayTitle)); if(stayCountry && stayCountry.toLowerCase()!==stayTitle.toLowerCase()) title.append(node('span','home-destination-country',stayCountry));
     const outline=createCountryOutline(departureCountry(model.currentStay),'home-destination-country-outline');
     const meta=node('div','home-destination-meta'); meta.append(node('span','',model.currentStay.dates),node('span','',`${model.currentStay.remainingDays} days remaining`));
     const progressWrap=node('div','home-stay-progress-wrap');

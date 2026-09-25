@@ -56,12 +56,25 @@
   color:#dce7ee !important;
   box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
 }
-[data-screen="reservations"] :is(.reservation-type-tile,.reservation-flight-scope-tile,.reservation-allocation-tile)[data-active="true"] {
-  --choice-rgb:var(--tcc-p-sky-rgb) !important;
-  border-color:rgba(var(--tcc-p-sky-rgb),.68) !important;
-  background:radial-gradient(circle at 84% 0%,rgba(var(--tcc-p-sky-rgb),.14),transparent 52%),linear-gradient(145deg,rgba(22,52,67,.82),rgba(7,24,37,.94)) !important;
+[data-screen="reservations"] .reservation-type-tile[data-active="true"] {
+  border-color:rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.68) !important;
+  background:radial-gradient(circle at 84% 0%,rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.14),transparent 52%),linear-gradient(145deg,rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.12),rgba(7,24,37,.94)) !important;
   color:#f5fbff !important;
-  box-shadow:0 0 0 2px rgba(var(--tcc-p-sky-rgb),.07),inset 0 1px rgba(255,255,255,.045) !important;
+  box-shadow:0 0 0 2px rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.07),inset 0 1px rgba(255,255,255,.045) !important;
+}
+[data-screen="reservations"] .reservation-flight-scope-tile[data-active="true"] {
+  --choice-rgb:var(--tcc-p-blue-rgb) !important;
+  border-color:rgba(var(--tcc-p-blue-rgb),.68) !important;
+  background:radial-gradient(circle at 84% 0%,rgba(var(--tcc-p-blue-rgb),.14),transparent 52%),linear-gradient(145deg,rgba(var(--tcc-p-blue-rgb),.12),rgba(7,24,37,.94)) !important;
+  color:#f5fbff !important;
+  box-shadow:0 0 0 2px rgba(var(--tcc-p-blue-rgb),.07),inset 0 1px rgba(255,255,255,.045) !important;
+}
+[data-screen="reservations"] .reservation-allocation-tile[data-active="true"] {
+  --choice-rgb:var(--reservation-editor-rgb,var(--tcc-p-blue-rgb)) !important;
+  border-color:rgba(var(--reservation-editor-rgb,var(--tcc-p-blue-rgb)),.68) !important;
+  background:radial-gradient(circle at 84% 0%,rgba(var(--reservation-editor-rgb,var(--tcc-p-blue-rgb)),.14),transparent 52%),linear-gradient(145deg,rgba(var(--reservation-editor-rgb,var(--tcc-p-blue-rgb)),.12),rgba(7,24,37,.94)) !important;
+  color:#f5fbff !important;
+  box-shadow:0 0 0 2px rgba(var(--reservation-editor-rgb,var(--tcc-p-blue-rgb)),.07),inset 0 1px rgba(255,255,255,.045) !important;
 }
 
 /* -------------------------------------------------------------------------
@@ -69,23 +82,23 @@
    Category identity comes from iconography/labels. Broad tile surfaces stay
    graphite/navy. Completed is the explicit silver/grey exception. */
 [data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) {
-  --reservation-rgb:var(--tcc-p-sky-rgb) !important;
-  border-color:rgba(var(--tcc-p-sky-rgb),.30) !important;
-  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-sky-rgb),.065),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important;
+  --reservation-rgb:var(--tcc-p-silver-rgb) !important;
+  border-color:rgba(var(--reservation-rgb),.30) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--reservation-rgb),.065),transparent 50%),linear-gradient(145deg,rgba(25,39,52,.96),rgba(7,18,31,.985)) !important;
   filter:none !important;
   box-shadow:0 12px 26px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.045) !important;
 }
 [data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed)::before {
-  background:linear-gradient(90deg,rgba(var(--tcc-p-sky-rgb),.13),transparent 72%) !important;
+  background:linear-gradient(90deg,rgba(var(--reservation-rgb),.13),transparent 72%) !important;
 }
 [data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-icon {
-  border-color:rgba(var(--tcc-p-sky-rgb),.38) !important;
-  background:rgba(20,47,63,.54) !important;
-  color:#aeeaff !important;
+  border-color:rgba(var(--reservation-rgb),.38) !important;
+  background:rgba(var(--reservation-rgb),.10) !important;
+  color:rgb(var(--reservation-rgb)) !important;
   box-shadow:inset 0 1px rgba(255,255,255,.055) !important;
 }
 [data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-count strong {
-  color:#d7f4ff !important;
+  color:rgb(var(--reservation-rgb)) !important;
 }
 [data-screen="reservations"] .reservation-tab-completed {
   --reservation-rgb:var(--tcc-p-silver-rgb) !important;
@@ -105,11 +118,16 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 /* Reservation support widgets belong to the same family. To Book retains the
    user-approved yellow attention treatment; ordinary summary widgets do not
    introduce unrelated red/purple slabs. */
-[data-screen="reservations"] .reservation-next-five,
+[data-screen="reservations"] .reservation-next-five {
+  --comfort-accent:rgb(var(--tcc-p-blue-rgb)) !important;
+  border-color:rgba(var(--tcc-p-blue-rgb),.30) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-blue-rgb),.075),transparent 50%),linear-gradient(145deg,rgba(24,39,52,.96),rgba(7,19,32,.985)) !important;
+  box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04) !important;
+}
 [data-screen="reservations"] .reservation-booked-total {
-  --comfort-accent:rgb(var(--tcc-reservation-primary-rgb)) !important;
-  border-color:rgba(var(--tcc-p-sky-rgb),.30) !important;
-  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-sky-rgb),.075),transparent 50%),linear-gradient(145deg,rgba(24,39,52,.96),rgba(7,19,32,.985)) !important;
+  --comfort-accent:rgb(var(--tcc-p-green-rgb)) !important;
+  border-color:rgba(var(--tcc-p-green-rgb),.30) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-green-rgb),.075),transparent 50%),linear-gradient(145deg,rgba(24,39,52,.96),rgba(7,19,32,.985)) !important;
   box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04) !important;
 }
 [data-screen="reservations"] .reservation-booked-total :is(.reservation-total-value,.reservation-total-label),
@@ -120,14 +138,14 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-gold-rgb),.11),transparent 50%),linear-gradient(145deg,rgba(34,38,38,.96),rgba(9,23,35,.985)) !important;
 }
 [data-screen="reservations"] .reservation-health.reservation-health-verified {
-  border-color:rgba(var(--tcc-p-green-rgb),.38) !important;
-  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-green-rgb),.10),transparent 52%),linear-gradient(145deg,rgba(22,47,39,.92),rgba(7,20,31,.97)) !important;
+  border-color:rgba(var(--tcc-p-green-rgb),.40) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-green-rgb),.10),transparent 52%),linear-gradient(145deg,rgba(20,45,38,.92),rgba(7,20,31,.97)) !important;
 }
 [data-screen="reservations"] .reservation-health.reservation-health-needs-attention {
   border-color:rgba(var(--tcc-p-red-rgb),.42) !important;
-  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-red-rgb),.10),transparent 52%),linear-gradient(145deg,rgba(52,27,37,.92),rgba(7,20,31,.97)) !important;
+  background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-red-rgb),.10),transparent 52%),linear-gradient(145deg,rgba(48,28,34,.92),rgba(7,20,31,.97)) !important;
 }
-[data-screen="reservations"] .reservation-health-status { color:rgb(var(--tcc-p-green-rgb)) !important; }
+[data-screen="reservations"] .reservation-health.reservation-health-verified .reservation-health-status { color:rgb(var(--tcc-p-green-rgb)) !important; }
 [data-screen="reservations"] .reservation-health.reservation-health-needs-attention .reservation-health-status { color:rgb(var(--tcc-p-red-rgb)) !important; }
 
 /* Search surfaces remain neutral silver/graphite, never category-coloured. */
@@ -181,7 +199,7 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   width:96px !important;
   height:96px !important;
   justify-self:center !important;
-  background:radial-gradient(circle at center,#0a2530 0 57%,transparent 58%),conic-gradient(rgb(var(--tcc-p-green-rgb)) 0 var(--schengen-used),rgb(var(--tcc-p-gold-rgb)) var(--schengen-used) 100%) !important;
+  background:radial-gradient(circle at center,#0a2530 0 59%,transparent 60%),conic-gradient(transparent 0 var(--schengen-used),rgba(255,255,255,.12) var(--schengen-used) 100%),conic-gradient(rgb(var(--tcc-p-green-rgb)) 0%,rgb(var(--tcc-p-gold-rgb)) 48%,rgb(var(--tcc-p-gold-rgb)) 68%,rgb(var(--tcc-p-copper-rgb)) 84%,rgb(var(--tcc-p-red-rgb)) 100%) !important;
   box-shadow:inset 0 0 24px rgba(var(--tcc-p-green-rgb),.14),0 0 24px rgba(var(--tcc-p-green-rgb),.10) !important;
 }
 [data-screen="home"] .home-schengen-ring strong { font-size:31px !important; line-height:.92 !important; }
@@ -349,7 +367,7 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 /* Budget meaning remains visible as restrained edges/labels, not purple/green slabs. */
 [data-screen="budget"] .budget-destination-card { border-color:rgba(var(--tcc-p-sky-rgb),.32) !important; }
 [data-screen="budget"] .budget-destination-card :is(.budget-card-kicker,.budget-current-total strong) { color:#bcecff !important; }
-[data-screen="budget"] .budget-pace-card { border-color:rgba(var(--tcc-p-green-rgb),.26) !important; }
+[data-screen="budget"] .budget-pace-card { border-color:rgba(var(--tcc-p-silver-rgb),.26) !important; }
 [data-screen="budget"] .budget-annual-card { border-color:rgba(var(--tcc-p-gold-rgb),.28) !important; }
 /* Journey travel-type colours stay in icons/chips/bars only. */
 [data-screen="journey-history"] :is(.journey-milestones-panel,.journey-mix-panel,.journey-spend-panel) {
@@ -567,19 +585,22 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 [data-screen="itinerary"] .itinerary-route-picker-modal.tone-neutral > form > header h2 {
   color:#e1e8ed !important;
 }
-[data-screen="itinerary"] .tcc-itinerary-home-visit-modal,
+[data-screen="itinerary"] .tcc-itinerary-home-visit-modal {
+  --tcc-editor-rgb:var(--tcc-p-green-rgb) !important;
+  --tcc-editor-title:rgb(var(--tcc-p-gold-rgb)) !important;
+}
 [data-screen="itinerary"] .tcc-itinerary-editor-modal.tone-sky {
   --tcc-editor-rgb:var(--tcc-p-sky-rgb) !important;
   --tcc-editor-title:#bcecff !important;
 }
 [data-screen="itinerary"] .itinerary-home-visit-identity {
-  border-color:rgba(var(--tcc-p-sky-rgb),.36) !important;
-  background:linear-gradient(145deg,rgba(31,84,112,.28),rgba(8,22,39,.76)) !important;
+  border-color:rgba(var(--tcc-p-green-rgb),.36) !important;
+  background:linear-gradient(145deg,rgba(var(--tcc-p-green-rgb),.20),rgba(8,32,37,.76)) !important;
 }
-[data-screen="itinerary"] .itinerary-home-visit-copy small { color:#aee9fb !important; }
+[data-screen="itinerary"] .itinerary-home-visit-copy small { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 [data-screen="itinerary"] .itinerary-home-visit-note {
-  border-color:rgba(var(--tcc-p-sky-rgb),.24) !important;
-  background:rgba(10,30,43,.58) !important;
+  border-color:rgba(var(--tcc-p-gold-rgb),.24) !important;
+  background:rgba(var(--tcc-p-green-rgb),.10) !important;
 }
 
 }
@@ -615,8 +636,8 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 }
 [data-screen="checklist"] .checklist-owner-his .checklist-owner-head h2 { color:#bfe9ff !important; text-shadow:none !important; }
 [data-screen="checklist"] .checklist-owner-hers .checklist-owner-head h2 { color:#ffc2e2 !important; text-shadow:none !important; }
-[data-screen="checklist"] .checklist-column-permanent .checklist-column-icon { color:rgb(var(--tcc-p-green-rgb)) !important; }
-[data-screen="checklist"] .checklist-column-destination .checklist-column-icon { color:rgb(var(--tcc-p-sky-rgb)) !important; }
+[data-screen="checklist"] .checklist-column-permanent .checklist-column-icon { color:rgb(var(--tcc-p-gold-rgb)) !important; }
+[data-screen="checklist"] .checklist-column-destination .checklist-column-icon { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 [data-screen="checklist"] :is(
   .checklist-owner-his .checklist-owner-list .checklist-row,
   .checklist-owner-hers .checklist-owner-list .checklist-row,
@@ -628,7 +649,7 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   background:var(--tcc-material-bg-soft) !important;
 }
 [data-screen="checklist"] .checklist-shared-extras {
-  box-shadow:inset 3px 0 rgba(var(--tcc-p-violet-rgb),.42),var(--tcc-material-shadow) !important;
+  box-shadow:inset 3px 0 rgba(var(--tcc-p-silver-rgb),.42),var(--tcc-material-shadow) !important;
 }
 [data-screen="checklist"] .checklist-history {
   box-shadow:inset 3px 0 rgba(var(--tcc-p-silver-rgb),.42),var(--tcc-material-shadow) !important;
@@ -683,24 +704,23 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   box-shadow:var(--tcc-material-shadow) !important;
 }
 [data-screen="vault"] .vault-emergency-travel-card {
-  box-shadow:inset 3px 0 rgba(var(--tcc-p-red-rgb),.58),var(--tcc-material-shadow) !important;
+  box-shadow:inset 3px 0 rgba(var(--tcc-p-gold-rgb),.58),var(--tcc-material-shadow) !important;
 }
 [data-screen="vault"] .vault-emergency-contacts {
   box-shadow:inset 3px 0 rgba(var(--tcc-p-green-rgb),.58),var(--tcc-material-shadow) !important;
 }
 
 /* ========================================================================
-   LOCK 24 — Home Visit is a simple Standard/Australia stay, never Cruise.
-   Its secondary Add action therefore uses the Standard sky/material family;
-   violet is reserved for Cruise identity.
+   LOCK 24 — Home Visit is a separate Australian Green/Gold action.
+   It must never inherit the Standard/Sky travel-mode family.
    ======================================================================== */
 [data-screen="itinerary"] .itinerary-add-home {
-  border-color:rgba(var(--tcc-p-sky-rgb),.42) !important;
-  background:var(--tcc-material-bg-soft) !important;
-  color:#bcecff !important;
+  border-color:rgba(var(--tcc-p-gold-rgb),.42) !important;
+  background:linear-gradient(145deg,rgba(var(--tcc-p-green-rgb),.20),rgba(var(--tcc-p-ink-rgb),.96)) !important;
+  color:rgb(var(--tcc-p-gold-rgb)) !important;
   box-shadow:inset 0 1px rgba(255,255,255,.05) !important;
 }
-[data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:rgb(var(--tcc-p-sky-rgb)) !important; }
+[data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 
 /* ========================================================================
    LOCK 25 — Calendar source/filter chrome is neutral. Destination, booking
@@ -772,7 +792,7 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   opacity:.68;
 }
 [data-screen="calendar"] .calendar-period-line:focus-visible {
-  outline:2px solid rgba(var(--tcc-p-sky-rgb),.92) !important;
+  outline:2px solid rgba(var(--tcc-p-teal-rgb),.92) !important;
   outline-offset:-2px !important;
   border-radius:4px !important;
 }
@@ -798,7 +818,7 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 [data-screen="budget"] .budget-accounts-summary-card,
 .tcc-modal.tcc-expanded-modal.budget-accounts-manager-modal .budget-accounts-manager-summary,
 .tcc-modal.tcc-expanded-modal.budget-accounts-manager-modal .budget-account-manager-row {
-  border-color:rgba(var(--tcc-p-gold-rgb),.24) !important;
+  border-color:rgba(var(--tcc-p-silver-rgb),.24) !important;
   background:var(--tcc-material-bg-soft) !important;
   box-shadow:inset 0 1px rgba(255,255,255,.035) !important;
 }
@@ -870,13 +890,13 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   color:rgb(var(--reservation-rgb)) !important;
 }
 [data-screen="reservations"] .reservation-tab:not(.reservation-tab-completed) .reservation-tab-count strong { color:rgb(var(--reservation-rgb)) !important; }
-.tcc-modal.tcc-expanded-modal .reservation-category-expanded-flight { --tcc-expanded-rgb:var(--tcc-p-sky-rgb) !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-flight { --tcc-expanded-rgb:var(--tcc-p-blue-rgb) !important; }
 .tcc-modal.tcc-expanded-modal .reservation-category-expanded-train { --tcc-expanded-rgb:var(--tcc-p-teal-rgb) !important; }
 .tcc-modal.tcc-expanded-modal .reservation-category-expanded-cruise { --tcc-expanded-rgb:var(--tcc-p-violet-rgb) !important; }
 .tcc-modal.tcc-expanded-modal .reservation-category-expanded-rv { --tcc-expanded-rgb:var(--tcc-p-copper-rgb) !important; }
 .tcc-modal.tcc-expanded-modal .reservation-category-expanded-hotel { --tcc-expanded-rgb:var(--tcc-p-gold-rgb) !important; }
 .tcc-modal.tcc-expanded-modal .reservation-category-expanded-airbnb { --tcc-expanded-rgb:var(--tcc-p-pink-rgb) !important; }
-.tcc-modal.tcc-expanded-modal .reservation-category-expanded-ticket { --tcc-expanded-rgb:var(--tcc-p-red-rgb) !important; }
+.tcc-modal.tcc-expanded-modal .reservation-category-expanded-ticket { --tcc-expanded-rgb:var(--tcc-p-rose-rgb) !important; }
 
 /* Calendar: destination identity remains in the thin period rails/background
    tint; source/type identity is a separate readable edge. This stops a Tokyo
@@ -1082,7 +1102,7 @@ html body [data-expandable="true"][data-expand-tone] > .reservation-section-head
 html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-tone="teal"] {
   --tcc-source-expand-rgb:var(--tcc-p-violet-rgb);
   border-color:rgba(var(--tcc-p-violet-rgb),.42) !important;
-  background:radial-gradient(circle at 90% 0,rgba(var(--tcc-p-violet-rgb),.10),transparent 48%),linear-gradient(145deg,#123039,#0b2230 66%,#071827) !important;
+  background:radial-gradient(circle at 90% 0,rgba(var(--tcc-p-violet-rgb),.10),transparent 48%),linear-gradient(145deg,#302442,#201d35 66%,#071827) !important;
 }
 html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-tone="teal"] :is(.budget-card-kicker,.budget-card-title) {
   color:rgb(var(--tcc-p-violet-rgb)) !important;
@@ -1093,12 +1113,11 @@ html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-to
    Rows remain restrained and readable, but their travel-mode family is visible
    before expansion so the enlarged detail never changes colour identity. */
 [data-screen="journey-history"] .journey-record-row {
-  --journey-record-rgb:var(--tcc-p-blue-rgb);
-  border:1px solid rgba(var(--journey-record-rgb),.38) !important;
-  border-left-width:1px !important;
-  box-shadow:none !important;
+  --journey-record-rgb: var(--tcc-p-blue-rgb);
+  border-left:3px solid rgba(var(--journey-record-rgb),.62) !important;
+  box-shadow:inset 3px 0 0 rgba(var(--journey-record-rgb),.08);
 }
-[data-screen="journey-history"] .journey-record-row.journey-record-tone-blue,
+[data-screen="journey-history"] .journey-record-row.journey-record-tone-blue { --journey-record-rgb:var(--tcc-p-blue-rgb); }
 [data-screen="journey-history"] .journey-record-row.journey-record-tone-sky { --journey-record-rgb:var(--tcc-p-blue-rgb); }
 [data-screen="journey-history"] .journey-record-row.journey-record-tone-copper,
 [data-screen="journey-history"] .journey-record-row.journey-record-tone-orange { --journey-record-rgb:var(--tcc-p-copper-rgb); }
@@ -1108,9 +1127,7 @@ html body [data-screen="budget"] .budget-destination-budgets-card[data-expand-to
 }
 [data-screen="journey-history"] .journey-record-row:hover,
 [data-screen="journey-history"] .journey-record-row:focus-visible {
-  border-color:rgba(var(--journey-record-rgb),.62) !important;
-  border-left-width:1px !important;
-  box-shadow:none !important;
+  border-left-color:rgb(var(--journey-record-rgb)) !important;
 }
 
 /* ========================================================================
@@ -1338,7 +1355,7 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 [data-screen="budget"] .budget-annual-forecast,
 [data-screen="budget"] .budget-forecast-panel {
   border-color:rgba(var(--tcc-p-pink-rgb),.42) !important;
-  background:radial-gradient(circle at 90% 4%,rgba(var(--tcc-p-pink-rgb),.14),transparent 46%),linear-gradient(145deg,#172b4a,#0a1c31) !important;
+  background:radial-gradient(circle at 90% 4%,rgba(var(--tcc-p-pink-rgb),.14),transparent 46%),linear-gradient(145deg,#40213d,#25192f) !important;
 }
 
 /* Accounts should use the available vertical space rather than hiding two of
@@ -1517,7 +1534,7 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 [data-screen="checklist"] .checklist-column-permanent .checklist-next-task > span { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 [data-screen="checklist"] .checklist-column-destination {
   border-color:rgba(var(--tcc-p-teal-rgb),.52) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-teal-rgb),.17),transparent 48%),linear-gradient(145deg,#173c58,#0b2034) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-teal-rgb),.17),transparent 48%),linear-gradient(145deg,#153f45,#0a2231) !important;
 }
 [data-screen="checklist"] .checklist-owner-his {
   border-color:rgba(var(--tcc-p-blue-rgb),.52) !important;
@@ -1529,19 +1546,19 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 }
 [data-screen="checklist"] .checklist-overview-card {
   border-color:rgba(var(--tcc-p-silver-rgb),.50) !important;
-  background:radial-gradient(circle at 86% 4%,rgba(var(--tcc-p-silver-rgb),.18),transparent 48%),linear-gradient(145deg,#252c55,#111c33) !important;
+  background:radial-gradient(circle at 86% 4%,rgba(var(--tcc-p-silver-rgb),.18),transparent 48%),linear-gradient(145deg,#303943,#202934) !important;
 }
 [data-screen="checklist"] .checklist-overview-ring {
-  background:radial-gradient(circle at center,#101f36 0 55%,transparent 56%),conic-gradient(rgb(var(--tcc-p-sky-rgb)) 0 var(--checklist-progress),rgb(var(--tcc-p-violet-rgb)) var(--checklist-progress) 82%,rgba(255,255,255,.12) 82% 100%) !important;
-  box-shadow:0 0 24px rgba(var(--tcc-p-violet-rgb),.12) !important;
+  background:radial-gradient(circle at center,#101f36 0 55%,transparent 56%),conic-gradient(rgb(var(--tcc-p-green-rgb)) 0 var(--checklist-progress),rgb(var(--tcc-p-silver-rgb)) var(--checklist-progress) 100%) !important;
+  box-shadow:none !important;
 }
-[data-screen="checklist"] .checklist-overview-ring span { color:#a9dfff !important; }
+[data-screen="checklist"] .checklist-overview-ring span { color:rgb(var(--tcc-p-silver-rgb)) !important; }
 [data-screen="checklist"] .checklist-next-card {
   border-color:rgba(var(--tcc-p-copper-rgb),.52) !important;
-  background:radial-gradient(circle at 90% 0,rgba(var(--tcc-p-copper-rgb),.20),transparent 48%),linear-gradient(145deg,#372a59,#151b34) !important;
+  background:radial-gradient(circle at 90% 0,rgba(var(--tcc-p-copper-rgb),.20),transparent 48%),linear-gradient(145deg,#422e25,#2a2123) !important;
 }
 [data-screen="checklist"] .checklist-shared-extras {
-  border-color:rgba(var(--tcc-p-violet-rgb),.30) !important;
+  border-color:rgba(var(--tcc-p-silver-rgb),.30) !important;
   background:linear-gradient(145deg,rgba(42,49,57,.42),rgba(8,20,34,.90)) !important;
 }
 [data-screen="checklist"] .checklist-row {
@@ -1551,8 +1568,8 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 [data-screen="checklist"] .checklist-column-list,
 [data-screen="checklist"] .checklist-owner-list { gap:9px !important; }
 [data-screen="checklist"] .checklist-stage-tab[data-active="true"] {
-  border-color:rgba(var(--tcc-p-blue-rgb),.58) !important;
-  background:linear-gradient(145deg,rgba(42,77,137,.62),rgba(13,35,65,.92)) !important;
+  border-color:rgba(var(--tcc-p-sky-rgb),.58) !important;
+  background:linear-gradient(145deg,rgba(var(--tcc-p-sky-rgb),.18),rgba(13,35,65,.92)) !important;
 }
 @media (max-width:1050px) {
   [data-screen="checklist"] .checklist-layout-grid { grid-template-columns:minmax(0,1fr) !important; }
@@ -1572,11 +1589,11 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 }
 [data-screen="journey-history"] .journey-spend-panel {
   border-color:rgba(var(--tcc-p-gold-rgb),.48) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-gold-rgb),.16),transparent 46%),linear-gradient(145deg,#35253c,#0d1c30) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-gold-rgb),.16),transparent 46%),linear-gradient(145deg,#41361f,#29261f) !important;
 }
 [data-screen="journey-history"] .journey-snapshot-panel {
   border-color:rgba(var(--tcc-p-pink-rgb),.48) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-pink-rgb),.17),transparent 46%),linear-gradient(145deg,#1c3158,#0b1d34) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-pink-rgb),.17),transparent 46%),linear-gradient(145deg,#432331,#2b1d29) !important;
 }
 [data-screen="journey-history"] .journey-insight-three {
   grid-template-columns:1fr 1fr !important;
@@ -1592,11 +1609,11 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
 }
 [data-screen="journey-history"] .journey-milestones-panel {
   border-color:rgba(var(--tcc-p-teal-rgb),.50) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-teal-rgb),.16),transparent 46%),linear-gradient(145deg,#3b311d,#101d2e) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-teal-rgb),.16),transparent 46%),linear-gradient(145deg,#153d3c,#0c292f) !important;
 }
 [data-screen="journey-history"] .journey-top-destinations {
   border-color:rgba(var(--tcc-p-copper-rgb),.52) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-copper-rgb),.18),transparent 46%),linear-gradient(145deg,#482637,#101a2c) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-copper-rgb),.18),transparent 46%),linear-gradient(145deg,#422e25,#2a2123) !important;
 }
 [data-screen="journey-history"] .journey-mix-panel {
   grid-column:1 / -1 !important;
@@ -1625,8 +1642,8 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
   background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-green-rgb),.16),transparent 46%),linear-gradient(145deg,#183b32,#0b1d2b) !important;
 }
 [data-screen="journey-history"] .journey-health-needs-attention {
-  border-color:rgba(var(--tcc-p-gold-rgb),.50) !important;
-  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-gold-rgb),.16),transparent 46%),linear-gradient(145deg,#3b321e,#101d2e) !important;
+  border-color:rgba(var(--tcc-p-red-rgb),.50) !important;
+  background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-red-rgb),.16),transparent 46%),linear-gradient(145deg,#3c2429,#101d2e) !important;
 }
 
 /* ------------------------------------------------------------------------
@@ -1836,12 +1853,12 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
     height:43px !important;
     display:grid !important;
     place-items:center !important;
-    border:1px solid color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-sky-rgb))) 64%,transparent) !important;
+    border:1px solid color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) 64%,transparent) !important;
     border-radius:12px !important;
-    background:linear-gradient(145deg,color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-sky-rgb))) 20%,transparent),rgba(4,15,28,.44)) !important;
-    color:var(--vault-accent,rgb(var(--tcc-p-sky-rgb))) !important;
+    background:linear-gradient(145deg,color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) 20%,transparent),rgba(4,15,28,.44)) !important;
+    color:var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) !important;
     filter:none !important;
-    box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-sky-rgb))) 17%,transparent) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) 17%,transparent) !important;
   }
   html body [data-screen="vault"] .vault-category-card .vault-category-icon .tcc-line-icon,
   html body [data-screen="vault"] .vault-all-records .vault-category-icon .tcc-line-icon {
@@ -2083,10 +2100,10 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="home"] .home-mini-schengen.is-not-checked :is(.home-mini-diamond,.home-mini-head h2) { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 
   html body [data-screen="home"] .home-mini-schengen.is-not-allowed {
-    border-color:rgba(var(--tcc-p-rose-rgb),.58) !important;
-    background:radial-gradient(circle at 86% 0%,rgba(var(--tcc-p-rose-rgb),.17),transparent 48%),linear-gradient(145deg,#461d2b,#271923 62%,#071925) !important;
+    border-color:rgba(var(--tcc-p-red-rgb),.58) !important;
+    background:radial-gradient(circle at 86% 0%,rgba(var(--tcc-p-red-rgb),.17),transparent 48%),linear-gradient(145deg,#461d2b,#271923 62%,#071925) !important;
   }
-  html body [data-screen="home"] .home-mini-schengen.is-not-allowed :is(.home-mini-diamond,.home-mini-head h2) { color:#f49ab1 !important; }
+  html body [data-screen="home"] .home-mini-schengen.is-not-allowed :is(.home-mini-diamond,.home-mini-head h2) { color:rgb(var(--tcc-p-red-rgb)) !important; }
 
   html body [data-screen="home"] .home-mini-timeline {
     border-color:rgba(var(--tcc-p-violet-rgb),.50) !important;
@@ -2123,16 +2140,16 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
    travel-mode colours remain data identity, not competing panel themes. */
 @layer tccLocks {
   html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-current {
-    border-color:rgba(var(--tcc-p-green-rgb),.46) !important;
-    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(25,67,62,.88),rgba(5,23,36,.91)) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--tcc-p-teal-rgb),.46) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-teal-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(12,57,61,.88),rgba(5,23,36,.91)) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 18px rgba(var(--tcc-p-teal-rgb),.045) !important;
   }
-  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-green-rgb)) !important; }
+  html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 
   html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-next {
     border-color:rgba(var(--tcc-p-copper-rgb),.46) !important;
     background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-copper-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(65,39,28,.88),rgba(25,22,32,.91)) !important;
-    box-shadow:none !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.055),0 0 18px rgba(var(--tcc-p-copper-rgb),.045) !important;
   }
   html body [data-screen="itinerary"] > .itinerary-stay-banner .tcc-stay-banner-next .eyebrow { color:rgb(var(--tcc-p-copper-rgb)) !important; }
 
@@ -2155,7 +2172,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="itinerary"] .itinerary-upcoming-panel {
     --comfort-accent:rgb(var(--tcc-p-blue-rgb)) !important;
     border-color:rgba(var(--tcc-p-blue-rgb),.43) !important;
-    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-blue-rgb),.13),transparent 47%),linear-gradient(145deg,#3f203b,#24182f 62%,#091a2a) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-blue-rgb),.13),transparent 47%),linear-gradient(145deg,#203050,#17243b 62%,#091827) !important;
     box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(var(--tcc-p-blue-rgb),.045),inset 0 1px rgba(255,255,255,.04) !important;
   }
   html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:#ffb2dc !important; }
@@ -2188,7 +2205,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
     background:radial-gradient(circle at 90% 5%,rgba(var(--tcc-p-green-rgb),.16),transparent 46%),linear-gradient(145deg,rgba(50,67,28,.95),rgba(22,31,25,.97)) !important;
   }
-  html body [data-screen="itinerary"] .itinerary-stat-countries :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:rgb(var(--tcc-p-gold-rgb)) !important; }
+  html body [data-screen="itinerary"] .itinerary-stat-countries :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:rgb(var(--tcc-p-green-rgb)) !important; }
 
   html body [data-screen="itinerary"] .itinerary-stat-routes {
     border-color:rgba(var(--tcc-p-pink-rgb),.42) !important;
@@ -2218,7 +2235,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     border-color:rgba(var(--tcc-p-red-rgb),.46) !important;
     background:radial-gradient(circle at 90% 5%,rgba(var(--tcc-p-red-rgb),.17),transparent 46%),linear-gradient(145deg,rgba(72,27,40,.95),rgba(31,19,28,.97)) !important;
   }
-  html body [data-screen="itinerary"] .itinerary-stat-overlaps :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:rgb(var(--tcc-p-rose-rgb)) !important; }
+  html body [data-screen="itinerary"] .itinerary-stat-overlaps :is(.itinerary-stat-icon,.itinerary-stat-copy strong) { color:rgb(var(--tcc-p-red-rgb)) !important; }
 
   /* Silver is a first-class expanded-card tone for the Missing Stays tile. */
   html body .tcc-modal.tcc-expanded-modal.tone-lime {
@@ -2227,7 +2244,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     --tcc-expanded-mid:#2a351f !important;
     --tcc-expanded-base:#1b231d !important;
   }
-  html body .tcc-modal.tcc-expanded-modal.tone-lime > form > header h2 { color:rgb(var(--tcc-p-gold-rgb)) !important; }
+  html body .tcc-modal.tcc-expanded-modal.tone-lime > form > header h2 { color:rgb(var(--tcc-p-green-rgb)) !important; }
 
   html body .tcc-modal.tcc-expanded-modal.tone-silver {
     --tcc-expanded-rgb:var(--tcc-p-silver-rgb) !important;
@@ -2237,16 +2254,15 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   }
   html body .tcc-modal.tcc-expanded-modal.tone-silver > form > header h2 { color:#d8e0e6 !important; }
 
-  /* Upcoming may share copper with the far-away Next Destination card because
-     those two widgets cannot occupy the same iPad viewport. Copper stays well
-     separated from the simultaneously visible gold statistic. */
+  /* Upcoming is Blue. Keep every lower material aligned with that locked
+     identity so an older Copper fallback cannot return during regeneration. */
   html body [data-screen="itinerary"] .itinerary-upcoming-panel {
     --comfort-accent:rgb(var(--tcc-p-blue-rgb)) !important;
     border-color:rgba(var(--tcc-p-blue-rgb),.44) !important;
-    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-blue-rgb),.14),transparent 47%),linear-gradient(145deg,#422d25,#2a2025 62%,#091a2a) !important;
+    background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-blue-rgb),.14),transparent 47%),linear-gradient(145deg,#203050,#17243b 62%,#091827) !important;
     box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(var(--tcc-p-blue-rgb),.045),inset 0 1px rgba(255,255,255,.04) !important;
   }
-  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:rgb(var(--tcc-p-copper-rgb)) !important; }
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:rgb(var(--tcc-p-blue-rgb)) !important; }
   html body .tcc-modal.tcc-expanded-modal.tone-copper {
     --tcc-expanded-rgb:var(--tcc-p-copper-rgb) !important;
     --tcc-expanded-deep:#4a3126 !important;
@@ -2263,11 +2279,10 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
    only when two same-family panels cannot occupy one iPad viewport. */
 @layer tccLocks {
   html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-current {
-    border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(25,67,62,.90),rgba(22,29,27,.94)) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--tcc-p-pink-rgb),.40) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.13),transparent 48%),linear-gradient(145deg,rgba(70,32,55,.88),rgba(25,21,35,.92)) !important;
   }
-  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-green-rgb)) !important; }
+  html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-current .eyebrow { color:#f0add0 !important; }
   html body [data-screen="budget"] .budget-stay-banner .tcc-stay-banner-next {
     border-color:rgba(var(--tcc-p-copper-rgb),.40) !important;
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-copper-rgb),.13),transparent 48%),linear-gradient(145deg,rgba(64,42,31,.88),rgba(27,22,31,.92)) !important;
@@ -2372,26 +2387,24 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
 @layer tccLocks {
   html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-current {
     border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(25,67,62,.90),rgba(22,29,27,.94)) !important;
-    box-shadow:none !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(48,61,28,.90),rgba(22,29,27,.94)) !important;
   }
-  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-green-rgb)) !important; }
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-current .eyebrow { color:#d7f09a !important; }
   html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-next {
-    border-color:rgba(var(--tcc-p-copper-rgb),.44) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-copper-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(64,42,31,.90),rgba(27,22,31,.94)) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--tcc-p-rose-rgb),.48) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-rose-rgb),.16),transparent 48%),linear-gradient(145deg,rgba(67,26,41,.92),rgba(29,20,31,.95)) !important;
   }
-  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-next .eyebrow { color:rgb(var(--tcc-p-copper-rgb)) !important; }
+  html body [data-screen="reservations"] .reservation-stay-banner .tcc-stay-banner-next .eyebrow { color:#e69bb2 !important; }
 
-  /* To Book keeps an amber status language inside, while the containing panel
-     is copper so it does not duplicate the Hotels tile visible above it. */
+  /* To Book is a semantic amber/gold panel. Keep its lower material aligned
+     with the locked Gold authority so it cannot fall back to Copper. */
   html body [data-screen="reservations"] .reservation-to-book {
     --comfort-accent:rgb(var(--tcc-p-gold-rgb)) !important;
     border-color:rgba(var(--tcc-p-gold-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
   }
   html body [data-screen="reservations"] .reservation-to-book > h2,
-  html body [data-screen="reservations"] .reservation-to-book .reservation-panel-title { color:rgb(var(--tcc-p-copper-rgb)) !important; }
+  html body [data-screen="reservations"] .reservation-to-book .reservation-panel-title { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 
   html body [data-screen="reservations"] .reservation-next-five {
     --comfort-accent:rgb(var(--tcc-p-blue-rgb)) !important;
@@ -2431,17 +2444,15 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
    source/destination coding, not duplicate widget decoration. */
 @layer tccLocks {
   html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-current {
-    border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(25,67,62,.90),rgba(22,29,27,.94)) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--tcc-p-gold-rgb),.42) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(61,51,27,.90),rgba(27,28,28,.94)) !important;
   }
-  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-green-rgb)) !important; }
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-current .eyebrow { color:rgb(var(--tcc-p-gold-rgb)) !important; }
   html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-next {
-    border-color:rgba(var(--tcc-p-copper-rgb),.44) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-copper-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(64,42,31,.90),rgba(27,22,31,.94)) !important;
-    box-shadow:none !important;
+    border-color:rgba(var(--tcc-p-red-rgb),.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-red-rgb),.15),transparent 48%),linear-gradient(145deg,rgba(65,32,46,.92),rgba(29,21,32,.95)) !important;
   }
-  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-next .eyebrow { color:rgb(var(--tcc-p-copper-rgb)) !important; }
+  html body [data-screen="calendar"] .calendar-stay-banner .tcc-stay-banner-next .eyebrow { color:#e7a5bb !important; }
 
   html body [data-screen="calendar"] .calendar-legend-item.calendar-legend-periods {
     --comfort-accent:rgb(var(--tcc-p-teal-rgb)) !important;
@@ -2512,9 +2523,9 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
   }
   html body [data-screen="journey-history"] .journey-health-needs-attention {
-    --comfort-accent:rgb(var(--tcc-p-gold-rgb)) !important;
-    border-color:rgba(var(--tcc-p-gold-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.14),transparent 48%),linear-gradient(145deg,#41361f,#29261f 62%,#091925) !important;
+    --comfort-accent:rgb(var(--tcc-p-red-rgb)) !important;
+    border-color:rgba(var(--tcc-p-red-rgb),.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-red-rgb),.14),transparent 48%),linear-gradient(145deg,#41252b,#292126 62%,#091925) !important;
   }
 }
 
@@ -2542,7 +2553,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="checklist"] .checklist-overview-card .eyebrow { color:#d8e0e6 !important; }
   html body [data-screen="checklist"] .checklist-overview-ring {
     background:radial-gradient(circle at center,#101f36 0 55%,transparent 56%),conic-gradient(rgb(var(--tcc-p-green-rgb)) 0 var(--checklist-progress),rgb(var(--tcc-p-silver-rgb)) var(--checklist-progress) 100%) !important;
-    box-shadow:0 0 24px rgba(var(--tcc-p-silver-rgb),.10) !important;
+    box-shadow:none !important;
   }
   html body [data-screen="checklist"] .checklist-overview-ring span { color:#e0e6eb !important; }
 
@@ -2564,7 +2575,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="checklist"] .checklist-history {
     --comfort-accent:rgb(var(--tcc-p-silver-rgb)) !important;
     border-color:rgba(var(--tcc-p-silver-rgb),.44) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-silver-rgb),.14),transparent 48%),linear-gradient(145deg,#343b22,#252a22 62%,#091924) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-silver-rgb),.14),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
   }
   html body [data-screen="checklist"] .checklist-history .checklist-section-head h2 { color:#d8e29a !important; }
 }
@@ -2586,9 +2597,9 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="vault"] .vault-summary-card {
     --comfort-accent:rgb(var(--tcc-p-pink-rgb)) !important;
     border-color:rgba(var(--tcc-p-pink-rgb),.44) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.14),transparent 48%),linear-gradient(145deg,#153d31,#0b292d 62%,#071a27) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.14),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
   }
-  html body [data-screen="vault"] .vault-summary-card > h2 { color:#a8f0cb !important; }
+  html body [data-screen="vault"] .vault-summary-card > h2 { color:rgb(var(--tcc-p-pink-rgb)) !important; }
 
   html body [data-screen="vault"] .vault-expiry-card {
     --comfort-accent:rgb(var(--tcc-p-gold-rgb)) !important;
@@ -2603,15 +2614,15 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-red-rgb),.15),transparent 48%),linear-gradient(145deg,#472532,#2b1d29 62%,#091824) !important;
     box-shadow:inset 3px 0 rgba(var(--tcc-p-red-rgb),.74),var(--tcc-material-shadow) !important;
   }
-  html body [data-screen="vault"] .vault-emergency-travel-card > h2 { color:rgb(var(--tcc-p-rose-rgb)) !important; }
+  html body [data-screen="vault"] .vault-emergency-travel-card > h2 { color:rgb(var(--tcc-p-red-rgb)) !important; }
 
   html body [data-screen="vault"] .vault-emergency-contacts {
     --comfort-accent:rgb(var(--tcc-p-green-rgb)) !important;
     border-color:rgba(var(--tcc-p-green-rgb),.52) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.17),transparent 48%),linear-gradient(145deg,#38202f,#251a28 62%,#091824) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.17),transparent 48%),linear-gradient(145deg,#173b27,#102b27 62%,#081925) !important;
     box-shadow:inset 3px 0 rgba(var(--tcc-p-green-rgb),.78),var(--tcc-material-shadow) !important;
   }
-  html body [data-screen="vault"] .vault-emergency-contacts h2 { color:#dfa3bd !important; }
+  html body [data-screen="vault"] .vault-emergency-contacts h2 { color:rgb(var(--tcc-p-green-rgb)) !important; }
 
   html body [data-screen="vault"] .vault-activity-compact {
     --comfort-accent:rgb(var(--tcc-p-sky-rgb)) !important;
@@ -2670,9 +2681,9 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-teal-rgb),.14),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
   }
   html body [data-screen="settings"] .settings-health-card-tone-lime {
-    --comfort-accent:rgb(var(--tcc-p-gold-rgb)) !important;
-    border-color:rgba(var(--tcc-p-gold-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.14),transparent 48%),linear-gradient(145deg,#343b22,#252a22 62%,#091924) !important;
+    --comfort-accent:rgb(var(--tcc-p-green-rgb)) !important;
+    border-color:rgba(var(--tcc-p-green-rgb),.46) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.14),transparent 48%),linear-gradient(145deg,#173b2f,#172d2a 62%,#091924) !important;
   }
   html body [data-screen="settings"] .settings-health-card-tone-blue {
     --comfort-accent:rgb(var(--tcc-p-blue-rgb)) !important;
@@ -2700,7 +2711,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="settings"] .settings-health-card-verified .settings-health-dot { background:rgb(var(--tcc-p-green-rgb)) !important; box-shadow:0 0 10px rgba(var(--tcc-p-green-rgb),.46) !important; }
   html body [data-screen="settings"] .settings-health-card-not-configured .settings-health-card-status { color:rgb(var(--tcc-p-gold-rgb)) !important; }
   html body [data-screen="settings"] .settings-health-card-not-configured .settings-health-dot { background:rgb(var(--tcc-p-gold-rgb)) !important; box-shadow:0 0 10px rgba(var(--tcc-p-gold-rgb),.42) !important; }
-  html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-card-status { color:rgb(var(--tcc-p-rose-rgb)) !important; }
+  html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-card-status { color:rgb(var(--tcc-p-red-rgb)) !important; }
   html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-dot { background:rgb(var(--tcc-p-red-rgb)) !important; box-shadow:0 0 10px rgba(var(--tcc-p-red-rgb),.46) !important; }
 
   html body [data-screen="settings"] .settings-defaults {
@@ -2727,10 +2738,10 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="settings"] .settings-backup {
     --comfort-accent:rgb(var(--tcc-p-teal-rgb)) !important;
     border-color:rgba(var(--tcc-p-teal-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-teal-rgb),.14),transparent 48%),linear-gradient(145deg,#422e25,#2a2123 62%,#091a2a) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-teal-rgb),.14),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
   }
   html body [data-screen="settings"] .settings-backup .settings-section-head h2,
-  html body [data-screen="settings"] .settings-backup > h2 { color:rgb(var(--tcc-p-copper-rgb)) !important; }
+  html body [data-screen="settings"] .settings-backup > h2 { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 
   html body [data-screen="settings"] .settings-info {
     --comfort-accent:rgb(var(--tcc-p-silver-rgb)) !important;
@@ -2953,10 +2964,10 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
 
   /* Journey History completed rows align with the calmer Itinerary treatment. */
   html body [data-screen="journey-history"] .journey-record-row {
-    border:1px solid rgba(var(--journey-record-rgb),.38) !important;
-    border-left-width:1px !important;
+    border:1px solid rgba(var(--tcc-p-blue-rgb),.12) !important;
+    border-left:4px solid rgba(var(--journey-record-rgb),.62) !important;
     background:linear-gradient(145deg,#0b1d2f,#061321 88%) !important;
-    box-shadow:none !important;
+    box-shadow:inset 3px 0 rgba(var(--journey-record-rgb),.20),inset 0 1px rgba(255,255,255,.025) !important;
   }
   html body [data-screen="journey-history"] .journey-record-row .journey-type-icon {
     color:rgb(var(--journey-record-rgb)) !important;
@@ -3031,7 +3042,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:linear-gradient(145deg,rgba(13,29,44,.92),rgba(7,19,31,.96)) !important;
   }
   .tcc-modal.tcc-expanded-modal .checklist-ready-expanded .checklist-expanded-stage-row.is-active {
-    border-left-color:rgb(var(--tcc-p-sky-rgb)) !important;
+    border-left-color:rgb(var(--tcc-expanded-rgb)) !important;
     background:linear-gradient(145deg,rgba(16,47,66,.92),rgba(8,25,39,.97)) !important;
   }
   .tcc-modal.tcc-expanded-modal .checklist-ready-expanded .checklist-expanded-stage-row > b.is-watch { color:rgb(var(--tcc-p-gold-rgb)) !important; }
@@ -3047,10 +3058,10 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="settings"] .settings-backup {
     --comfort-accent:rgb(var(--tcc-p-teal-rgb)) !important;
     border-color:rgba(var(--tcc-p-teal-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-teal-rgb),.15),transparent 48%),linear-gradient(145deg,#342850,#221d3a 62%,#09192a) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-teal-rgb),.15),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
   }
   html body [data-screen="settings"] .settings-backup .settings-section-head h2,
-  html body [data-screen="settings"] .settings-backup > h2 { color:#d7bfff !important; }
+  html body [data-screen="settings"] .settings-backup > h2 { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 }
 
 /* S40 PHYSICAL-IPAD REVIEW CLOSURE B — final behavioural/layout corrections. */
@@ -3119,7 +3130,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     display:block !important;
     height:100% !important;
     border-radius:inherit !important;
-    background:linear-gradient(90deg,rgb(var(--tcc-p-gold-rgb)),rgb(var(--tcc-p-red-rgb))) !important;
+    background:linear-gradient(90deg,rgba(var(--tcc-expanded-rgb),.78),rgb(var(--tcc-expanded-rgb))) !important;
   }
   @media (orientation:portrait) and (max-width:1100px) {
     .tcc-modal.tcc-expanded-modal .checklist-ready-expanded .checklist-expanded-status-hero {
@@ -3131,12 +3142,12 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   }
 
   /* Vault viewport distribution: preserve semantics while keeping neighbours
-     visibly separated. Summary teal, expiry gold, emergency coral, contacts
-     lime and activity steel-blue deliberately avoid near-duplicate pairs. */
+     visibly separated. Summary pink, expiry gold, emergency red, contacts
+     green and activity sky deliberately avoid near-duplicate pairs. */
   html body [data-screen="vault"] .vault-summary-card {
     --comfort-accent:rgb(var(--tcc-p-pink-rgb)) !important;
     border-color:rgba(var(--tcc-p-pink-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.15),transparent 48%),linear-gradient(145deg,#153c3b,#0d292f 62%,#081925) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
   }
   html body [data-screen="vault"] .vault-summary-card > h2 { color:#98eee6 !important; }
   html body [data-screen="vault"] .vault-emergency-travel-card {
@@ -3182,7 +3193,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     display:block !important;
     height:100% !important;
     border-radius:inherit !important;
-    background:linear-gradient(90deg,rgb(var(--tcc-p-sky-rgb)),rgb(var(--tcc-p-green-rgb))) !important;
+    background:linear-gradient(90deg,rgba(var(--tcc-expanded-rgb),.72),rgb(var(--tcc-expanded-rgb))) !important;
   }
   .tcc-modal.tcc-expanded-modal .checklist-ready-expanded .checklist-expanded-stage-row > b {
     min-width:88px !important;
@@ -3590,7 +3601,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:
       radial-gradient(circle at center,#0d2030 0 55%,transparent 56%),
       conic-gradient(rgb(var(--tcc-p-green-rgb)) 0 var(--checklist-progress),#b9c6d2 var(--checklist-progress) 100%) !important;
-    box-shadow:inset 0 0 18px rgba(0,0,0,.24),0 0 26px rgba(var(--tcc-p-sky-rgb),.12) !important;
+    box-shadow:none !important;
   }
   html body [data-screen="checklist"] .checklist-overview-ring span { color:#dceaf4 !important; }
   html body [data-screen="checklist"] .checklist-overview-metric {
@@ -3887,16 +3898,16 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="reservations"] .reservation-type-airbnb { --reservation-choice-rgb:var(--tcc-p-pink-rgb) !important; }
   html body [data-screen="reservations"] .reservation-type-ticket { --reservation-choice-rgb:var(--tcc-p-rose-rgb) !important; }
   html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-choice-icon {
-    color:rgb(var(--tcc-text-soft-rgb)) !important;
+    color:rgb(var(--reservation-choice-rgb)) !important;
     opacity:1 !important;
-    filter:none !important;
+    filter:drop-shadow(0 0 7px rgba(var(--reservation-choice-rgb),.24)) !important;
   }
 
   /* Add Expense category icons remain visibly distinct even before selection. */
   html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-icon {
-    color:rgb(var(--tcc-text-soft-rgb)) !important;
+    color:rgb(var(--choice-rgb)) !important;
     opacity:1 !important;
-    filter:none !important;
+    filter:drop-shadow(0 0 7px rgba(var(--choice-rgb),.22)) !important;
   }
 
   /* Safari/iPad native input intrinsic-width hardening. No Add/Edit grid child
@@ -4648,15 +4659,13 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     border-radius:0 14px 14px 0 !important;
     border-left-color:rgba(145,190,216,.10) !important;
   }
-  html body :is(
-    [data-screen="itinerary"],
-    [data-screen="budget"],
-    [data-screen="reservations"],
-    [data-screen="calendar"]
-  ) > .tcc-stay-banner .tcc-stay-banner-current {
-    border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
-    background:linear-gradient(145deg,rgba(var(--tcc-p-green-rgb),.18),rgba(10,28,39,.98)) !important;
-    box-shadow:none !important;
+  html body [data-screen="itinerary"] > .tcc-stay-banner .tcc-stay-banner-current,
+  html body [data-screen="budget"] > .tcc-stay-banner .tcc-stay-banner-current,
+  html body [data-screen="calendar"] > .tcc-stay-banner .tcc-stay-banner-current {
+    background:linear-gradient(145deg,rgba(25,67,62,.96),rgba(10,28,39,.98)) !important;
+  }
+  html body [data-screen="reservations"] > .tcc-stay-banner .tcc-stay-banner-current {
+    background:linear-gradient(145deg,rgba(63,69,31,.96),rgba(13,29,37,.98)) !important;
   }
   html body :is(
     [data-screen="itinerary"],
@@ -4664,9 +4673,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     [data-screen="reservations"],
     [data-screen="calendar"]
   ) > .tcc-stay-banner .tcc-stay-banner-next {
-    border-color:rgba(var(--tcc-p-copper-rgb),.42) !important;
-    background:linear-gradient(145deg,rgba(var(--tcc-p-copper-rgb),.18),rgba(18,27,39,.98)) !important;
-    box-shadow:none !important;
+    background:linear-gradient(145deg,rgba(78,43,50,.96),rgba(18,27,39,.98)) !important;
   }
   html body :is(
     [data-screen="itinerary"],
@@ -4788,12 +4795,12 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-needs-setup {
     --check-rgb:var(--tcc-p-gold-rgb) !important;
     border-color:rgba(var(--tcc-p-gold-rgb),.50) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.18),transparent 48%),linear-gradient(145deg,#493d24 0%,#2c2820 58%,#091827 100%) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.18),transparent 48%),linear-gradient(145deg,#4a4124 0%,#2d2922 58%,#091827 100%) !important;
   }
   html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-no-next-destination {
     --check-rgb:var(--tcc-p-gold-rgb) !important;
     border-color:rgba(var(--tcc-p-gold-rgb),.48) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.17),transparent 48%),linear-gradient(145deg,#493d24 0%,#2c2820 58%,#091827 100%) !important;
+    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.17),transparent 48%),linear-gradient(145deg,#4a4124 0%,#2d2922 58%,#091827 100%) !important;
   }
   html body [data-screen="checklist"] .checklist-overview-card {
     border-color:rgba(var(--tcc-p-silver-rgb),.50) !important;
@@ -4860,12 +4867,21 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   }
   html body [data-screen="itinerary"] .itinerary-add-home .tcc-line-icon { color:rgb(var(--tcc-p-gold-rgb)) !important; }
   html body [data-screen="itinerary"] .tcc-itinerary-home-visit-modal {
+    --tcc-editor-rgb:var(--tcc-p-green-rgb) !important;
+    --tcc-editor-title:rgb(var(--tcc-p-gold-rgb)) !important;
     border-color:rgba(var(--tcc-p-gold-rgb),.52) !important;
     background:radial-gradient(circle at 12% 0%,rgba(var(--tcc-p-gold-rgb),.12),transparent 42%),linear-gradient(145deg,#173f2f 0%,#122e29 54%,#101a22 100%) !important;
   }
   html body [data-screen="itinerary"] .tcc-itinerary-home-visit-modal .itinerary-home-visit-identity {
-    border-color:rgba(var(--tcc-p-gold-rgb),.34) !important;
+    border-color:rgba(var(--tcc-p-green-rgb),.46) !important;
     background:linear-gradient(145deg,rgba(16,94,62,.34),rgba(8,32,37,.78)) !important;
+  }
+  html body [data-screen="itinerary"] .tcc-itinerary-home-visit-modal .itinerary-home-visit-copy small {
+    color:rgb(var(--tcc-p-gold-rgb)) !important;
+  }
+  html body [data-screen="itinerary"] .tcc-itinerary-home-visit-modal .itinerary-home-visit-note {
+    border-color:rgba(var(--tcc-p-gold-rgb),.30) !important;
+    background:rgba(var(--tcc-p-green-rgb),.10) !important;
   }
 
   /* Settings closure: the four lower utility panels are one compact row on
@@ -4927,7 +4943,6 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
 @layer tccLocks {
   :root {
     --tcc-icon-teal-rgb:var(--tcc-p-teal-rgb);
-    --tcc-icon-sky-rgb:var(--tcc-p-sky-rgb);
     --tcc-icon-blue-rgb:var(--tcc-p-blue-rgb);
     --tcc-icon-violet-rgb:var(--tcc-p-violet-rgb);
     --tcc-icon-copper-rgb:var(--tcc-p-copper-rgb);
@@ -4986,17 +5001,17 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     [data-screen="checklist"] .checklist-column-icon,
     [data-screen="checklist"] .checklist-next-icon
   ) {
-    width:40px !important;
-    height:40px !important;
-    min-width:40px !important;
-    min-height:40px !important;
-    flex:0 0 40px !important;
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    min-height:38px !important;
+    flex:0 0 38px !important;
     display:grid !important;
     place-items:center !important;
-    border:1px solid rgba(var(--tcc-card-rgb),.60) !important;
-    border-radius:12px !important;
-    background:rgba(var(--tcc-card-rgb),.10) !important;
-    color:rgb(var(--tcc-text-soft-rgb)) !important;
+    border:1px solid rgba(var(--tcc-functional-icon-rgb),.38) !important;
+    border-radius:11px !important;
+    background:rgba(var(--tcc-functional-icon-fill-rgb),.78) !important;
+    color:rgb(var(--tcc-functional-icon-rgb)) !important;
     box-shadow:none !important;
     filter:none !important;
   }
@@ -5016,8 +5031,8 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     [data-screen="checklist"] .checklist-column-icon,
     [data-screen="checklist"] .checklist-next-icon
   ) svg {
-    width:21px !important;
-    height:21px !important;
+    width:20px !important;
+    height:20px !important;
     color:inherit !important;
     stroke:currentColor !important;
   }
@@ -5118,7 +5133,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="vault"] .vault-category-accommodation { --vault-rgb:var(--tcc-icon-copper-rgb) !important; --vault-accent:rgb(var(--tcc-icon-copper-rgb)) !important; }
   html body [data-screen="vault"] .vault-category-emergency { --vault-rgb:var(--tcc-icon-pink-rgb) !important; --vault-accent:rgb(var(--tcc-icon-pink-rgb)) !important; }
 
-  html body [data-screen="checklist"] .checklist-stage-panel { --check-rgb:var(--tcc-icon-sky-rgb) !important; }
+  html body [data-screen="checklist"] .checklist-stage-panel { --check-rgb:var(--tcc-p-sky-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-his { --check-rgb:var(--tcc-icon-blue-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-hers { --check-rgb:var(--tcc-icon-pink-rgb) !important; }
   html body [data-screen="checklist"] .checklist-shared-extras { --check-rgb:var(--tcc-icon-violet-rgb) !important; }
@@ -5144,17 +5159,17 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="checklist"] .checklist-stage-panel .checklist-stage-icon,
   html body [data-screen="checklist"] .checklist-column .checklist-column-icon,
   html body [data-screen="checklist"] .checklist-next-card .checklist-next-icon {
-    width:40px !important;
-    height:40px !important;
-    min-width:40px !important;
-    min-height:40px !important;
-    flex:0 0 40px !important;
+    width:38px !important;
+    height:38px !important;
+    min-width:38px !important;
+    min-height:38px !important;
+    flex:0 0 38px !important;
     display:grid !important;
     place-items:center !important;
-    border:1px solid rgba(var(--tcc-shared-icon-rgb),.60) !important;
+    border:1px solid rgba(var(--tcc-shared-icon-rgb),.56) !important;
     border-radius:12px !important;
-    background:rgba(var(--tcc-shared-icon-rgb),.10) !important;
-    color:rgb(var(--tcc-text-soft-rgb)) !important;
+    background:linear-gradient(145deg,rgba(var(--tcc-shared-icon-rgb),.14),rgba(4,15,28,.42)) !important;
+    color:rgb(var(--tcc-shared-icon-rgb)) !important;
     box-shadow:none !important;
     filter:none !important;
   }

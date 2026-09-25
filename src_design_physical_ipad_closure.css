@@ -1,0 +1,252 @@
+/*
+  S54 PHYSICAL IPAD SCREENSHOT CLOSURE — 23–24 Sep 2026
+  Final unlayered authority for issues visible in Cameron's IMG_1903–IMG_1931
+  physical-iPad review. This file is intentionally loaded after
+  src_design_locked_contract.css. Do not move it earlier in the cascade.
+*/
+
+/* -------------------------------------------------------------------------
+   HEADER CLOSURE
+   Journey History / Checklist / Vault: one image paint path, no 18px crop.
+   The 2px seam allowance hides sampling edges without clipping baked copy.
+   ------------------------------------------------------------------------- */
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"]
+) > .tcc-page-hero > .tcc-baked-hero-image {
+  inset:-2px !important;
+  width:calc(100% + 4px) !important;
+  height:calc(100% + 4px) !important;
+  max-width:none !important;
+  max-height:none !important;
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+html body [data-screen="journey-history"] > .tcc-page-hero > .tcc-baked-hero-image,
+html body [data-screen="checklist"] > .tcc-page-hero > .tcc-baked-hero-image {
+  object-position:left center !important;
+}
+html body [data-screen="vault"] > .tcc-page-hero > .tcc-baked-hero-image {
+  object-position:center center !important;
+}
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"]
+) > .tcc-page-hero {
+  border:0 !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  filter:none !important;
+  overflow:hidden !important;
+}
+
+/* Vault artwork contains obsolete baked title/status copy. The live left/right
+   regions are opaque enough to prevent that old copy showing through. */
+html body [data-screen="vault"] > .vault-reference-hero .tcc-page-hero-copy {
+  background:linear-gradient(90deg,#071321 0%,#071321 76%,rgba(7,19,33,.94) 88%,rgba(7,19,33,0) 100%) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero .vault-hero-actions {
+  background:#071321 !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+html body [data-screen="vault"].vault-screen-locked > .vault-locked-reference-hero::after {
+  content:"" !important;
+  display:block !important;
+  position:absolute !important;
+  z-index:1 !important;
+  inset:0 0 0 72% !important;
+  background:linear-gradient(90deg,rgba(7,19,33,0),#071321 52%,#071321 100%) !important;
+  pointer-events:none !important;
+}
+
+/* Locked Vault must never become a giant blank Access Denied slab. */
+html body [data-screen="vault"].vault-screen-locked .vault-access-denied {
+  min-height:0 !important;
+  height:auto !important;
+  padding:22px 28px !important;
+  margin:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  border:1px solid rgba(var(--tcc-p-pink-rgb),.24) !important;
+  border-radius:18px !important;
+  background:rgba(var(--tcc-p-ink-rgb),.88) !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-access-denied strong {
+  font-size:clamp(28px,3vw,40px) !important;
+  line-height:1 !important;
+}
+
+/* -------------------------------------------------------------------------
+   COLOUR CLOSURE — preserve the parent widget identity, neutralise stray
+   internal mini-palettes that competed with it in the physical screenshots.
+   ------------------------------------------------------------------------- */
+
+/* Journey History — completed record body is premium graphite, not a large
+   washed-out Silver slab. Type identity stays in the compact icon/border. */
+html body [data-screen="journey-history"] .journey-records {
+  background:linear-gradient(145deg,rgba(24,34,48,.98),rgba(7,18,31,.99)) !important;
+  border-color:rgba(var(--tcc-p-silver-rgb),.28) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="journey-history"] .journey-record-row {
+  background:rgba(var(--tcc-p-ink-rgb),.70) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="journey-history"] .journey-record-row .journey-type-icon {
+  width:40px !important;
+  height:40px !important;
+  min-width:40px !important;
+  min-height:40px !important;
+  max-width:40px !important;
+  max-height:40px !important;
+  flex:0 0 40px !important;
+  display:grid !important;
+  place-items:center !important;
+  padding:0 !important;
+  border-radius:10px !important;
+  background:rgba(var(--journey-record-rgb,var(--tcc-p-blue-rgb)),.09) !important;
+  border:1px solid rgba(var(--journey-record-rgb,var(--tcc-p-blue-rgb)),.34) !important;
+  color:rgb(var(--journey-record-rgb,var(--tcc-p-blue-rgb))) !important;
+  box-shadow:none !important;
+}
+
+/* Journey Snapshot owns Pink. Its internal booking cards are neutral graphite;
+   the aggregate booking amount inherits Pink instead of Sky/Copper. */
+html body [data-screen="journey-history"] .journey-snapshot-panel .journey-booking-summary,
+html body [data-screen="journey-history"] .journey-snapshot-panel .journey-booking-card {
+  border-color:rgba(var(--tcc-p-pink-rgb),.20) !important;
+  background:rgba(var(--tcc-p-ink-rgb),.78) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="journey-history"] .journey-snapshot-panel .journey-booking-summary-head > b {
+  color:rgb(var(--tcc-p-pink-rgb)) !important;
+}
+
+/* Destination Totals is Copper-owned, but ordinary numeric amounts are data,
+   not semantic status. Keep them readable neutral. */
+html body [data-screen="journey-history"] .journey-top-destinations :is(
+  .journey-top-item > b,
+  .journey-top-summary > span:last-child
+),
+html body [data-screen="journey-history"] .journey-destination-totals-expanded :is(
+  .journey-destination-total-row > b,
+  .journey-destination-average
+) {
+  color:rgb(var(--tcc-text-primary-rgb)) !important;
+}
+
+/* Vault All Records Silver uses a graphite body. */
+html body [data-screen="vault"] .vault-all-records {
+  background:linear-gradient(145deg,rgba(28,38,51,.98),rgba(8,19,31,.99)) !important;
+  border-color:rgba(var(--tcc-p-silver-rgb),.30) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="vault"] .vault-expiry-row > b {
+  color:rgb(var(--tcc-p-gold-rgb)) !important;
+}
+
+/* Settings App Health: verified medical mark is Green. Main health remains
+   Red before/needs recheck and Green only after a clean verification. */
+html body [data-screen="settings"] .settings-health.settings-health-verified .settings-health-ambulance,
+html body [data-screen="settings"] .settings-health.settings-health-verified .settings-health-score-icon {
+  color:rgb(var(--tcc-p-green-rgb)) !important;
+  border-color:rgba(var(--tcc-p-green-rgb),.42) !important;
+  background:rgba(var(--tcc-p-green-rgb),.10) !important;
+  box-shadow:none !important;
+}
+
+/* Checklist readiness copy must follow the semantic Ready/Not Ready/Setup hue. */
+html body [data-screen="checklist"] .checklist-ready-banner :is(
+  .checklist-ready-copy .eyebrow,
+  .checklist-ready-copy > strong
+) {
+  color:rgb(var(--tcc-card-rgb)) !important;
+}
+
+/* Monthly Spend History is a Blue parent. Do not create a second rainbow
+   system with per-month bar colours or Green/Gold selected-year controls. */
+html body [data-screen="budget"] .budget-monthly-history .budget-history-year {
+  border-color:rgba(var(--tcc-p-blue-rgb),.26) !important;
+  background:rgba(var(--tcc-p-ink-rgb),.82) !important;
+  color:rgb(var(--tcc-text-primary-rgb)) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="budget"] .budget-monthly-history .budget-history-year[data-active="true"] {
+  border-color:rgba(var(--tcc-p-blue-rgb),.60) !important;
+  background:rgba(var(--tcc-p-blue-rgb),.20) !important;
+  color:rgb(var(--tcc-text-primary-rgb)) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="budget"] .budget-monthly-history [class*="budget-history-fill-"] {
+  background:linear-gradient(180deg,rgb(var(--tcc-p-blue-rgb)),rgba(var(--tcc-p-blue-rgb),.72)) !important;
+  box-shadow:none !important;
+}
+
+/* -------------------------------------------------------------------------
+   EXPANDED / FORM COLOUR PARITY
+   ------------------------------------------------------------------------- */
+html body .tcc-modal.tcc-expanded-modal .tcc-modal-close:focus-visible {
+  outline:2px solid rgba(var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb)),.62) !important;
+  outline-offset:2px !important;
+  border-color:rgba(var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb)),.48) !important;
+  box-shadow:none !important;
+}
+html body .tcc-modal.tcc-editor-modal .tcc-modal-close:focus-visible {
+  outline:2px solid rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb))),.62) !important;
+  outline-offset:2px !important;
+  border-color:rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb))),.48) !important;
+  box-shadow:none !important;
+}
+html body .tcc-modal.tcc-editor-modal :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):focus,
+html body .tcc-modal.tcc-expanded-modal :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):focus {
+  border-color:rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb))),.62) !important;
+  outline:2px solid rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-blue-rgb))),.22) !important;
+  outline-offset:1px !important;
+  box-shadow:none !important;
+}
+
+/* Home Schengen expanded Save belongs to the Green Schengen widget. */
+html body .tcc-modal.tcc-expanded-modal .home-expanded-schengen .home-expanded-save {
+  border-color:rgba(var(--tcc-p-green-rgb),.48) !important;
+  background:rgba(var(--tcc-p-green-rgb),.20) !important;
+  color:rgb(var(--tcc-text-primary-rgb)) !important;
+  box-shadow:none !important;
+}
+
+/* Current-stay progress is Green on the shared strip. Prevent iPad/Safari's
+   native Blue/White progress appearance from leaking through. */
+html body .tcc-stay-banner-current progress {
+  accent-color:rgb(var(--tcc-p-green-rgb)) !important;
+  background:rgba(var(--tcc-p-green-rgb),.14) !important;
+  border:0 !important;
+  border-radius:999px !important;
+  overflow:hidden !important;
+  box-shadow:none !important;
+}
+html body .tcc-stay-banner-current progress::-webkit-progress-bar {
+  background:rgba(var(--tcc-p-green-rgb),.14) !important;
+}
+html body .tcc-stay-banner-current progress::-webkit-progress-value {
+  background:rgb(var(--tcc-p-green-rgb)) !important;
+}
+html body .tcc-stay-banner-current progress::-moz-progress-bar {
+  background:rgb(var(--tcc-p-green-rgb)) !important;
+}
+
+/* No regression to decorative glow/shadow material in closure layer. */
+html body [data-screen] .tcc-expand-indicator,
+html body [data-screen] .tcc-expand-control {
+  box-shadow:none !important;
+  filter:none !important;
+}
+
+/* S54_PHYSICAL_IPAD_SCREENSHOT_CLOSURE_SENTINEL */

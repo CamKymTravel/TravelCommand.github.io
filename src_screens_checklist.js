@@ -143,8 +143,9 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
   function renderTypes() {
     typeTiles.replaceChildren();
     for (const listType of CHECKLIST_LIST_TYPES) {
-      const button = node('button', `checklist-type-tile checklist-type-${listType}`, LIST_LABELS[listType]);
+      const button = node('button', 'checklist-type-tile', LIST_LABELS[listType]);
       button.type = 'button';
+      button.dataset.listType = listType;
       const unavailableDestination = listType === 'destination' && !model.checklistDestination && existing?.listType !== 'destination';
       button.disabled = unavailableDestination;
       if (unavailableDestination) button.title = 'No next destination is planned';

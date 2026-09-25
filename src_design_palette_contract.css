@@ -183,9 +183,9 @@ html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-read
 html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-needs-setup,
 html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-no-next-destination { --tcc-card-rgb:var(--tcc-p-gold-rgb) !important; --check-rgb:var(--tcc-p-gold-rgb) !important; }
 html body [data-screen="settings"] .settings-health-card { --tcc-card-rgb:var(--tcc-p-silver-rgb) !important; }
-html body [data-screen="settings"] .settings-health.settings-health-verified { --tcc-health-state-rgb:var(--tcc-p-green-rgb) !important; }
-html body [data-screen="settings"] :is(.settings-health.settings-health-needs-attention,.settings-health.settings-health-dirty) { --tcc-health-state-rgb:var(--tcc-p-red-rgb) !important; }
-html body [data-screen="settings"] .settings-health.settings-health-needs-setup { --tcc-health-state-rgb:var(--tcc-p-red-rgb) !important; }
+html body [data-screen="settings"] .settings-health { --tcc-health-state-rgb:var(--tcc-p-red-rgb) !important; --health-state-rgb:var(--tcc-p-red-rgb) !important; }
+html body [data-screen="settings"] .settings-health.settings-health-verified { --tcc-health-state-rgb:var(--tcc-p-green-rgb) !important; --health-state-rgb:var(--tcc-p-green-rgb) !important; }
+html body [data-screen="settings"] :is(.settings-health.settings-health-needs-attention,.settings-health.settings-health-dirty,.settings-health.settings-health-needs-setup) { --tcc-health-state-rgb:var(--tcc-p-red-rgb) !important; --health-state-rgb:var(--tcc-p-red-rgb) !important; }
 html body [data-screen="settings"] .settings-health-card-tone-silver { --tcc-card-rgb:var(--tcc-p-silver-rgb) !important; }
 html body [data-screen="settings"] .settings-health-card-tone-gold { --tcc-card-rgb:var(--tcc-p-gold-rgb) !important; }
 html body [data-screen="settings"] .settings-health-card-tone-copper { --tcc-card-rgb:var(--tcc-p-copper-rgb) !important; }
@@ -269,6 +269,10 @@ html body :is(
   background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-card-rgb),var(--tcc-feature-radial-a)),transparent 49%),linear-gradient(145deg,rgba(var(--tcc-card-rgb),var(--tcc-feature-lead-a)),rgba(var(--tcc-p-ink-rgb),var(--tcc-feature-tail-a)) 74%) !important;
   box-shadow:none !important; text-shadow:none !important; filter:none !important; -webkit-filter:none !important;
 }
+
+/* PHYSICAL-IPAD LARGE SILVER SURFACES — approved graphite bodies, not washed-out Silver slabs. */
+html body [data-screen="journey-history"] .journey-records { background:linear-gradient(145deg,rgba(24,34,48,.98),rgba(7,18,31,.99)) !important; border-color:rgba(var(--tcc-p-silver-rgb),.28) !important; box-shadow:none !important; }
+html body [data-screen="vault"] .vault-all-records { background:linear-gradient(145deg,rgba(28,38,51,.98),rgba(8,19,31,.99)) !important; border-color:rgba(var(--tcc-p-silver-rgb),.30) !important; box-shadow:none !important; }
 
 /* FEATURE-CARD DECORATION RESET — old screen-specific rails/glows cannot sit on top of the shared material. */
 html body :is(
@@ -532,7 +536,7 @@ html body [data-screen="checklist"] .checklist-column-permanent .checklist-next-
 html body [data-screen="checklist"] .checklist-column-destination .checklist-next-task>span { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 html body [data-screen="checklist"] .checklist-next-card .eyebrow, html body [data-screen="checklist"] .checklist-next-visual-copy>small { color:rgb(var(--tcc-p-copper-rgb)) !important; }
 html body [data-screen="checklist"] .checklist-history h2 { color:rgb(var(--tcc-text-primary-rgb)) !important; }
-html body [data-screen="checklist"] .checklist-ready-banner .eyebrow { color:rgb(var(--tcc-p-sky-rgb)) !important; }
+html body [data-screen="checklist"] .checklist-ready-banner :is(.checklist-ready-copy .eyebrow,.checklist-ready-copy>strong) { color:rgb(var(--tcc-card-rgb)) !important; }
 html body [data-screen="checklist"] .checklist-ready-banner .checklist-ready-icon { color:rgb(var(--tcc-p-gold-rgb)) !important; border-color:rgba(var(--tcc-p-gold-rgb),.62) !important; background:rgba(var(--tcc-p-gold-rgb),.11) !important; box-shadow:none !important; }
 html body [data-screen="checklist"] .checklist-ready-banner.checklist-ready-ready .checklist-ready-icon { color:rgb(var(--tcc-p-green-rgb)) !important; border-color:rgba(var(--tcc-p-green-rgb),.62) !important; background:rgba(var(--tcc-p-green-rgb),.11) !important; }
 html body [data-screen="checklist"] .checklist-stage-tab .checklist-stage-icon { border-color:rgba(var(--tcc-p-silver-rgb),.36) !important; background:rgba(var(--tcc-p-silver-rgb),.07) !important; color:rgb(var(--tcc-p-silver-rgb)) !important; }
@@ -552,22 +556,16 @@ html body [data-screen="journey-history"] :is(.journey-spend-panel,.journey-snap
 html body [data-screen="journey-history"] .journey-milestone:nth-child(3n+1)>strong { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 html body [data-screen="journey-history"] .journey-milestone:nth-child(3n+2)>strong { color:rgb(var(--tcc-p-sky-rgb)) !important; }
 html body [data-screen="journey-history"] .journey-milestone:nth-child(3n+3)>strong { color:rgb(var(--tcc-p-violet-rgb)) !important; }
-html body [data-screen="journey-history"] .journey-top-item>b, html body [data-screen="journey-history"] .journey-top-summary>span:last-child { color:rgb(var(--tcc-p-gold-rgb)) !important; }
+html body [data-screen="journey-history"] .journey-top-item>b, html body [data-screen="journey-history"] .journey-top-summary>span:last-child { color:rgb(var(--tcc-text-primary-rgb)) !important; }
+html body [data-screen="journey-history"] .journey-destination-totals-expanded :is(.journey-destination-average,.journey-destination-total-row>b) { color:rgb(var(--tcc-text-primary-rgb)) !important; }
 html body [data-screen="journey-history"] .journey-records h2 { color:rgb(var(--tcc-text-primary-rgb)) !important; }
-/* Completed rows: neutral body + restrained full travel-type border; never a side rail. */
-html body [data-screen="journey-history"] .journey-record-row { --journey-record-rgb:var(--tcc-p-blue-rgb) !important; border:1px solid rgba(var(--journey-record-rgb),.38) !important; border-left-width:1px !important; background:rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; filter:none !important; }
-html body [data-screen="journey-history"] .journey-record-row:is(.journey-record-tone-blue,.journey-record-tone-sky) { --journey-record-rgb:var(--tcc-p-blue-rgb) !important; }
-html body [data-screen="journey-history"] .journey-record-row:is(.journey-record-tone-copper,.journey-record-tone-orange) { --journey-record-rgb:var(--tcc-p-copper-rgb) !important; }
-html body [data-screen="journey-history"] .journey-record-row.journey-record-tone-violet { --journey-record-rgb:var(--tcc-p-violet-rgb) !important; }
-html body [data-screen="journey-history"] .journey-record-row .journey-type-icon { color:rgb(var(--journey-record-rgb)) !important; border-color:rgba(var(--journey-record-rgb),.42) !important; background:rgba(var(--journey-record-rgb),.10) !important; box-shadow:none !important; filter:none !important; }
-html body [data-screen="journey-history"] .journey-record-row:is(:hover,:focus-visible) { border-color:rgba(var(--journey-record-rgb),.62) !important; border-left-width:1px !important; box-shadow:none !important; }
 
 /* VAULT — category cards use Journey History grammar; lower panels keep approved semantic inner cues. */
 html body [data-screen="vault"] :is(.vault-summary-card,.vault-expiry-card,.vault-emergency-card,.vault-emergency-contacts,.vault-activity,.vault-hidden-email-panel) h2 { color:rgb(var(--tcc-card-rgb)) !important; text-shadow:none !important; }
 html body [data-screen="vault"] :is(.vault-summary-total,.vault-summary-active)>strong { color:rgb(var(--tcc-text-primary-rgb)) !important; }
 html body [data-screen="vault"] .vault-summary-watch>strong { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 html body [data-screen="vault"] .vault-summary-expired>strong { color:rgb(var(--tcc-p-red-rgb)) !important; }
-html body [data-screen="vault"] .vault-expiry-row>b { color:rgb(var(--tcc-p-sky-rgb)) !important; }
+html body [data-screen="vault"] .vault-expiry-row>b { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 html body [data-screen="vault"] .vault-emergency-card .vault-travel-fact-copy>small { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 html body [data-screen="vault"] .vault-emergency-card .vault-travel-fact-copy>b { color:rgb(var(--tcc-p-teal-rgb)) !important; }
 html body [data-screen="vault"] .vault-section-hero:not(.vault-section-streaming) .eyebrow { color:rgb(var(--tcc-card-rgb)) !important; text-shadow:none !important; }
@@ -588,6 +586,9 @@ html body [data-screen="settings"] :is(.settings-fact,.settings-info-rows>div) {
 html body [data-screen="journey-history"] .journey-mix-standard { --journey-type-rgb:var(--tcc-p-blue-rgb) !important; }
 html body [data-screen="journey-history"] .journey-mix-motorhome { --journey-type-rgb:var(--tcc-p-copper-rgb) !important; }
 html body [data-screen="journey-history"] .journey-mix-cruise { --journey-type-rgb:var(--tcc-p-violet-rgb) !important; }
+html body [data-screen="journey-history"] .journey-record-row.journey-record-tone-blue { --journey-record-rgb:var(--tcc-p-blue-rgb) !important; }
+html body [data-screen="journey-history"] :is(.journey-record-row.journey-record-tone-copper,.journey-record-row.journey-record-tone-orange) { --journey-record-rgb:var(--tcc-p-copper-rgb) !important; }
+html body [data-screen="journey-history"] .journey-record-row.journey-record-tone-violet { --journey-record-rgb:var(--tcc-p-violet-rgb) !important; }
 html body [data-screen="journey-history"] :is(.journey-mix-standard,.journey-mix-motorhome,.journey-mix-cruise) progress { accent-color:rgb(var(--journey-type-rgb)) !important; }
 
 /* FIRST-FOUR PHOTO-FIRST ORIENTATION STRIP — identical on all four screens. */
@@ -609,25 +610,25 @@ html body [data-screen="budget"] .budget-category-shopping, html body .tcc-modal
 html body [data-screen="budget"] .budget-bar-shopping { background:rgb(var(--tcc-p-rose-rgb)) !important; }
 html body [data-screen="budget"] .budget-category-miscellaneous, html body .tcc-modal .budget-category-miscellaneous { --choice-rgb:var(--tcc-p-gold-rgb) !important; --tcc-card-rgb:var(--tcc-p-gold-rgb) !important; }
 html body [data-screen="budget"] .budget-bar-miscellaneous { background:rgb(var(--tcc-p-gold-rgb)) !important; }
-html body [data-screen="reservations"] .reservation-type-flight { --choice-rgb:var(--tcc-p-blue-rgb) !important; --reservation-choice-rgb:var(--tcc-p-blue-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-train { --choice-rgb:var(--tcc-p-teal-rgb) !important; --reservation-choice-rgb:var(--tcc-p-teal-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-cruise { --choice-rgb:var(--tcc-p-violet-rgb) !important; --reservation-choice-rgb:var(--tcc-p-violet-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-rv { --choice-rgb:var(--tcc-p-copper-rgb) !important; --reservation-choice-rgb:var(--tcc-p-copper-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-hotel { --choice-rgb:var(--tcc-p-gold-rgb) !important; --reservation-choice-rgb:var(--tcc-p-gold-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-airbnb { --choice-rgb:var(--tcc-p-pink-rgb) !important; --reservation-choice-rgb:var(--tcc-p-pink-rgb) !important; }
-html body [data-screen="reservations"] .reservation-type-ticket { --choice-rgb:var(--tcc-p-rose-rgb) !important; --reservation-choice-rgb:var(--tcc-p-rose-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="flight"] { --reservation-editor-rgb:var(--tcc-p-blue-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-flight { --reservation-choice-rgb:var(--tcc-p-blue-rgb) !important; --choice-rgb:var(--tcc-p-blue-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="train"] { --reservation-editor-rgb:var(--tcc-p-teal-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-train { --reservation-choice-rgb:var(--tcc-p-teal-rgb) !important; --choice-rgb:var(--tcc-p-teal-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="cruise"] { --reservation-editor-rgb:var(--tcc-p-violet-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-cruise { --reservation-choice-rgb:var(--tcc-p-violet-rgb) !important; --choice-rgb:var(--tcc-p-violet-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="rv"] { --reservation-editor-rgb:var(--tcc-p-copper-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-rv { --reservation-choice-rgb:var(--tcc-p-copper-rgb) !important; --choice-rgb:var(--tcc-p-copper-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="hotel"] { --reservation-editor-rgb:var(--tcc-p-gold-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-hotel { --reservation-choice-rgb:var(--tcc-p-gold-rgb) !important; --choice-rgb:var(--tcc-p-gold-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="airbnb"] { --reservation-editor-rgb:var(--tcc-p-pink-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-airbnb { --reservation-choice-rgb:var(--tcc-p-pink-rgb) !important; --choice-rgb:var(--tcc-p-pink-rgb) !important; }
+html body [data-screen="reservations"] .reservation-editor[data-type="ticket"] { --reservation-editor-rgb:var(--tcc-p-rose-rgb) !important; }
+html body [data-screen="reservations"] .reservation-type-ticket { --reservation-choice-rgb:var(--tcc-p-rose-rgb) !important; --choice-rgb:var(--tcc-p-rose-rgb) !important; }
 html body [data-screen="itinerary"] .itinerary-type-tile[data-travel-type="standard"] { --choice-rgb:var(--tcc-p-blue-rgb) !important; }
 html body [data-screen="itinerary"] .itinerary-type-tile[data-travel-type="motorhome"] { --choice-rgb:var(--tcc-p-copper-rgb) !important; }
 html body [data-screen="itinerary"] .itinerary-type-tile[data-travel-type="cruise"] { --choice-rgb:var(--tcc-p-violet-rgb) !important; }
-html body [data-screen="calendar"] :is(.calendar-type-reminder,.calendar-type-note) { --calendar-choice-rgb:var(--tcc-p-violet-rgb) !important; }
-html body [data-screen="checklist"] .checklist-type-permanent { --checklist-choice-rgb:var(--tcc-p-gold-rgb) !important; }
-html body [data-screen="checklist"] .checklist-type-destination { --checklist-choice-rgb:var(--tcc-p-teal-rgb) !important; }
-html body [data-screen="budget"] .budget-category-tile[data-active="true"] { border-color:rgba(var(--choice-rgb),.72) !important; background:radial-gradient(circle at 82% 0%,rgba(var(--choice-rgb),.22),transparent 48%),rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; }
-html body [data-screen="reservations"] .reservation-type-tile[data-active="true"] { border-color:rgba(var(--reservation-choice-rgb),.72) !important; background:radial-gradient(circle at 82% 0%,rgba(var(--reservation-choice-rgb),.22),transparent 48%),rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; }
-html body [data-screen="itinerary"] .itinerary-type-tile[data-active="true"] { border-color:rgba(var(--choice-rgb),.72) !important; background:radial-gradient(circle at 82% 0%,rgba(var(--choice-rgb),.22),transparent 48%),rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; }
-html body [data-screen="calendar"] .calendar-type-tile[data-active="true"] { border-color:rgba(var(--calendar-choice-rgb),.72) !important; background:radial-gradient(circle at 82% 0%,rgba(var(--calendar-choice-rgb),.22),transparent 48%),rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; }
-html body [data-screen="checklist"] .checklist-type-tile[data-active="true"] { border-color:rgba(var(--checklist-choice-rgb),.72) !important; background:radial-gradient(circle at 82% 0%,rgba(var(--checklist-choice-rgb),.22),transparent 48%),rgba(var(--tcc-p-ink-rgb),.72) !important; box-shadow:none !important; }
 html body [data-screen="budget"] .budget-category-choice-icon { border-color:rgba(var(--choice-rgb),.56) !important; background:rgba(var(--choice-rgb),.11) !important; color:rgb(var(--choice-rgb)) !important; box-shadow:none !important; }
+html body [data-screen="reservations"] .reservation-type-tile[data-active="true"] { border-color:rgba(var(--reservation-choice-rgb),.68) !important; background:radial-gradient(circle at 84% 0%,rgba(var(--reservation-choice-rgb),.14),transparent 52%),linear-gradient(145deg,rgba(var(--reservation-choice-rgb),.12),rgba(var(--tcc-p-ink-rgb),.94)) !important; box-shadow:none !important; }
 html body [data-screen="reservations"] .reservation-type-choice-icon { border-color:rgba(var(--reservation-choice-rgb),.56) !important; background:rgba(var(--reservation-choice-rgb),.11) !important; color:rgb(var(--reservation-choice-rgb)) !important; box-shadow:none !important; }
 html body [data-screen="itinerary"] .itinerary-type-choice-icon { border-color:rgba(var(--choice-rgb),.56) !important; background:rgba(var(--choice-rgb),.11) !important; color:rgb(var(--choice-rgb)) !important; box-shadow:none !important; }
 html body [data-screen="budget"] :is(.budget-category-summary,.budget-living-manager-card) { border:1px solid rgba(var(--choice-rgb),var(--tcc-feature-border-a)) !important; background:radial-gradient(circle at 92% 0%,rgba(var(--choice-rgb),var(--tcc-feature-radial-a)),transparent 49%),linear-gradient(145deg,rgba(var(--choice-rgb),var(--tcc-feature-lead-a)),rgba(var(--tcc-p-ink-rgb),var(--tcc-feature-tail-a)) 74%) !important; box-shadow:none !important; filter:none !important; }
@@ -685,9 +686,18 @@ html body .tcc-modal.tcc-expanded-modal :is(.tcc-expand-trigger,.tcc-expand-indi
 
 /* SETTINGS HEALTH — semantic red-before-check / green-after-clear. */
 html body [data-screen="settings"] .settings-health { border-color:rgba(var(--tcc-health-state-rgb),var(--tcc-feature-border-a)) !important; background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-health-state-rgb),var(--tcc-feature-radial-a)),transparent 49%),linear-gradient(145deg,rgba(var(--tcc-health-state-rgb),var(--tcc-feature-lead-a)),rgba(var(--tcc-p-ink-rgb),var(--tcc-feature-tail-a)) 74%) !important; box-shadow:none !important; filter:none !important; }
+html body [data-screen="reservations"] .reservation-health.reservation-health-verified .reservation-health-status { color:rgb(var(--tcc-p-green-rgb)) !important; }
+html body [data-screen="reservations"] .reservation-health.reservation-health-needs-attention .reservation-health-status { color:rgb(var(--tcc-p-red-rgb)) !important; }
+html body [data-screen="journey-history"] .journey-health.journey-health-verified .journey-health-status { color:rgb(var(--tcc-p-green-rgb)) !important; }
+html body [data-screen="journey-history"] .journey-health.journey-health-needs-attention .journey-health-status { color:rgb(var(--tcc-p-red-rgb)) !important; }
+html body [data-screen="settings"] .settings-health-card-verified .settings-health-card-status { color:rgb(var(--tcc-p-green-rgb)) !important; }
+html body [data-screen="settings"] .settings-health-card-not-configured .settings-health-card-status { color:rgb(var(--tcc-p-gold-rgb)) !important; }
+html body [data-screen="settings"] .settings-health-card-needs-attention .settings-health-card-status { color:rgb(var(--tcc-p-red-rgb)) !important; }
 
 /* FUNCTIONAL CONTROLS — neutral by default; controls inside coloured core widgets inherit that widget hue. */
 html body :is(.tcc-expand-indicator,.tcc-expand-control,.reservation-rail-chevron,.itinerary-expand-control,.checklist-expanded-add) { border-color:rgba(var(--tcc-p-silver-rgb),.28) !important; background:rgba(var(--tcc-p-silver-rgb),.07) !important; color:rgb(var(--tcc-p-silver-rgb)) !important; box-shadow:none !important; filter:none !important; }
+html body [data-screen="reservations"] .reservation-next-five .reservation-rail-chevron { border-color:rgba(var(--tcc-card-rgb),.38) !important; background:rgba(var(--tcc-card-rgb),.09) !important; color:rgb(var(--tcc-card-rgb)) !important; box-shadow:none !important; filter:none !important; }
+html body .tcc-modal.tcc-expanded-modal .checklist-expanded-add { border-color:rgba(var(--tcc-card-rgb),.54) !important; background:rgba(var(--tcc-card-rgb),.12) !important; color:rgb(var(--tcc-text-primary-rgb)) !important; box-shadow:none !important; filter:none !important; }
 html body :is(
   [data-screen="home"] .home-ref-daily,
   [data-screen="home"] .home-ref-destination,
@@ -779,12 +789,12 @@ html body [data-screen="checklist"]>.tcc-page-hero[data-header-key="header-check
 html body [data-screen="vault"]>.tcc-page-hero[data-header-key="header-vault"] { border:0 !important; outline:0 !important; box-shadow:none !important; background:transparent !important; filter:none !important; }
 html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero { position:relative !important; overflow:hidden !important; isolation:isolate !important; border:0 !important; outline:0 !important; box-shadow:none !important; background:transparent !important; filter:none !important; border-radius:22px !important; }
 html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero::before, html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero::after { content:none !important; display:none !important; background:none !important; border:0 !important; outline:0 !important; box-shadow:none !important; }
-html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero>.tcc-baked-hero-image { position:absolute !important; inset:-18px !important; z-index:0 !important; width:calc(100% + 36px) !important; height:calc(100% + 36px) !important; max-width:none !important; max-height:none !important; object-fit:cover !important; object-position:center center !important; border:0 !important; outline:0 !important; box-shadow:none !important; filter:none !important; pointer-events:none !important; user-select:none !important; }
+html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero>.tcc-baked-hero-image { position:absolute !important; inset:-2px !important; z-index:0 !important; width:calc(100% + 4px) !important; height:calc(100% + 4px) !important; max-width:none !important; max-height:none !important; object-fit:cover !important; object-position:center center !important; border:0 !important; outline:0 !important; box-shadow:none !important; filter:none !important; pointer-events:none !important; user-select:none !important; }
+html body [data-screen="journey-history"]>.tcc-page-hero>.tcc-baked-hero-image, html body [data-screen="checklist"]>.tcc-page-hero>.tcc-baked-hero-image { object-position:left center !important; }
 html body :is([data-screen="journey-history"],[data-screen="checklist"],[data-screen="vault"])>.tcc-page-hero>:not(.tcc-baked-hero-image) { position:relative !important; z-index:2 !important; }
 
 /* SHARED FORM / FOCUS LANGUAGE. */
 html body [data-screen] :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { border-color:rgba(var(--tcc-p-silver-rgb),.22) !important; background:rgba(var(--tcc-p-ink-rgb),.72) !important; color:rgb(var(--tcc-text-primary-rgb)) !important; box-shadow:none !important; filter:none !important; }
-html body [data-screen] :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus { border-color:rgba(var(--tcc-p-sky-rgb),.62) !important; outline:2px solid rgba(var(--tcc-p-sky-rgb),.22) !important; outline-offset:1px !important; box-shadow:none !important; }
-html body .tcc-modal.tcc-editor-modal :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus { border-color:rgba(var(--tcc-card-rgb),.64) !important; outline:2px solid rgba(var(--tcc-card-rgb),.24) !important; outline-offset:1px !important; box-shadow:none !important; }
+html body [data-screen] :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus { border-color:rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-sky-rgb))),.62) !important; outline:2px solid rgba(var(--tcc-editor-rgb,var(--tcc-expanded-rgb,var(--tcc-p-sky-rgb))),.22) !important; outline-offset:1px !important; box-shadow:none !important; }
 
 /* S54_GENERATED_VISUAL_AUTHORITY_SENTINEL */

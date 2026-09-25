@@ -12,7 +12,7 @@ import { paletteRgbText, TCC_CANONICAL_PALETTE_RGB } from './src_core_visual-pal
 
 
 const TYPE_LABELS = Object.freeze({ reminder:'Reminder', note:'Note' });
-const PERSONAL_CALENDAR_TONES = Object.freeze({ reminder:'violet', note:'violet' });
+const PERSONAL_CALENDAR_TONES = Object.freeze({ reminder:'gold', note:'violet' });
 
 function node(tag, className, text) {
   const element = document.createElement(tag);

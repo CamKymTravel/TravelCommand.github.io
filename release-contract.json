@@ -1,28 +1,27 @@
 {
-  "contractVersion": "S54-s54-shell-1daeaf522d3a8d78-2026-09-23",
-  "packageRole": "S54 recovered continuity working source — NOT FINAL MASTER until physical-iPad acceptance.",
-  "principle": "This exact S54 recovered source is the forward working authority. Earlier checkpoints are provenance/history only; fix forward from this source.",
+  "contractVersion": "V60-R7.4-S53-tiny-currency-ui-2026-09-17",
+  "packageRole": "S53 tiny-currency UI-consistency candidate carried forward from software-closed S52/v16 — NOT FINAL MASTER until remaining physical-iPad acceptance.",
+  "principle": "This exact S53/v17 source is the forward working authority. S52 and earlier checkpoints are provenance/history only; never replace current fixes with an older checkpoint.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
     "maxFiles": 108,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:morocco-s54-simulation-09-20260920",
+    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
     "manifestId": "./tokyo-full-simulation-s40-2030-02-20-v1",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-s54-shell-1daeaf522d3a8d78",
-    "appVersion": "1.2.0-v60-s54-shell-1daeaf522d3a8d78",
-    "buildMarker": "s54-shell-1daeaf522d3a8d78"
+    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
+    "appVersion": "1.2.0-v60-r7.4-tiny-currency-ui-s53",
+    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17"
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:morocco-s54-simulation-09-20260920",
-    "cacheName": "tcc-v1-s54-shell-1daeaf522d3a8d78",
-    "buildMarker": "s54-shell-1daeaf522d3a8d78",
-    "serviceWorkerUrl": "./sw.js?v=s54-shell-1daeaf522d3a8d78",
-    "shellFingerprint": "1daeaf522d3a8d78"
+    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
+    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
+    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17",
+    "serviceWorkerUrl": "./sw.js?v=60-r7.4-s53-tiny-currency-ui-2026-09-17-v17"
   },
   "sourceAuthority": {
-    "authority": "S54 recovered continuity working source with deterministic app-shell fingerprinting and visual-regression recovery.",
+    "authority": "S53 tiny-currency UI-consistency source, carried forward from software-closed S52/v16 after audit found pre-Save Expense/Reservation conversion displays could show AUD 0.00 while canonical save stored AUD 0.01.",
     "forwardOnly": true,
     "predecessorsAreHistory": [
       "S51",
@@ -402,9 +401,9 @@
   ],
   "promotion": {
     "finalMaster": "BLOCKED",
-    "reason": "Source-side regression recovery is in progress; physical-iPad acceptance remains required."
+    "reason": "S53/v17 fixes the reproduced tiny-currency pre-Save display mismatch. FINAL MASTER remains blocked by required physical-iPad acceptance."
   },
-  "handoffInstruction": "Continue only from this exact S54 recovered working source; fix forward, rerun the full regression protocol, resynchronise the shell fingerprint, and keep physical-iPad acceptance OPEN until Cameron checks the consolidated build.",
+  "handoffInstruction": "Continue only from this exact S53/v17 source. Do not return to S52/S51/S50/S49/S48/S47/S46/S45/S44/S43/S42/S41/S40/S39/S38/S37/S36/S35/S34/S33. If any regression or later iPad recheck fails, fix forward from S53, rerun the full regression protocol, reseal hashes, and repeat the failed gate plus dependent gates.",
   "knownExternalLimitations": [
     "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
@@ -567,6 +566,5 @@
       "positive foreign-currency costs below half an AUD cent rounded to AUD 0.00 and were rejected instead of saving the smallest canonical cent",
       "Reservation/Expense pre-Save tiny-currency display mismatch (AUD 0.00 shown while canonical save stored AUD 0.01)"
     ]
-  },
-  "physicalIpadAcceptanceStatus": "OPEN"
+  }
 }

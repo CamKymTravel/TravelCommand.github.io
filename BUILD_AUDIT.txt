@@ -1,42 +1,17 @@
-TRAVEL COMMAND CENTRE — FULLY LOADED MOROCCO SIMULATION
-Build date: 23/09/2026
-Shell fingerprint: 1daeaf522d3a8d78
-Source aggregate: 29/29 PASS
-Simulation guard: 17/17 PASS
-Release layout gate: 72/72 PASS
-Simulation coverage gate: 25/25 PASS
-Build/cache guard: 15/15 PASS
-Physical-iPad static gate: 43/43 PASS
-Expanded widget colour: 93/93 PASS
-Deep screen widget colour: 132/132 PASS
-Viewport colour distribution: 66/66 PASS
-Form/editor colour: 45/45 PASS
+Travel Command Centre — S54 Morocco Simulation 10
+Built: 25 September 2026
+Source: CURRENT_SOURCE_EXACT from TCC_S54_CONTINUITY_FULL_REGRESSION_FINAL_2026-09-25_1506.zip
+Purpose: fresh visual/physical-iPad simulation candidate only; not Final Master.
 
-NAVIGABLE SCREENS
-Home
-Itinerary
-Budget
-Reservations
-Calendar
-Journey History
-Checklist
-The Vault
-Settings
+Source verification before packaging:
+- S54 full visual regression: 23/23 PASS
+- S54 physical screenshot closure: 40/40 PASS
 
-SIMULATION DATA
-Itinerary stays: 48
-Route points: 24
-Expenses: 269
-Reservations: 78
-Calendar events: 13
-Journey history records: 36
-Checklist items: 59
-Vault records: 9
-Accounts: 5
-Streaming entries: 16
+Simulation identity changes are package-only:
+- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-10-20260925
+- Fresh service-worker cache: tcc-v1-v60-r7.11-s54-morocco-simulation-10-2026-09-25
+- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim10
+- Fresh manifest id: ./morocco-s54-simulation-10-20260925
+- Fresh App Health build marker for this candidate
 
-Simulation current date: 15/07/2029
-Current stay: Morocco
-Next stay: Algeria
-
-Package note: runtime-only build. Historical .pre-* forensic backups are intentionally excluded.
+No design, layout, colour, widget, data-model, or functional source change was made while creating this simulation candidate.
