@@ -294,17 +294,19 @@ function openEmailEditor({ stateService, host, recordId = null, editorTone = 'go
 
 function renderLocked(main, stateService, access, requestRender) {
   main.classList.add('vault-screen-locked');
-  // Locked Vault authority: one clean Vault header and one Access Denied state.
-  // The private three-tap gesture lives on the header itself. No hint text,
-  // visible unlock control, record counts or protected-section previews appear
-  // while the Vault is locked.
+  // Physical-iPad authority restored from the approved earlier build: keep the
+  // premium baked Vault artwork intact, then show one compact protected-access
+  // badge underneath. The private three-tap gesture stays on the header itself;
+  // no record counts or protected-section previews are exposed while locked.
   const hero=createPageHero({
     key:'header-vault',
-    title:'The Vault',
     className:'vault-reference-hero vault-locked-reference-hero',
     position:'center center'
   });
   hero.setAttribute('aria-label','The Vault');
+  const bakedStatusMask=node('span','vault-baked-status-mask');
+  bakedStatusMask.setAttribute('aria-hidden','true');
+  hero.append(bakedStatusMask);
   let taps=0;
   let resetTimer=null;
   hero.addEventListener('click',()=>{
@@ -318,9 +320,13 @@ function renderLocked(main, stateService, access, requestRender) {
     }
     resetTimer=setTimeout(()=>{taps=0;resetTimer=null;},1800);
   });
-  const denied=node('section','vault-access-denied');
-  denied.append(node('strong','','Access Denied'));
-  main.append(hero,denied);
+  const locked=node('section','vault-locked-badge');
+  const icon=node('span','vault-locked-badge-icon');
+  icon.append(createLineIcon('vault'));
+  const copy=node('span','vault-locked-badge-copy');
+  copy.append(node('strong','','VAULT LOCKED'),node('small','','PROTECTED ACCESS'));
+  locked.append(icon,copy);
+  main.append(hero,locked);
 }
 
 function vaultExpandedStat(label,value,sub='',tone=''){

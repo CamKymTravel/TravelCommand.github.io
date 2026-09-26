@@ -1,45 +1,42 @@
-Travel Command Centre — S54 Morocco Simulation 13
-Built: 26 September 2026
-Source: authoritative S54 CURRENT_SOURCE_EXACT after the final 26 Sep cross-chat and fallback reconciliation
-Purpose: fresh visual/physical-iPad simulation candidate only; not Final Master.
+Travel Command Centre — S54 Morocco Simulation 16
+Date: 26/09/2026
 
-Final source verification immediately before packaging:
-- S54 full visual regression: 26/26 PASS
-- Source Integrity: 232/232 PASS
-- Physical Screenshot Closure: 66/66 PASS
-- Chat Closure: 25/25 PASS
-- Chat All-Screen: 13/13 PASS
-- Expanded Widget Colour: 93/93 PASS
-- Entire App Consistency: 111/111 PASS
-- Core Widget Consistency: 143/143 PASS
-- Viewport Colour Distribution: 18/18 PASS
-- Matrix Single Source: 248/248 PASS
-- Generated Visual Authority: 74/74 PASS
-- Semantic Status Colour: 22/22 PASS
-- Dark Material Parity: 163/163 PASS
-- Lower Layer Parent Parity: 108/108 PASS
-- Cross-Chat Reconciliation: 19/19 PASS
-- Authority/Report Parity: 13/13 PASS
+ROLE
+Physical-iPad visual review candidate only. Not Final Master.
 
-Recent fixes carried into this candidate include:
-- All latest physical-iPad text/layout/header fixes from the post-Simulation-12 audit.
-- Journey History, Checklist and Vault special-header outline/frame reconciliation.
-- Checklist premium colour identities, Shared Extras removal and context-locked Add forms.
-- Vault category colour normalisation, separate Emergency Travel Card / Emergency Contacts expansion and current-country emergency filtering.
-- Shared Current Stay / Next Destination strip treatment across Itinerary, Budget, Reservations and Calendar.
-- Calendar iPad-safe toolbar/legend/day-label/note spacing and approved destination/travel strips.
-- Budget portrait text protections and current-stay destination-budget row closure.
-- Icon-only sidebar/status-bar clearance, enlarged launch identity and double-tap page-zoom prevention.
-- App Health remains red/attention before a successful whole-app check and green after clearing.
-- Dormant lower-layer colour fallbacks reconciled to final authority: neutral glyphs, correct heading hues, no obsolete Checklist colour rail.
-- Obsolete Shared/Violet authority and stale closure totals removed from current source authority records.
-- Brightness/colour-presence lock retained: no global dimming, desaturation or muddy app-wide overlay; Home remains the visual brightness/style ceiling.
+SOURCE
+Packaged from the exact reconciled S54 CURRENT_SOURCE_EXACT after the complete screenshot-driven all-screen fitment closure and final Checklist stage-label correction.
 
-Simulation identity changes are package-only:
-- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-13-20260926
-- Fresh service-worker cache: tcc-v1-v60-r7.12-s54-morocco-simulation-13-2026-09-26
-- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim13
-- Fresh manifest id: ./morocco-s54-simulation-13-20260926
-- Fresh App Health build marker for this candidate
+PRE-PACKAGE SOFTWARE EVIDENCE
+- Full visual regression: 27/27 PASS
+- Post-Simulation-14 fitment gate: 26/26 PASS
+- Source integrity (within full regression): 232/232 PASS
+- Physical screenshot closure (within full regression): 75/75 PASS
+- JavaScript syntax: 65/65 PASS
 
-No redesign, scope change, global dimming or rollback to an older simulation was made while creating Simulation 13.
+THIS SIMULATION INCLUDES
+- No persistent blue last-widget/focus ring after ordinary widget expansion.
+- Modal close no longer returns focus to an ordinary widget trigger.
+- Sidebar/compass status-bar clearance retained.
+- Home lower canvas uses more of the available iPad height.
+- Shared portrait current/next stay strips protect destination names.
+- Itinerary long destination/trip names retain extra wrapping room.
+- Budget summary/forecast text fitment retained.
+- Reservations portrait search/sort/filter controls retain clean order and fit.
+- Calendar legend text fitment retained.
+- Checklist stage tabs, His/Hers counters and Overview alignment retained.
+- Checklist “Arrival & Settle In” remains on one deliberate line without shrinking the other stages.
+- Vault portrait category layout remains balanced.
+- Country Quick Look portrait modal sizes to content and clears the status bar.
+- Settings lower portrait utility cards remain balanced.
+- Approved restored Journey History / Checklist / Vault / Settings hero artwork retained.
+- Schengen ring/card clearance retained.
+- No global dimming, desaturation or brightness reduction.
+
+FRESH SIMULATION IDENTITY
+- Storage: tcc:v1:morocco-s54-simulation-16-20260926
+- Cache: tcc-v1-v60-r7.15-s54-morocco-simulation-16-2026-09-26
+- Service worker: ./sw.js?v=v60-r7.15-s54-morocco-simulation-16-2026-09-26
+- Manifest id: ./morocco-s54-simulation-16-20260926
+- Fixture date: 15/07/2029 (Morocco)
+- Fixture revision: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim16

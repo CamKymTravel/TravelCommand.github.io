@@ -175,6 +175,13 @@ export function createModal({ title, body, actions = [], className = '', showClo
   });
   dialog.addEventListener('close', () => {
     queueMicrotask(() => {
+      // Ordinary expandable cards are transient drill-downs, not a persistent
+      // selection. Do not return focus to the card after closing its expanded
+      // view, otherwise iPad Safari can leave a visible blue last-widget ring.
+      if (dialog.dataset.skipReturnFocus === 'true') {
+        returnFocus?.blur?.();
+        return;
+      }
       // Some flows deliberately replace one modal with another immediately
       // (Country Quick Look <-> Phrase Helper). Do not let the closing modal
       // steal VoiceOver/keyboard focus back to a control behind the newly open
@@ -391,6 +398,10 @@ export function openExpandedCard({ host, source, title, tone = 'sky', body = nul
     className: `tcc-expanded-modal tcc-expanded-inherits-source tone-${resolvedTone}`,
     actions: []
   });
+  // Closing an ordinary widget enlargement must return the source card to its
+  // normal visual state. Semantic controls inside editors/tabs still retain
+  // normal keyboard focus behaviour.
+  dialog.dataset.skipReturnFocus = 'true';
   // S36 visual closure: an expanded widget is the same widget at a larger
   // scale, not a new generic modal. Carry the collapsed widget's declared
   // colour family into the outer frame as an explicit invariant so later
@@ -400,7 +411,10 @@ export function openExpandedCard({ host, source, title, tone = 'sky', body = nul
   if (inheritedRgb) dialog.style.setProperty('--tcc-expanded-rgb', inheritedRgb.join(','));
   if (!body) wireSnapshotActions(snapshot, source, dialog);
   host.append(dialog);
-  dialog.addEventListener('close', () => dialog.remove(), { once:true });
+  dialog.addEventListener('close', () => {
+    source?.blur?.();
+    dialog.remove();
+  }, { once:true });
   dialog.showModal();
 }
 
@@ -421,6 +435,7 @@ export function makeExpandableCard(element, { host, title, tone = 'sky', bodyBui
     }
     event?.preventDefault?.();
     openExpandedCard({ host, source:element, title:title || 'Expanded view', tone, body:bodyBuilder?.() || null });
+    if (event?.type === 'click') requestAnimationFrame(() => element.blur?.());
   };
 
   if (hasNestedControls) {
@@ -438,6 +453,7 @@ export function makeExpandableCard(element, { host, title, tone = 'sky', bodyBui
       event.preventDefault();
       event.stopPropagation();
       openExpandedCard({ host, source:element, title:title || 'Expanded view', tone, body:bodyBuilder?.() || null });
+      requestAnimationFrame(() => { trigger.blur?.(); element.blur?.(); });
     });
     element.append(trigger);
   } else {

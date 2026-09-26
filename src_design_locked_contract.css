@@ -2743,7 +2743,11 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     html body .app-shell { padding-left:var(--sidebar-w) !important; }
     html body .sidebar {
       width:var(--sidebar-w) !important;
-      padding:10px 8px !important;
+      /* Physical iPad lock: keep the compass/navigation below the status bar.
+         This core lock is intentionally independent of the later safe-area
+         closure so a stale/late stylesheet can never put the compass under
+         the clock again. */
+      padding:34px 8px 10px !important;
       align-items:stretch !important;
     }
     html body .sidebar-brand {
@@ -4825,13 +4829,30 @@ html body [data-screen="checklist"] .checklist-column-permanent {
   }
 
   /* Home Schengen compact card: Used and Left share the first metrics row;
-     Must Leave By spans underneath so the days-left ring never collides. */
+     Must Leave By spans underneath. The ring owns a protected lane and is
+     deliberately smaller than the row height so its arc never touches the
+     Entry / Exit row on a physical landscape iPad. */
+  html body [data-screen="home"] .home-mini-schengen .home-schengen-body {
+    grid-template-columns:94px minmax(0,1fr) !important;
+    column-gap:10px !important;
+    align-items:center !important;
+  }
+  html body [data-screen="home"] .home-mini-schengen .home-schengen-ring {
+    width:82px !important;
+    height:82px !important;
+    justify-self:center !important;
+    align-self:center !important;
+    margin:0 !important;
+  }
   html body [data-screen="home"] .home-schengen-metrics {
     grid-template-columns:1fr 1fr !important;
     gap:5px !important;
   }
   html body [data-screen="home"] .home-schengen-metrics > .home-schengen-must-leave {
     grid-column:1 / -1 !important;
+  }
+  html body [data-screen="home"] .home-schengen-dates {
+    margin-top:2px !important;
   }
 
   /* Add Home Visit uses Australian green-and-gold rather than generic amber. */

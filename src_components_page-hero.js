@@ -11,7 +11,7 @@ const objectUrls = new Map();
 const BAKED_HEADER_ART_KEYS = new Set(['header-journey-history','header-checklist','header-settings','header-vault']);
 // These three were repeatedly showing Safari edge seams when painted through a
 // pseudo-element background. Render them as one real overscanned image layer.
-const FRAMELESS_BAKED_HEADER_KEYS = new Set(['header-journey-history','header-checklist','header-vault']);
+const FRAMELESS_BAKED_HEADER_KEYS = new Set(['header-journey-history','header-checklist','header-settings','header-vault']);
 const TRAVEL_MODE_HEADER_KEYS = new Set(['banner-cruise-princess','banner-motorhome-europe','banner-motorhome-usa']);
 
 // Destination photography is deliberately allowed to crop vertically so it

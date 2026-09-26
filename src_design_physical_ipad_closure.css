@@ -6,18 +6,35 @@
 */
 
 /* -------------------------------------------------------------------------
-   HEADER CLOSURE
-   Journey History / Checklist / Vault: one image paint path, no 18px crop.
-   The 6px seam allowance hides sampling edges without clipping baked copy.
+   HEADER CLOSURE — 26 Sep 2026 approved earlier-build authority.
+   Journey History / Checklist / Vault / Settings use the original baked art
+   as the title authority. One cyan widget frame only; zero CSS overscan;
+   no duplicate live title, pseudo-frame, glow or shadow.
    ------------------------------------------------------------------------- */
+:root { --tcc-header-outline-rgb:111,193,229; }
 html body :is(
   [data-screen="journey-history"],
   [data-screen="checklist"],
-  [data-screen="vault"]
+  [data-screen="vault"],
+  [data-screen="settings"]
+) > .tcc-page-hero {
+  border:1px solid rgba(var(--tcc-header-outline-rgb),.58) !important;
+  border-radius:22px !important;
+  outline:0 !important;
+  box-shadow:none !important;
+  filter:none !important;
+  overflow:hidden !important;
+  background:#071321 !important;
+}
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"],
+  [data-screen="settings"]
 ) > .tcc-page-hero > .tcc-baked-hero-image {
-  inset:-6px !important;
-  width:calc(100% + 12px) !important;
-  height:calc(100% + 12px) !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
   max-width:none !important;
   max-height:none !important;
   border:0 !important;
@@ -29,66 +46,32 @@ html body [data-screen="journey-history"] > .tcc-page-hero > .tcc-baked-hero-ima
 html body [data-screen="checklist"] > .tcc-page-hero > .tcc-baked-hero-image {
   object-position:left center !important;
 }
-html body [data-screen="vault"] > .tcc-page-hero > .tcc-baked-hero-image {
+html body [data-screen="vault"] > .tcc-page-hero > .tcc-baked-hero-image,
+html body [data-screen="settings"] > .tcc-page-hero > .tcc-baked-hero-image {
   object-position:center center !important;
 }
 html body :is(
   [data-screen="journey-history"],
-  [data-screen="checklist"]
+  [data-screen="checklist"],
+  [data-screen="vault"],
+  [data-screen="settings"]
 ) > .tcc-page-hero[data-baked-header-art="true"] > .tcc-page-hero-copy {
   display:none !important;
 }
 html body :is(
   [data-screen="journey-history"],
   [data-screen="checklist"],
-  [data-screen="vault"]
-) > .tcc-page-hero {
-  border:0 !important;
-  outline:0 !important;
-  box-shadow:none !important;
-  filter:none !important;
-  overflow:hidden !important;
-}
-
-/* Vault artwork contains obsolete baked title/status copy. The live left/right
-   regions are opaque enough to prevent that old copy showing through. */
-html body [data-screen="vault"] > .vault-reference-hero .tcc-page-hero-copy {
-  background:linear-gradient(90deg,#071321 0%,#071321 76%,rgba(7,19,33,.94) 88%,rgba(7,19,33,0) 100%) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero .vault-hero-actions {
-  background:#071321 !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-html body [data-screen="vault"].vault-screen-locked > .vault-locked-reference-hero::after {
-  content:"" !important;
-  display:block !important;
-  position:absolute !important;
-  z-index:1 !important;
-  inset:0 0 0 72% !important;
-  background:linear-gradient(90deg,rgba(7,19,33,0),#071321 52%,#071321 100%) !important;
-  pointer-events:none !important;
-}
-
-/* Locked Vault must never become a giant blank Access Denied slab. */
-html body [data-screen="vault"].vault-screen-locked .vault-access-denied {
-  min-height:0 !important;
-  height:auto !important;
-  padding:22px 28px !important;
-  margin:0 !important;
-  display:grid !important;
-  place-items:center !important;
-  border:1px solid rgba(var(--tcc-p-pink-rgb),.24) !important;
-  border-radius:18px !important;
-  background:rgba(var(--tcc-p-ink-rgb),.88) !important;
-  box-shadow:none !important;
-  filter:none !important;
-}
-html body [data-screen="vault"].vault-screen-locked .vault-access-denied strong {
-  font-size:clamp(28px,3vw,40px) !important;
-  line-height:1 !important;
+  [data-screen="vault"],
+  [data-screen="settings"]
+) > .tcc-page-hero::before,
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"],
+  [data-screen="settings"]
+) > .tcc-page-hero::after {
+  content:none !important;
+  display:none !important;
 }
 
 /* -------------------------------------------------------------------------
@@ -292,86 +275,23 @@ html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) :is(.modal-body,.
 }
 
 /* -------------------------------------------------------------------------
-   VAULT HEADER ARTWORK MASK — 26 Sep 2026 physical iPad closure.
-   The supplied header JPG contains obsolete baked title/subtitle on the left
-   and a historical 28-record status card on the right. The centre vault-door
-   artwork is retained; opaque edge masks permanently remove the obsolete copy
-   in both unlocked and locked states. Live unlocked copy/actions render above
-   these masks. Locked state shows only the clean central vault-door artwork.
-   ------------------------------------------------------------------------- */
-html body [data-screen="vault"] > .vault-reference-hero {
-  position:relative !important;
-  isolation:isolate !important;
-}
-html body [data-screen="vault"] > .vault-reference-hero::before,
-html body [data-screen="vault"] > .vault-reference-hero::after {
-  content:"" !important;
-  display:block !important;
-  position:absolute !important;
-  top:0 !important;
-  bottom:0 !important;
-  pointer-events:none !important;
-  z-index:1 !important;
-}
-html body [data-screen="vault"] > .vault-reference-hero::before {
-  left:0 !important;
-  width:31% !important;
-  background:linear-gradient(90deg,#071321 0%,#071321 76%,rgba(7,19,33,.97) 86%,rgba(7,19,33,0) 100%) !important;
-}
-html body [data-screen="vault"] > .vault-reference-hero::after {
-  right:0 !important;
-  left:auto !important;
-  width:23% !important;
-  background:linear-gradient(90deg,rgba(7,19,33,0) 0%,rgba(7,19,33,.97) 20%,#071321 34%,#071321 100%) !important;
-}
-html body [data-screen="vault"] > .vault-reference-hero > :not(.tcc-baked-hero-image) {
-  position:relative !important;
-  z-index:2 !important;
-}
-html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero .tcc-page-hero-copy {
-  display:flex !important;
-  background:transparent !important;
-}
-html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero .vault-hero-actions {
-  background:#071321 !important;
-  box-shadow:inset 0 0 0 1px rgba(var(--tcc-p-sky-rgb),.14) !important;
-}
-html body [data-screen="vault"].vault-screen-locked > .vault-locked-reference-hero .tcc-page-hero-copy {
-  display:none !important;
-}
-html body [data-screen="vault"].vault-screen-locked {
-  grid-template-rows:auto auto !important;
-  align-content:start !important;
-  min-height:0 !important;
-  overflow:auto !important;
-}
-html body [data-screen="vault"].vault-screen-locked .vault-access-denied {
-  align-self:start !important;
-  justify-self:stretch !important;
-  min-height:0 !important;
-  height:auto !important;
-  margin-top:14px !important;
-  padding:28px !important;
-  background:linear-gradient(145deg,rgba(19,25,42,.98),rgba(8,18,31,.99)) !important;
-}
-
-/* -------------------------------------------------------------------------
    HOME SCHENGEN RING CLEARANCE — 26 Sep 2026 physical iPad finding.
    The days-left ring must have its own protected lane so neither its arc nor
-   glow crowds the Used / Left / Must Leave By metrics. Keep the Home card at
+   label crowds the Used / Left / Must Leave By metrics. Keep the Home card at
    its approved size; reclaim clearance inside the existing compact layout.
    ------------------------------------------------------------------------- */
 html body [data-screen="home"] .home-mini-schengen .home-schengen-body {
-  grid-template-columns:104px minmax(0,1fr) !important;
+  grid-template-columns:94px minmax(0,1fr) !important;
   column-gap:10px !important;
   align-items:center !important;
 }
 html body [data-screen="home"] .home-mini-schengen .home-schengen-ring {
-  width:90px !important;
-  height:90px !important;
-  justify-self:start !important;
-  margin-left:2px !important;
-  box-shadow:inset 0 0 20px rgba(var(--tcc-p-green-rgb),.13),0 0 10px rgba(var(--tcc-p-green-rgb),.08) !important;
+  width:82px !important;
+  height:82px !important;
+  justify-self:center !important;
+  align-self:center !important;
+  margin:0 !important;
+  box-shadow:none !important;
 }
 html body [data-screen="home"] .home-mini-schengen .home-schengen-metrics {
   min-width:0 !important;
@@ -1011,4 +931,455 @@ html body [data-screen="calendar"] .calendar-day-number {
     line-height:1.08 !important;
     white-space:normal !important;
   }
+}
+
+
+/* -------------------------------------------------------------------------
+   APPROVED PREMIUM HEADER RESTORATION — 26 Sep 2026 physical iPad authority.
+   The generated tccFinalPalette layer now owns the same rules so these are a
+   readable final guard only: original baked artwork, one frame, no duplicate
+   live title, compact Settings/Vault proportions, compact Vault locked badge.
+   ------------------------------------------------------------------------- */
+html body [data-screen="vault"] > .vault-reference-hero > .vault-baked-status-mask {
+  position:absolute !important;
+  z-index:1 !important;
+  top:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  width:22% !important;
+  pointer-events:none !important;
+  background:linear-gradient(90deg,rgba(7,19,33,0) 0%,rgba(7,19,33,.92) 24%,#071321 42%,#071321 100%) !important;
+}
+html body [data-screen="vault"] > .vault-reference-hero > .vault-hero-actions {
+  position:relative !important;
+  z-index:2 !important;
+  background:#071321 !important;
+}
+html body [data-screen="vault"].vault-screen-locked {
+  grid-template-rows:auto auto !important;
+  align-content:start !important;
+  justify-items:stretch !important;
+  gap:18px !important;
+  min-height:0 !important;
+  overflow:auto !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge {
+  justify-self:center !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+  min-width:292px !important;
+  padding:13px 22px !important;
+  border:1px solid rgba(var(--tcc-p-sky-rgb),.68) !important;
+  border-radius:17px !important;
+  background:linear-gradient(145deg,rgba(8,31,47,.97),rgba(5,20,34,.99)) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge-icon {
+  width:46px !important;
+  height:46px !important;
+  display:grid !important;
+  place-items:center !important;
+  border:1px solid rgba(var(--tcc-p-sky-rgb),.30) !important;
+  border-radius:13px !important;
+  background:linear-gradient(145deg,rgba(var(--tcc-p-blue-rgb),.22),rgba(var(--tcc-p-ink-rgb),.86)) !important;
+  color:#f1f6f8 !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge-icon .tcc-line-icon {
+  width:25px !important;
+  height:25px !important;
+  color:inherit !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge-copy { display:grid !important; gap:3px !important; }
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge-copy strong {
+  color:#f4f7f8 !important; font-size:22px !important; line-height:1 !important; font-weight:850 !important; letter-spacing:.035em !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-locked-badge-copy small {
+  color:rgb(var(--tcc-p-sky-rgb)) !important; font-size:11px !important; line-height:1 !important; font-weight:850 !important; letter-spacing:.16em !important;
+}
+html body [data-screen="vault"].vault-screen-locked .vault-access-denied { display:none !important; }
+
+
+/* -------------------------------------------------------------------------
+   POST-SIMULATION 14 FITMENT + TRANSIENT-FOCUS CLOSURE — 26 Sep 2026.
+   Physical iPad screenshots IMG_2014–IMG_2054 are the authority for this pass.
+   No redesign, no dimming: retain the approved premium colour/material system.
+   ------------------------------------------------------------------------- */
+
+/* Ordinary expandable widgets must not retain a blue focus/selection ring after
+   opening or closing. Semantic active states remain on nav, tabs and filters. */
+html body [data-expandable="true"]:focus,
+html body [data-expandable="true"]:focus-visible,
+html body [data-expandable="true"] > .tcc-expand-trigger:focus,
+html body [data-expandable="true"] > .tcc-expand-trigger:focus-visible {
+  outline:0 !important;
+  outline-offset:0 !important;
+}
+
+/* The compact sidebar has ample vertical room. Give the compass a visibly
+   separate lane below the system clock/status bar on both approved iPads. */
+@media (max-width:1200px) {
+  html body .sidebar {
+    padding-top:max(48px,calc(env(safe-area-inset-top,0px) + 22px)) !important;
+  }
+}
+
+/* HOME — use a little of the spare physical-iPad bottom area. Keep the fixed
+   one-screen dashboard, but let the lower widgets/search breathe more. */
+@media (orientation:landscape) and (max-height:850px) {
+  html body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
+    height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 12px) !important;
+    min-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 12px) !important;
+    max-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 12px) !important;
+    grid-template-rows:230px 232px minmax(0,1fr) 50px !important;
+    padding-bottom:5px !important;
+  }
+  html body [data-screen="home"] .home-ref-minis { align-items:stretch !important; min-height:0 !important; }
+  html body [data-screen="home"] .home-mini-panel { height:100% !important; min-height:0 !important; }
+}
+
+/* Shared portrait current/next strip — keep the destination names visible
+   between the label lane and the days-remaining/planned lane. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-card {
+    grid-template-columns:70px minmax(0,1fr) 104px !important;
+    column-gap:6px !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow {
+    font-size:9px !important;
+    letter-spacing:.13em !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-identity {
+    display:flex !important;
+    min-width:0 !important;
+    width:100% !important;
+    gap:5px !important;
+    overflow:visible !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-name {
+    display:block !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    font-size:14px !important;
+    line-height:1.02 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-detail {
+    font-size:9.5px !important;
+  }
+}
+
+/* ITINERARY portrait — protect the destination-name lane. Long names may use
+   two clean lines instead of being cut to "Amsterd…". */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="itinerary"] .itinerary-entry {
+    grid-template-columns:150px minmax(250px,1.45fr) minmax(112px,.62fr) minmax(168px,.86fr) !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-entry > span { padding-inline:10px !important; }
+  html body [data-screen="itinerary"] .itinerary-entry-identity { gap:7px !important; }
+  html body [data-screen="itinerary"] .itinerary-entry-icon { width:34px !important; height:34px !important; flex-basis:34px !important; }
+  html body [data-screen="itinerary"] .itinerary-entry-flag { width:30px !important; height:30px !important; flex-basis:30px !important; font-size:25px !important; }
+  html body [data-screen="itinerary"] .itinerary-entry-identity-copy strong {
+    display:-webkit-box !important;
+    -webkit-box-orient:vertical !important;
+    -webkit-line-clamp:2 !important;
+    line-clamp:2 !important;
+    max-height:2.24em !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    word-break:normal !important;
+    font-size:16px !important;
+    line-height:1.12 !important;
+  }
+  html body [data-screen="itinerary"] .itinerary-entry-budget strong { font-size:18px !important; }
+}
+
+/* CALENDAR portrait — the three legend widgets should name themselves without
+   ellipsis. Counts stay in their own compact lane. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="calendar"] .calendar-legend-item {
+    grid-template-columns:34px minmax(0,1fr) 28px !important;
+    column-gap:6px !important;
+    padding:7px 8px !important;
+  }
+  html body [data-screen="calendar"] .calendar-legend-swatch {
+    width:32px !important;
+    height:32px !important;
+  }
+  html body [data-screen="calendar"] .calendar-legend-item > strong {
+    font-size:11.5px !important;
+    line-height:1.02 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    word-break:normal !important;
+  }
+  html body [data-screen="calendar"] .calendar-legend-item > small {
+    min-width:26px !important;
+    font-size:10px !important;
+  }
+}
+
+/* CHECKLIST — stage tabs and His/Hers counters were the main fitment problem in
+   the screenshot batch. Keep four stages, but give icon/copy consistent lanes
+   and keep the expand glyph clear of the owner totals. */
+html body [data-screen="checklist"] .checklist-stage-tabs {
+  align-items:stretch !important;
+}
+html body [data-screen="checklist"] .checklist-stage-tab {
+  min-height:60px !important;
+  grid-template-columns:30px minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:6px !important;
+  padding:6px 7px !important;
+}
+html body [data-screen="checklist"] .checklist-stage-icon {
+  width:30px !important;
+  height:30px !important;
+  align-self:center !important;
+}
+html body [data-screen="checklist"] .checklist-stage-copy {
+  min-width:0 !important;
+  display:grid !important;
+  align-content:center !important;
+  gap:2px !important;
+}
+html body [data-screen="checklist"] .checklist-stage-copy strong {
+  font-size:12px !important;
+  line-height:1.03 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+html body [data-screen="checklist"] .checklist-stage-copy small {
+  font-size:9.5px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+html body [data-screen="checklist"] .checklist-owner-stats {
+  margin-right:28px !important;
+}
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="checklist"] .checklist-stage-tab {
+    grid-template-columns:28px minmax(0,1fr) !important;
+    gap:5px !important;
+    padding-inline:5px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-icon { width:28px !important; height:28px !important; }
+  html body [data-screen="checklist"] .checklist-stage-copy strong { font-size:11px !important; }
+  html body [data-screen="checklist"] .checklist-owner-stats { margin-right:24px !important; }
+}
+
+/* BUDGET portrait — stop year-forecast values from ellipsising inside the
+   three compact metrics. Keep the existing three-card composition. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="budget"] .budget-forecast-grid-refined {
+    gap:7px !important;
+  }
+  html body [data-screen="budget"] .budget-forecast-grid-refined .budget-pace-metric {
+    min-width:0 !important;
+    padding:8px 7px !important;
+  }
+  html body [data-screen="budget"] .budget-forecast-grid-refined .budget-pace-metric > span {
+    font-size:10px !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+  }
+  html body [data-screen="budget"] .budget-forecast-grid-refined .budget-pace-metric > strong {
+    display:block !important;
+    max-width:100% !important;
+    font-size:11.5px !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    word-break:normal !important;
+  }
+  html body [data-screen="budget"] .budget-forecast-grid-refined .budget-pace-metric > small {
+    font-size:9.5px !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   ALL-SCREEN FITMENT CLOSURE II — 26 Sep 2026 physical iPad screenshot audit.
+   Small geometry/text corrections only. Preserve approved colour, brightness,
+   premium material depth and the restored hero/header artwork.
+   ------------------------------------------------------------------------- */
+
+/* HOME — use a little more of the otherwise empty lower landscape canvas while
+   keeping the fixed no-scroll command-centre behaviour. */
+@media (orientation:landscape) and (max-height:850px) {
+  html body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
+    height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 20px) !important;
+    min-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 20px) !important;
+    max-height:calc(100dvh - var(--tcc-safe-top,0px) - var(--tcc-safe-bottom,0px) + 20px) !important;
+  }
+}
+
+/* ITINERARY — long trip names have enough row height for three deliberate
+   lines on portrait instead of ending in an avoidable ellipsis. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="itinerary"] .itinerary-entry-identity-copy strong {
+    -webkit-line-clamp:3 !important;
+    line-clamp:3 !important;
+    max-height:3.36em !important;
+  }
+}
+
+/* BUDGET — the two top summary cards are a visual pair. Stretch the shorter
+   destination card to the pace card's row height so portrait does not leave a
+   dead rectangular gap beneath it. */
+html body [data-screen="budget"] .budget-reference-top {
+  align-items:stretch !important;
+}
+html body [data-screen="budget"] .budget-reference-top > .budget-summary-card {
+  height:100% !important;
+  align-self:stretch !important;
+  box-sizing:border-box !important;
+}
+
+/* RESERVATIONS — portrait search/sort controls should read in task order rather
+   than forming four equally weighted half-width boxes. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="reservations"] .reservation-list-controls {
+    grid-template-columns:minmax(0,1fr) 96px !important;
+    gap:8px !important;
+    align-items:end !important;
+  }
+  html body [data-screen="reservations"] .reservation-control-search {
+    grid-column:1 / -1 !important;
+  }
+  html body [data-screen="reservations"] .reservation-list-controls > .reservation-control:nth-child(2) {
+    grid-column:1 !important;
+  }
+  html body [data-screen="reservations"] .reservation-control-direction {
+    grid-column:2 !important;
+    align-self:end !important;
+  }
+  html body [data-screen="reservations"] .reservation-list-controls > .reservation-control:last-child {
+    grid-column:1 / -1 !important;
+  }
+}
+
+/* VAULT — keep the approved three-plus-two portrait composition but make the
+   second row intentionally balanced instead of leaving an empty third-card hole. */
+@media (orientation:portrait) and (max-width:900px) {
+  html body [data-screen="vault"] .vault-category-grid {
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+  html body [data-screen="vault"] .vault-category-card:nth-child(-n+3) {
+    grid-column:span 2 !important;
+  }
+  html body [data-screen="vault"] .vault-category-card:nth-child(n+4) {
+    grid-column:span 3 !important;
+  }
+}
+
+/* HOME COUNTRY QUICK LOOK — portrait has ample height, but the fixed one-screen
+   landscape helper height created hundreds of pixels of empty modal canvas and
+   pushed the dialog under the iPad status bar. Let Quick Look size to content;
+   the Phrase Helper keeps its existing dedicated geometry. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="home"] .tcc-modal.home-helper-quick-modal {
+    height:auto !important;
+    max-height:calc(100dvh - max(64px,env(safe-area-inset-top,0px) + 42px) - max(24px,env(safe-area-inset-bottom,0px))) !important;
+    margin-top:max(48px,calc(env(safe-area-inset-top,0px) + 28px)) !important;
+    margin-bottom:max(18px,env(safe-area-inset-bottom,0px)) !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="home"] .tcc-modal.home-helper-quick-modal > form {
+    height:auto !important;
+    max-height:inherit !important;
+    grid-template-rows:58px auto !important;
+  }
+  html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .modal-body {
+    min-height:0 !important;
+    overflow:auto !important;
+  }
+  html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-rich {
+    height:auto !important;
+    min-height:0 !important;
+    overflow:visible !important;
+  }
+}
+
+/* SETTINGS — keep the lower portrait utility cards matched as a two-column
+   system and prevent their headings/status chips from colliding at the join. */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body [data-screen="settings"] .settings-lower-grid {
+    align-items:stretch !important;
+  }
+  html body [data-screen="settings"] .settings-lower-grid > .settings-panel {
+    height:100% !important;
+    box-sizing:border-box !important;
+  }
+  html body [data-screen="settings"] .settings-lower-grid .settings-section-head {
+    grid-template-columns:minmax(0,1fr) auto !important;
+    align-items:start !important;
+  }
+  html body [data-screen="settings"] .settings-lower-grid .settings-section-head h2 {
+    min-width:0 !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   FINAL PRE-SIMULATION FITMENT SEAL — 26 Sep 2026.
+   Physical iPad Simulation 15 Checklist review: keep the fourth stage label
+   on one deliberate line without shrinking the rest of the stage strip.
+   ------------------------------------------------------------------------- */
+html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) {
+  grid-template-columns:28px minmax(0,1fr) !important;
+  gap:4px !important;
+  padding-left:5px !important;
+  padding-right:5px !important;
+}
+html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-icon {
+  width:28px !important;
+  height:28px !important;
+}
+html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-copy strong {
+  font-size:11px !important;
+  line-height:1 !important;
+  letter-spacing:-.012em !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
 }

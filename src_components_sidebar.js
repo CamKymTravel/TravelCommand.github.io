@@ -17,10 +17,7 @@ export function renderSidebar(activeScreen, onNavigate, onBrandActivate = null, 
   const mark=document.createElement(onBrandActivate?'button':'span'); mark.className=onBrandActivate?'brand-mark brand-mark-button':'brand-mark'; mark.innerHTML='<img class="brand-app-icon" src="./app-icon.png" alt="" aria-hidden="true">'; if(onBrandActivate){mark.type='button';mark.setAttribute('aria-label',activeScreen==='home'?"Where's the toilet?":'Travel Command Centre compass');mark.addEventListener('click',onBrandActivate);} else mark.setAttribute('aria-hidden','true');
   const name=document.createElement('span'); name.className='sidebar-brand-name'; name.innerHTML='<strong>TRAVEL</strong><small>COMMAND CENTRE</small>'; brand.append(mark,name); aside.append(brand);
   const nav=document.createElement('nav'); nav.setAttribute('aria-label','Primary navigation'); NAV_ITEMS.forEach(([id,label,icon])=>{ const button=document.createElement('button'); button.type='button'; button.className='nav-button'; button.dataset.active=String(id===activeScreen); if(id===activeScreen) button.setAttribute('aria-current','page'); button.setAttribute('aria-label',label); const iconNode=document.createElement('span');iconNode.className='nav-icon';iconNode.append(createLineIcon(icon)); const labelNode=document.createElement('span');labelNode.textContent=label;button.append(iconNode,labelNode);button.addEventListener('click',()=>{
-    const previous=document.querySelector('.tcc-nav-flash'); if(previous) previous.remove();
-    const rect=button.getBoundingClientRect(); const cue=document.createElement('div'); cue.className='tcc-nav-flash'; cue.textContent=label; cue.style.top=`${Math.round(rect.top+rect.height/2)}px`; document.body.append(cue);
-    requestAnimationFrame(()=>cue.classList.add('is-visible'));
-    setTimeout(()=>{cue.classList.remove('is-visible');setTimeout(()=>cue.remove(),140);},900);
+    button.blur?.();
     onNavigate(id);
   });nav.append(button); }); aside.append(nav);
   const status=document.createElement('section'); status.className='sidebar-status';

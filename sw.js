@@ -3,7 +3,7 @@
 // cache identity is mandatory so activate() can actually see the predecessor
 // cache and run the busy-dialog/picker hand-off instead of misclassifying an
 // already-installed V50 app as a first install.
-const CACHE_NAME = 'tcc-v1-v60-r7.12-s54-morocco-simulation-13-2026-09-26';
+const CACHE_NAME = 'tcc-v1-v60-r7.15-s54-morocco-simulation-16-2026-09-26';
 const CACHE_PREFIX = 'tcc-v1-';
 const APP_SHELL = [
   './',
