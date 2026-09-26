@@ -1,27 +1,27 @@
 {
-  "contractVersion": "V60-R7.4-S53-tiny-currency-ui-2026-09-17",
-  "packageRole": "S53 tiny-currency UI-consistency candidate carried forward from software-closed S52/v16 — NOT FINAL MASTER until remaining physical-iPad acceptance.",
-  "principle": "This exact S53/v17 source is the forward working authority. S52 and earlier checkpoints are provenance/history only; never replace current fixes with an older checkpoint.",
+  "contractVersion": "V60-R7.12-S54-morocco-simulation-13-2026-09-26",
+  "packageRole": "S54 Morocco Simulation 13 — physical-iPad visual review candidate only; not Final Master.",
+  "principle": "This simulation is packaged from the reconciled CURRENT_SOURCE_EXACT S54 authority after the 26 Sep 2026 regression closure. Older simulations are evidence/history only and must never replace current source.",
   "protocolFile": "CONTINUITY_FULL_BUILD_PROTOCOL_AND_GUARD.py",
   "package": {
     "maxFiles": 108,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
-    "manifestId": "./tokyo-full-simulation-s40-2030-02-20-v1",
+    "storageKey": "tcc:v1:morocco-s54-simulation-13-20260926",
+    "manifestId": "./morocco-s54-simulation-13-20260926",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
-    "appVersion": "1.2.0-v60-r7.4-tiny-currency-ui-s53",
-    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17"
+    "cacheName": "tcc-v1-v60-r7.12-s54-morocco-simulation-13-2026-09-26",
+    "appVersion": "1.2.0-v60-r7.12-s54-morocco-simulation-13",
+    "buildMarker": "v60-r7.12-s54-morocco-simulation-13-2026-09-26"
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:tokyo-full-simulation-s40-real-ipad-v1",
-    "cacheName": "tcc-v1-v60-r7.4-s53-tiny-currency-ui-2026-09-17-v17",
-    "buildMarker": "v60-r7.4-tiny-currency-ui-2026-09-17-s53-v17",
-    "serviceWorkerUrl": "./sw.js?v=60-r7.4-s53-tiny-currency-ui-2026-09-17-v17"
+    "storageKey": "tcc:v1:morocco-s54-simulation-13-20260926",
+    "cacheName": "tcc-v1-v60-r7.12-s54-morocco-simulation-13-2026-09-26",
+    "buildMarker": "v60-r7.12-s54-morocco-simulation-13-2026-09-26",
+    "serviceWorkerUrl": "./sw.js?v=v60-r7.12-s54-morocco-simulation-13-2026-09-26"
   },
   "sourceAuthority": {
-    "authority": "S53 tiny-currency UI-consistency source, carried forward from software-closed S52/v16 after audit found pre-Save Expense/Reservation conversion displays could show AUD 0.00 while canonical save stored AUD 0.01.",
+    "authority": "Current S54 CURRENT_SOURCE_EXACT after 26 Sep 2026 cross-chat reconciliation, stale-authority cleanup, lower-layer fallback reconciliation and brightness-preservation lock.",
     "forwardOnly": true,
     "predecessorsAreHistory": [
       "S51",
@@ -44,7 +44,7 @@
       "S34",
       "S33"
     ],
-    "provenance": "S52 preserves all sealed S51 visual/interaction fixes and storage identity, then makes canonical AUD rounding retain AUD 0.01 for any real positive foreign-currency cost whose converted value would otherwise round to AUD 0.00. Zero remains zero; normal cent rounding is unchanged."
+    "provenance": "Simulation 13 is package-only: runtime identity was refreshed after all current-source gates passed. No redesign or rollback to Simulation 12 or older source was used."
   },
   "hardVisualRules": [
     "Every expanded widget preserves the same colour family as its collapsed/original widget.",
@@ -246,13 +246,13 @@
     }
   },
   "latestSoftwareEvidence": {
-    "exactSource": "PENDING definitive S52 exact-source rerun.",
-    "targeted": "PASS — S52 focused tiny-currency gate; retained S51 editor/device-proxy gates pending definitive rerun.",
+    "exactSource": "PASS — S54 full live regression 26/26 immediately before Simulation 13 packaging.",
+    "targeted": "PASS — cross-chat reconciliation, physical screenshot closure, source integrity, lower-layer parity and authority/report parity are included in the full live suite.",
     "priority": "Core interaction regression retained from S50; 56/56 exact-source suite remains clean after S51 focus-size repair.",
-    "expandedColour": "PASS — source/expanded/editor colour continuity retained, including Home Visit gold and category-specific editor identities.",
+    "expandedColour": "PASS — expanded/editor colour continuity retained; app-wide brightness/colour presence remains protected from global dimming/desaturation.",
     "touchTargets": "44px global touch-target lock retained; portrait sidebar navigation remains 56px high.",
     "mainOverflow": "PASS — S51 focus-zoom gate and retained Add/Edit overlap gates report no horizontal overflow at the three approved iPad viewports.",
-    "expandedGeometry": "Existing expanded-modal geometry protections retained; final S40 matrix rerun pending.",
+    "expandedGeometry": "PASS — current S54 expanded/editor geometry protections retained; live expanded-widget and physical-iPad gates are authoritative.",
     "deadSpace": "Journey Milestones increased to a 12-fact automatic grid and Ready-to-Move top hero uses its previous empty right side for readiness progress.",
     "hiddenEditors": "PASS — S51 iPad focus-zoom gate verifies all audited editable controls are 16px or larger at 1194×834, 1024×768 and 768×1024; S50 nested-editor overlap protections retained.",
     "textClipping": "PASS — S51 Reservation focus-size repair retains S49 Add-editor geometry with no date/time field collision or selector clipping.",

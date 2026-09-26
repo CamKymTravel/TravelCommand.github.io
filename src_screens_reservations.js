@@ -867,7 +867,7 @@ export function renderReservationsScreen({ stateService, currentDate, navigate }
        iPad. The summary rail begins below them, so it can never cover the fourth
        tile column or hide RV / Motorhome and Completed. */
     main.append(tabs);
-    const addBar=node('button','reservation-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode(' ADD RESERVATION')); addBar.addEventListener('click',()=>openReservationEditor({stateService,host:main,currentDate,initialType:options.activeType})); main.append(addBar);
+    const addBar=node('button','reservation-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode('ADD RESERVATION')); addBar.addEventListener('click',()=>openReservationEditor({stateService,host:main,currentDate,initialType:options.activeType})); main.append(addBar);
 
     const contentGrid=node('section','reservation-reference-grid');
     const left=node('div','reservation-reference-main');

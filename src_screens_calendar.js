@@ -498,7 +498,7 @@ export function renderCalendarScreen({ stateService, currentDate, navigate }) {
 
     const inlineActions = node('div', 'calendar-inline-actions');
     const add = node('button', 'button calendar-add');
-    add.append(createLineIcon('plus'), document.createTextNode(' NOTE'));
+    add.append(createLineIcon('plus'), document.createTextNode('NOTE'));
     add.type = 'button';
     add.setAttribute('aria-label', 'Add reminder or note');
     add.addEventListener('click', () => openPersonalEventEditor({ stateService, host:main, currentDate }));

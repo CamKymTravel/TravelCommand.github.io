@@ -645,10 +645,6 @@
   [data-screen="checklist"] .checklist-row-compact .checklist-row-copy { padding-block:5px; }
   [data-screen="checklist"] .checklist-row-compact .checklist-row-copy strong { font-size:9.5px; }
   [data-screen="checklist"] .checklist-row-compact .checklist-row-copy small { font-size:7.5px; }
-  [data-screen="checklist"] .checklist-shared-extras { grid-column:1 / -1; display:grid; grid-template-columns:auto 1fr; gap:7px 12px; align-items:center; padding:10px 12px; border:1px solid rgba(var(--tcc-p-violet-rgb),.25); border-radius:13px; background:rgba(76,45,105,.18); }
-  [data-screen="checklist"] .checklist-shared-extras > strong { font-size:9px; letter-spacing:.11em; }
-  [data-screen="checklist"] .checklist-shared-extras > span { justify-self:end; color:var(--text-secondary); font-size:8px; }
-  [data-screen="checklist"] .checklist-shared-extras > div { grid-column:1 / -1; display:grid; grid-template-columns:1fr 1fr; gap:6px; }
   [data-screen="checklist"] .checklist-required-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
   [data-screen="checklist"] .checklist-column { box-shadow:inset 0 1px rgba(255,255,255,.045),0 12px 26px rgba(0,0,0,.13); }
   [data-screen="checklist"] .checklist-column-head { align-items:center; padding-bottom:10px; }
@@ -1089,7 +1085,7 @@
     border:1px solid currentColor;
     border-radius:12px;
     background:rgba(4,15,28,.22);
-    color:rgb(var(--tcc-p-sky-rgb));
+    color:rgb(var(--tcc-text-soft-rgb));
     font-size:21px;
     font-weight:800;
     box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px rgba(var(--tcc-p-sky-rgb),.10);
@@ -1097,11 +1093,11 @@
   [data-screen="journey-history"] .journey-summary-copy { min-width:0; display:grid; gap:6px; }
   [data-screen="journey-history"] .journey-summary-copy > strong { font-size:clamp(23px,2.15vw,33px); }
   [data-screen="journey-history"] .journey-summary-copy > span { font-size:11px; font-weight:820; line-height:1.08; text-transform:uppercase; letter-spacing:.035em; }
-  [data-screen="journey-history"] .journey-summary-countries .journey-summary-icon { color:rgb(var(--tcc-p-teal-rgb)); }
-  [data-screen="journey-history"] .journey-summary-destinations .journey-summary-icon { color:rgb(var(--tcc-p-blue-rgb)); }
-  [data-screen="journey-history"] .journey-summary-days .journey-summary-icon { color:rgb(var(--tcc-p-violet-rgb)); }
-  [data-screen="journey-history"] .journey-summary-years .journey-summary-icon { color:rgb(var(--tcc-p-copper-rgb)); }
-  [data-screen="journey-history"] .journey-summary-spend .journey-summary-icon { color:rgb(var(--tcc-p-pink-rgb)); }
+  [data-screen="journey-history"] .journey-summary-countries .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)); }
+  [data-screen="journey-history"] .journey-summary-destinations .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)); }
+  [data-screen="journey-history"] .journey-summary-days .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)); }
+  [data-screen="journey-history"] .journey-summary-years .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)); }
+  [data-screen="journey-history"] .journey-summary-spend .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)); }
   [data-screen="journey-history"] .journey-summary-spend .journey-summary-copy > strong { font-size:clamp(19px,1.6vw,25px); white-space:nowrap; }
 
   /* Restore the richer coloured material treatment from the approved analytics references. */
@@ -1865,7 +1861,7 @@
     border:1px solid color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) 58%,transparent);
     border-radius:12px;
     background:linear-gradient(145deg,color-mix(in srgb,var(--vault-accent,rgb(var(--tcc-p-silver-rgb))) 18%,transparent),rgba(4,16,29,.46));
-    color:var(--vault-accent,#dff6ff);
+    color:rgb(var(--tcc-text-soft-rgb));
     font-size:23px;
     box-shadow:inset 0 1px rgba(255,255,255,.10),0 0 16px var(--vault-card-glow,rgba(var(--tcc-p-sky-rgb),.10));
   }
@@ -5095,8 +5091,6 @@
   [data-screen="checklist"] .checklist-stage-copy small,
   [data-screen="checklist"] .checklist-owner-head p,
   [data-screen="checklist"] .checklist-owner-stats span,
-  [data-screen="checklist"] .checklist-shared-extras > strong,
-  [data-screen="checklist"] .checklist-shared-extras > span,
   [data-screen="checklist"] .checklist-next-task > span,
   [data-screen="checklist"] .checklist-next-facts small,
   [data-screen="checklist"] .checklist-column-list .checklist-row-copy small,
@@ -5585,8 +5579,6 @@
   [data-screen="checklist"] .checklist-stage-copy small,
   [data-screen="checklist"] .checklist-owner-head p,
   [data-screen="checklist"] .checklist-owner-stats span,
-  [data-screen="checklist"] .checklist-shared-extras > strong,
-  [data-screen="checklist"] .checklist-shared-extras > span,
   [data-screen="checklist"] .checklist-next-task > span,
   [data-screen="checklist"] .checklist-next-facts small,
   [data-screen="checklist"] .checklist-column-list .checklist-row-copy small,
@@ -5982,8 +5974,6 @@
   [data-screen="checklist"] .checklist-stage-copy small,
   [data-screen="checklist"] .checklist-owner-head p,
   [data-screen="checklist"] .checklist-owner-stats span,
-  [data-screen="checklist"] .checklist-shared-extras > strong,
-  [data-screen="checklist"] .checklist-shared-extras > span,
   [data-screen="checklist"] .checklist-next-task > span,
   [data-screen="checklist"] .checklist-next-facts small,
   [data-screen="checklist"] .checklist-column-list .checklist-row-copy small,
@@ -7557,7 +7547,6 @@
     .checklist-next-task > span,.checklist-next-task strong,.checklist-next-task small,
     .checklist-next-visual-copy span,.checklist-next-visual-copy small,
     .checklist-overview-metric span,.checklist-overview-ring span,
-    .checklist-shared-extras > strong,.checklist-shared-extras > span,
     .checklist-ready-action,.checklist-next-action
   ),
   [data-screen="vault"] :is(
@@ -7790,7 +7779,7 @@
    below the 44px interaction floor. Keep the existing premium visual treatment;
    only protect the live target size. Home uses the common mini-row floor so
    Alerts, Upcoming Events and Trip Timeline remain equally safe. Checklist
-   compact task copy (His/Hers and Shared Extras) is an Edit button and therefore
+   compact task copy (His/Hers) is an Edit button and therefore
    receives the same floor independently of the already-protected completion tick. */
 @layer screens {
   [data-screen="home"] button.home-mini-row,

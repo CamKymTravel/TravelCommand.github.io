@@ -14,6 +14,7 @@ import { resolveOfflinePlace } from './src_core_coordinates.js';
 import { createStayBanner } from './src_components_page-hero.js';
 import { buildItineraryColourMap } from './src_core_calendar-view-model.js';
 import { isDestinationBudgetUsable } from './src_core_budget.js';
+import { buildHomeViewModel } from './src_core_home-view-model.js';
 
 function itineraryFlagCountry(record = {}) {
   const route=['cruise','motorhome','rv'].includes(String(record.travelType||'').toLowerCase());
@@ -775,7 +776,7 @@ function renderMap(model, host) {
   panel.setAttribute('aria-label','Forward Journey Map');
   const head = node('div', 'itinerary-map-title-row');
   const copy=node('div'); copy.append(node('p','eyebrow','FORWARD PLANNING MAP'),node('h2','',"Where We're Going"));
-  const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode(' Expand Map'));
+  const expand=node('button','button itinerary-expand-map'); expand.type='button'; expand.append(createLineIcon('expand'),document.createTextNode('Expand Map'));
   expand.addEventListener('click',()=>{ const body=node('div','itinerary-expanded-map'); body.append(renderOfflineMap(model.journeyMap,{ariaLabel:'Expanded forward planning map',fitToPoints:true,labelMode:'key',interactive:true})); const mapTone=materialToneFromRenderedSurface(panel,'sky'); const modal=createModal({title:'Forward Journey Plan',body,actions:[],className:`tcc-expanded-modal tcc-expanded-inherits-source itinerary-map-expanded-modal tone-${mapTone}`}); host.append(modal); modal.showModal(); modal.addEventListener('close',()=>modal.remove(),{once:true}); });
   head.append(copy,expand); panel.append(head);
   const first=model.currentStay||null, next=model.nextDestination||null; const routePoints=model.upcoming.reduce((sum,record)=>sum+Number(record.routePointCount||0),0);
@@ -1050,9 +1051,14 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
     // R31: restore the shared destination/header orientation above the planning
     // map. This is read-only on Itinerary: the left menu remains the only way
     // to change screens.
+    // Shared orientation strip must use the same Home-derived current/next
+    // model as Budget, Reservations and Calendar. Using the Itinerary model
+    // here omitted remaining-days/progress fields and made this strip render
+    // differently from the other screens on physical iPad.
+    const stayOrientation = buildHomeViewModel(state, currentDate, { alertLimit:0, eventLimit:0 });
     const itineraryBanner=createStayBanner({
-      currentStay:model.currentStay?{...model.currentStay,title:model.currentStay.name,dates:model.currentStay.displayDates}:null,
-      nextDestination:model.nextDestination?{...model.nextDestination,title:model.nextDestination.name,durationDays:model.nextDestination.days}:null,
+      currentStay:stayOrientation.currentStay,
+      nextDestination:stayOrientation.nextDestination,
       className:'itinerary-stay-banner'
     });
     main.append(itineraryBanner);
@@ -1090,8 +1096,8 @@ export function renderItineraryScreen({ stateService, currentDate, navigate }) {
       renderContent();
     });
     const actionRow=node('section','itinerary-action-row');
-    const addBar=node('button','itinerary-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode(' ADD DESTINATION')); addBar.addEventListener('click',()=>openEditor(null));
-    const addHome=node('button','itinerary-add-home'); addHome.type='button'; addHome.append(createLineIcon('home'),document.createTextNode(' ADD HOME VISIT'));
+    const addBar=node('button','itinerary-add-bar'); addBar.type='button'; addBar.append(createLineIcon('plus'),document.createTextNode('ADD DESTINATION')); addBar.addEventListener('click',()=>openEditor(null));
+    const addHome=node('button','itinerary-add-home'); addHome.type='button'; addHome.append(createLineIcon('home'),document.createTextNode('ADD HOME VISIT'));
     addHome.addEventListener('click',()=>openHomeVisitEditor({stateService,host:main,currentDate,prepareRecordVisibility}));
     actionRow.append(addBar,addHome);
     main.append(actionRow);

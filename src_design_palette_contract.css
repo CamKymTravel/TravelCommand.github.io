@@ -119,7 +119,6 @@ html body [data-screen="checklist"] .checklist-overview-card { --tcc-card-rgb:va
 html body [data-screen="checklist"] .checklist-stage-panel { --tcc-card-rgb:var(--tcc-p-sky-rgb) !important; }
 html body [data-screen="checklist"] .checklist-owner-his { --tcc-card-rgb:var(--tcc-p-blue-rgb) !important; }
 html body [data-screen="checklist"] .checklist-owner-hers { --tcc-card-rgb:var(--tcc-p-pink-rgb) !important; }
-html body [data-screen="checklist"] .checklist-shared-extras { --tcc-card-rgb:var(--tcc-p-violet-rgb) !important; }
 html body [data-screen="checklist"] .checklist-column-permanent { --tcc-card-rgb:var(--tcc-p-gold-rgb) !important; }
 html body [data-screen="checklist"] .checklist-column-destination { --tcc-card-rgb:var(--tcc-p-teal-rgb) !important; }
 html body [data-screen="checklist"] .checklist-next-card { --tcc-card-rgb:var(--tcc-p-copper-rgb) !important; }
@@ -243,7 +242,6 @@ html body :is(
   [data-screen="checklist"] .checklist-overview-card,
   [data-screen="checklist"] .checklist-stage-panel,
   [data-screen="checklist"] .checklist-owner-card,
-  [data-screen="checklist"] .checklist-shared-extras,
   [data-screen="checklist"] .checklist-column,
   [data-screen="checklist"] .checklist-next-card,
   [data-screen="checklist"] .checklist-history,
@@ -318,7 +316,6 @@ html body :is(
   [data-screen="checklist"] .checklist-overview-card,
   [data-screen="checklist"] .checklist-stage-panel,
   [data-screen="checklist"] .checklist-owner-card,
-  [data-screen="checklist"] .checklist-shared-extras,
   [data-screen="checklist"] .checklist-column,
   [data-screen="checklist"] .checklist-next-card,
   [data-screen="checklist"] .checklist-history,
@@ -381,7 +378,6 @@ html body :is(
   [data-screen="checklist"] .checklist-overview-card,
   [data-screen="checklist"] .checklist-stage-panel,
   [data-screen="checklist"] .checklist-owner-card,
-  [data-screen="checklist"] .checklist-shared-extras,
   [data-screen="checklist"] .checklist-column,
   [data-screen="checklist"] .checklist-next-card,
   [data-screen="checklist"] .checklist-history,
@@ -501,7 +497,6 @@ html body :is(
   [data-screen="checklist"] .checklist-overview-card,
   [data-screen="checklist"] .checklist-stage-panel,
   [data-screen="checklist"] .checklist-owner-card,
-  [data-screen="checklist"] .checklist-shared-extras,
   [data-screen="checklist"] .checklist-column,
   [data-screen="checklist"] .checklist-next-card,
   [data-screen="checklist"] .checklist-history,
@@ -523,14 +518,13 @@ html body :is(
 ) { --comfort-accent:rgb(var(--tcc-card-rgb)) !important; --screen-accent:rgb(var(--tcc-card-rgb)) !important; --s24-screen-rgb:var(--tcc-card-rgb) !important; --tcc-shared-icon-rgb:var(--tcc-card-rgb) !important; --reservation-rgb:var(--tcc-card-rgb) !important; --reservation-accent:rgb(var(--tcc-card-rgb)) !important; --reservation-card-glow:rgba(var(--tcc-card-rgb),var(--tcc-feature-radial-a)) !important; --journey-rgb:var(--tcc-card-rgb) !important; --journey-spend-rgb:var(--tcc-card-rgb) !important; --check-rgb:var(--tcc-card-rgb) !important; --ready-rgb:var(--tcc-card-rgb) !important; --vault-rgb:var(--tcc-card-rgb) !important; --vault-section-rgb:var(--tcc-card-rgb) !important; --vault-accent:rgb(var(--tcc-card-rgb)) !important; --vault-panel-accent:rgb(var(--tcc-card-rgb)) !important; --vault-card-glow:rgba(var(--tcc-card-rgb),var(--tcc-feature-radial-a)) !important; --vault-card-border:rgba(var(--tcc-card-rgb),var(--tcc-feature-border-a)) !important; --health-card-glow:rgba(var(--tcc-card-rgb),var(--tcc-feature-radial-a)) !important; --calendar-legend-glow:rgba(var(--tcc-card-rgb),var(--tcc-feature-radial-a)) !important; --coverage-accent:rgb(var(--tcc-card-rgb)) !important; }
 html body [data-screen="reservations"] .reservation-tab { --reservation-rgb:var(--tcc-card-rgb) !important; --reservation-accent:rgb(var(--tcc-card-rgb)) !important; }
 html body [data-screen="journey-history"] .journey-summary-card { --journey-rgb:var(--tcc-card-rgb) !important; }
-html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-shared-extras,.checklist-column,.checklist-next-card,.checklist-history) { --check-rgb:var(--tcc-card-rgb) !important; }
+html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-column,.checklist-next-card,.checklist-history) { --check-rgb:var(--tcc-card-rgb) !important; }
 html body [data-screen="vault"] .vault-category-card { --vault-rgb:var(--tcc-card-rgb) !important; --vault-accent:rgb(var(--tcc-card-rgb)) !important; }
 
 /* CHECKLIST — restore the approved multi-semantic identity without rails or shadows. */
-html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-shared-extras,.checklist-column,.checklist-next-card,.checklist-history) { box-shadow:none !important; border-left-width:1px !important; }
+html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-column,.checklist-next-card,.checklist-history) { box-shadow:none !important; border-left-width:1px !important; }
 html body [data-screen="checklist"] :is(.checklist-owner-his,.checklist-owner-hers) h2 { color:rgb(var(--tcc-card-rgb)) !important; text-shadow:none !important; }
 html body [data-screen="checklist"] :is(.checklist-owner-his,.checklist-owner-hers) .checklist-owner-stats>strong { color:rgb(var(--tcc-text-primary-rgb)) !important; }
-html body [data-screen="checklist"] .checklist-shared-extras>strong { color:rgb(var(--tcc-p-violet-rgb)) !important; }
 html body [data-screen="checklist"] :is(.checklist-column-permanent,.checklist-column-destination) .checklist-column-title h2 { color:rgb(var(--tcc-text-primary-rgb)) !important; text-shadow:none !important; }
 html body [data-screen="checklist"] .checklist-column-permanent .checklist-next-task>span { color:rgb(var(--tcc-p-gold-rgb)) !important; }
 html body [data-screen="checklist"] .checklist-column-destination .checklist-next-task>span { color:rgb(var(--tcc-p-teal-rgb)) !important; }
@@ -742,7 +736,6 @@ html body :is(
   [data-screen="checklist"] .checklist-overview-card,
   [data-screen="checklist"] .checklist-stage-panel,
   [data-screen="checklist"] .checklist-owner-card,
-  [data-screen="checklist"] .checklist-shared-extras,
   [data-screen="checklist"] .checklist-column,
   [data-screen="checklist"] .checklist-next-card,
   [data-screen="checklist"] .checklist-history,

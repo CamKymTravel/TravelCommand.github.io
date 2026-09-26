@@ -2929,7 +2929,6 @@
     .checklist-next-task > span,.checklist-next-task strong,.checklist-next-task small,
     .checklist-next-visual-copy span,.checklist-next-visual-copy small,
     .checklist-overview-metric span,.checklist-overview-ring span,
-    .checklist-shared-extras > strong,.checklist-shared-extras > span,
     .checklist-ready-action,.checklist-next-action
   ),
   [data-screen="vault"] :is(

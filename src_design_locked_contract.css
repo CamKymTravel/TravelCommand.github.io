@@ -608,14 +608,13 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
 /* ========================================================================
    LOCK 22 — Checklist structural surfaces are neutral premium material. HIS,
    HERS, Permanent and Destination keep their identity only as compact edge,
-   icon/title and control accents. Shared Extras and Checklist History are
+   icon/title and control accents. Checklist History is
    ordinary neutral structure; Ready-to-Move remains the sole full-card
    amber/green checklist state.
    ======================================================================== */
 [data-screen="checklist"] :is(
   .checklist-owner-card,
   .checklist-column,
-  .checklist-shared-extras,
   .checklist-history
 ) {
   border-color:var(--tcc-material-border) !important;
@@ -642,14 +641,10 @@ html body [data-screen="reservations"] .reservation-tabs .reservation-tab.reserv
   .checklist-owner-his .checklist-owner-list .checklist-row,
   .checklist-owner-hers .checklist-owner-list .checklist-row,
   .checklist-column .checklist-row,
-  .checklist-shared-extras .checklist-row,
   .checklist-history-item
 ) {
   border-color:rgba(var(--tcc-p-silver-rgb),.18) !important;
   background:var(--tcc-material-bg-soft) !important;
-}
-[data-screen="checklist"] .checklist-shared-extras {
-  box-shadow:inset 3px 0 rgba(var(--tcc-p-silver-rgb),.42),var(--tcc-material-shadow) !important;
 }
 [data-screen="checklist"] .checklist-history {
   box-shadow:inset 3px 0 rgba(var(--tcc-p-silver-rgb),.42),var(--tcc-material-shadow) !important;
@@ -1557,10 +1552,6 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
   border-color:rgba(var(--tcc-p-copper-rgb),.52) !important;
   background:radial-gradient(circle at 90% 0,rgba(var(--tcc-p-copper-rgb),.20),transparent 48%),linear-gradient(145deg,#422e25,#2a2123) !important;
 }
-[data-screen="checklist"] .checklist-shared-extras {
-  border-color:rgba(var(--tcc-p-silver-rgb),.30) !important;
-  background:linear-gradient(145deg,rgba(42,49,57,.42),rgba(8,20,34,.90)) !important;
-}
 [data-screen="checklist"] .checklist-row {
   border-color:rgba(157,185,207,.18) !important;
   background:rgba(5,19,32,.58) !important;
@@ -1921,13 +1912,6 @@ html body .tcc-page-hero[data-header-key="header-vault"]::after {
   html body [data-screen="checklist"] .checklist-column-destination progress::-webkit-progress-value {
     background:rgb(var(--tcc-p-teal-rgb)) !important;
   }
-  html body [data-screen="checklist"] .checklist-shared-extras {
-    border-color:rgba(var(--tcc-p-violet-rgb),.44) !important;
-    background:radial-gradient(circle at 92% 0,rgba(var(--tcc-p-violet-rgb),.13),transparent 50%),linear-gradient(145deg,#252b4b,#0c1b31) !important;
-  }
-  html body [data-screen="checklist"] .checklist-shared-extras > strong {
-    color:#cbbfff !important;
-  }
 
   /* Journey History: living-cost money is data, not a success state. Tie the
      emphasis to the trip type so Standard / Motorhome / Cruise scan together
@@ -2175,7 +2159,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     background:radial-gradient(circle at 94% 0%,rgba(var(--tcc-p-blue-rgb),.13),transparent 47%),linear-gradient(145deg,#203050,#17243b 62%,#091827) !important;
     box-shadow:0 15px 32px rgba(0,0,0,.22),0 0 18px rgba(var(--tcc-p-blue-rgb),.045),inset 0 1px rgba(255,255,255,.04) !important;
   }
-  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:#ffb2dc !important; }
+  html body [data-screen="itinerary"] .itinerary-upcoming-panel .itinerary-section-head h2 { color:rgb(var(--tcc-p-blue-rgb)) !important; }
 
   html body [data-screen="itinerary"] .itinerary-completed {
     --comfort-accent:rgb(var(--tcc-p-silver-rgb)) !important;
@@ -2565,19 +2549,13 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
   html body [data-screen="checklist"] .checklist-next-card .eyebrow,
   html body [data-screen="checklist"] .checklist-next-card .checklist-next-icon { color:rgb(var(--tcc-p-copper-rgb)) !important; }
 
-  html body [data-screen="checklist"] .checklist-shared-extras {
-    --comfort-accent:rgb(var(--tcc-p-violet-rgb)) !important;
-    border-color:rgba(var(--tcc-p-violet-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-violet-rgb),.15),transparent 48%),linear-gradient(145deg,#342850,#221d3a 62%,#09192a) !important;
-  }
-  html body [data-screen="checklist"] .checklist-shared-extras > strong { color:#d7bfff !important; }
 
   html body [data-screen="checklist"] .checklist-history {
     --comfort-accent:rgb(var(--tcc-p-silver-rgb)) !important;
     border-color:rgba(var(--tcc-p-silver-rgb),.44) !important;
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-silver-rgb),.14),transparent 48%),linear-gradient(145deg,#303943,#202934 62%,#091823) !important;
   }
-  html body [data-screen="checklist"] .checklist-history .checklist-section-head h2 { color:#d8e29a !important; }
+  html body [data-screen="checklist"] .checklist-history .checklist-section-head h2 { color:rgb(var(--tcc-p-silver-rgb)) !important; }
 }
 
 /* S39 PHASE 33 — Vault viewport colour uniqueness.
@@ -3149,7 +3127,7 @@ body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
     border-color:rgba(var(--tcc-p-pink-rgb),.46) !important;
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-pink-rgb),.15),transparent 48%),linear-gradient(145deg,#432331,#2b1d29 62%,#091824) !important;
   }
-  html body [data-screen="vault"] .vault-summary-card > h2 { color:#98eee6 !important; }
+  html body [data-screen="vault"] .vault-summary-card > h2 { color:rgb(var(--tcc-p-pink-rgb)) !important; }
   html body [data-screen="vault"] .vault-emergency-travel-card {
     --comfort-accent:rgb(var(--tcc-p-red-rgb)) !important;
     border-color:rgba(var(--tcc-p-red-rgb),.46) !important;
@@ -4039,7 +4017,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="budget"] :is(.budget-summary-card,.budget-panel),
   html body [data-screen="reservations"] :is(.reservation-tab,.reservation-to-book,.reservation-next-five,.reservation-booked-total),
   html body [data-screen="journey-history"] :is(.journey-summary-card,.journey-panel,.journey-milestones-panel,.journey-mix-panel,.journey-spend-panel,.journey-snapshot-panel),
-  html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-shared-extras,.checklist-column,.checklist-next-card,.checklist-history),
+  html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-column,.checklist-next-card,.checklist-history),
   html body [data-screen="vault"] :is(.vault-category-card,.vault-all-records,.vault-summary-card,.vault-expiry-card,.vault-emergency-card,.vault-activity,.vault-emergency-contacts),
   html body [data-screen="settings"] :is(.settings-health-card,.settings-panel) {
     filter:none !important;
@@ -4203,7 +4181,8 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="journey-history"] .journey-summary-days { --journey-rgb:var(--tcc-p-violet-rgb) !important; }
   html body [data-screen="journey-history"] .journey-summary-years { --journey-rgb:var(--tcc-p-copper-rgb) !important; }
   html body [data-screen="journey-history"] .journey-summary-spend { --journey-rgb:var(--tcc-p-pink-rgb) !important; }
-  html body [data-screen="journey-history"] .journey-summary-card :is(.journey-summary-icon,strong) { color:rgb(var(--journey-rgb)) !important; }
+  html body [data-screen="journey-history"] .journey-summary-card .journey-summary-icon { color:rgb(var(--tcc-text-soft-rgb)) !important; }
+  html body [data-screen="journey-history"] .journey-summary-card strong { color:rgb(var(--journey-rgb)) !important; }
 
   html body [data-screen="journey-history"] .journey-spend-panel {
     border-color:rgba(var(--tcc-p-gold-rgb),.42) !important;
@@ -4229,7 +4208,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   /* ----------------------------- CHECKLIST ------------------------------ */
   /* Checklist is the structural reference for the new common card grammar:
      coloured identity + common depth + a narrow left-edge cue. */
-  html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-column,.checklist-next-card,.checklist-history,.checklist-shared-extras) {
+  html body [data-screen="checklist"] :is(.checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,.checklist-owner-card,.checklist-column,.checklist-next-card,.checklist-history) {
     box-shadow:inset 4px 0 rgba(var(--check-rgb),.78), var(--tcc-vn-shadow) !important;
     border-color:rgba(var(--check-rgb),.36) !important;
     background:radial-gradient(circle at 92% 0%,rgba(var(--check-rgb),.14),transparent 48%),linear-gradient(145deg,rgba(var(--check-rgb),.12),rgba(var(--tcc-p-ink-rgb),.985) 70%) !important;
@@ -4240,8 +4219,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="checklist"] .checklist-stage-panel { --check-rgb:var(--tcc-p-sky-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-his { --check-rgb:var(--tcc-p-blue-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-hers { --check-rgb:var(--tcc-p-pink-rgb) !important; }
-  html body [data-screen="checklist"] .checklist-shared-extras { --check-rgb:var(--tcc-p-violet-rgb) !important; }
-  html body [data-screen="checklist"] .checklist-column-permanent { --check-rgb:var(--tcc-p-gold-rgb) !important; }
+html body [data-screen="checklist"] .checklist-column-permanent { --check-rgb:var(--tcc-p-gold-rgb) !important; }
   html body [data-screen="checklist"] .checklist-column-destination { --check-rgb:var(--tcc-p-teal-rgb) !important; }
   html body [data-screen="checklist"] .checklist-next-card { --check-rgb:var(--tcc-p-copper-rgb) !important; }
   html body [data-screen="checklist"] .checklist-history { --check-rgb:var(--tcc-p-silver-rgb) !important; }
@@ -4278,7 +4256,8 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="vault"] .vault-category-insurance { --vault-rgb:var(--tcc-p-teal-rgb) !important; }
   html body [data-screen="vault"] .vault-category-accommodation { --vault-rgb:var(--tcc-p-copper-rgb) !important; }
   html body [data-screen="vault"] .vault-category-emergency { --vault-rgb:var(--tcc-p-pink-rgb) !important; }
-  html body [data-screen="vault"] .vault-category-card :is(.vault-category-icon,.vault-category-count) { color:rgb(var(--vault-rgb)) !important; }
+  html body [data-screen="vault"] .vault-category-card .vault-category-icon { color:rgb(var(--tcc-text-soft-rgb)) !important; }
+  html body [data-screen="vault"] .vault-category-card .vault-category-count { color:rgb(var(--vault-rgb)) !important; }
 
   html body [data-screen="vault"] .vault-all-records {
     border-color:rgba(150,164,176,.31) !important;
@@ -4777,7 +4756,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
      rest of TCC — no narrow accent rail and no inset colour cue. */
   html body [data-screen="checklist"] :is(
     .checklist-ready-banner,.checklist-overview-card,.checklist-stage-panel,
-    .checklist-owner-card,.checklist-shared-extras,.checklist-column,
+    .checklist-owner-card,.checklist-column,
     .checklist-next-card,.checklist-history
   ) {
     box-shadow:none !important;
@@ -4818,11 +4797,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     border-color:rgba(var(--tcc-p-pink-rgb),.52) !important;
     background:radial-gradient(circle at 90% 0%,rgba(var(--tcc-p-pink-rgb),.20),transparent 48%),linear-gradient(145deg,#482845 0%,#2b2038 62%,#091827 100%) !important;
   }
-  html body [data-screen="checklist"] .checklist-shared-extras {
-    border-color:rgba(var(--tcc-p-violet-rgb),.46) !important;
-    background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-violet-rgb),.17),transparent 48%),linear-gradient(145deg,#2b2a52 0%,#1d213c 60%,#091827 100%) !important;
-  }
-  html body [data-screen="checklist"] .checklist-column-permanent {
+html body [data-screen="checklist"] .checklist-column-permanent {
     border-color:rgba(var(--tcc-p-gold-rgb),.52) !important;
     background:radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-gold-rgb),.18),transparent 48%),linear-gradient(145deg,#40351f 0%,#29271f 58%,#091827 100%) !important;
   }
@@ -5136,8 +5111,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
   html body [data-screen="checklist"] .checklist-stage-panel { --check-rgb:var(--tcc-p-sky-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-his { --check-rgb:var(--tcc-icon-blue-rgb) !important; }
   html body [data-screen="checklist"] .checklist-owner-hers { --check-rgb:var(--tcc-icon-pink-rgb) !important; }
-  html body [data-screen="checklist"] .checklist-shared-extras { --check-rgb:var(--tcc-icon-violet-rgb) !important; }
-  html body [data-screen="checklist"] .checklist-column-permanent { --check-rgb:var(--tcc-icon-gold-rgb) !important; }
+html body [data-screen="checklist"] .checklist-column-permanent { --check-rgb:var(--tcc-icon-gold-rgb) !important; }
   html body [data-screen="checklist"] .checklist-column-destination { --check-rgb:var(--tcc-icon-teal-rgb) !important; }
   html body [data-screen="checklist"] .checklist-next-card { --check-rgb:var(--tcc-icon-copper-rgb) !important; }
   html body [data-screen="checklist"] .checklist-history { --check-rgb:var(--tcc-icon-silver-rgb) !important; }
@@ -5169,7 +5143,7 @@ html body [data-screen] .tcc-modal.tcc-editor-modal.tone-maroon { --tcc-editor-r
     border:1px solid rgba(var(--tcc-shared-icon-rgb),.56) !important;
     border-radius:12px !important;
     background:linear-gradient(145deg,rgba(var(--tcc-shared-icon-rgb),.14),rgba(4,15,28,.42)) !important;
-    color:rgb(var(--tcc-shared-icon-rgb)) !important;
+    color:rgb(var(--tcc-text-soft-rgb)) !important;
     box-shadow:none !important;
     filter:none !important;
   }

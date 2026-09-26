@@ -373,13 +373,40 @@ function vaultExpiryExpandedBody(expiring,daysUntil){
   section.append(list);body.append(section);return body;
 }
 
-function vaultEmergencyExpandedBody(state){
-  const body=node('div','home-expanded-dashboard vault-emergency-expanded');
+function vaultCountryMatches(record,country){
+  const target=String(country||'').trim().toLowerCase();
+  if(!target||target==='no current stay')return false;
+  return [record?.reference,record?.title,record?.details,record?.notes]
+    .filter(Boolean)
+    .some(value=>String(value).toLowerCase().includes(target));
+}
+
+function vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist}){
+  const body=node('div','home-expanded-dashboard vault-emergency-travel-expanded');
+  const stats=node('div','home-expanded-stats home-expanded-stats-four');
+  stats.append(
+    vaultExpandedStat('CURRENT COUNTRY',currentCountry||'No current stay','travel context','red'),
+    vaultExpandedStat('LOCAL EMERGENCY',localEmergency?'STORED':'NOT STORED','current-country record',localEmergency?'green':'gold'),
+    vaultExpandedStat('EMBASSY / CONSULATE',embassy?'STORED':'NOT STORED','current-country record',embassy?'green':'gold'),
+    vaultExpandedStat('INSURANCE',insuranceAssist?'STORED':'NOT STORED','travel assistance',insuranceAssist?'green':'gold')
+  );
+  body.append(stats);
+  const section=node('section','home-expanded-section');section.append(node('h3','','CURRENT-COUNTRY EMERGENCY TRAVEL CARD'));
+  const list=node('div','home-expanded-list');
+  const facts=[['LOCAL EMERGENCY',localEmergency],['AUSTRALIAN EMBASSY / CONSULATE',embassy],['INSURANCE ASSISTANCE',insuranceAssist]];
+  for(const [label,record] of facts){const row=node('div','home-expanded-list-row');const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',record?.title||'Not stored'),node('small','',record?[record.reference||currentCountry,record.details||record.notes].filter(Boolean).join(' · '):`${currentCountry||'Current country'} · add this information in The Vault`));row.append(node('span','home-expanded-priority',label),copy,node('b','',record?'STORED':'MISSING'));list.append(row);}
+  section.append(list);body.append(section);return body;
+}
+
+function vaultEmergencyContactsExpandedBody(state){
+  const body=node('div','home-expanded-dashboard vault-emergency-contacts-expanded');
   const records=state.vault.filter(record=>record.category==='emergency');
   const stats=node('div','home-expanded-stats home-expanded-stats-four');
-  const cameron=records.filter(record=>record.owner==='Cameron').length,kym=records.filter(record=>record.owner==='Kym').length,shared=records.length-cameron-kym;
-  stats.append(vaultExpandedStat('EMERGENCY CONTACTS',records.length,'all stored emergency records','red'),vaultExpandedStat('CAMERON',cameron,'owned records','blue'),vaultExpandedStat('KYM',kym,'owned records','pink'),vaultExpandedStat('SHARED',shared,'shared / other records','teal'));body.append(stats);
-  const section=node('section','home-expanded-section');section.append(node('h3','','EMERGENCY TRAVEL CARD'));
+  const cameron=records.filter(record=>String(record.owner||'').toLowerCase()==='cameron').length;
+  const kym=records.filter(record=>String(record.owner||'').toLowerCase()==='kym').length;
+  const shared=Math.max(0,records.length-cameron-kym);
+  stats.append(vaultExpandedStat('EMERGENCY CONTACTS',records.length,'all stored contact records','green'),vaultExpandedStat('CAMERON',cameron,'owned records','blue'),vaultExpandedStat('KYM',kym,'owned records','pink'),vaultExpandedStat('SHARED',shared,'shared / other records','teal'));body.append(stats);
+  const section=node('section','home-expanded-section');section.append(node('h3','','ALL EMERGENCY CONTACTS'));
   const list=node('div','home-expanded-list');if(!records.length)list.append(node('p','home-expanded-empty','No emergency contacts stored'));
   for(const record of records){const row=node('div','home-expanded-list-row');const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',record.title),node('small','',[record.owner||'Shared',record.reference||record.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(node('span','home-expanded-priority','CONTACT'),copy,node('b','','STORED'));list.append(row);}section.append(list);body.append(section);return body;
 }
@@ -411,8 +438,9 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const allEmergencyRecords=state.vault.filter(r=>r.category==='emergency');
   const currentStay=(state.itinerary||[]).find(stay=>stay?.startDate&&stay?.endDate&&stay.startDate<=now&&now<=stay.endDate)||null;
   const currentCountry=currentStay?.country||currentStay?.startCountry||currentStay?.endCountry||currentStay?.name||'No current stay';
-  const localEmergency=allEmergencyRecords.find(r=>/emergency services|emergency number|local emergency|ambulance|police|\b112\b|\b911\b/i.test(`${r.title||''} ${r.details||''}`))||null;
-  const embassy=allEmergencyRecords.find(r=>/embassy|consulate/i.test(`${r.title||''} ${r.details||''}`))||null;
+  const currentCountryEmergencyRecords=allEmergencyRecords.filter(r=>vaultCountryMatches(r,currentCountry));
+  const localEmergency=currentCountryEmergencyRecords.find(r=>/emergency services|emergency number|local emergency|ambulance|police|\b112\b|\b911\b/i.test(`${r.title||''} ${r.details||''}`))||currentCountryEmergencyRecords[0]||null;
+  const embassy=currentCountryEmergencyRecords.find(r=>/embassy|consulate/i.test(`${r.title||''} ${r.details||''}`))||null;
   const insuranceAssist=state.vault.find(r=>r.category==='insurance'&&/assist|emergency|travel cover|insurance/i.test(`${r.title||''} ${r.details||''}`))||state.vault.find(r=>r.category==='insurance')||null;
   const openVaultRecord=r=>{if(!r)return;access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();};
   const travelFact=(label,record,fallback)=>{const tag=record?'button':'div';const row=node(tag,'vault-travel-fact');if(record){row.type='button';row.setAttribute('aria-label',`Open ${vaultRecordContext(record,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(record));}const copy=node('span','vault-travel-fact-copy');copy.append(node('small','',label),node('strong','',record?.title||fallback));const detail=record?.reference||record?.details||'';if(detail)copy.append(node('b','',detail));row.append(copy);return row;};
@@ -421,8 +449,8 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const countryFact=node('div','vault-travel-fact vault-travel-country');const countryCopy=node('span','vault-travel-fact-copy');countryCopy.append(node('small','','CURRENT COUNTRY'),node('strong','',currentCountry));countryFact.append(countryCopy);emergency.append(countryFact,travelFact('LOCAL EMERGENCY',localEmergency,'Not stored'),travelFact('AUSTRALIAN EMBASSY / CONSULATE',embassy,'Not stored'),travelFact('INSURANCE ASSISTANCE',insuranceAssist,'Not stored'));lower.append(emergency);
   const contacts=node('section','vault-emergency-contacts');const contactHead=node('div','vault-section-head');contactHead.append(node('h2','','Emergency Contacts'),node('span','vault-count',String(allEmergencyRecords.length)));contacts.append(contactHead);const contactList=node('div','vault-emergency-contact-list');if(!allEmergencyRecords.length)contactList.append(node('p','vault-empty','No emergency contacts stored'));for(const r of allEmergencyRecords.slice(0,4)){const row=node('button','vault-emergency-contact-row');row.type='button';const icon=vaultCategoryIcon('emergency');const copy=node('span','vault-emergency-contact-copy');copy.append(node('strong','',r.title),node('small','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(icon,copy);row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(r));contactList.append(row);}contacts.append(contactList);lower.append(contacts);main.append(lower);
   const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'silver'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
-  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
-  makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'green',bodyBuilder:()=>vaultEmergencyExpandedBody(state)});
+  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist})});
+  makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'green',bodyBuilder:()=>vaultEmergencyContactsExpandedBody(state)});
   makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'sky',bodyBuilder:()=>vaultActivityExpandedBody(state)});
 }
 function openAllVaultRecords({stateService,host,access,requestRender}){const state=stateService.snapshot();const body=node('div','vault-all-list');for(const r of [...state.vault].sort((a,b)=>String(a.category).localeCompare(String(b.category))||String(a.title).localeCompare(String(b.title)))){const row=node('button','vault-all-row');row.type='button';row.append(node('strong','',r.title),node('span','',`${VAULT_CATEGORY_LABELS[r.category]} · ${r.owner||'Shared'}`));row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>{dialog.close();access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();});body.append(row);}const dialog=createModal({title:'All Vault Records',body,actions:[{label:'Close',onClick:d=>d.close()}],className:'tcc-expanded-modal tcc-expanded-inherits-source tone-silver'});host.append(dialog);dialog.showModal();dialog.addEventListener('close',()=>dialog.remove(),{once:true});}
@@ -537,7 +565,7 @@ export function renderVaultScreen({ stateService, vaultAccessSession:access, req
   if(!access?.vaultUnlocked){renderLocked(main,stateService,access,requestRender);return main;}
   const unlockedState=stateService.snapshot();
   const heroActions=node('div','vault-hero-actions');
-  const streaming=node('button','vault-hero-streaming');streaming.type='button';streaming.append(createLineIcon('streaming'),document.createTextNode(' STREAMING'));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});
+  const streaming=node('button','vault-hero-streaming');streaming.type='button';streaming.append(createLineIcon('streaming'),document.createTextNode('STREAMING'));streaming.addEventListener('click',()=>{markStreamingOpened(access);requestRender();});
   const status=node('div','vault-hero-status');status.append(node('small','','VAULT STATUS'),node('strong','',String(unlockedState.vault.length)),node('span','',`RECORD${unlockedState.vault.length===1?'':'S'} SECURED`),node('em','','LOCAL ONLY · STORED ON THIS IPAD'));
   const lock=node('button','vault-hero-lock','Lock Vault');lock.type='button';lock.addEventListener('click',()=>{lockVault(access);requestRender();});
   heroActions.append(streaming,status,lock);

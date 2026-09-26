@@ -1,27 +1,45 @@
-Travel Command Centre — S54 Morocco Simulation 12
+Travel Command Centre — S54 Morocco Simulation 13
 Built: 26 September 2026
-Source: current S54 CURRENT_SOURCE_EXACT working source after the physical-iPad header and global expanded/editor opacity repairs
+Source: authoritative S54 CURRENT_SOURCE_EXACT after the final 26 Sep cross-chat and fallback reconciliation
 Purpose: fresh visual/physical-iPad simulation candidate only; not Final Master.
 
-Source verification before packaging:
-- S54 physical screenshot closure: 49/49 PASS
-- S54 expanded widget colour gate: 93/93 PASS
-- S54 source integrity: 209/209 PASS
-- S54 full visual regression aggregate: attempted, but exceeded execution timeout; not claimed as passed in this build audit.
+Final source verification immediately before packaging:
+- S54 full visual regression: 26/26 PASS
+- Source Integrity: 232/232 PASS
+- Physical Screenshot Closure: 66/66 PASS
+- Chat Closure: 25/25 PASS
+- Chat All-Screen: 13/13 PASS
+- Expanded Widget Colour: 93/93 PASS
+- Entire App Consistency: 111/111 PASS
+- Core Widget Consistency: 143/143 PASS
+- Viewport Colour Distribution: 18/18 PASS
+- Matrix Single Source: 248/248 PASS
+- Generated Visual Authority: 74/74 PASS
+- Semantic Status Colour: 22/22 PASS
+- Dark Material Parity: 163/163 PASS
+- Lower Layer Parent Parity: 108/108 PASS
+- Cross-Chat Reconciliation: 19/19 PASS
+- Authority/Report Parity: 13/13 PASS
 
-Current repairs carried into this candidate include:
-- Expanded/editor modal shells, forms, bodies, headers and footers are opaque across the app while retaining source-widget colour identity.
-- Lower fallback modal layers are also opaque, preventing Safari bleed-through if cascade order changes.
-- Journey History and Checklist baked headers use a single title paint path; legacy duplicate pseudo/live title paths are quarantined.
-- Journey History, Checklist and Vault special headers use the reconciled physical-iPad edge/seam treatment.
-- Vault obsolete baked status/title regions are masked without replacing the approved vault-door artwork.
-- Calendar legacy thin-line paint paths are quarantined in favour of the approved coloured strips.
+Recent fixes carried into this candidate include:
+- All latest physical-iPad text/layout/header fixes from the post-Simulation-12 audit.
+- Journey History, Checklist and Vault special-header outline/frame reconciliation.
+- Checklist premium colour identities, Shared Extras removal and context-locked Add forms.
+- Vault category colour normalisation, separate Emergency Travel Card / Emergency Contacts expansion and current-country emergency filtering.
+- Shared Current Stay / Next Destination strip treatment across Itinerary, Budget, Reservations and Calendar.
+- Calendar iPad-safe toolbar/legend/day-label/note spacing and approved destination/travel strips.
+- Budget portrait text protections and current-stay destination-budget row closure.
+- Icon-only sidebar/status-bar clearance, enlarged launch identity and double-tap page-zoom prevention.
+- App Health remains red/attention before a successful whole-app check and green after clearing.
+- Dormant lower-layer colour fallbacks reconciled to final authority: neutral glyphs, correct heading hues, no obsolete Checklist colour rail.
+- Obsolete Shared/Violet authority and stale closure totals removed from current source authority records.
+- Brightness/colour-presence lock retained: no global dimming, desaturation or muddy app-wide overlay; Home remains the visual brightness/style ceiling.
 
 Simulation identity changes are package-only:
-- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-12-20260926
-- Fresh service-worker cache: tcc-v1-v60-r7.11-s54-morocco-simulation-12-2026-09-26
-- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim12
-- Fresh manifest id: ./morocco-s54-simulation-12-20260926
+- Fresh local-storage namespace: tcc:v1:morocco-s54-simulation-13-20260926
+- Fresh service-worker cache: tcc-v1-v60-r7.12-s54-morocco-simulation-13-2026-09-26
+- Fresh fixture revision marker: 2029-07-15-morocco-full-multiyear-heavy-v1-s54sim13
+- Fresh manifest id: ./morocco-s54-simulation-13-20260926
 - Fresh App Health build marker for this candidate
 
-No redesign or unrelated feature change was made while creating this simulation candidate.
+No redesign, scope change, global dimming or rollback to an older simulation was made while creating Simulation 13.

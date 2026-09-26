@@ -90,19 +90,29 @@ function textAreaField(label, name, value = '') {
   return wrap;
 }
 
-function openChecklistEditor({ stateService, host, currentDate, itemId = null, initialListType = 'permanent', initialStage = null, initialOwner = 'both', initialRequired = true, editorTone = null }) {
+function openChecklistEditor({ stateService, host, currentDate, itemId = null, initialListType = 'permanent', initialStage = null, initialOwner = 'both', initialRequired = true, editorTone = null, addContext = null }) {
   const state = stateService.snapshot();
   const model = buildChecklistViewModel(state, currentDate);
   const existing = itemId ? state.checklists.find(item => item.id === itemId) : null;
   if (itemId && !existing) return;
-  const initialType = CHECKLIST_LIST_TYPES.includes(existing?.listType) ? existing.listType : initialListType;
+  const isNew = !existing;
+  const resolvedAddContext = isNew && ['permanent','destination','his','hers'].includes(addContext) ? addContext : null;
+  const contextListType = resolvedAddContext === 'destination'
+    ? 'destination'
+    : resolvedAddContext === 'permanent'
+      ? 'permanent'
+      : resolvedAddContext === 'his' || resolvedAddContext === 'hers'
+        ? (model.checklistDestination ? 'destination' : 'permanent')
+        : null;
+  const initialType = CHECKLIST_LIST_TYPES.includes(existing?.listType) ? existing.listType : (contextListType || initialListType);
+  const lockedPersonalOwner = resolvedAddContext === 'his' ? 'cameron' : resolvedAddContext === 'hers' ? 'kym' : null;
   const savedValue = {
     listType:initialType,
     itineraryId:existing?.listType === 'destination' ? existing.itineraryId : (initialType === 'destination' ? model.checklistDestination?.id || null : null),
     title:existing?.title || '',
     stage:CHECKLIST_STAGES.includes(existing?.stage) ? existing.stage : (CHECKLIST_STAGES.includes(initialStage) ? initialStage : model.activeStage),
-    owner:CHECKLIST_OWNERS.includes(String(existing?.owner || '').toLowerCase()) ? String(existing.owner).toLowerCase() : initialOwner,
-    required:existing?.required == null ? Boolean(initialRequired) : Boolean(existing.required),
+    owner:lockedPersonalOwner || (resolvedAddContext === 'permanent' || resolvedAddContext === 'destination' ? 'both' : (CHECKLIST_OWNERS.includes(String(existing?.owner || '').toLowerCase()) ? String(existing.owner).toLowerCase() : initialOwner)),
+    required:lockedPersonalOwner ? false : (existing?.required == null ? Boolean(initialRequired) : Boolean(existing.required)),
     dueDate:existing?.dueDate || '',
     notes:existing?.notes || ''
   };
@@ -116,7 +126,8 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
   const destinationHint = node('p', 'checklist-destination-hint');
   const fields = node('div', 'checklist-form-grid');
   const error = node('p', 'checklist-form-error');
-  body.append(typeTiles, destinationHint, fields, error);
+  if (!resolvedAddContext) body.append(typeTiles);
+  body.append(destinationHint, fields, error);
 
   function value(name) { return body.querySelector(`[name="${name}"]`)?.value ?? ''; }
   function checked(name) { return Boolean(body.querySelector(`[name="${name}"]`)?.checked); }
@@ -129,19 +140,22 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
   }
   function capture() {
     const listType = body.dataset.listType;
+    const owner = lockedPersonalOwner || (resolvedAddContext === 'permanent' || resolvedAddContext === 'destination' ? 'both' : value('owner'));
+    const required = lockedPersonalOwner ? false : checked('required');
     return {
       listType,
       itineraryId:listType === 'destination' ? (existing?.listType === 'destination' ? existing.itineraryId : model.checklistDestination?.id || null) : null,
       title:value('title'),
       stage:value('stage'),
-      owner:value('owner'),
-      required:checked('required'),
+      owner,
+      required,
       dueDate:value('dueDate') || null,
       notes:value('notes')
     };
   }
   function renderTypes() {
     typeTiles.replaceChildren();
+    if (resolvedAddContext) return;
     for (const listType of CHECKLIST_LIST_TYPES) {
       const button = node('button', 'checklist-type-tile', LIST_LABELS[listType]);
       button.type = 'button';
@@ -157,13 +171,17 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
     }
   }
   function updateDestinationHint() {
+    const target = existing?.listType === 'destination'
+      ? state.itinerary.find(item => item.id === existing.itineraryId)
+      : model.checklistDestination;
+    if (resolvedAddContext === 'his') { destinationHint.textContent = 'Adding to His Needs & Wants · Optional · Does not block Ready to Move.'; return; }
+    if (resolvedAddContext === 'hers') { destinationHint.textContent = 'Adding to Her Needs & Wants · Optional · Does not block Ready to Move.'; return; }
+    if (resolvedAddContext === 'permanent') { destinationHint.textContent = 'Adding to Permanent Checklist · Available across every destination.'; return; }
+    if (resolvedAddContext === 'destination') { destinationHint.textContent = target ? `Adding to Destination Checklist · ${target.name} · ${formatAUDate(target.startDate)} – ${formatAUDate(target.endDate)}` : 'No next destination is planned.'; return; }
     if (body.dataset.listType !== 'destination') {
       destinationHint.textContent = 'Permanent items remain available across every destination.';
       return;
     }
-    const target = existing?.listType === 'destination'
-      ? state.itinerary.find(item => item.id === existing.itineraryId)
-      : model.checklistDestination;
     destinationHint.textContent = target ? `Destination checklist · ${target.name} · ${formatAUDate(target.startDate)} – ${formatAUDate(target.endDate)}` : 'No next destination is planned.';
   }
   function populate(saved) {
@@ -171,14 +189,15 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
     error.textContent = '';
     renderTypes();
     updateDestinationHint();
-    fields.replaceChildren(
+    const editorFields = [
       inputField('Item', 'title', 'text', saved.title),
-      selectField('Stage', 'stage', CHECKLIST_STAGES.map(stage => [stage, STAGE_META[stage].label]), saved.stage),
-      selectField('Owner', 'owner', CHECKLIST_OWNERS.map(owner => [owner, OWNER_LABELS[owner]]), saved.owner),
-      inputField('Due Date', 'dueDate', 'date', saved.dueDate),
-      checkboxField('Required for Ready to Move', 'required', saved.required),
-      textAreaField('Notes', 'notes', saved.notes)
-    );
+      selectField('Stage', 'stage', CHECKLIST_STAGES.map(stage => [stage, STAGE_META[stage].label]), saved.stage)
+    ];
+    if (!resolvedAddContext) editorFields.push(selectField('Owner', 'owner', CHECKLIST_OWNERS.map(owner => [owner, OWNER_LABELS[owner]]), saved.owner));
+    editorFields.push(inputField('Due Date', 'dueDate', 'date', saved.dueDate));
+    if (!lockedPersonalOwner) editorFields.push(checkboxField('Required for Ready to Move', 'required', saved.required));
+    editorFields.push(textAreaField('Notes', 'notes', saved.notes));
+    fields.replaceChildren(...editorFields);
     if (modal && !editorTone) setModalTone(modal, currentEditorTone());
     fields.querySelector('[name="owner"]')?.addEventListener('change', () => { if (!editorTone) setModalTone(modal, currentEditorTone()); });
   }
@@ -251,7 +270,12 @@ function openChecklistEditor({ stateService, host, currentDate, itemId = null, i
   );
 
   const resolvedTone=currentEditorTone();
-  modal = createModal({ title:existing ? 'Edit Checklist Item' : 'Add Checklist Item', body, actions, className:`tcc-editor-modal tcc-checklist-editor-modal tone-${resolvedTone}` });
+  const addTitle = resolvedAddContext === 'his' ? 'Add His Item'
+    : resolvedAddContext === 'hers' ? 'Add Her Item'
+      : resolvedAddContext === 'permanent' ? 'Add Permanent Item'
+        : resolvedAddContext === 'destination' ? 'Add Destination Item'
+          : 'Add Checklist Item';
+  modal = createModal({ title:existing ? 'Edit Checklist Item' : addTitle, body, actions, className:`tcc-editor-modal tcc-checklist-editor-modal tone-${resolvedTone}` });
   setModalTone(modal,resolvedTone);
   host.append(modal);
   modal.addEventListener('close', () => modal.remove(), { once:true });
@@ -338,7 +362,7 @@ function renderOverview(model){
   const ring=node('div','checklist-overview-ring');
   ring.style.setProperty('--checklist-progress',`${Math.max(0,Math.min(100,model.overview.percent))}%`);
   ring.setAttribute('role','progressbar'); ring.setAttribute('aria-label','Overall checklist completion'); ring.setAttribute('aria-valuemin','0'); ring.setAttribute('aria-valuemax','100'); ring.setAttribute('aria-valuenow',String(model.overview.percent)); ring.setAttribute('aria-valuetext',`${model.overview.percent}% · ${model.overview.completed} of ${model.overview.total} complete overall`);
-  ring.append(node('span','','OVERALL CHECKLIST'),node('strong','',`${model.overview.percent}%`),node('small','',`${model.overview.completed} of ${model.overview.total} complete`));
+  ring.append(node('strong','',`${model.overview.percent}%`),node('small','',`${model.overview.completed} / ${model.overview.total} COMPLETE`));
   panel.append(ring);
   const metrics=node('div','checklist-overview-metrics');
   metrics.append(paceMini('Completed',model.overview.completed,'complete'),paceMini('Pending',model.overview.remaining,'pending'),paceMini('Overdue',model.overview.overdue,'overdue'));
@@ -361,7 +385,7 @@ function renderStageNavigation(model, onStageChange) {
     tabs.append(button);
   }
   const info=node('p','checklist-stage-info');
-  info.append(createLineIcon('info'), document.createTextNode(' Complete all required checklist tasks before travel. Optional His/Hers items do not block Ready to Move.'));
+  info.append(createLineIcon('info'), document.createTextNode('Complete all required checklist tasks before travel. Optional items do not block Ready to Move.'));
   wrap.append(tabs,info);
   return wrap;
 }
@@ -385,15 +409,10 @@ function renderOwnerCard(title, subtitle, items, tone, stateService, openEditor,
 function renderOwnerPanels(model,stateService,openEditor){
   const wrap=node('section','checklist-owner-grid');
   wrap.append(renderOwnerCard('HIS','NEEDS & WANTS',model.his,'his',stateService,openEditor,model.activeDestinationId,null),renderOwnerCard('HERS','NEEDS & WANTS',model.hers,'hers',stateService,openEditor,model.activeDestinationId,null));
-  if(model.sharedOptional.length){
-    const shared=node('div','checklist-shared-extras');
-    shared.append(node('strong','','SHARED EXTRAS'),node('span','',`${model.sharedOptional.filter(item=>item.completed).length}/${model.sharedOptional.length} complete`));
-    const list=node('div'); const openSharedItem=id=>openEditor(id,'violet'); for(const item of model.sharedOptional) list.append(renderChecklistRow(item,stateService,openSharedItem,true,model.activeDestinationId)); shared.append(list); wrap.append(shared);
-  }
   return wrap;
 }
 
-function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress,listType,stateService,openEditor,addItem,scopeItineraryId,{ disabled=false, disabledReason='' }={}){
+function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress,listType,stateService,openEditor,addItem,scopeItineraryId,{ disabled=false, disabledReason='', optionalItems=[] }={}){
   const panel=node('section',`checklist-column checklist-column-${listType}`);
   const head=node('div','checklist-column-head');
   const heading=node('div','checklist-column-title'); const columnIcon=node('span','checklist-column-icon'); columnIcon.append(createLineIcon(listType==='permanent'?'permanent':'destination')); heading.append(columnIcon);
@@ -401,7 +420,7 @@ function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress
   head.append(heading); panel.append(head);
 
   const progressCopy=node('div','checklist-progress-copy');
-  progressCopy.append(node('strong','',`${stageProgress.completed} of ${stageProgress.total} this stage`),node('span','',`${overallProgress.completed} of ${overallProgress.total} overall · ${overallProgress.percent}%`));
+  progressCopy.append(node('strong','',`${stageProgress.completed} of ${stageProgress.total} required this stage`),node('span','',`${overallProgress.completed} of ${overallProgress.total} required overall · ${overallProgress.percent}%`));
   const progress=document.createElement('progress'); progress.max=100; progress.value=overallProgress.percent; progress.setAttribute('aria-label',`${title} overall progress`); progress.setAttribute('aria-valuetext',`${overallProgress.completed} of ${overallProgress.total} complete · ${overallProgress.percent}%`);
   panel.append(progressCopy,progress);
 
@@ -414,8 +433,9 @@ function renderListPanel(title,subtitle,stageItems,stageProgress,overallProgress
   panel.append(preview);
 
   const list=node('div','checklist-column-list');
-  if(!stageItems.length) list.append(node('p','checklist-empty','No entries yet · No required tasks in this stage'));
+  if(!stageItems.length && !optionalItems.length) list.append(node('p','checklist-empty','No entries yet · No checklist items in this stage'));
   for(const item of stageItems) list.append(renderChecklistRow(item,stateService,openEditor,false,scopeItineraryId));
+  for(const item of optionalItems) list.append(renderChecklistRow(item,stateService,openEditor,false,scopeItineraryId));
   panel.append(list);
   return panel;
 }
@@ -447,7 +467,7 @@ function ownerExpandedBody({title,subtitle,items,tone,stateService,openEditor,sc
   const body=node('section',`checklist-owner-expanded checklist-owner-${tone}`);
   const head=node('div','checklist-expanded-head');
   const copy=node('div');copy.append(node('p','eyebrow',subtitle),node('h2','',title));
-  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem?.());});
+  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode('ADD ITEM'));add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem?.());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
   if(!items.length)list.append(node('p','checklist-empty','No entries yet · No optional items in this stage'));
@@ -460,7 +480,7 @@ function checklistExpandedBody({title,subtitle,items,stateService,openEditor,add
   const body=node('section','checklist-expanded-list-body');
   const head=node('div','checklist-expanded-head');
   const copy=node('div');copy.append(node('h2','',title),node('p','',subtitle));
-  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode(' ADD ITEM'));add.disabled=Boolean(disabled);add.title=add.disabled?disabledReason:'';if(!add.disabled)add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem());});
+  const add=node('button','button checklist-expanded-add');add.type='button';add.append(createLineIcon('plus'),document.createTextNode('ADD ITEM'));add.disabled=Boolean(disabled);add.title=add.disabled?disabledReason:'';if(!add.disabled)add.addEventListener('click',()=>{const dialog=add.closest('dialog');if(dialog?.open)dialog.close();queueMicrotask(()=>addItem());});
   head.append(copy,add);body.append(head);
   const list=node('div','checklist-expanded-list');
   if(!items.length)list.append(node('p','checklist-empty','No entries yet'));
@@ -617,7 +637,7 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     const openDestination=id=>openChecklistEditor({stateService,host:main,currentDate,itemId:id,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'});
 
     const changeStage=stage=>stateService.commit(draft=>{draft.ui.checklistStage=stage;});
-    const addOwnerItem=(owner,tone)=>openChecklistEditor({stateService,host:main,currentDate,initialListType:model.checklistDestination?'destination':'permanent',initialStage:model.activeStage,initialOwner:owner,initialRequired:false,editorTone:tone});
+    const addOwnerItem=(owner,tone)=>openChecklistEditor({stateService,host:main,currentDate,initialListType:model.checklistDestination?'destination':'permanent',initialStage:model.activeStage,initialOwner:owner,initialRequired:false,editorTone:tone,addContext:owner==='cameron'?'his':'hers'});
     const ready=renderReadyBanner(model,changeStage,navigate), stages=renderStageNavigation(model,changeStage), owners=renderOwnerPanels(model,stateService,openAny);
     makeExpandableCard(ready,{host:main,title:'Ready to Move',tone:model.ready.status==='ready'?'green':model.ready.status==='not-ready'?'red':'gold',bodyBuilder:()=>readyExpandedBody(model,navigate)});
     const primary=node('div','checklist-reference-primary');
@@ -626,12 +646,12 @@ export function renderChecklistScreen({ stateService, currentDate, navigate }) {
     const hersCard=owners.querySelector('.checklist-owner-hers');
     if(hisCard)makeExpandableCard(hisCard,{host:main,title:'His Needs & Wants',tone:'blue',bodyBuilder:()=>ownerExpandedBody({title:'HIS',subtitle:'NEEDS & WANTS',items:model.his,tone:'his',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('cameron','blue')})});
     if(hersCard)makeExpandableCard(hersCard,{host:main,title:'Her Needs & Wants',tone:'pink',bodyBuilder:()=>ownerExpandedBody({title:'HERS',subtitle:'NEEDS & WANTS',items:model.hers,tone:'hers',stateService,openEditor:openAny,scopeItineraryId:model.activeDestinationId,addItem:()=>addOwnerItem('kym','pink')})});
-    const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'}),model.activeDestinationId);
+    const permanentPanel=renderListPanel('Permanent Checklist','Tasks that apply to every destination.',model.stagePermanent,model.stagePermanentProgress,model.permanentProgress,'permanent',stateService,openPermanent,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold',addContext:'permanent'}),model.activeDestinationId,{optionalItems:model.sharedPermanentOptional});
     const destinationScopeLabel=model.nextDestination?'Tasks specific to the next destination.':model.checklistDestination?'Tasks specific to the current destination.':'Tasks for a planned destination.';
-    const destinationPanel=renderListPanel('Destination Checklist',destinationScopeLabel,model.stageDestination,model.stageDestinationProgress,model.destinationProgress,'destination',stateService,openDestination,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'}),model.activeDestinationId,{disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'});
+    const destinationPanel=renderListPanel('Destination Checklist',destinationScopeLabel,model.stageDestination,model.stageDestinationProgress,model.destinationProgress,'destination',stateService,openDestination,()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal',addContext:'destination'}),model.activeDestinationId,{disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first',optionalItems:model.sharedDestinationOptional});
     const requiredGrid=node('section','checklist-required-grid'); requiredGrid.append(permanentPanel,destinationPanel);
-    makeExpandableCard(permanentPanel,{host:main,title:'Permanent Checklist',tone:'gold',bodyBuilder:()=>checklistExpandedBody({title:'Permanent Checklist',subtitle:'Tasks that apply to every destination.',items:model.stagePermanent,stateService,openEditor:openPermanent,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold'}),scopeItineraryId:model.activeDestinationId})});
-    makeExpandableCard(destinationPanel,{host:main,title:'Destination Checklist',tone:'teal',bodyBuilder:()=>checklistExpandedBody({title:'Destination Checklist',subtitle:destinationScopeLabel,items:model.stageDestination,stateService,openEditor:openDestination,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal'}),scopeItineraryId:model.activeDestinationId,disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'})});
+    makeExpandableCard(permanentPanel,{host:main,title:'Permanent Checklist',tone:'gold',bodyBuilder:()=>checklistExpandedBody({title:'Permanent Checklist',subtitle:'Tasks that apply to every destination.',items:[...model.stagePermanent,...model.sharedPermanentOptional],stateService,openEditor:openPermanent,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'permanent',initialStage:model.activeStage,editorTone:'gold',addContext:'permanent'}),scopeItineraryId:model.activeDestinationId})});
+    makeExpandableCard(destinationPanel,{host:main,title:'Destination Checklist',tone:'teal',bodyBuilder:()=>checklistExpandedBody({title:'Destination Checklist',subtitle:destinationScopeLabel,items:[...model.stageDestination,...model.sharedDestinationOptional],stateService,openEditor:openDestination,addItem:()=>openChecklistEditor({stateService,host:main,currentDate,initialListType:'destination',initialStage:model.activeStage,editorTone:'teal',addContext:'destination'}),scopeItineraryId:model.activeDestinationId,disabled:!model.checklistDestination,disabledReason:'Plan the next destination in Itinerary first'})});
     primary.append(requiredGrid);
     const overview=renderOverview(model), nextDestination=renderNextDestinationCard(model,navigate);
     makeExpandableCard(overview,{host:main,title:'Checklist Overview',tone:'silver',bodyBuilder:()=>overviewExpandedBody(model)});
