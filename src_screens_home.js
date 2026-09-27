@@ -570,7 +570,18 @@ function compactSchengen(model){
   ring.classList.toggle('is-unchecked',!hasSchengenCounts||model.schengen.status==='not-checked');
   ring.classList.toggle('is-not-allowed',model.schengen.status==='not-allowed');
   if(hasSchengenCounts){ring.setAttribute('role','progressbar');ring.setAttribute('aria-label','Schengen allowance used');ring.setAttribute('aria-valuemin','0');ring.setAttribute('aria-valuemax',String(total));ring.setAttribute('aria-valuenow',String(Math.max(0,Math.min(total,used))));ring.setAttribute('aria-valuetext',`${used} days used · ${remaining} days remaining of ${total}`);}else{ring.setAttribute('role','img');ring.setAttribute('aria-label','Schengen allowance · Not checked');}
-  ring.append(node('strong','',model.schengen.daysRemaining!=null?String(model.schengen.daysRemaining):'—'),node('span','','DAYS LEFT'),node('small','',`OF ${total}`));
+  if(hasSchengenCounts){
+    ring.append(node('strong','',String(model.schengen.daysRemaining)),node('span','','DAYS LEFT'),node('small','',`OF ${total}`));
+  }else{
+    ring.append(node('strong','','—'),node('span','','SET UP'));
+  }
+  if(!hasSchengenCounts){
+    const empty=node('div','home-schengen-empty');
+    empty.append(node('strong','','SET UP SCHENGEN'),node('span','','Tap to enter dates and days'));
+    body.append(ring,empty); content.append(body);
+    const status=node('div','home-schengen-status schengen-not-checked','NOT CHECKED'); content.append(status);
+    panel.append(content); return panel;
+  }
   const meta=node('div','home-schengen-metrics');
   const u=node('div');u.append(node('strong','',String(model.schengen.daysUsed??'—')),node('span','','USED'));
   const l=node('div');l.append(node('strong','',String(model.schengen.daysRemaining??'—')),node('span','','LEFT'));

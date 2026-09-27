@@ -200,6 +200,101 @@ function openVaultRecordEditor({ stateService, host, recordId = null, initialCat
   modalHost(host, modal);
 }
 
+function emergencyCardTextField(label, name, value = '', placeholder = '') {
+  const wrap=node('label','vault-emergency-card-editor-field');
+  wrap.append(node('span','vault-emergency-card-editor-label',label));
+  const input=document.createElement('textarea');
+  input.name=name;
+  input.rows=2;
+  input.value=value || '';
+  if(placeholder) input.placeholder=placeholder;
+  input.autocomplete='off';
+  wrap.append(input);
+  return wrap;
+}
+
+function emergencyCardSavedValue(record, kind) {
+  if(!record) return '';
+  if(kind==='insurance') return String(record.notes || record.details || '').trim();
+  return String(record.details || record.notes || '').trim();
+}
+
+function openEmergencyTravelCardEditor({ stateService, host, currentCountry, localEmergencyId = null, embassyId = null, insuranceAssistId = null }) {
+  const snapshot=stateService.snapshot();
+  const find=id=>id?snapshot.vault.find(record=>record.id===id)||null:null;
+  const localEmergency=find(localEmergencyId);
+  const embassy=find(embassyId);
+  const insuranceAssist=find(insuranceAssistId);
+  const country=String(currentCountry || '').trim();
+  const hasCountry=Boolean(country && country!=='No current stay');
+  const saved={
+    localEmergency:emergencyCardSavedValue(localEmergency,'local'),
+    embassy:emergencyCardSavedValue(embassy,'embassy'),
+    insurance:emergencyCardSavedValue(insuranceAssist,'insurance')
+  };
+  const session=new FormSession(saved);
+  const body=node('div','vault-emergency-card-editor');
+  const context=node('section','vault-emergency-card-editor-context');
+  context.append(
+    node('span','','CURRENT COUNTRY'),
+    node('strong','',hasCountry?country:'No current stay'),
+    node('small','',hasCountry?'Save the emergency details you want available offline for this country.':'Add a current itinerary stay before saving country-specific emergency details.')
+  );
+  const fields=node('div','vault-emergency-card-editor-fields');
+  const error=node('p','vault-form-error');
+  body.append(context,fields,error);
+  const value=name=>body.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+  const populate=v=>{
+    error.textContent='';
+    fields.replaceChildren(
+      emergencyCardTextField('Local emergency number / services','localEmergency',v.localEmergency,'e.g. 112 · Police · Ambulance'),
+      emergencyCardTextField('Australian embassy / consulate','embassy',v.embassy,'Phone, address or offline contact details'),
+      emergencyCardTextField('Travel insurance assistance','insurance',v.insurance,'Emergency assistance phone / support details')
+    );
+    for(const input of fields.querySelectorAll('textarea[name="localEmergency"], textarea[name="embassy"]')) input.disabled=!hasCountry;
+  };
+  populate(saved);
+  const saveExisting=(draft,record,next)=>saveVaultRecordDraft(draft,{recordId:record.id,fields:{
+    category:record.category,
+    title:record.title,
+    owner:record.owner || 'Both',
+    reference:record.reference || next.reference || '',
+    issueDate:record.issueDate || null,
+    expiryDate:record.expiryDate || null,
+    details:next.details ?? record.details ?? '',
+    notes:next.notes ?? record.notes ?? ''
+  }},{now:stateService.now});
+  const actions=[
+    {label:'Undo Changes',onClick:()=>populate(session.undo())},
+    {label:'Cancel',onClick:dialog=>{session.cancel();dialog.close();}},
+    {label:'Save Travel Card',onClick:dialog=>{
+      try{
+        const next=session.update(draft=>Object.assign(draft,{localEmergency:value('localEmergency'),embassy:value('embassy'),insurance:value('insurance')}));
+        if(!hasCountry && (next.localEmergency || next.embassy)) throw new Error('Add a current itinerary stay before saving country-specific emergency details');
+        stateService.commit(draft=>{
+          if(next.localEmergency){
+            if(localEmergency) saveExisting(draft,localEmergency,{reference:country,details:next.localEmergency});
+            else saveVaultRecordDraft(draft,{fields:{category:'emergency',title:`${country} Local Emergency`,owner:'Both',reference:country,issueDate:null,expiryDate:null,details:next.localEmergency,notes:'Emergency Travel Card'}},{now:stateService.now});
+          }
+          if(next.embassy){
+            if(embassy) saveExisting(draft,embassy,{reference:country,details:next.embassy});
+            else saveVaultRecordDraft(draft,{fields:{category:'emergency',title:`Australian Embassy / Consulate — ${country}`,owner:'Both',reference:country,issueDate:null,expiryDate:null,details:next.embassy,notes:'Emergency Travel Card'}},{now:stateService.now});
+          }
+          if(next.insurance){
+            if(insuranceAssist) saveExisting(draft,insuranceAssist,{notes:next.insurance});
+            else saveVaultRecordDraft(draft,{fields:{category:'insurance',title:'Travel Insurance Assistance',owner:'Both',reference:'',issueDate:null,expiryDate:null,details:'',notes:next.insurance}},{now:stateService.now});
+          }
+        });
+        session.markSaved(next);
+        if(dialog.isConnected&&dialog.open)dialog.close();
+      }catch(err){error.textContent=err.message;}
+    }}
+  ];
+  const modal=createModal({title:'Edit Emergency Travel Card',body,actions,className:'tcc-editor-modal tcc-vault-emergency-card-editor-modal tone-red'});
+  setModalTone(modal,'red');
+  modalHost(host,modal);
+}
+
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = () => reject(new Error('Could not read screenshot')); reader.readAsDataURL(file);
@@ -387,7 +482,7 @@ function vaultCountryMatches(record,country){
     .some(value=>String(value).toLowerCase().includes(target));
 }
 
-function vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist}){
+function vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist,onEdit=null}){
   const body=node('div','home-expanded-dashboard vault-emergency-travel-expanded');
   const stats=node('div','home-expanded-stats home-expanded-stats-four');
   stats.append(
@@ -397,10 +492,23 @@ function vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy
     vaultExpandedStat('INSURANCE',insuranceAssist?'STORED':'NOT STORED','travel assistance',insuranceAssist?'green':'gold')
   );
   body.append(stats);
+  if(onEdit){
+    const actions=node('div','vault-emergency-expanded-actions');
+    const edit=node('button','button vault-emergency-edit-button','Edit Emergency Travel Card');
+    edit.type='button';
+    edit.addEventListener('click',()=>onEdit(edit));
+    actions.append(edit);body.append(actions);
+  }
   const section=node('section','home-expanded-section');section.append(node('h3','','CURRENT-COUNTRY EMERGENCY TRAVEL CARD'));
   const list=node('div','home-expanded-list');
-  const facts=[['LOCAL EMERGENCY',localEmergency],['AUSTRALIAN EMBASSY / CONSULATE',embassy],['INSURANCE ASSISTANCE',insuranceAssist]];
-  for(const [label,record] of facts){const row=node('div','home-expanded-list-row');const copy=node('span','home-expanded-list-copy');copy.append(node('strong','',record?.title||'Not stored'),node('small','',record?[record.reference||currentCountry,record.details||record.notes].filter(Boolean).join(' · '):`${currentCountry||'Current country'} · add this information in The Vault`));row.append(node('span','home-expanded-priority',label),copy,node('b','',record?'STORED':'MISSING'));list.append(row);}
+  const facts=[['LOCAL EMERGENCY',localEmergency,'local'],['AUSTRALIAN EMBASSY / CONSULATE',embassy,'embassy'],['INSURANCE ASSISTANCE',insuranceAssist,'insurance']];
+  for(const [label,record,kind] of facts){
+    const row=node('div','home-expanded-list-row');
+    const copy=node('span','home-expanded-list-copy');
+    const detail=kind==='insurance'?(record?.notes||record?.details):(record?.details||record?.notes);
+    copy.append(node('strong','',record?.title||'Not stored'),node('small','',record?[record.reference||currentCountry,detail].filter(Boolean).join(' · '):`${currentCountry||'Current country'} · add this information in The Vault`));
+    row.append(node('span','home-expanded-priority',label),copy,node('b','',record?'STORED':'MISSING'));list.append(row);
+  }
   section.append(list);body.append(section);return body;
 }
 
@@ -445,17 +553,28 @@ function renderOverview(main, stateService, access, requestRender, currentDate) 
   const currentStay=(state.itinerary||[]).find(stay=>stay?.startDate&&stay?.endDate&&stay.startDate<=now&&now<=stay.endDate)||null;
   const currentCountry=currentStay?.country||currentStay?.startCountry||currentStay?.endCountry||currentStay?.name||'No current stay';
   const currentCountryEmergencyRecords=allEmergencyRecords.filter(r=>vaultCountryMatches(r,currentCountry));
-  const localEmergency=currentCountryEmergencyRecords.find(r=>/emergency services|emergency number|local emergency|ambulance|police|\b112\b|\b911\b/i.test(`${r.title||''} ${r.details||''}`))||currentCountryEmergencyRecords[0]||null;
+  const localEmergency=currentCountryEmergencyRecords.find(r=>/emergency services|emergency number|local emergency|ambulance|police|\b112\b|\b911\b/i.test(`${r.title||''} ${r.details||''}`))||currentCountryEmergencyRecords.find(r=>!/embassy|consulate/i.test(`${r.title||''} ${r.details||''}`))||null;
   const embassy=currentCountryEmergencyRecords.find(r=>/embassy|consulate/i.test(`${r.title||''} ${r.details||''}`))||null;
-  const insuranceAssist=state.vault.find(r=>r.category==='insurance'&&/assist|emergency|travel cover|insurance/i.test(`${r.title||''} ${r.details||''}`))||state.vault.find(r=>r.category==='insurance')||null;
+  const insuranceAssist=state.vault.find(r=>r.category==='insurance'&&/assist|emergency/i.test(`${r.title||''} ${r.details||''} ${r.notes||''}`))||state.vault.find(r=>r.category==='insurance'&&/travel cover|insurance/i.test(`${r.title||''} ${r.details||''}`))||state.vault.find(r=>r.category==='insurance')||null;
   const openVaultRecord=r=>{if(!r)return;access.activeSection=r.category;access.selectedRecordId=r.id;access.selectedRecordTone=VAULT_TONES[r.category]||'blue';requestRender();};
   const travelFact=(label,record,fallback)=>{const tag=record?'button':'div';const row=node(tag,'vault-travel-fact');if(record){row.type='button';row.setAttribute('aria-label',`Open ${vaultRecordContext(record,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(record));}const copy=node('span','vault-travel-fact-copy');copy.append(node('small','',label),node('strong','',record?.title||fallback));const detail=record?.reference||record?.details||'';if(detail)copy.append(node('b','',detail));row.append(copy);return row;};
   const lower=node('div','vault-overview-lower');
-  const emergency=node('section','vault-emergency-card vault-emergency-travel-card'); emergency.append(node('h2','','Emergency Travel Card'));
+  const emergency=node('section','vault-emergency-card vault-emergency-travel-card');
+  const emergencyHead=node('div','vault-section-head vault-emergency-card-head');
+  const emergencyTitle=node('h2','','Emergency Travel Card');
+  const emergencyEdit=node('button','button vault-emergency-edit-button','Edit');
+  emergencyEdit.type='button';
+  const openEmergencyEditor=source=>{
+    const expandedDialog=source?.closest?.('dialog');
+    if(expandedDialog?.open) expandedDialog.close();
+    queueMicrotask(()=>openEmergencyTravelCardEditor({stateService,host:main,currentCountry,localEmergencyId:localEmergency?.id||null,embassyId:embassy?.id||null,insuranceAssistId:insuranceAssist?.id||null}));
+  };
+  emergencyEdit.addEventListener('click',()=>openEmergencyEditor(emergencyEdit));
+  emergencyHead.append(emergencyTitle,emergencyEdit);emergency.append(emergencyHead);
   const countryFact=node('div','vault-travel-fact vault-travel-country');const countryCopy=node('span','vault-travel-fact-copy');countryCopy.append(node('small','','CURRENT COUNTRY'),node('strong','',currentCountry));countryFact.append(countryCopy);emergency.append(countryFact,travelFact('LOCAL EMERGENCY',localEmergency,'Not stored'),travelFact('AUSTRALIAN EMBASSY / CONSULATE',embassy,'Not stored'),travelFact('INSURANCE ASSISTANCE',insuranceAssist,'Not stored'));lower.append(emergency);
   const contacts=node('section','vault-emergency-contacts');const contactHead=node('div','vault-section-head');contactHead.append(node('h2','','Emergency Contacts'),node('span','vault-count',String(allEmergencyRecords.length)));contacts.append(contactHead);const contactList=node('div','vault-emergency-contact-list');if(!allEmergencyRecords.length)contactList.append(node('p','vault-empty','No emergency contacts stored'));for(const r of allEmergencyRecords.slice(0,4)){const row=node('button','vault-emergency-contact-row');row.type='button';const icon=vaultCategoryIcon('emergency');const copy=node('span','vault-emergency-contact-copy');copy.append(node('strong','',r.title),node('small','',[r.owner||'Shared',r.reference||r.details||'Saved emergency contact'].filter(Boolean).join(' · ')));row.append(icon,copy);row.setAttribute('aria-label',`Open ${vaultRecordContext(r,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(r));contactList.append(row);}contacts.append(contactList);lower.append(contacts);main.append(lower);
   const activity=node('section','vault-activity vault-activity-compact');const head=node('div','vault-section-head');head.append(node('h2','','Recent Activity'),node('span','vault-count',String(model.recentActivity.length)));activity.append(head);const list=node('div','vault-activity-list');if(!model.recentActivity.length)list.append(node('p','vault-empty','No entries yet'));for(const item of model.recentActivity.slice(0,4)){const row=node('button','vault-activity-row');row.type='button';row.append(node('strong','',item.title),node('small','',item.subtitle));if(item.kind==='streaming'){const target=state.streaming.find(record=>record.id===item.id);row.setAttribute('aria-label',`Edit streaming login · ${streamingRecordContext(target || {service:item.title})}`);row.addEventListener('click',()=>openStreamingEditor({stateService,host:main,recordId:item.id,editorTone:'silver'}));}else{const target=state.vault.find(record=>record.id===item.vaultRecordId);if(target){row.setAttribute('aria-label',item.kind==='attachment'?`Open ${vaultRecordContext(target,{includeCategory:true})} for screenshot ${item.title}`:`Edit ${vaultRecordContext(target,{includeCategory:true})}`);row.addEventListener('click',()=>openVaultRecord(target));}else{row.disabled=true;row.setAttribute('aria-disabled','true');}}list.append(row);}activity.append(list);main.append(activity);
-  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist})});
+  makeExpandableCard(emergency,{host:main,title:'Emergency Travel Card',tone:'red',bodyBuilder:()=>vaultEmergencyTravelExpandedBody({currentCountry,localEmergency,embassy,insuranceAssist,onEdit:openEmergencyEditor})});
   makeExpandableCard(contacts,{host:main,title:'Emergency Contacts',tone:'green',bodyBuilder:()=>vaultEmergencyContactsExpandedBody(state)});
   makeExpandableCard(activity,{host:main,title:'Recent Activity',tone:'sky',bodyBuilder:()=>vaultActivityExpandedBody(state)});
 }

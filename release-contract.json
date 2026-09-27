@@ -1,32 +1,32 @@
 {
-  "contractVersion": "S54-R17-SIMULATION-25-2026-09-27-COMPACT-REPOSITORY-SEAL",
-  "packageRole": "S54 Simulation 25 / R17 — compact repository-friendly physical-iPad acceptance package under 100 files.",
+  "contractVersion": "S54-R18-SIMULATION-27-2026-09-27-KYM-FIRST-ENTRY-SEAL",
+  "packageRole": "S54 Simulation 27 / R18 — compact physical-iPad usability acceptance package under 100 files.",
   "principle": "This exact S54 current working source is the forward authority. Earlier checkpoints, simulation identities, style rules and regression expectations are provenance/history only; they must never override a newer locked decision.",
   "protocolFile": "release-contract.json (continuity rules embedded; Python guard intentionally omitted from compact repository package)",
   "package": {
     "maxFiles": 99,
     "requiredHeaderAssets": 86,
     "runtimeMode": "simulation",
-    "storageKey": "tcc:v1:morocco-s54-simulation-25-20260927",
-    "manifestId": "./tokyo-full-simulation-s40-2030-02-20-v1",
+    "storageKey": "tcc:v1:morocco-s54-simulation-27-20260927",
+    "manifestId": "./travel-command-centre-s54-simulation-27-r18",
     "cachePrefix": "tcc-v1-",
-    "cacheName": "tcc-v1-v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
-    "appVersion": "1.2.0-v60-r7.17-s54-morocco-simulation-25-r17",
-    "buildMarker": "v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
+    "cacheName": "tcc-v1-v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
+    "appVersion": "1.2.0-v60-r7.18-s54-morocco-simulation-27-r18",
+    "buildMarker": "v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
     "repositoryPackaging": "compact-under-100-files",
     "looseBrandAssets": "embedded-data-uri",
     "historicalAuditFiles": "omitted-from-runtime-zip",
     "actualExtractedFileCount": 98
   },
   "runtimeIdentity": {
-    "storageKey": "tcc:v1:morocco-s54-simulation-25-20260927",
-    "cacheName": "tcc-v1-v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
-    "buildMarker": "v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
-    "serviceWorkerUrl": "./sw.js?v=v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
-    "appVersion": "1.2.0-v60-r7.17-s54-morocco-simulation-25-r17"
+    "storageKey": "tcc:v1:morocco-s54-simulation-27-20260927",
+    "cacheName": "tcc-v1-v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
+    "buildMarker": "v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
+    "serviceWorkerUrl": "./sw.js?v=v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
+    "appVersion": "1.2.0-v60-r7.18-s54-morocco-simulation-27-r18"
   },
   "sourceAuthority": {
-    "authority": "S54 R17 forward working authority after the 27 Sep full-screen visual fitment and colour audit. R17 preserves all R16 fitment/function locks and adds paint-only premium widget refinement, crisper identity borders, restrained top-sheen, modal/source-tone polish and colour-distribution review.",
+    "authority": "S54 R18 forward working authority: R17 visual cohesion plus Kym-first data-entry closure for stable editors, larger first-choice icons/labels, simplified Destination Budget, and directly editable Emergency Travel Card.",
     "forwardOnly": true,
     "predecessorsAreHistory": [
       "S51",
@@ -49,8 +49,8 @@
       "S34",
       "S33"
     ],
-    "provenance": "R17 is a forward-only visual-finish layer on the accepted R16 source. It changes paint/hierarchy only; no approved screen structure, workflow, calculations, storage, launch sequence or R16 fitment geometry is redesigned.",
-    "regressionSeal": "R17 must preserve R16 six-size fitment, 183 portrait expanded-widget cases, long-name/local-currency containment, Quick Look, vector rings, R14 headers and all functional locks. R17 additionally locks no-global-dimming, premium top-sheen, stronger identity borders and zero actionable adjacent colour-duplication issues."
+    "provenance": "R18 is a forward-only usability layer on the accepted R17 source. It preserves approved screen design, colours, calculations and storage while reducing entry-screen movement and keeping Save/Cancel visible.",
+    "regressionSeal": "R18 must preserve all R17/R16 visual and functional locks while keeping primary editor actions visible at every supported iPad size and maintaining enlarged Expense/Reservation choices and direct Emergency Travel Card editing."
   },
   "hardVisualRules": [
     "Every expanded widget preserves the same colour family as its collapsed/original widget.",
@@ -98,7 +98,11 @@
     "All editable iPad form controls must render at 16px or larger so Safari focus never auto-zooms the app; ordinary tap/focus must not change page scale.",
     "Tiny positive foreign-currency conversions must display the same canonical AUD cent value before Save as the value stored after Save; a positive amount may not display AUD 0.00 when canonical storage is AUD 0.01.",
     "Shared icon hue families are numerically identical across Journey History, Booked Reservations and The Vault; Journey History is the RGB benchmark while category assignments remain unchanged.",
-    "Checklist stage navigation keeps the approved neutral/blue visual treatment. Fixes are limited to text size, icon lane, padding and containment so all four labels stay inside their tiles; Checklist Overview keeps the approved solid readiness donut and readable 100%, completion text and Completed/Pending/Overdue metrics."
+    "Checklist stage navigation keeps the approved neutral/blue visual treatment. Fixes are limited to text size, icon lane, padding and containment so all four labels stay inside their tiles; Checklist Overview keeps the approved solid readiness donut and readable 100%, completion text and Completed/Pending/Overdue metrics.",
+    "Kym-first editor rule: primary Add/Edit modals keep Save/Cancel visible while only the middle form content scrolls.",
+    "Add Expense and Add Reservation first-choice tiles use large, high-contrast icons and large category labels in portrait and landscape.",
+    "Destination Budget setup is limited to AUD budget plus fixed exchange rate; Save Budget is always visible.",
+    "Emergency Travel Card is directly editable from The Vault with one compact editor and always-visible Save Travel Card."
   ],
   "screenClosureRegister": {
     "Home": {
@@ -446,15 +450,15 @@
   ],
   "promotion": {
     "finalMaster": "BLOCKED",
-    "reason": "Simulation 25 / R17 is a physical-iPad visual acceptance package; Final Master remains blocked until physical-iPad acceptance."
+    "reason": "Simulation 27 / R18 is a physical-iPad usability acceptance package; Final Master remains blocked until physical-iPad acceptance."
   },
-  "handoffInstruction": "Install Simulation 25 as the next physical-iPad screen-test package. This compact repository package preserves R17 visual authority while keeping the extracted file count below 100.",
+  "handoffInstruction": "Install Simulation 27 as the next physical-iPad usability test package. This compact repository package preserves R17 visual authority, adds R18 Kym-first editor improvements, and remains below 100 extracted files.",
   "knownExternalLimitations": [
     "Secure-origin PIN hashing/unlock and IndexedDB restore commit could not be honestly proven in the sandbox because local navigation was blocked by browser policy; they remain explicit physical-iPad gates, not PASS claims."
   ],
   "sourceSeal": {
     "status": "SEALED_COMPACT_REPOSITORY",
-    "identity": "v60-r7.17-s54-morocco-simulation-25-2026-09-27-r17",
+    "identity": "v60-r7.18-s54-morocco-simulation-27-2026-09-27-r18",
     "checkpoint": "S54_R17_SIMULATION_25_VISUAL_COHESION_SEAL",
     "predecessorPackage": "S54_MOROCCO_SIMULATION_23_R16",
     "packageProduced": true,
@@ -556,7 +560,8 @@
       "sw.js": "9f0c9d08de04dc0c0e19b0971aad427866d36cc0a2b1896046a8bde48cb54df3",
       "tokyo-4year-simulation-fixture.json": "b33fe40515cee826779483ec2047702538affe791f6b87aea6e6d24fada228bd"
     },
-    "digest": "01bcd78b39445bf05228c1dcbb187aa5e37c5a939f01db911d51a1fa2c027da4"
+    "digest": "01bcd78b39445bf05228c1dcbb187aa5e37c5a939f01db911d51a1fa2c027da4",
+    "authority": "R18 Kym-first usability closure on R17 visual cohesion."
   },
   "regressionEvidence": {
     "phase": "S54-R16-Simulation-23-final-physical-iPad-fitment-closure",
@@ -734,6 +739,10 @@
     "Simulation 25 packaging-only change: historical audit JSON and Python guard files are omitted from the repository ZIP so the extracted file count remains below 100; release-contract.json retains the continuity decisions and evidence summary."
   ],
   "regression": {
-    "regressionSeal": "R16 owns final physical-iPad fitment and expanded-widget geometry while preserving all R15/R14/R12/R11/R10/R9 visual and runtime locks."
-  }
+    "regressionSeal": "R18 owns Kym-first editor stability while preserving all R17 visual cohesion and R16/R15/R14 geometry/runtime locks."
+  },
+  "historicalFixes": [
+    "27 Sep R18 Kym-first editor closure: fixed modal action rail, enlarged Add Expense/Add Reservation selector icons and labels, and simplified Destination Budget setup.",
+    "27 Sep R18 Emergency Travel Card closure: The Vault overview card now has direct editing for current-country local emergency, Australian embassy/consulate and insurance-assistance details, with one fixed Save Travel Card action."
+  ]
 }

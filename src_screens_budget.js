@@ -695,7 +695,7 @@ function openAnnualBudgetEditor({stateService,host,budgetYear}) {
   const error=node('p','budget-form-error');body.append(field,help,error);
   const modal=createModal({title:'Edit Annual Budget',body,className:'tcc-editor-modal tone-gold',actions:[
     {label:'Cancel',onClick:d=>d.close()},
-    {label:'Save',onClick:d=>{try{stateService.commit(draft=>saveGeneralSettingsDraft(draft,{journeyStartDate:draft.settings.journeyStartDate,defaultCurrency:draft.settings.defaultCurrency,annualBudgetAUD:input.value,annualBudgetYear:year}));if(d.isConnected&&d.open)d.close();}catch(err){error.textContent=err.message;}}}
+    {label:'Save Budget',onClick:d=>{try{stateService.commit(draft=>saveGeneralSettingsDraft(draft,{journeyStartDate:draft.settings.journeyStartDate,defaultCurrency:draft.settings.defaultCurrency,annualBudgetAUD:input.value,annualBudgetYear:year}));if(d.isConnected&&d.open)d.close();}catch(err){error.textContent=err.message;}}}
   ]});
   host.append(modal);modal.addEventListener('close',()=>modal.remove(),{once:true});modal.showModal();
 }
@@ -806,40 +806,26 @@ function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManage
   const intro=node('div','budget-destination-editor-intro');
   intro.append(node('strong','',entry.name),node('span','',[displayCountryForStay(entry),budgetDateRangeText(entry)].filter(Boolean).join(' · ')),budgetDateTicket(entry));
   body.append(intro);
-  const snapshot=node('div','budget-destination-editor-snapshot');
-  const currentMoney=destinationMoney(entry,current), spentMoney=destinationMoney(entry,spent), remainingMoney=destinationMoney(entry,current-spent);
-  snapshot.append(
-    paceMetric('Destination budget total',currentMoney.primary,current>0?'is-set':'is-missing',currentMoney.secondary?`${currentMoney.secondary} equivalent`:''),
-    paceMetric('Dated costs allocated to this stay',spentMoney.primary,'',spentMoney.secondary?`${spentMoney.secondary} equivalent`:''),
-    paceMetric('Budget remaining after dated costs',remainingMoney.primary,current-spent>=0?'is-set':'is-missing',remainingMoney.secondary?`${remainingMoney.secondary} equivalent`:'')
-  );
-  body.append(snapshot);
-  const dates=node('section','budget-destination-editor-dates');
-  dates.append(
-    node('div','budget-destination-editor-dates-head','STAY DATES · FROM ITINERARY'),
-    budgetDateTicket(entry),
-    node('p','budget-destination-editor-date-note','Dates are set once in Itinerary and are read-only here. Destination Budgets only asks Kym for the AUD budget and the fixed exchange rate.')
-  );
-  body.append(dates);
+  // R18 Kym-first editor: the setup task is only AUD budget + fixed rate.
+  // The larger budget/spend snapshot already lives on the Budget screen and
+  // made this modal unnecessarily tall on iPad, so it is deliberately omitted.
+  // The destination header already shows the locked itinerary dates. Do not
+  // repeat the same date ticket again lower in the form; one stable reference
+  // point is easier to scan and keeps the two-input task compact.
   const localCurrency=String(entry.localCurrency||'').trim().toUpperCase();
   const setupIntro=node('section','budget-destination-conversion-intro');
   setupIntro.append(
     node('span','budget-destination-conversion-kicker','SET THIS STAY UP ONCE'),
-    node('strong','',localCurrency ? `${entry.name || 'This destination'} uses ${localCurrency}. Enter only the AUD budget and the exchange rate.` : 'Destination currency is missing from the itinerary.'),
+    node('strong','',localCurrency ? `${entry.name || 'This destination'} · ${localCurrency}` : 'Destination currency is missing from the itinerary.'),
     node('p','',localCurrency
-      ? `The itinerary supplies ${localCurrency} automatically, so Kym cannot accidentally choose the wrong currency. Travel Command Centre converts the AUD budget into ${localCurrency} and locks that rate to these dates.`
-      : 'Return to Itinerary and re-save this stay after its country is corrected. Currency is assigned automatically from the destination and is never chosen manually in Destination Budgets.')
+      ? 'Enter the AUD budget and the fixed exchange rate. That is all Kym needs to set here.'
+      : 'Correct the itinerary country before setting this Destination Budget.')
   );
   body.append(setupIntro);
   const field=inputField('Budget for this stay (AUD)','destinationBudgetAUD','number',current||'');
   field.classList.add('budget-destination-editor-field'); body.append(field);
-  const currencyReadout=node('section','budget-destination-currency-readout');
-  currencyReadout.append(
-    node('span','budget-destination-currency-readout-label','LOCAL CURRENCY · FROM ITINERARY'),
-    node('strong','',localCurrency||'Not available'),
-    node('small','',localCurrency ? `${entry.name} · no currency selection required` : 'Correct the itinerary country before setting this Destination Budget')
-  );
-  body.append(currencyReadout);
+  // The setup banner already names the itinerary-supplied local currency.
+  // Avoid a second read-only currency card between the two editable fields.
   const rateField=inputField(`Exchange Rate · ${localCurrency || 'local currency'} for 1 AUD`,'destinationFixedLocalPerAUD','number',entry.fixedLocalPerAUD??'');
   rateField.classList.add('budget-destination-editor-rate-field');
   const lockedCurrency=destinationHasRateLockingCosts(state,itineraryId);
@@ -871,20 +857,18 @@ function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManage
     }
     const localAmount=audToLocal(amountValue,rate);
     const reverse=1/rate;
-    const grid=node('div','budget-destination-conversion-grid');
+    const grid=node('div','budget-destination-conversion-grid budget-destination-conversion-grid-compact');
     grid.append(
-      paceMetric('AUD BUDGET',signedMoney(amountValue,'AUD'),'is-set','What you are allowing for this stay'),
-      paceMetric('LOCKED EXCHANGE RATE',`1 AUD = ${rate.toLocaleString('en-AU',{maximumFractionDigits:4})} ${localCurrency}`,'is-set',`1 ${localCurrency} = AUD ${signedMoney(reverse,'AUD')}`),
-      paceMetric('LOCAL BUDGET CREATED',signedMoney(localAmount,localCurrency),'is-set','This is the amount Kym will see and spend against')
+      paceMetric('AUD BUDGET',signedMoney(amountValue,'AUD'),'is-set','Budget for this stay'),
+      paceMetric('FIXED RATE',`1 AUD = ${rate.toLocaleString('en-AU',{maximumFractionDigits:4})} ${localCurrency}`,'is-set','Locked to these dates'),
+      paceMetric('LOCAL BUDGET',signedMoney(localAmount,localCurrency),'is-set','Spend against this amount')
     );
-    conversionPreview.append(grid,node('p','budget-destination-conversion-lock-note',`Once saved, expenses dated to this stay are entered in ${localCurrency}. Their AUD equivalent is calculated automatically using this locked rate—there is no currency choice or exchange-rate entry in Add Expense.`));
+    conversionPreview.append(grid,node('p','budget-destination-conversion-lock-note',`Expenses for these dates will use ${localCurrency} automatically.`));
   };
   field.querySelector('input')?.addEventListener('input',updateBudgetConversionPreview);
   rateInput?.addEventListener('input',updateBudgetConversionPreview);
   updateBudgetConversionPreview();
-  body.append(node('p','budget-destination-editor-help',lockedCurrency
-    ? `The ${localCurrency||'local'} exchange rate is locked because this stay already has Destination Budget costs (living expenses and/or destination-allocated reservations). Annual-only bookings do not lock this rate.`
-    : `The itinerary supplies ${localCurrency||'the local currency'} automatically. Set only the AUD budget and exchange rate here; Destination Budgets is the only place where that conversion is established.`)); 
+  if (lockedCurrency) body.append(node('p','budget-destination-editor-help',`The ${localCurrency||'local'} rate is locked because this stay already has Destination Budget costs.`));
   const error=node('p','budget-form-error'); body.append(error);
   let reopenQueued=false;
   const queueReopen=()=>{ if(!reopenManager||reopenQueued)return; reopenQueued=true; queueMicrotask(reopenManager); };
@@ -892,7 +876,7 @@ function openDestinationBudgetEditor({stateService,host,itineraryId,reopenManage
     title:current>0?'Edit Destination Budget':'Create Destination Budget',body,
     actions:[
       {label:'Cancel',onClick:d=>d.close()},
-      {label:'Save',onClick:d=>{
+      {label:'Save Budget',onClick:d=>{
         try{
           const value=body.querySelector('[name="destinationBudgetAUD"]')?.value??'';
           const amount=value===''?0:Number(value);

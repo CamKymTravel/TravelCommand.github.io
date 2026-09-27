@@ -2778,3 +2778,435 @@ html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] :is(
     outline:0 !important;
   }
 }
+
+/* ========================================================================
+   R18 — Kym-first data-entry closure · 27 Sep 2026
+   Physical-iPad rule: primary entry screens must move as little as possible,
+   Save/Cancel must remain visible, and first-choice category icons/labels must
+   be large enough to identify at a glance. Destination Budget is a two-input
+   setup task, not a tutorial page.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  /* All editors: fixed header/footer rails, only the middle content may scroll. */
+  html body .tcc-modal.tcc-editor-modal {
+    max-height:min(calc(100dvh - 48px), 920px) !important;
+    overflow:hidden !important;
+  }
+  html body .tcc-modal.tcc-editor-modal > form {
+    display:grid !important;
+    grid-template-rows:auto minmax(0,1fr) auto !important;
+    max-height:min(calc(100dvh - 48px), 920px) !important;
+    overflow:hidden !important;
+  }
+  html body .tcc-modal.tcc-editor-modal > form > header {
+    position:relative !important;
+    z-index:4 !important;
+    flex:none !important;
+  }
+  html body .tcc-modal.tcc-editor-modal > form > .modal-body {
+    min-height:0 !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  html body .tcc-modal.tcc-editor-modal > form > footer {
+    position:relative !important;
+    z-index:5 !important;
+    flex:none !important;
+    min-height:72px !important;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px)) !important;
+    border-top:1px solid rgba(var(--tcc-editor-rgb),.34) !important;
+    box-shadow:0 -14px 28px rgba(2,10,18,.34) !important;
+  }
+  html body .tcc-modal.tcc-editor-modal > form > footer .button {
+    min-height:52px !important;
+    font-size:16px !important;
+    font-weight:850 !important;
+  }
+
+  /* ADD EXPENSE — large, unmistakable six-category selector. */
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tiles {
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tile {
+    min-height:78px !important;
+    padding:8px 6px 7px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:6px !important;
+    font-size:14px !important;
+    font-weight:850 !important;
+    line-height:1.08 !important;
+    color:#eef5fa !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-icon {
+    width:28px !important;
+    height:28px !important;
+    min-width:28px !important;
+    min-height:28px !important;
+    padding:7px !important;
+    box-sizing:content-box !important;
+    border:1px solid rgba(var(--choice-rgb),.58) !important;
+    border-radius:12px !important;
+    background:rgba(var(--choice-rgb),.14) !important;
+    color:rgb(var(--choice-rgb)) !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-label {
+    font-size:14px !important;
+    font-weight:850 !important;
+    line-height:1.08 !important;
+    text-align:center !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-editor-modal .budget-selected-tick {
+    width:19px !important;
+    height:19px !important;
+    top:7px !important;
+    right:7px !important;
+  }
+
+  /* ADD RESERVATION — same glanceable hierarchy as Add Expense. */
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-tiles {
+    grid-template-columns:repeat(7,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-tile {
+    min-height:84px !important;
+    padding:8px 6px 7px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:6px !important;
+    font-size:14px !important;
+    font-weight:850 !important;
+    line-height:1.06 !important;
+    color:#f1f6fa !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-choice-icon {
+    width:29px !important;
+    height:29px !important;
+    min-width:29px !important;
+    min-height:29px !important;
+    padding:7px !important;
+    box-sizing:content-box !important;
+    border:1px solid rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.58) !important;
+    border-radius:12px !important;
+    background:rgba(var(--reservation-choice-rgb,var(--choice-rgb)),.14) !important;
+    color:rgb(var(--reservation-choice-rgb,var(--choice-rgb))) !important;
+  }
+  html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-choice-label {
+    font-size:14px !important;
+    font-weight:850 !important;
+    line-height:1.06 !important;
+    text-align:center !important;
+  }
+
+  /* Destination Budget: compact two-input task with a permanently visible footer. */
+  html body [data-screen="budget"] .tcc-budget-destination-editor-modal {
+    width:min(920px,calc(100vw - 24px)) !important;
+    max-height:calc(100dvh - 48px) !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-destination-editor-modal > form {
+    max-height:calc(100dvh - 48px) !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-destination-editor-modal > form > .modal-body {
+    padding:12px 14px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor {
+    gap:10px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-intro {
+    padding:8px 11px !important;
+    gap:2px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-intro > strong {
+    font-size:18px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-dates {
+    padding:8px 10px !important;
+    gap:6px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-date-note {
+    margin:0 !important;
+    font-size:11px !important;
+    line-height:1.2 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-intro {
+    padding:9px 11px !important;
+    gap:3px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-intro > strong {
+    font-size:16px !important;
+    line-height:1.15 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-intro > p {
+    margin:0 !important;
+    font-size:11.5px !important;
+    line-height:1.2 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-field,
+  html body [data-screen="budget"] .budget-destination-editor-rate-field {
+    margin:0 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-editor-field input,
+  html body [data-screen="budget"] .budget-destination-editor-rate-field input {
+    min-height:52px !important;
+    height:52px !important;
+    font-size:20px !important;
+    font-weight:850 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-currency-readout {
+    min-height:0 !important;
+    padding:7px 10px !important;
+    display:grid !important;
+    grid-template-columns:auto auto 1fr !important;
+    align-items:center !important;
+    gap:8px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-currency-readout-label,
+  html body [data-screen="budget"] .budget-destination-currency-readout small {
+    font-size:10.5px !important;
+    line-height:1.1 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-currency-readout strong {
+    font-size:17px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-preview {
+    padding:9px 10px !important;
+    gap:7px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-preview-head {
+    font-size:11px !important;
+    margin:0 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-grid-compact {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric {
+    min-height:78px !important;
+    padding:8px 9px !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric > span,
+  html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric > small {
+    font-size:10px !important;
+    line-height:1.12 !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric > strong {
+    font-size:18px !important;
+    line-height:1.05 !important;
+    overflow-wrap:anywhere !important;
+  }
+  html body [data-screen="budget"] .budget-destination-conversion-lock-note,
+  html body [data-screen="budget"] .budget-destination-editor-help {
+    margin:0 !important;
+    padding:7px 9px !important;
+    font-size:10.5px !important;
+    line-height:1.18 !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-destination-editor-modal > form > footer {
+    grid-template-columns:1fr 1.35fr !important;
+  }
+  html body [data-screen="budget"] .tcc-budget-destination-editor-modal > form > footer .button:last-child {
+    font-size:17px !important;
+    font-weight:900 !important;
+  }
+
+  /* Fresh-install Schengen placeholder: do not crowd an empty ring with fake counts. */
+  html body [data-screen="home"] .home-mini-schengen .home-schengen-ring.is-unchecked span {
+    font-size:9px !important;
+    margin-top:3px !important;
+    letter-spacing:.12em !important;
+  }
+  html body [data-screen="home"] .home-mini-schengen .home-schengen-ring.is-unchecked small {
+    display:none !important;
+  }
+
+  @media (max-width:900px) {
+    /* Keep Add Expense on one stable six-choice row even in portrait so Kym
+       does not have to visually chase a reflowing selector. */
+    html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tiles {
+      grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+      gap:5px !important;
+    }
+    html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tile {
+      min-height:80px !important;
+      padding-left:3px !important;
+      padding-right:3px !important;
+    }
+    html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-label {
+      font-size:12.5px !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-tiles {
+      grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    }
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-tile {
+      min-height:84px !important;
+    }
+    /* The conversion summary stays one compact row in portrait; it is a quick
+       confirmation, not a second page of the form. */
+    html body [data-screen="budget"] .budget-destination-conversion-grid-compact {
+      grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+      gap:6px !important;
+    }
+    html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric {
+      min-height:72px !important;
+      padding:7px !important;
+    }
+    html body [data-screen="budget"] .budget-destination-conversion-grid-compact .budget-pace-metric > strong {
+      font-size:16px !important;
+    }
+    html body [data-screen="budget"] .budget-destination-currency-readout {
+      grid-template-columns:auto auto 1fr !important;
+    }
+  }
+
+  @media (max-height:760px) and (orientation:landscape) {
+    html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-tile,
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-tile {
+      min-height:70px !important;
+    }
+    html body [data-screen="budget"] .tcc-budget-editor-modal .budget-category-choice-icon,
+    html body [data-screen="reservations"] .tcc-reservation-editor-modal .reservation-type-choice-icon {
+      width:25px !important;
+      height:25px !important;
+      min-width:25px !important;
+      min-height:25px !important;
+      padding:6px !important;
+    }
+  }
+}
+
+/* ========================================================================
+   R18 — Emergency Travel Card direct edit closure · 27 Sep 2026
+   The overview card must be editable without routing Kym through three
+   different Vault sections. The dedicated editor keeps one fixed Save rail.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  html body [data-screen="vault"] .vault-emergency-card-head {
+    align-items:center !important;
+    margin:0 0 10px !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-card-head > h2 {
+    margin:0 !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-edit-button {
+    min-height:42px !important;
+    padding:8px 14px !important;
+    border:1px solid rgba(var(--tcc-p-red-rgb),.50) !important;
+    border-radius:12px !important;
+    background:linear-gradient(145deg,rgba(var(--tcc-p-red-rgb),.14),rgba(var(--tcc-p-ink-rgb),.90)) !important;
+    color:#ffd8df !important;
+    font-size:13px !important;
+    font-weight:900 !important;
+    letter-spacing:.02em !important;
+    box-shadow:none !important;
+  }
+  html body [data-screen="vault"] .vault-emergency-edit-button:active {
+    transform:translateY(1px) !important;
+  }
+  html body .tcc-vault-emergency-card-editor-modal {
+    width:min(820px,calc(100vw - 24px)) !important;
+    max-height:min(calc(100dvh - 48px),860px) !important;
+  }
+  html body .tcc-vault-emergency-card-editor-modal > form {
+    max-height:min(calc(100dvh - 48px),860px) !important;
+  }
+  html body .tcc-vault-emergency-card-editor-modal > form > .modal-body {
+    padding:12px 14px !important;
+  }
+  html body .vault-emergency-card-editor {
+    display:grid !important;
+    gap:12px !important;
+  }
+  html body .vault-emergency-card-editor-context {
+    display:grid !important;
+    grid-template-columns:auto 1fr !important;
+    align-items:center !important;
+    gap:4px 12px !important;
+    padding:11px 13px !important;
+    border:1px solid rgba(var(--tcc-p-red-rgb),.30) !important;
+    border-radius:14px !important;
+    background:linear-gradient(145deg,rgba(var(--tcc-p-red-rgb),.09),rgba(7,24,36,.82)) !important;
+  }
+  html body .vault-emergency-card-editor-context > span {
+    color:rgb(var(--tcc-p-red-rgb)) !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    letter-spacing:.12em !important;
+  }
+  html body .vault-emergency-card-editor-context > strong {
+    color:#f7fbff !important;
+    font-size:20px !important;
+    font-weight:900 !important;
+  }
+  html body .vault-emergency-card-editor-context > small {
+    grid-column:1 / -1 !important;
+    color:#b9c9d5 !important;
+    font-size:12px !important;
+    line-height:1.3 !important;
+  }
+  html body .vault-emergency-card-editor-fields {
+    display:grid !important;
+    gap:10px !important;
+  }
+  html body .vault-emergency-card-editor-field {
+    display:grid !important;
+    gap:6px !important;
+    padding:11px 12px !important;
+    border:1px solid rgba(var(--tcc-p-red-rgb),.24) !important;
+    border-radius:14px !important;
+    background:rgba(5,21,34,.72) !important;
+  }
+  html body .vault-emergency-card-editor-label {
+    color:#f2bbc5 !important;
+    font-size:14px !important;
+    font-weight:850 !important;
+  }
+  html body .vault-emergency-card-editor-field textarea {
+    width:100% !important;
+    min-height:68px !important;
+    resize:vertical !important;
+    padding:10px 12px !important;
+    border:1px solid rgba(148,184,205,.24) !important;
+    border-radius:11px !important;
+    background:rgba(4,17,30,.88) !important;
+    color:#f7fbff !important;
+    font-size:16px !important;
+    font-weight:700 !important;
+    line-height:1.3 !important;
+  }
+  html body .vault-emergency-card-editor-field textarea:disabled {
+    opacity:.55 !important;
+  }
+  html body .tcc-vault-emergency-card-editor-modal > form > footer {
+    grid-template-columns:1fr 1fr 1.4fr !important;
+  }
+  html body .tcc-vault-emergency-card-editor-modal > form > footer .button:last-child {
+    border-color:rgba(var(--tcc-p-red-rgb),.55) !important;
+    background:linear-gradient(145deg,rgba(var(--tcc-p-red-rgb),.20),rgba(8,27,39,.94)) !important;
+  }
+  html body .vault-emergency-expanded-actions {
+    display:flex !important;
+    justify-content:flex-end !important;
+  }
+  html body .vault-emergency-expanded-actions .vault-emergency-edit-button {
+    min-width:230px !important;
+  }
+  @media (max-width:900px) {
+    html body .tcc-vault-emergency-card-editor-modal > form > footer {
+      grid-template-columns:1fr 1fr !important;
+    }
+    html body .tcc-vault-emergency-card-editor-modal > form > footer .button:first-child {
+      grid-column:1 / -1 !important;
+      min-height:44px !important;
+    }
+    html body .vault-emergency-card-editor-field textarea {
+      min-height:74px !important;
+    }
+  }
+}
