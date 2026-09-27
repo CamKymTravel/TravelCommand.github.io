@@ -1,0 +1,2780 @@
+/* ========================================================================
+   TRAVEL COMMAND CENTRE — CURRENT VISUAL AUTHORITY
+   27 Sep 2026
+
+   This file is intentionally loaded LAST, but its rules live in the FIRST
+   cascade layer (tccCurrentAuthority). That is deliberate: important rules in
+   the first layer outrank every historical layered or unlayered !important rule.
+   Earlier files remain implementation history/fallback only.
+   ======================================================================== */
+@import url('./src_design_palette_contract.css') layer(tccCurrentAuthority);
+
+@layer tccCurrentAuthority {
+:root {
+  --tcc-current-authority-revision: 20260927.16;
+}
+
+/* ------------------------------------------------------------------------
+   HEADER AUTHORITY — supplied baked artwork must be shown in full inside the
+   approved per-screen header box. Never centre-crop, zoom or overscan the art.
+   ------------------------------------------------------------------------ */
+html body :is(
+  [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"],
+  [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"],
+  [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"],
+  [data-screen="settings"] > .tcc-page-hero[data-header-key="header-settings"]
+) {
+  position:relative !important;
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:auto !important;
+  max-height:none !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:1px solid rgba(111,193,229,.68) !important;
+  outline:0 !important;
+  border-radius:22px !important;
+  box-sizing:border-box !important;
+  background:#071321 !important;
+  box-shadow:none !important;
+  filter:none !important;
+}
+html body [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"] { min-height:214px !important; height:214px !important; max-height:214px !important; aspect-ratio:auto !important; }
+html body [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"] { min-height:214px !important; height:214px !important; max-height:214px !important; aspect-ratio:auto !important; }
+html body [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"] { min-height:188px !important; height:188px !important; max-height:188px !important; aspect-ratio:auto !important; }
+html body [data-screen="settings"] > .tcc-page-hero[data-header-key="header-settings"] { min-height:166px !important; height:166px !important; max-height:166px !important; aspect-ratio:auto !important; }
+
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"],
+  [data-screen="settings"]
+) > .tcc-page-hero[data-baked-header-art="true"] > .tcc-baked-hero-image {
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:fill !important;
+  object-position:center center !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  outline:0 !important;
+  border-radius:inherit !important;
+  box-shadow:none !important;
+  filter:none !important;
+  pointer-events:none !important;
+  user-select:none !important;
+}
+html body :is(
+  [data-screen="journey-history"],
+  [data-screen="checklist"],
+  [data-screen="vault"],
+  [data-screen="settings"]
+) > .tcc-page-hero[data-baked-header-art="true"] > .tcc-page-hero-copy {
+  display:none !important;
+}
+
+/* Static baked-header fail-safe. The real <img> remains the primary paint, but
+   these exact same local assets sit underneath it so a late/failed DOM image
+   assignment can never leave an empty header on the installed iPad. */
+html body [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"] { background-image:url('./header-journey-history.jpg') !important; background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important; }
+html body [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"] { background-image:url('./header-checklist.jpg') !important; background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important; }
+html body [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"] { background-image:url('./header-vault.jpg') !important; background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important; }
+html body [data-screen="settings"] > .tcc-page-hero[data-header-key="header-settings"] { background-image:url('./header-settings.jpg') !important; background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important; }
+
+/* THE VAULT — preserve the baked THE VAULT title at left and replace only the
+   obsolete baked status panel at right with the live current status/actions. */
+html body [data-screen="vault"] > .vault-reference-hero > .vault-baked-status-mask {
+  position:absolute !important;
+  z-index:1 !important;
+  top:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  width:25% !important;
+  pointer-events:none !important;
+  background:linear-gradient(90deg,rgba(7,19,33,0) 0%,rgba(7,19,33,.92) 17%,#071321 34%,#071321 100%) !important;
+}
+html body [data-screen="vault"]:not(.vault-screen-locked) > .vault-reference-hero > .vault-hero-actions {
+  position:absolute !important;
+  z-index:3 !important;
+  top:6px !important;
+  right:8px !important;
+  bottom:6px !important;
+  left:auto !important;
+  width:236px !important;
+  min-width:236px !important;
+  max-width:236px !important;
+  height:auto !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:6px !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  grid-template-rows:minmax(0,1fr) 38px !important;
+  gap:5px !important;
+  align-self:auto !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  border:1px solid rgba(var(--tcc-p-sky-rgb),.18) !important;
+  border-radius:14px !important;
+  background:rgba(3,13,24,.965) !important;
+  box-shadow:none !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-status {
+  grid-column:1 / -1 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  height:auto !important;
+  padding:5px 8px !important;
+  display:grid !important;
+  align-content:center !important;
+  gap:1px !important;
+  overflow:hidden !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-streaming,
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-lock {
+  grid-row:2 !important;
+  min-width:0 !important;
+  min-height:38px !important;
+  height:38px !important;
+  padding:0 6px !important;
+  font-size:9.5px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-status small {
+  font-size:8px !important;
+  line-height:1 !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-status span {
+  font-size:8px !important;
+  line-height:1.02 !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-status em {
+  margin-top:2px !important;
+  padding-top:2px !important;
+  border-top:1px solid rgba(var(--tcc-p-sky-rgb),.12) !important;
+  font-size:7px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+html body [data-screen="vault"] .vault-reference-hero .vault-hero-status strong {
+  font-size:24px !important;
+  line-height:.94 !important;
+}
+
+/* Vault locked: compact protected-access badge only. Never a full-height slab. */
+html body [data-screen="vault"].vault-screen-locked {
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) !important;
+  grid-template-rows:auto auto !important;
+  align-content:start !important;
+  justify-items:stretch !important;
+  gap:16px !important;
+  min-height:0 !important;
+}
+html body [data-screen="vault"].vault-screen-locked > .vault-locked-badge {
+  justify-self:center !important;
+  align-self:start !important;
+  width:auto !important;
+  min-width:0 !important;
+  max-width:min(420px,calc(100% - 32px)) !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:13px 22px !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:14px !important;
+  border:1px solid rgba(var(--tcc-p-sky-rgb),.58) !important;
+  border-radius:17px !important;
+  background:linear-gradient(145deg,rgba(8,31,47,.97),rgba(5,20,34,.99)) !important;
+  box-shadow:none !important;
+}
+
+/* Vault categories: definitive geometry. Landscape = one five-card row.
+   Portrait = deliberate 3 + 2 layout, never five clipped cards or one column. */
+html body [data-screen="vault"] .vault-category-grid {
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  gap:10px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+html body [data-screen="vault"] .vault-category-card {
+  min-width:0 !important;
+  width:auto !important;
+  min-height:148px !important;
+  grid-column:auto !important;
+  padding:14px 10px !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen="vault"] .vault-category-card > strong {
+  max-width:100% !important;
+  font-size:16px !important;
+  line-height:1.08 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+  text-align:center !important;
+}
+html body [data-screen="vault"] .vault-category-card {
+  justify-items:center !important;
+  text-align:center !important;
+}
+@media (orientation:portrait) and (max-width:900px) {
+  html body [data-screen="vault"] .vault-category-grid {
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+  html body [data-screen="vault"] .vault-category-card:nth-child(-n+3) { grid-column:span 2 !important; }
+  html body [data-screen="vault"] .vault-category-card:nth-child(n+4) { grid-column:span 3 !important; }
+}
+@media (orientation:landscape), (min-width:901px) {
+  html body [data-screen="vault"] .vault-category-grid { grid-template-columns:repeat(5,minmax(0,1fr)) !important; }
+  html body [data-screen="vault"] .vault-category-card { grid-column:auto !important; }
+}
+
+/* ------------------------------------------------------------------------
+   CHECK AUTHORITY — App Health in Settings is the only app-wide check UI.
+   Historical per-screen check panels must never reappear through old CSS/DOM.
+   ------------------------------------------------------------------------ */
+html body [data-screen="journey-history"] :is(.journey-health,.journey-check),
+html body [data-screen="reservations"] :is(.reservation-health,.reservation-health-check),
+html body [data-screen="calendar"] :is(.calendar-sync-check,.calendar-sync-status,.sync-check),
+html body [data-screen="budget"] :is(.budget-verify,.budget-check,.budget-health),
+html body [data-screen="checklist"] :is(.checklist-history,.checklist-history-group,.checklist-history-groups,.checklist-history-compact-empty) {
+  display:none !important;
+}
+
+/* ------------------------------------------------------------------------
+   TEXT / FITMENT HARD STOPS — no heading/value may escape its card.
+   These are deliberately conservative and do not globally shrink typography.
+   ------------------------------------------------------------------------ */
+html body [data-screen] :is(
+  .vault-category-card,
+  .journey-summary-card,
+  .reservation-tab,
+  .checklist-owner-card,
+  .checklist-column,
+  .settings-health-card,
+  .budget-pace-metric,
+  .home-mini-card
+) {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen] :is(
+  .vault-category-card strong,
+  .journey-summary-card strong,
+  .reservation-tab strong,
+  .checklist-owner-card strong,
+  .checklist-column strong,
+  .settings-health-card strong,
+  .budget-pace-metric strong,
+  .home-mini-card strong
+) {
+  max-width:100% !important;
+}
+
+/* Ordinary cards never keep a persistent focus/selection ring after taps.
+   Semantic active controls (navigation, tabs, filters, selected options) keep
+   their intentional active styling. */
+html body [data-expandable="true"]:focus,
+html body [data-expandable="true"]:focus-visible,
+html body [data-expandable="true"] > .tcc-expand-trigger:focus,
+html body [data-expandable="true"] > .tcc-expand-trigger:focus-visible {
+  outline:0 !important;
+  box-shadow:none !important;
+}
+
+/* ------------------------------------------------------------------------
+   ALL-SCREEN FITMENT AUTHORITY — physical-iPad failures are sealed here.
+   These rules intentionally own only geometry/overflow that has regressed in
+   prior builds; colour remains owned by the generated palette authority.
+   ------------------------------------------------------------------------ */
+
+/* Shared Current / Next strip on Itinerary, Budget, Reservations and Calendar.
+   Four explicit lanes prevent destination names, dates, day counts and progress
+   from ever painting through one another in landscape. */
+html body :is(
+  [data-screen="itinerary"],
+  [data-screen="budget"],
+  [data-screen="reservations"],
+  [data-screen="calendar"]
+) > .tcc-stay-banner .tcc-stay-banner-card {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  grid-template-columns:92px minmax(0,1fr) minmax(78px,auto) 94px !important;
+  overflow:hidden !important;
+}
+html body :is(
+  [data-screen="itinerary"],
+  [data-screen="budget"],
+  [data-screen="reservations"],
+  [data-screen="calendar"]
+) > .tcc-stay-banner .tcc-stay-banner-identity {
+  min-width:0 !important;
+  max-width:100% !important;
+  overflow:hidden !important;
+}
+html body :is(
+  [data-screen="itinerary"],
+  [data-screen="budget"],
+  [data-screen="reservations"],
+  [data-screen="calendar"]
+) > .tcc-stay-banner .tcc-stay-banner-name {
+  min-width:0 !important;
+  max-width:100% !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+html body :is(
+  [data-screen="itinerary"],
+  [data-screen="budget"],
+  [data-screen="reservations"],
+  [data-screen="calendar"]
+) > .tcc-stay-banner .tcc-stay-banner-detail,
+html body :is(
+  [data-screen="itinerary"],
+  [data-screen="budget"],
+  [data-screen="reservations"],
+  [data-screen="calendar"]
+) > .tcc-stay-banner .tcc-stay-mode-marker {
+  white-space:nowrap !important;
+  min-width:0 !important;
+}
+@media (orientation:portrait) and (max-width:1100px) {
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-card {
+    grid-template-columns:70px minmax(0,1fr) 104px !important;
+    column-gap:6px !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-identity {
+    display:flex !important;
+    width:100% !important;
+    min-width:0 !important;
+    gap:5px !important;
+    overflow:hidden !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-name {
+    display:block !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    font-size:14px !important;
+    line-height:1.02 !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-detail {
+    font-size:9.5px !important;
+  }
+}
+
+/* Journey History rows: destination text wraps only at word boundaries and the
+   compact numeric columns remain isolated from the destination lane. */
+html body [data-screen="journey-history"] :is(.journey-row,.journey-record-row,.journey-summary-card) {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen="journey-history"] .journey-record-row strong {
+  min-width:0 !important;
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+
+/* Checklist overview/stages: prevent long labels and owner metrics from
+   crossing card boundaries while retaining the approved typography scale. */
+html body [data-screen="checklist"] :is(
+  .checklist-ready-copy,.checklist-stage-copy,.checklist-owner-head,
+  .checklist-owner-stats,.checklist-column-head,.checklist-overview-metrics
+) {
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen="checklist"] :is(
+  .checklist-ready-copy,.checklist-stage-copy,.checklist-column-title
+) strong {
+  max-width:100% !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+
+/* Settings App Health: cards may grow vertically, but text never escapes. */
+html body [data-screen="settings"] :is(
+  .settings-health,.settings-health-hero,.settings-health-grid,
+  .settings-health-card,.settings-health-card-copy,.settings-health-score
+) {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen="settings"] .settings-health-card-copy :is(strong,p),
+html body [data-screen="settings"] .settings-health-score-copy :is(strong,small) {
+  max-width:100% !important;
+  white-space:normal !important;
+  overflow-wrap:normal !important;
+  word-break:normal !important;
+}
+
+
+/* ------------------------------------------------------------------------
+   NO-REGRESSION SCREEN GEOMETRY SEAL — neutral fitment only.
+   Historical layout files may continue to provide detail, but they may not
+   reintroduce page-width overflow, minimum-content blowouts, or collapse the
+   currently approved major grids on iPad.
+   ------------------------------------------------------------------------ */
+html body [data-screen] {
+  min-width:0 !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  overflow-x:hidden !important;
+}
+html body [data-screen] :is(
+  [class*="-grid"], [class*="-row"], [class*="-panel"], [class*="-card"],
+  [class*="-controls"], [class*="-banner"], [class*="-hero"]
+) {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+html body [data-screen] :is([class*="-grid"], [class*="-row"]) > * {
+  min-width:0 !important;
+  box-sizing:border-box !important;
+}
+
+/* Major accepted landscape grids are explicitly owned here so an older
+   breakpoint cannot silently retake control in a later continuity merge. */
+@media (orientation:landscape) {
+  html body [data-screen="journey-history"] .journey-summary-grid {
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  }
+  html body [data-screen="checklist"] .checklist-layout-grid {
+    grid-template-columns:minmax(0,1fr) clamp(240px,24vw,300px) !important;
+    gap:14px !important;
+    align-items:start !important;
+  }
+  html body [data-screen="checklist"] .checklist-reference-rail {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:12px !important;
+    align-items:start !important;
+    align-content:start !important;
+  }
+  html body [data-screen="checklist"] .checklist-reference-rail > * {
+    width:100% !important;
+    min-width:0 !important;
+    align-self:start !important;
+  }
+  html body [data-screen="checklist"] .checklist-owner-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+  html body [data-screen="settings"] .settings-health-grid {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+
+
+/* ------------------------------------------------------------------------
+   ICON-ONLY SIDEBAR LEARNING CUE — latest locked interaction.
+   Tapping any menu icon briefly names the destination screen, then clears.
+   This is deliberately body-level/fixed so screen re-rendering cannot remove
+   it before Kym has time to read it. It never becomes persistent selection.
+   ------------------------------------------------------------------------ */
+html body .tcc-nav-flash {
+  position:fixed !important;
+  z-index:2147482000 !important;
+  left:84px !important;
+  transform:translateY(-50%) !important;
+  min-width:max-content !important;
+  max-width:220px !important;
+  padding:8px 13px !important;
+  border:1px solid rgba(var(--tcc-p-sky-rgb),.48) !important;
+  border-radius:11px !important;
+  background:rgba(5,20,35,.97) !important;
+  color:rgb(var(--tcc-text-primary-rgb)) !important;
+  box-shadow:none !important;
+  font-size:15px !important;
+  font-weight:850 !important;
+  line-height:1 !important;
+  letter-spacing:.01em !important;
+  white-space:nowrap !important;
+  pointer-events:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  transition:opacity .12s ease,visibility 0s linear .12s !important;
+}
+html body .tcc-nav-flash.is-visible {
+  opacity:1 !important;
+  visibility:visible !important;
+  transition:opacity .12s ease !important;
+}
+
+}
+
+/* ========================================================================
+   27 Sep 2026 — LATEST PHYSICAL-IPAD LOCK: shared portrait stay orientation.
+   The portrait strip must retain the same information hierarchy as landscape:
+   label -> flag + destination name -> dates, with day count/progress isolated.
+   Explicit class ownership prevents historical generic-span selectors from
+   stealing the destination-name lane again.
+   ======================================================================== */
+@media (orientation:portrait) and (max-width:1100px) {
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-card {
+    display:grid !important;
+    grid-template-columns:78px minmax(150px,1fr) minmax(92px,auto) !important;
+    grid-template-rows:28px 24px !important;
+    column-gap:8px !important;
+    row-gap:0 !important;
+    align-items:center !important;
+    padding:6px 10px !important;
+    overflow:hidden !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow {
+    grid-column:1 !important;
+    grid-row:1 / 3 !important;
+    display:block !important;
+    min-width:0 !important;
+    align-self:center !important;
+    font-size:9.5px !important;
+    line-height:1.08 !important;
+    letter-spacing:.14em !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-identity {
+    grid-column:2 !important;
+    grid-row:1 !important;
+    display:flex !important;
+    align-items:center !important;
+    align-self:end !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    gap:7px !important;
+    overflow:hidden !important;
+    visibility:visible !important;
+    opacity:1 !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-flag {
+    display:inline-block !important;
+    flex:0 0 auto !important;
+    font-size:17px !important;
+    line-height:1 !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-name {
+    display:block !important;
+    flex:1 1 auto !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    color:#f5f8fb !important;
+    font-size:15px !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-dates {
+    grid-column:2 !important;
+    grid-row:2 !important;
+    display:block !important;
+    min-width:0 !important;
+    align-self:start !important;
+    color:#d4dee7 !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-detail {
+    grid-column:3 !important;
+    grid-row:1 !important;
+    display:block !important;
+    align-self:end !important;
+    justify-self:end !important;
+    min-width:0 !important;
+    color:#d4dee7 !important;
+    font-size:10px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner progress {
+    grid-column:3 !important;
+    grid-row:2 !important;
+    display:block !important;
+    align-self:start !important;
+    justify-self:end !important;
+    width:92px !important;
+    max-width:100% !important;
+    height:6px !important;
+    margin:3px 0 0 !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-mode-marker {
+    display:none !important;
+  }
+}
+
+/* Checklist final readability lock — preserve the approved 100% ring and
+   status-cell hierarchy without clipping at either iPad orientation. */
+html body [data-screen="checklist"] .checklist-overview-card {
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring {
+  flex:0 0 auto !important;
+  overflow:visible !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring > strong,
+html body [data-screen="checklist"] .checklist-overview-ring > small,
+html body [data-screen="checklist"] .checklist-overview-metric > span,
+html body [data-screen="checklist"] .checklist-overview-metric > strong {
+  max-width:100% !important;
+  text-align:center !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring > small {
+  white-space:nowrap !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metrics {
+  width:100% !important;
+  min-width:0 !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metric {
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+/* Checklist Overview is a locked physical-iPad component: exact text/ring
+   geometry lives in the final authority so lower historical rules cannot alter
+   the accepted graph or make its labels collide. */
+html body [data-screen="checklist"] .checklist-overview-card {
+  padding:16px 14px 15px !important;
+  gap:10px !important;
+}
+html body [data-screen="checklist"] .checklist-overview-card > .eyebrow {
+  margin:0 0 1px !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+  letter-spacing:.14em !important;
+  white-space:nowrap !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring {
+  width:154px !important;
+  height:154px !important;
+  display:grid !important;
+  place-items:center !important;
+  align-content:center !important;
+  gap:5px !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring > strong {
+  font-size:39px !important;
+  line-height:.95 !important;
+  letter-spacing:-.025em !important;
+  white-space:nowrap !important;
+}
+html body [data-screen="checklist"] .checklist-overview-ring > small {
+  font-size:11px !important;
+  line-height:1.1 !important;
+  font-weight:800 !important;
+  letter-spacing:.055em !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metrics {
+  gap:8px !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metric {
+  min-height:64px !important;
+  padding:8px 6px !important;
+  align-content:center !important;
+  gap:3px !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metric > span {
+  font-size:10px !important;
+  line-height:1.05 !important;
+  font-weight:800 !important;
+  letter-spacing:.045em !important;
+  white-space:nowrap !important;
+}
+html body [data-screen="checklist"] .checklist-overview-metric > strong {
+  font-size:22px !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+}
+
+/* ========================================================================
+   27 Sep 2026 — R10 COMPUTED-CASCADE PORTRAIT STAY-STRIP CLOSURE.
+   Live browser rendering exposed an important-layer conflict: the historical
+   tccLocks rule still placed progress/mode in a fourth grid column, so the
+   current destination identity collapsed to a few pixels on portrait iPad.
+   This rule intentionally lives inside the FIRST/strongest important layer,
+   tccCurrentAuthority, so the latest physical-iPad decision wins in computed
+   CSS rather than merely existing later in the file.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card {
+      display:grid !important;
+      grid-template-columns:70px minmax(0,1fr) 82px !important;
+      grid-template-rows:28px 24px !important;
+      column-gap:6px !important;
+      row-gap:0 !important;
+      align-items:center !important;
+      padding:6px 10px !important;
+      overflow:hidden !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow {
+      grid-column:1 !important;
+      grid-row:1 / 3 !important;
+      align-self:center !important;
+      min-width:0 !important;
+      margin:0 !important;
+      font-size:9.25px !important;
+      line-height:1.06 !important;
+      letter-spacing:.12em !important;
+      white-space:normal !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-identity {
+      grid-column:2 !important;
+      grid-row:1 !important;
+      display:flex !important;
+      align-items:center !important;
+      align-self:end !important;
+      min-width:0 !important;
+      width:100% !important;
+      max-width:100% !important;
+      gap:5px !important;
+      overflow:hidden !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-flag {
+      display:inline-block !important;
+      flex:0 0 auto !important;
+      font-size:16px !important;
+      line-height:1 !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-name {
+      display:block !important;
+      flex:1 1 auto !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      color:#f5f8fb !important;
+      font-size:14px !important;
+      line-height:1 !important;
+      font-weight:800 !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+      visibility:visible !important;
+      opacity:1 !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-dates {
+      grid-column:2 !important;
+      grid-row:2 !important;
+      min-width:0 !important;
+      align-self:start !important;
+      color:#d4dee7 !important;
+      font-size:10px !important;
+      line-height:1.05 !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-detail {
+      grid-column:3 !important;
+      grid-row:1 !important;
+      align-self:end !important;
+      justify-self:end !important;
+      min-width:0 !important;
+      max-width:82px !important;
+      color:#d4dee7 !important;
+      font-size:9.25px !important;
+      line-height:1 !important;
+      white-space:nowrap !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner progress {
+      grid-column:3 !important;
+      grid-row:2 !important;
+      align-self:start !important;
+      justify-self:end !important;
+      width:82px !important;
+      max-width:100% !important;
+      height:6px !important;
+      margin:3px 0 0 !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-mode-marker {
+      display:none !important;
+      grid-column:3 !important;
+      grid-row:2 !important;
+    }
+  }
+}
+
+/* ========================================================================
+   27 Sep 2026 — R11 PORTRAIT BUDGET INNER-METRIC FITMENT CLOSURE.
+   Live 768/834 portrait rendering exposed auto-minimum grid growth inside the
+   Current Destination Budget card: the long remaining-after-commitments metric
+   widened its two-column track beyond the card and visually entered Stay Pace.
+   The outer approved Destination / Stay Pace pair remains untouched. Only the
+   destination card's inner metric grid becomes a readable one-column stack in
+   portrait, while every child is explicitly allowed to shrink inside its box.
+   This is in tccCurrentAuthority so older layered !important rules cannot undo
+   the computed fitment on physical iPad.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-destination-card .budget-current-trio {
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) !important;
+      gap:8px !important;
+      min-width:0 !important;
+      max-width:100% !important;
+    }
+    html body [data-screen="budget"] .budget-destination-card .budget-current-metric {
+      min-width:0 !important;
+      max-width:100% !important;
+      width:100% !important;
+      box-sizing:border-box !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="budget"] .budget-destination-card .budget-current-metric > :is(span,strong,small) {
+      min-width:0 !important;
+      max-width:100% !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="budget"] .budget-destination-card .budget-current-metric > strong {
+      font-size:20px !important;
+      line-height:1.05 !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body [data-screen="budget"] .budget-destination-card .budget-current-metric > small {
+      white-space:normal !important;
+    }
+  }
+}
+
+
+/* ========================================================================
+   27 Sep 2026 — R12 PHYSICAL-IPAD HOME VIEWPORT + LAUNCH CLOSURE.
+   Physical standalone iPad evidence showed the Home canvas reserving bottom
+   space twice: once in Safari's dynamic standalone viewport and again through
+   the Home safe-area height subtraction. That shortened the lower widget row,
+   made Schengen feel crowded and left an unnecessary strip beneath Search.
+   Home now consumes the full standalone content viewport while retaining the
+   existing top safe-area offset. Bottom safe-area is no longer subtracted from
+   Home's fixed dashboard height a second time. The one-screen/no-scroll rule,
+   approved hero/stat heights and all text sizes remain unchanged.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  @media (orientation:landscape) and (max-height:850px) {
+    html body:has([data-screen="home"].home-screen) [data-screen="home"].home-screen {
+      box-sizing:border-box !important;
+      height:calc(100dvh - var(--tcc-safe-top,0px)) !important;
+      min-height:calc(100dvh - var(--tcc-safe-top,0px)) !important;
+      max-height:calc(100dvh - var(--tcc-safe-top,0px)) !important;
+      margin-bottom:0 !important;
+      grid-template-rows:230px 232px minmax(0,1fr) 50px !important;
+      gap:8px !important;
+      padding-bottom:5px !important;
+      overflow:hidden !important;
+    }
+
+    /* The extra recovered height belongs to the four compact operational
+       widgets rather than to decorative whitespace. Keep their internals
+       shrink-safe so the Schengen ring/metrics/dates/status remain separated. */
+    html body [data-screen="home"] .home-ref-minis,
+    html body [data-screen="home"] .home-mini-panel,
+    html body [data-screen="home"] .home-mini-schengen,
+    html body [data-screen="home"] .home-schengen-content {
+      min-height:0 !important;
+    }
+    html body [data-screen="home"] .home-mini-schengen .home-schengen-content {
+      grid-template-rows:minmax(82px,1fr) auto auto !important;
+      align-content:stretch !important;
+      gap:4px !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="home"] .home-mini-schengen .home-schengen-dates,
+    html body [data-screen="home"] .home-mini-schengen .home-schengen-status {
+      position:relative !important;
+      z-index:1 !important;
+      flex:none !important;
+    }
+  }
+}
+
+/* Dynamic launch on physical iPad must never show a partially overlapping
+   brand/destination state. The embedded compass image has no external fetch;
+   these transition timings make each stage visually complete before the next
+   stage becomes readable. */
+html[data-tcc-launch-phase="destination"] .tcc-launch-brand {
+  opacity:0 !important;
+  visibility:hidden !important;
+  transition:none !important;
+}
+html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] .tcc-launch-destination {
+  opacity:1 !important;
+  transform:translateY(0) scale(1) !important;
+  transition:none !important;
+}
+html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] :is(
+  .tcc-launch-flag,
+  .tcc-launch-country,
+  .tcc-launch-city,
+  .tcc-launch-home-label
+) {
+  opacity:1 !important;
+  transform:none !important;
+  transition:none !important;
+  transition-delay:0s !important;
+}
+
+/* ========================================================================
+   27 Sep 2026 — R14 PHYSICAL-IPAD CHECKLIST TEXT + HEADER FRAME CLOSURE.
+   Physical iPad authority: preserve the approved pre-R13 Checklist appearance.
+   This pass changes FITMENT only — no segmented ring, no per-stage recolour.
+   The four baked-art headers also regain one clear cyan perimeter in the
+   strongest cascade layer so historical border:0 cannot remove it again.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  /* Checklist stage strip: keep the original neutral/blue visual treatment,
+     but reserve enough copy width that every label remains inside its tile. */
+  html body [data-screen="checklist"] .checklist-stage-tabs {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:6px !important;
+    padding:8px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-tab,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) {
+    min-width:0 !important;
+    min-height:60px !important;
+    grid-template-columns:28px minmax(0,1fr) !important;
+    gap:5px !important;
+    padding:6px 6px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-icon,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-icon {
+    width:28px !important;
+    height:28px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy {
+    min-width:0 !important;
+    max-width:100% !important;
+    display:grid !important;
+    align-content:center !important;
+    gap:2px !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy strong,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-copy strong {
+    min-width:0 !important;
+    max-width:100% !important;
+    margin:0 !important;
+    font-size:11px !important;
+    line-height:1.04 !important;
+    letter-spacing:-.006em !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    word-break:normal !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy small {
+    min-width:0 !important;
+    max-width:100% !important;
+    font-size:9px !important;
+    line-height:1.05 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-info {
+    box-sizing:border-box !important;
+    min-height:38px !important;
+    margin:0 !important;
+    padding:8px 11px 9px !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:8px !important;
+    font-size:9.5px !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-info .tcc-line-icon {
+    flex:0 0 16px !important;
+    width:16px !important;
+    height:16px !important;
+    margin-top:0 !important;
+  }
+
+  /* Checklist Overview: retain the original solid readiness donut. Tighten
+     only the three metric labels so COMPLETED/PENDING/OVERDUE stay contained. */
+  html body [data-screen="checklist"] .checklist-overview-metrics {
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-metric {
+    min-width:0 !important;
+    padding:8px 4px !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-metric > span {
+    min-width:0 !important;
+    max-width:100% !important;
+    font-size:9px !important;
+    line-height:1.04 !important;
+    letter-spacing:.018em !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+  }
+
+  @media (max-width:1050px) {
+    html body [data-screen="checklist"] .checklist-stage-tab,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) {
+      grid-template-columns:26px minmax(0,1fr) !important;
+      gap:4px !important;
+      padding-left:5px !important;
+      padding-right:5px !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-icon,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-icon {
+      width:26px !important;
+      height:26px !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-copy strong,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-copy strong {
+      font-size:10px !important;
+      letter-spacing:-.012em !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-copy small {
+      font-size:8.5px !important;
+    }
+    html body [data-screen="checklist"] .checklist-overview-metric > span {
+      font-size:8.6px !important;
+      letter-spacing:.005em !important;
+    }
+  }
+
+  /* The outline belongs to the header widget, not the image. This repeats the
+     perimeter at the end of the strongest layer to permanently defeat any old
+     border:0 declaration. */
+  html body :is(
+    [data-screen="journey-history"] > .tcc-page-hero[data-header-key="header-journey-history"],
+    [data-screen="checklist"] > .tcc-page-hero[data-header-key="header-checklist"],
+    [data-screen="vault"] > .tcc-page-hero[data-header-key="header-vault"],
+    [data-screen="settings"] > .tcc-page-hero[data-header-key="header-settings"]
+  ) {
+    border:1px solid rgba(111,193,229,.68) !important;
+    outline:0 !important;
+    border-radius:22px !important;
+    box-sizing:border-box !important;
+    box-shadow:none !important;
+    overflow:hidden !important;
+  }
+}
+
+
+/* ========================================================================
+   27 Sep 2026 — R15 PHYSICAL-IPAD GRAPH + CHECKLIST TYPOGRAPHY CLOSURE.
+   Physical screenshots are the authority. Keep the approved screen design;
+   replace gradient-generated rings with vector strokes so Safari cannot show
+   segmented remnants or raster seams, and give the four stage labels enough
+   copy width/line-height to remain clean at every iPad V1 viewport.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  /* Checklist stage strip — typography/spacing only. */
+  html body [data-screen="checklist"] .checklist-stage-tabs {
+    grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    gap:7px !important;
+    padding:8px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-tab,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) {
+    min-width:0 !important;
+    min-height:64px !important;
+    grid-template-columns:24px minmax(0,1fr) !important;
+    align-items:center !important;
+    gap:7px !important;
+    padding:7px 8px !important;
+    overflow:hidden !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-icon,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-icon {
+    width:24px !important;
+    height:24px !important;
+    min-width:24px !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy {
+    min-width:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:center !important;
+    align-items:flex-start !important;
+    gap:2px !important;
+    overflow:visible !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy strong,
+  html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-copy strong {
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin:0 !important;
+    font-size:11px !important;
+    line-height:1.12 !important;
+    letter-spacing:-.01em !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    overflow-wrap:normal !important;
+    word-break:normal !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-copy small {
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    margin:0 !important;
+    font-size:9.5px !important;
+    line-height:1.08 !important;
+    white-space:nowrap !important;
+    overflow:visible !important;
+  }
+  html body [data-screen="checklist"] .checklist-stage-info {
+    min-height:40px !important;
+    padding:9px 12px 10px !important;
+    gap:8px !important;
+    font-size:10.25px !important;
+    line-height:1.28 !important;
+    overflow:hidden !important;
+  }
+
+  /* Checklist Overview — vector donut. No conic/repeating gradient is allowed
+     to paint the ring, so 100% is one continuous circle on Safari. */
+  html body [data-screen="checklist"] .checklist-overview-ring {
+    position:relative !important;
+    isolation:isolate !important;
+    background:#0d2030 !important;
+    border-radius:50% !important;
+    overflow:visible !important;
+    box-shadow:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring::before,
+  html body [data-screen="checklist"] .checklist-overview-ring::after {
+    content:none !important;
+    display:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg {
+    position:absolute !important;
+    inset:0 !important;
+    z-index:0 !important;
+    width:100% !important;
+    height:100% !important;
+    display:block !important;
+    overflow:visible !important;
+    pointer-events:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg-track,
+  html body [data-screen="checklist"] .checklist-overview-svg-value {
+    fill:none !important;
+    stroke-width:14 !important;
+    vector-effect:non-scaling-stroke !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg-track {
+    stroke:rgb(var(--tcc-p-silver-rgb)) !important;
+    opacity:.24 !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg-value {
+    stroke:rgb(var(--tcc-p-green-rgb)) !important;
+    stroke-linecap:butt !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg[data-complete="true"] .checklist-overview-svg-track {
+    opacity:0 !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring > strong,
+  html body [data-screen="checklist"] .checklist-overview-ring > small {
+    position:relative !important;
+    z-index:1 !important;
+  }
+
+  /* Budget Stay Pace — vector arc removes the visible Safari raster seam at
+     six o'clock while preserving the existing traffic-light colour identity. */
+  html body [data-screen="budget"] .budget-pace-ring {
+    position:relative !important;
+    isolation:isolate !important;
+    background:#0a2130 !important;
+    border-radius:50% !important;
+    overflow:visible !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring::before,
+  html body [data-screen="budget"] .budget-pace-ring::after {
+    content:none !important;
+    display:none !important;
+  }
+  html body [data-screen="budget"] .budget-pace-svg {
+    position:absolute !important;
+    inset:0 !important;
+    z-index:0 !important;
+    width:100% !important;
+    height:100% !important;
+    display:block !important;
+    overflow:visible !important;
+    pointer-events:none !important;
+  }
+  html body [data-screen="budget"] .budget-pace-svg-track,
+  html body [data-screen="budget"] .budget-pace-svg-value {
+    fill:none !important;
+    stroke-width:13 !important;
+    vector-effect:non-scaling-stroke !important;
+  }
+  html body [data-screen="budget"] .budget-pace-svg-track {
+    stroke:rgb(var(--pace-rgb,var(--tcc-p-green-rgb))) !important;
+    opacity:.18 !important;
+  }
+  html body [data-screen="budget"] .budget-pace-svg-value {
+    stroke:rgb(var(--pace-rgb,var(--tcc-p-green-rgb))) !important;
+    stroke-linecap:butt !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring > strong,
+  html body [data-screen="budget"] .budget-pace-ring > span {
+    position:relative !important;
+    z-index:1 !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring-gold { --pace-rgb:var(--tcc-p-gold-rgb) !important; }
+
+  @media (max-width:1050px) {
+    html body [data-screen="checklist"] .checklist-stage-tabs { gap:6px !important; }
+    html body [data-screen="checklist"] .checklist-stage-tab,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) {
+      grid-template-columns:22px minmax(0,1fr) !important;
+      gap:5px !important;
+      padding:6px 6px !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-icon,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-icon {
+      width:22px !important;
+      height:22px !important;
+      min-width:22px !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-copy strong,
+    html body [data-screen="checklist"] .checklist-stage-tab:nth-child(4) .checklist-stage-copy strong {
+      font-size:10.75px !important;
+      line-height:1.1 !important;
+      letter-spacing:-.014em !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-copy small {
+      font-size:9.25px !important;
+    }
+    html body [data-screen="checklist"] .checklist-stage-info {
+      font-size:10px !important;
+      padding-inline:10px !important;
+    }
+  }
+}
+
+/* ========================================================================
+   27 Sep 2026 — R16 FINAL PHYSICAL-IPAD FITMENT + VISUAL POLISH CLOSURE.
+   Authority is the user's 1180x820 / 820x1180 physical-iPad screenshots.
+   This pass does not redesign approved screens. It gives long names, dates,
+   local-currency values and the two ring instruments enough real space to fit,
+   and makes Country Quick Look a content-sized portrait surface.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  /* Shared Current / Next strip — three protected lanes on portrait. Long
+     destination names truncate only inside their own identity lane; dates and
+     day counts can never cross the centre divider or one another. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card {
+      min-height:64px !important;
+      grid-template-columns:68px minmax(0,1fr) minmax(76px,88px) !important;
+      grid-template-rows:30px 26px !important;
+      column-gap:6px !important;
+      row-gap:0 !important;
+      padding:5px 8px !important;
+      overflow:hidden !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow {
+      grid-column:1 !important;
+      grid-row:1 / 3 !important;
+      min-width:0 !important;
+      margin:0 !important;
+      align-self:center !important;
+      font-size:8.8px !important;
+      line-height:1.08 !important;
+      letter-spacing:.105em !important;
+      white-space:normal !important;
+      overflow:hidden !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-identity {
+      grid-column:2 !important;
+      grid-row:1 !important;
+      min-width:0 !important;
+      width:100% !important;
+      display:flex !important;
+      align-items:center !important;
+      gap:4px !important;
+      overflow:hidden !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-flag {
+      flex:0 0 auto !important;
+      font-size:15px !important;
+      line-height:1 !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-name {
+      flex:1 1 auto !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      font-size:clamp(11.5px,1.72vw,14px) !important;
+      line-height:1.02 !important;
+      letter-spacing:-.01em !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-dates {
+      grid-column:2 !important;
+      grid-row:2 !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      align-self:start !important;
+      font-size:clamp(8.7px,1.25vw,10px) !important;
+      line-height:1.05 !important;
+      letter-spacing:-.01em !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-detail {
+      grid-column:3 !important;
+      grid-row:1 !important;
+      min-width:0 !important;
+      max-width:88px !important;
+      justify-self:end !important;
+      align-self:center !important;
+      font-size:8.7px !important;
+      line-height:1.05 !important;
+      letter-spacing:-.01em !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner progress {
+      grid-column:3 !important;
+      grid-row:2 !important;
+      justify-self:end !important;
+      align-self:start !important;
+      width:min(80px,100%) !important;
+      height:6px !important;
+      margin:3px 0 0 !important;
+    }
+    @media (max-width:790px) {
+      html body :is(
+        [data-screen="itinerary"],
+        [data-screen="budget"],
+        [data-screen="reservations"],
+        [data-screen="calendar"]
+      ) > .tcc-stay-banner .tcc-stay-banner-card {
+        grid-template-columns:64px minmax(0,1fr) 74px !important;
+        column-gap:5px !important;
+        padding-inline:7px !important;
+      }
+      html body :is(
+        [data-screen="itinerary"],
+        [data-screen="budget"],
+        [data-screen="reservations"],
+        [data-screen="calendar"]
+      ) > .tcc-stay-banner .tcc-stay-banner-detail { max-width:74px !important; font-size:8.3px !important; }
+      html body :is(
+        [data-screen="itinerary"],
+        [data-screen="budget"],
+        [data-screen="reservations"],
+        [data-screen="calendar"]
+      ) > .tcc-stay-banner progress { width:70px !important; }
+    }
+  }
+
+  /* Budget — monetary values are content, never decoration. Permit a clean
+     break at the currency-code space when a local amount is too long rather
+     than letting the number enter another card. */
+  html body [data-screen="budget"] :is(
+    .budget-current-total,
+    .budget-current-metric,
+    .budget-annual-main-value,
+    .budget-destination-current-strip,
+    .budget-pace-metric,
+    .budget-flow-legend-item,
+    .budget-account-row-copy,
+    .budget-account-row-amount,
+    .budget-category-summary,
+    .budget-destination-manager-current-money
+  ) { min-width:0 !important; max-width:100% !important; box-sizing:border-box !important; }
+
+  html body [data-screen="budget"] .budget-current-total > strong {
+    max-width:100% !important;
+    font-size:clamp(27px,4vw,35px) !important;
+    line-height:1.02 !important;
+    letter-spacing:-.035em !important;
+    text-align:center !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+    word-break:keep-all !important;
+  }
+  html body [data-screen="budget"] .budget-current-metric > strong {
+    max-width:100% !important;
+    font-size:clamp(18px,2.65vw,22px) !important;
+    line-height:1.05 !important;
+    letter-spacing:-.02em !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+    word-break:keep-all !important;
+  }
+  html body [data-screen="budget"] .budget-annual-main-value > strong {
+    max-width:100% !important;
+    font-size:clamp(28px,4.25vw,38px) !important;
+    line-height:1 !important;
+    letter-spacing:-.035em !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:clip !important;
+  }
+  html body [data-screen="budget"] .budget-current-footer-metric strong {
+    max-width:100% !important;
+    font-size:clamp(10.5px,1.65vw,13px) !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+    word-break:keep-all !important;
+  }
+  html body [data-screen="budget"] .budget-category-summary strong,
+  html body [data-screen="budget"] .budget-flow-legend-item strong,
+  html body [data-screen="budget"] .budget-forecast-grid-refined .budget-pace-metric > strong {
+    max-width:100% !important;
+    font-variant-numeric:tabular-nums !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+    word-break:keep-all !important;
+  }
+
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-current-total > strong { font-size:clamp(25px,4.45vw,33px) !important; }
+    html body [data-screen="budget"] .budget-current-metric > strong { font-size:clamp(17px,2.8vw,21px) !important; }
+    html body [data-screen="budget"] .budget-annual-main-value { min-height:142px !important; padding-inline:12px !important; }
+    html body [data-screen="budget"] .budget-annual-main-value > strong { font-size:clamp(27px,4.7vw,36px) !important; }
+
+    /* Budget by Category heading and Month/Year switch get their own lanes. */
+    html body [data-screen="budget"] .budget-chart-panel > .budget-section-head {
+      display:grid !important;
+      grid-template-columns:minmax(0,1fr) auto !important;
+      align-items:start !important;
+      gap:8px !important;
+      min-width:0 !important;
+    }
+    html body [data-screen="budget"] .budget-chart-controls {
+      grid-template-columns:repeat(2,minmax(58px,1fr)) !important;
+      gap:4px !important;
+      min-width:124px !important;
+      max-width:146px !important;
+      padding:3px !important;
+    }
+    html body [data-screen="budget"] .budget-chart-toggle {
+      min-width:0 !important;
+      min-height:36px !important;
+      padding:0 9px !important;
+      font-size:11.5px !important;
+      white-space:nowrap !important;
+    }
+
+    /* Destination budget coverage: long local currency gets a protected
+       right-hand lane and may wrap at the code/number space. */
+    html body [data-screen="budget"] .budget-destination-current-strip {
+      grid-template-columns:minmax(0,1fr) minmax(106px,auto) !important;
+      column-gap:8px !important;
+    }
+    html body [data-screen="budget"] .budget-destination-current-strip > strong {
+      min-width:0 !important;
+      max-width:100% !important;
+      white-space:nowrap !important;
+      overflow:hidden !important;
+      text-overflow:ellipsis !important;
+    }
+    html body [data-screen="budget"] .budget-destination-current-strip > b {
+      min-width:0 !important;
+      max-width:150px !important;
+      justify-self:end !important;
+      text-align:right !important;
+      font-size:clamp(13px,2.15vw,16px) !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:keep-all !important;
+    }
+
+    /* Account names and amounts share width explicitly instead of competing. */
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-brand) {
+      grid-template-columns:44px minmax(0,1fr) minmax(82px,auto) !important;
+      gap:8px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-copy > strong {
+      min-width:0 !important;
+      max-width:100% !important;
+      font-size:clamp(14px,2.25vw,18px) !important;
+      line-height:1.08 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount {
+      min-width:0 !important;
+      max-width:112px !important;
+      font-size:clamp(14px,2.1vw,18px) !important;
+      line-height:1 !important;
+      white-space:nowrap !important;
+      text-align:right !important;
+    }
+  }
+
+  /* Itinerary portrait summary — six facts become a calm 3 x 2 grid. This is
+     the same information and colour system, only a fitment reflow. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="itinerary"] .itinerary-stats {
+      grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+      gap:8px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-stat {
+      min-height:86px !important;
+      grid-template-columns:34px minmax(0,1fr) !important;
+      gap:7px !important;
+      padding:9px 10px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-stat-copy strong {
+      font-size:clamp(22px,3.5vw,26px) !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-stat-copy span {
+      max-width:100% !important;
+      font-size:10px !important;
+      line-height:1.08 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-budget {
+      min-width:0 !important;
+      max-width:100% !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong {
+      max-width:100% !important;
+      font-size:clamp(15px,2.4vw,19px) !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:keep-all !important;
+    }
+  }
+
+  /* Ring instruments — let the graph accommodate the copy. The inner copy
+     gets a wider clear aperture and a larger physical ring on iPad. */
+  html body [data-screen="budget"] .budget-pace-top {
+    grid-template-columns:174px minmax(0,1fr) !important;
+    gap:15px !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring {
+    width:166px !important;
+    height:166px !important;
+  }
+  html body [data-screen="budget"] .budget-pace-svg-track,
+  html body [data-screen="budget"] .budget-pace-svg-value { stroke-width:11 !important; }
+  html body [data-screen="budget"] .budget-pace-ring > strong {
+    max-width:120px !important;
+    font-size:22px !important;
+    line-height:1.02 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring > span {
+    max-width:118px !important;
+    margin-top:3px !important;
+    font-size:10px !important;
+    line-height:1.18 !important;
+    text-align:center !important;
+    white-space:normal !important;
+  }
+
+  html body [data-screen="checklist"] .checklist-overview-card {
+    padding:15px 13px !important;
+    gap:10px !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring {
+    width:168px !important;
+    height:168px !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-svg-track,
+  html body [data-screen="checklist"] .checklist-overview-svg-value { stroke-width:12 !important; }
+  html body [data-screen="checklist"] .checklist-overview-ring > strong {
+    max-width:126px !important;
+    font-size:34px !important;
+    line-height:1 !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring > small {
+    max-width:128px !important;
+    margin-top:4px !important;
+    font-size:8.7px !important;
+    line-height:1.12 !important;
+    letter-spacing:.085em !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-pace-top {
+      grid-template-columns:166px minmax(0,1fr) !important;
+      gap:12px !important;
+    }
+    html body [data-screen="budget"] .budget-pace-ring { width:158px !important; height:158px !important; }
+    html body [data-screen="checklist"] .checklist-overview-ring { width:164px !important; height:164px !important; }
+  }
+
+  /* Country Quick Look — portrait is content-sized and intentionally reflowed,
+     rather than a landscape grid floating at the top of an empty full-height
+     modal. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal {
+      width:min(720px,calc(100vw - 34px)) !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - max(58px,env(safe-area-inset-top,0px) + 34px) - max(20px,env(safe-area-inset-bottom,0px))) !important;
+      margin-top:max(42px,calc(env(safe-area-inset-top,0px) + 24px)) !important;
+      margin-bottom:max(16px,env(safe-area-inset-bottom,0px)) !important;
+      bottom:auto !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal > form {
+      height:auto !important;
+      min-height:0 !important;
+      max-height:inherit !important;
+      grid-template-rows:auto auto !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .modal-body {
+      min-height:0 !important;
+      max-height:calc(100dvh - 138px) !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      padding:12px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-rich {
+      height:auto !important;
+      min-height:0 !important;
+      display:grid !important;
+      grid-template-rows:auto auto auto auto !important;
+      gap:11px !important;
+      overflow:visible !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-hero {
+      height:auto !important;
+      min-height:190px !important;
+      padding:14px !important;
+      align-items:end !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-hero h3 {
+      font-size:34px !important;
+      line-height:1 !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-chip-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      max-width:100% !important;
+      gap:6px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-feature-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:9px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-feature {
+      min-height:150px !important;
+      padding:10px 11px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-lower-grid {
+      grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr) !important;
+      gap:9px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-lower {
+      min-height:160px !important;
+      height:auto !important;
+      overflow:visible !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-essential-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:6px !important;
+    }
+    html body [data-screen="home"] .tcc-modal.home-helper-quick-modal .home-helper-essential strong {
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* R16 finishing contrast + launch flag scale. */
+  html body [data-screen="checklist"] .checklist-overview-ring > strong {
+    color:#f7fbff !important;
+    text-shadow:none !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring > small {
+    color:#dce7ef !important;
+    text-shadow:none !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring > span {
+    color:#dce7ef !important;
+    text-shadow:none !important;
+  }
+  html body .tcc-launch-flag {
+    width:210px !important;
+    height:142px !important;
+    margin-bottom:24px !important;
+    image-rendering:auto !important;
+  }
+  @media (max-width:1080px), (max-height:800px) {
+    html body .tcc-launch-flag {
+      width:190px !important;
+      height:128px !important;
+      margin-bottom:20px !important;
+    }
+  }
+
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner :is(.tcc-stay-banner-dates,.tcc-stay-banner-detail) {
+    min-width:0 !important;
+    max-width:100% !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-brand) {
+      grid-template-columns:44px minmax(0,1fr) minmax(76px,98px) !important;
+      column-gap:8px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-copy > strong {
+      font-size:15px !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount {
+      max-width:98px !important;
+      font-size:15px !important;
+      letter-spacing:-.02em !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* R16 ring breathing-room lock — physical iPad review showed that merely
+     fitting the centre copy was not enough. Give both instruments a visibly
+     larger clear aperture so no glyph can crowd the stroke. */
+  html body [data-screen="budget"] .budget-pace-top {
+    grid-template-columns:186px minmax(0,1fr) !important;
+    gap:15px !important;
+  }
+  html body [data-screen="budget"] .budget-pace-ring {
+    width:178px !important;
+    height:178px !important;
+  }
+  html body [data-screen="checklist"] .checklist-overview-ring {
+    width:180px !important;
+    height:180px !important;
+  }
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-pace-top {
+      grid-template-columns:182px minmax(0,1fr) !important;
+      gap:12px !important;
+    }
+    html body [data-screen="budget"] .budget-pace-ring {
+      width:174px !important;
+      height:174px !important;
+    }
+    html body [data-screen="checklist"] .checklist-overview-ring {
+      width:178px !important;
+      height:178px !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* Annual AUD figures have no natural currency-code break point. Give the
+     portrait card deterministic fit classes so six/seven-figure budgets never
+     clip on the 768-point iPad width. */
+  html body [data-screen="budget"] .budget-annual-main-value > strong.budget-money-long {
+    font-size:32px !important;
+  }
+  html body [data-screen="budget"] .budget-annual-main-value > strong.budget-money-xlong {
+    font-size:26px !important;
+    letter-spacing:-.035em !important;
+  }
+  @media (orientation:portrait) and (max-width:790px) {
+    html body [data-screen="budget"] .budget-annual-main-value > strong.budget-money-long {
+      font-size:30px !important;
+      letter-spacing:-.025em !important;
+    }
+    html body [data-screen="budget"] .budget-annual-main-value > strong.budget-money-xlong {
+      font-size:23px !important;
+      letter-spacing:-.045em !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* R16 portrait expanded-widget fitment closure — physical iPad 27 Sep.
+     Expanded read-only widgets must be content-driven, with exactly one
+     internal scroll region when content is taller than the viewport. Never
+     stretch a short expansion into a full-height blank slab, and never clip
+     long content behind the modal footer. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) {
+      width:min(760px,calc(100vw - 28px - var(--tcc-safe-left) - var(--tcc-safe-right))) !important;
+      max-width:calc(100vw - 28px - var(--tcc-safe-left) - var(--tcc-safe-right)) !important;
+      height:auto !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - max(52px,env(safe-area-inset-top,0px) + 34px) - max(18px,env(safe-area-inset-bottom,0px))) !important;
+      margin:auto !important;
+      overflow:hidden !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form {
+      height:auto !important;
+      min-height:0 !important;
+      max-height:inherit !important;
+      grid-template-rows:auto minmax(0,auto) auto !important;
+      gap:0 !important;
+      overflow:hidden !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > header {
+      min-height:72px !important;
+      padding:14px 18px !important;
+      flex:0 0 auto !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > header h2 {
+      min-width:0 !important;
+      font-size:clamp(24px,4.4vw,32px) !important;
+      line-height:1.04 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > .modal-body {
+      min-height:0 !important;
+      height:auto !important;
+      max-height:calc(100dvh - 190px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) !important;
+      padding:16px 18px 18px !important;
+      overflow-y:auto !important;
+      overflow-x:hidden !important;
+      overscroll-behavior:contain !important;
+      -webkit-overflow-scrolling:touch !important;
+      scrollbar-gutter:stable both-edges !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > footer {
+      position:relative !important;
+      inset:auto !important;
+      min-height:0 !important;
+      padding:10px 18px 14px !important;
+      flex:0 0 auto !important;
+      z-index:2 !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > footer:empty {
+      display:none !important;
+      padding:0 !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) .tcc-expanded-card-body,
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) .tcc-expanded-card-snapshot {
+      min-height:0 !important;
+      height:auto !important;
+      max-height:none !important;
+      overflow:visible !important;
+      align-self:start !important;
+      align-content:start !important;
+    }
+
+    /* Monthly Spend History: four stat cards are too narrow in portrait and
+       caused values to break mid-number. Two columns keeps every amount whole. */
+    html body [data-screen="budget"] .tcc-modal.tcc-expanded-modal .budget-monthly-history .budget-history-stats {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:10px !important;
+    }
+    html body [data-screen="budget"] .tcc-modal.tcc-expanded-modal .budget-monthly-history .budget-history-stat {
+      min-width:0 !important;
+      min-height:96px !important;
+      padding:13px 14px !important;
+    }
+    html body [data-screen="budget"] .tcc-modal.tcc-expanded-modal .budget-monthly-history .budget-history-stat strong {
+      max-width:100% !important;
+      font-size:clamp(19px,4.2vw,24px) !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:keep-all !important;
+    }
+
+    /* Journey Snapshot: long names such as Alpine Motorhome and Caribbean
+       Cruise I need a genuine two-column portrait layout instead of squeezing
+       six metrics into landscape-width cards. */
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-stat-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:10px !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-stat {
+      min-width:0 !important;
+      min-height:112px !important;
+      padding:14px 15px !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-stat > strong {
+      max-width:100% !important;
+      font-size:clamp(22px,4.4vw,28px) !important;
+      line-height:1.06 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-booking-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      gap:10px !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-booking {
+      min-width:0 !important;
+      min-height:102px !important;
+      padding:13px 14px !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-booking > :is(span,strong,b) {
+      max-width:100% !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="journey-history"] .tcc-modal.tcc-expanded-modal .journey-expanded-milestone-grid {
+      grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    }
+
+    /* Destination Budgets: long local-currency amounts keep their own lane and
+       the footer sits after the scrolling list instead of covering it. */
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-row {
+      grid-template-columns:minmax(150px,.72fr) minmax(130px,.72fr) minmax(190px,1fr) !important;
+      gap:10px !important;
+      align-items:center !important;
+    }
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-value {
+      min-width:0 !important;
+      max-width:100% !important;
+      justify-items:end !important;
+      text-align:right !important;
+    }
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-amount-primary {
+      max-width:100% !important;
+      font-size:clamp(17px,3.7vw,22px) !important;
+      line-height:1.04 !important;
+      white-space:nowrap !important;
+      letter-spacing:-.02em !important;
+    }
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-amount-secondary,
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-action {
+      max-width:100% !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+    }
+  }
+
+  /* Narrower portrait iPads: use one-column rows only where the three-column
+     Destination Budgets row would otherwise sacrifice legibility. */
+  @media (orientation:portrait) and (max-width:790px) {
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-row {
+      grid-template-columns:minmax(126px,.72fr) minmax(112px,.68fr) minmax(155px,1fr) !important;
+      gap:8px !important;
+    }
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-amount-primary {
+      font-size:clamp(15px,3.4vw,19px) !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* Account balances are right-aligned but must never rely on clipping. Make
+     the value own its complete grid track and scale only unusually long AUD or
+     foreign-currency strings. */
+  html body [data-screen="budget"] .budget-account-row-amount {
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    justify-self:stretch !important;
+    text-align:right !important;
+  }
+  html body [data-screen="budget"] .budget-account-row-amount > strong {
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+  }
+  html body [data-screen="budget"] .budget-account-row-amount > strong.budget-account-money-long {
+    font-size:14px !important;
+    letter-spacing:-.025em !important;
+  }
+  html body [data-screen="budget"] .budget-account-row-amount > strong.budget-account-money-xlong {
+    font-size:12.5px !important;
+    letter-spacing:-.045em !important;
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* R16 expanded-modal footer seal: account for native dialog padding when a
+     footer is present. Content remains auto-height; only genuinely long bodies
+     scroll, and the footer never overlays the last row. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form {
+      max-height:calc(100dvh - max(52px,env(safe-area-inset-top,0px) + 34px) - max(18px,env(safe-area-inset-bottom,0px)) - 34px) !important;
+      grid-template-rows:auto auto auto !important;
+      align-content:start !important;
+    }
+    html body [data-screen="budget"] .budget-destination-manager-modal .budget-destination-manager-copy > strong {
+      max-width:100% !important;
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+      line-height:1.12 !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    /* If an account carries an unusually long balance, give the value its
+       protected lane and let an equally long bank name step down slightly
+       rather than collide with it. */
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-money-xlong) .budget-account-row-copy > strong {
+      font-size:12.5px !important;
+      line-height:1.08 !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  /* Native <dialog> in portrait uses fixed inset:0. With an explicit max-height,
+     Safari/Chromium can stretch a short read-only expansion all the way to the
+     max block size, creating the photographed empty navy slab. Centre expanded
+     read-only dialogs explicitly so auto height really follows their content. */
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) {
+      inset:auto !important;
+      top:50% !important;
+      left:50% !important;
+      right:auto !important;
+      bottom:auto !important;
+      margin:0 !important;
+      transform:translate(-50%,-50%) !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-money-xlong) {
+      grid-template-columns:44px minmax(0,1fr) 90px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount > strong.budget-account-money-xlong {
+      font-size:11.5px !important;
+      letter-spacing:-.04em !important;
+    }
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-money-xlong) .budget-account-row-copy > strong {
+      font-size:12px !important;
+      line-height:1.08 !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:790px) {
+    /* 768-point iPad closure: keep the secondary account label whole. The
+       value lane is already protected, so trim only this metadata by one step. */
+    html body [data-screen="budget"] .budget-account-row-copy > small {
+      max-width:100% !important;
+      font-size:10px !important;
+      line-height:1.05 !important;
+      white-space:nowrap !important;
+      overflow:visible !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    /* Accounts summary is a three-lane layout in portrait: brand, bank copy,
+       balance. The base row is flex; make this explicit grid so long balances
+       cannot steal width from the bank label and metadata. */
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-brand) {
+      display:grid !important;
+      grid-template-columns:44px minmax(0,1fr) minmax(88px,108px) !important;
+      align-items:center !important;
+      column-gap:8px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-copy {
+      min-width:0 !important;
+      width:auto !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount {
+      min-width:0 !important;
+      width:100% !important;
+      max-width:108px !important;
+      justify-self:end !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-copy > small {
+      max-width:100% !important;
+      font-size:10px !important;
+      line-height:1.05 !important;
+      white-space:nowrap !important;
+    }
+  }
+  @media (orientation:portrait) and (max-width:790px) {
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-brand) {
+      grid-template-columns:42px minmax(0,1fr) minmax(82px,102px) !important;
+      column-gap:7px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount { max-width:102px !important; }
+  }
+}
+
+/* ========================================================================
+   27 Sep 2026 — R16 FINAL FITMENT SEAL II.
+   Physical-iPad authority: long destination names, long money strings and
+   narrow portrait itinerary rows must fit without relying on hidden overflow.
+   This seal only changes fitment geometry; it does not redesign approved cards.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    /* Shared Current / Next strip: reclaim width from labels and detail lanes so
+       ordinary long country/destination names remain fully readable. */
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card {
+      grid-template-columns:54px minmax(0,1fr) 82px !important;
+      column-gap:4px !important;
+      padding-inline:7px !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow {
+      font-size:8.1px !important;
+      letter-spacing:.09em !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-identity { gap:3px !important; }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-flag { font-size:14px !important; }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-detail {
+      max-width:82px !important;
+      font-size:8.15px !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner progress { width:76px !important; }
+
+    /* Itinerary rows: previous hard minimum columns totalled wider than a
+       768-point portrait content pane. Use a true fluid four-lane grid. */
+    html body [data-screen="itinerary"] .itinerary-entry {
+      width:100% !important;
+      max-width:100% !important;
+      grid-template-columns:104px minmax(0,1fr) 82px 120px !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry > span {
+      min-width:0 !important;
+      padding-inline:8px !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-identity {
+      min-width:0 !important;
+      gap:5px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-icon {
+      width:30px !important; height:30px !important; flex-basis:30px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-flag {
+      width:26px !important; height:26px !important; flex-basis:26px !important;
+      font-size:22px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-identity-copy {
+      min-width:0 !important;
+      overflow:hidden !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-identity-copy strong {
+      max-width:100% !important;
+      overflow-wrap:anywhere !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-plan > strong {
+      font-size:14px !important;
+      line-height:1.08 !important;
+      overflow-wrap:normal !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong {
+      font-size:clamp(13.5px,2.25vw,17px) !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:keep-all !important;
+    }
+
+    /* Extremely long account balance + long bank name: the amount keeps a
+       protected lane, while the name may break inside a long word as a last
+       resort rather than collide with the balance. */
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-money-xlong) {
+      grid-template-columns:44px minmax(0,1fr) 84px !important;
+      gap:7px !important;
+    }
+    html body [data-screen="budget"] .budget-account-row:has(.budget-account-money-xlong) .budget-account-row-copy > strong {
+      font-size:11.5px !important;
+      line-height:1.06 !important;
+      overflow-wrap:anywhere !important;
+      word-break:normal !important;
+    }
+    html body [data-screen="budget"] .budget-account-row-amount > strong.budget-account-money-xlong {
+      font-size:10.7px !important;
+      letter-spacing:-.045em !important;
+    }
+  }
+
+  @media (orientation:portrait) and (max-width:790px) {
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card {
+      grid-template-columns:50px minmax(0,1fr) 80px !important;
+      column-gap:4px !important;
+      padding-inline:6px !important;
+    }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-card > .eyebrow { font-size:7.8px !important; }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-name { font-size:12.7px !important; }
+    html body :is(
+      [data-screen="itinerary"],
+      [data-screen="budget"],
+      [data-screen="reservations"],
+      [data-screen="calendar"]
+    ) > .tcc-stay-banner .tcc-stay-banner-detail { max-width:80px !important; font-size:7.9px !important; }
+
+    html body [data-screen="itinerary"] .itinerary-entry {
+      grid-template-columns:98px minmax(0,1fr) 78px 112px !important;
+    }
+    html body [data-screen="itinerary"] .itinerary-entry > span { padding-inline:7px !important; }
+    html body [data-screen="itinerary"] .itinerary-entry-identity-copy strong { font-size:15px !important; }
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong { font-size:13.25px !important; }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong {
+      display:block !important;
+      width:100% !important;
+      min-width:0 !important;
+      max-width:100% !important;
+      justify-self:stretch !important;
+      white-space:normal !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+    }
+  }
+}
+
+/* 27 Sep 2026 — R16 portrait itinerary long-currency closure.
+   Currency + amount may be long in countries using large local units. Keep the
+   complete numeric token intact and scale it within its reserved portrait lane. */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong {
+      font-size:15px !important;
+      letter-spacing:-.018em !important;
+    }
+  }
+  @media (orientation:portrait) and (max-width:790px) {
+    html body [data-screen="itinerary"] .itinerary-entry-budget > strong {
+      font-size:13.25px !important;
+      letter-spacing:-.012em !important;
+    }
+  }
+}
+
+/* 27 Sep 2026 — R16 expanded-view content-height final authority.
+   A prior seal used a 1fr middle row, which made short portrait expansions
+   fill the modal's maximum height and recreate the photographed blank slab.
+   Content owns the height; only genuinely long bodies scroll. */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) {
+      height:fit-content !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - max(52px,env(safe-area-inset-top,0px) + 34px) - max(18px,env(safe-area-inset-bottom,0px))) !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form {
+      height:fit-content !important;
+      min-height:0 !important;
+      max-height:inherit !important;
+      grid-template-rows:auto auto auto !important;
+      align-content:start !important;
+    }
+    html body .tcc-modal.tcc-expanded-modal:not(.home-helper-quick-modal) > form > .modal-body {
+      height:auto !important;
+      min-height:0 !important;
+      max-height:calc(100dvh - 190px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) !important;
+      overflow-y:auto !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    /* Destination Budgets has a real action footer. Reserve its full height in
+       the scroll calculation so the footer remains inside the modal frame. */
+    html body [data-screen="budget"] .budget-destination-manager-modal > form > .modal-body {
+      max-height:calc(100dvh - 252px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.budget-destination-manager-modal > form > .modal-body {
+      max-height:calc(100dvh - 252px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) !important;
+    }
+  }
+}
+
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body .tcc-modal.tcc-expanded-modal.budget-destination-manager-modal:not(.home-helper-quick-modal) > form > .modal-body {
+      max-height:calc(100dvh - 252px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)) !important;
+    }
+  }
+}
+
+/* 27 Sep 2026 — R16 expanded Forward Coverage portrait fitment.
+   The collapsed strip may abbreviate route names, but the enlarged view must
+   show the full destination/route text. Reflow the timeline into proper cards
+   rather than squeezing seven flex segments into one row. */
+@layer tccCurrentAuthority {
+  @media (orientation:portrait) and (max-width:1100px) {
+    html body [data-screen="itinerary"] .tcc-modal.tcc-expanded-modal .itinerary-coverage-reference .itinerary-coverage-timeline {
+      display:grid !important;
+      grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+      grid-auto-rows:minmax(78px,auto) !important;
+      min-height:0 !important;
+      height:auto !important;
+      gap:4px !important;
+      overflow:visible !important;
+      background:transparent !important;
+      border:0 !important;
+    }
+    html body [data-screen="itinerary"] .tcc-modal.tcc-expanded-modal .itinerary-coverage-reference .itinerary-coverage-segment {
+      width:100% !important;
+      min-width:0 !important;
+      min-height:78px !important;
+      padding:9px 7px !important;
+      gap:4px !important;
+      border-radius:10px !important;
+      box-sizing:border-box !important;
+    }
+    html body [data-screen="itinerary"] .tcc-modal.tcc-expanded-modal .itinerary-coverage-reference .itinerary-coverage-segment strong {
+      display:block !important;
+      max-width:100% !important;
+      font-size:13px !important;
+      line-height:1.08 !important;
+      white-space:normal !important;
+      overflow:visible !important;
+      text-overflow:clip !important;
+      overflow-wrap:normal !important;
+      word-break:normal !important;
+      text-align:center !important;
+    }
+    html body [data-screen="itinerary"] .tcc-modal.tcc-expanded-modal .itinerary-coverage-reference .itinerary-coverage-segment small {
+      font-size:11px !important;
+      line-height:1.05 !important;
+      white-space:normal !important;
+    }
+  }
+}
+
+/* ========================================================================
+   R17 — PREMIUM VISUAL FINISH + COLOUR/FITMENT AUDIT
+   27 Sep 2026
+   Owner request: preserve the approved bright premium-dark direction, but
+   refine widget finish, hierarchy and colour clarity without redesigning the
+   screens. No geometry changes are introduced here unless they are purely
+   decorative; R16 fitment remains authoritative.
+   ======================================================================== */
+@layer tccCurrentAuthority {
+  :root { --tcc-current-authority-revision:20260927.17; }
+
+  /* Shared premium surface: retain each widget's locked hue while adding a
+     restrained top sheen and slightly crisper edge definition. This is paint
+     only, so it cannot move text, graphs or controls. */
+  html body :is(
+    [data-screen="home"] .home-ref-daily,
+    [data-screen="home"] .home-ref-destination,
+    [data-screen="home"] .home-ref-annual,
+    [data-screen="home"] .home-mini-upcoming,
+    [data-screen="home"] .home-mini-alerts,
+    [data-screen="home"] .home-mini-schengen,
+    [data-screen="home"] .home-mini-timeline,
+    [data-screen="itinerary"] .itinerary-map-panel,
+    [data-screen="itinerary"] .itinerary-coverage-reference,
+    [data-screen="itinerary"] .itinerary-stat,
+    [data-screen="itinerary"] .itinerary-upcoming-panel,
+    [data-screen="itinerary"] .itinerary-completed,
+    [data-screen="budget"] .budget-destination-card,
+    [data-screen="budget"] .budget-pace-card,
+    [data-screen="budget"] .budget-annual-card,
+    [data-screen="budget"] .budget-annual-planning-card,
+    [data-screen="budget"] .budget-destination-budgets-card,
+    [data-screen="budget"] .budget-chart-panel,
+    [data-screen="budget"] .budget-forecast-panel,
+    [data-screen="budget"] .budget-monthly-history,
+    [data-screen="budget"] .budget-living-panel,
+    [data-screen="budget"] .budget-reservations-panel,
+    [data-screen="budget"] .budget-accounts-summary-card,
+    [data-screen="budget"] .budget-recent,
+    [data-screen="reservations"] .reservation-tab,
+    [data-screen="reservations"] .reservation-to-book,
+    [data-screen="reservations"] .reservation-next-five,
+    [data-screen="reservations"] .reservation-booked-total,
+    [data-screen="calendar"] .calendar-legend-item,
+    [data-screen="journey-history"] .journey-summary-card,
+    [data-screen="journey-history"] .journey-spend-panel,
+    [data-screen="journey-history"] .journey-snapshot-panel,
+    [data-screen="journey-history"] .journey-milestones-panel,
+    [data-screen="journey-history"] .journey-top-destinations,
+    [data-screen="journey-history"] .journey-mix-panel,
+    [data-screen="journey-history"] .journey-record-filter-panel,
+    [data-screen="checklist"] .checklist-ready-banner,
+    [data-screen="checklist"] .checklist-overview-card,
+    [data-screen="checklist"] .checklist-stage-panel,
+    [data-screen="checklist"] .checklist-owner-card,
+    [data-screen="checklist"] .checklist-column,
+    [data-screen="checklist"] .checklist-next-card,
+    [data-screen="vault"] .vault-category-card,
+    [data-screen="vault"] .vault-summary-card,
+    [data-screen="vault"] .vault-expiry-card,
+    [data-screen="vault"] .vault-emergency-card,
+    [data-screen="vault"] .vault-emergency-contacts,
+    [data-screen="vault"] .vault-activity,
+    [data-screen="settings"] .settings-defaults,
+    [data-screen="settings"] .settings-security,
+    [data-screen="settings"] .settings-backup,
+    [data-screen="settings"] .settings-health-card
+  ) {
+    border-color:rgba(var(--tcc-card-rgb),.60) !important;
+    background-image:
+      linear-gradient(180deg,rgba(255,255,255,.040) 0%,rgba(255,255,255,.012) 13%,transparent 30%),
+      radial-gradient(circle at 91% 0%,rgba(var(--tcc-card-rgb),.30),transparent 49%),
+      linear-gradient(145deg,rgba(var(--tcc-card-rgb),.32),rgba(var(--tcc-p-ink-rgb),.985) 74%) !important;
+  }
+
+  /* Larger graphite surfaces stay intentionally neutral but receive the same
+     crisp top edge so they belong to the same premium material family. */
+  html body :is(
+    [data-screen="journey-history"] .journey-records,
+    [data-screen="vault"] .vault-all-records,
+    [data-screen="settings"] .settings-info,
+    [data-screen="budget"] .budget-living-panel
+  ) {
+    background-image:linear-gradient(180deg,rgba(255,255,255,.034),transparent 24%),linear-gradient(145deg,rgba(28,40,52,.94),rgba(7,18,31,.995)) !important;
+    border-color:rgba(var(--tcc-p-silver-rgb),.34) !important;
+  }
+
+  /* Expand controls should look like part of their widget, but never like a
+     persistent selected/focused state. */
+  html body :is(
+    [data-screen] .tcc-expand-indicator,
+    [data-screen] .tcc-expand-control,
+    [data-screen="reservations"] .reservation-rail-chevron,
+    [data-screen="itinerary"] .itinerary-expand-control
+  ) {
+    border-color:rgba(var(--tcc-card-rgb,var(--tcc-p-silver-rgb)),.48) !important;
+    background:linear-gradient(180deg,rgba(var(--tcc-card-rgb,var(--tcc-p-silver-rgb)),.15),rgba(var(--tcc-card-rgb,var(--tcc-p-silver-rgb)),.065)) !important;
+    color:rgb(var(--tcc-card-rgb,var(--tcc-p-silver-rgb))) !important;
+  }
+
+  /* Modal/expanded surfaces keep source-widget colour identity and gain the
+     same top sheen as their collapsed source card. */
+  html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) {
+    border-color:rgba(var(--tcc-card-rgb,var(--tcc-p-sky-rgb)),.60) !important;
+    background-image:linear-gradient(180deg,rgba(255,255,255,.035),transparent 18%),radial-gradient(circle at 92% 0%,rgba(var(--tcc-card-rgb,var(--tcc-p-sky-rgb)),.18),transparent 46%),linear-gradient(145deg,#10283a,#071421 72%) !important;
+  }
+  html body .tcc-modal:is(.tcc-expanded-modal,.tcc-editor-modal) > form > .modal-header {
+    background-image:linear-gradient(180deg,rgba(var(--tcc-card-rgb,var(--tcc-p-sky-rgb)),.18),rgba(var(--tcc-card-rgb,var(--tcc-p-sky-rgb)),.055)) !important;
+    border-bottom-color:rgba(var(--tcc-card-rgb,var(--tcc-p-sky-rgb)),.28) !important;
+  }
+
+  /* Baked headers: slightly stronger perimeter definition, still no glow or
+     crop change. */
+  html body :is(
+    [data-screen="journey-history"],
+    [data-screen="checklist"],
+    [data-screen="vault"],
+    [data-screen="settings"]
+  ) > .tcc-page-hero[data-baked-header-art="true"] {
+    border-color:rgba(111,193,229,.78) !important;
+  }
+
+  /* Shared Current/Next strip: sharpen the join and ensure both halves retain
+     distinct identity without making either brighter than the page content. */
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-current {
+    border-color:rgba(var(--tcc-p-green-rgb),.52) !important;
+    background-image:linear-gradient(180deg,rgba(255,255,255,.025),transparent 28%),radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-green-rgb),.20),transparent 48%),linear-gradient(145deg,rgba(var(--tcc-p-green-rgb),.20),rgba(var(--tcc-p-ink-rgb),.99) 72%) !important;
+  }
+  html body :is(
+    [data-screen="itinerary"],
+    [data-screen="budget"],
+    [data-screen="reservations"],
+    [data-screen="calendar"]
+  ) > .tcc-stay-banner .tcc-stay-banner-next {
+    border-color:rgba(var(--tcc-p-copper-rgb),.52) !important;
+    background-image:linear-gradient(180deg,rgba(255,255,255,.025),transparent 28%),radial-gradient(circle at 92% 0%,rgba(var(--tcc-p-copper-rgb),.20),transparent 48%),linear-gradient(145deg,rgba(var(--tcc-p-copper-rgb),.20),rgba(var(--tcc-p-ink-rgb),.99) 72%) !important;
+  }
+
+  /* Compact stat/metric tiles: one calm graphite inset treatment, with their
+     parent widget supplying the colour. This reduces visual noise while the
+     parent cards stay colourful. */
+  html body :is(
+    [data-screen="budget"] .budget-pace-metric,
+    [data-screen="budget"] .budget-annual-stat,
+    [data-screen="journey-history"] .journey-snapshot-stat,
+    [data-screen="journey-history"] .journey-mix-stat,
+    [data-screen="settings"] .settings-fact,
+    [data-screen="vault"] .vault-summary-metric,
+    [data-screen="itinerary"] .itinerary-map-metric
+  ) {
+    border-color:rgba(var(--tcc-p-silver-rgb),.18) !important;
+    background-image:linear-gradient(180deg,rgba(255,255,255,.025),transparent 30%),linear-gradient(145deg,rgba(18,34,49,.92),rgba(var(--tcc-p-ink-rgb),.985)) !important;
+  }
+
+  /* High-value numeric readouts remain bright white; hue is used for headings,
+     status and bars instead of tinting every number. */
+  html body :is(
+    [data-screen="budget"] .budget-pace-metric > strong,
+    [data-screen="journey-history"] .journey-snapshot-stat strong,
+    [data-screen="settings"] .settings-fact strong,
+    [data-screen="vault"] .vault-summary-metric strong
+  ) { color:rgb(var(--tcc-text-primary-rgb)) !important; }
+
+  /* Touch controls that are semantically selected retain their approved hue;
+     ordinary controls get a clearer premium edge without acquiring a lasting
+     blue focus halo. */
+  html body [data-screen] :is(button,.button):not(.nav-button):not([data-active="true"]):not([aria-pressed="true"]):focus:not(:focus-visible) {
+    outline:0 !important;
+  }
+}
