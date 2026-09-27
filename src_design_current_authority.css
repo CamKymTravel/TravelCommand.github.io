@@ -3081,40 +3081,6 @@ html[data-tcc-launch-identity="ready"][data-tcc-launch-phase="destination"] :is(
   }
 }
 
-@layer tccCurrentAuthority {
-  /* R18 fresh-start Schengen placeholder: a true empty state, not a grid of
-     dashes. It remains tappable/expandable but visually calm and readable. */
-  html body [data-screen="home"] .home-mini-schengen .home-schengen-empty {
-    min-width:0 !important;
-    min-height:72px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    justify-content:center !important;
-    gap:5px !important;
-    padding:10px 12px !important;
-    border:1px solid rgba(var(--tcc-p-gold-rgb),.20) !important;
-    border-radius:10px !important;
-    background:rgba(6,24,31,.46) !important;
-  }
-  html body [data-screen="home"] .home-mini-schengen .home-schengen-empty > strong {
-    color:rgb(var(--tcc-p-gold-rgb)) !important;
-    font-size:12px !important;
-    font-weight:900 !important;
-    letter-spacing:.08em !important;
-    line-height:1.1 !important;
-  }
-  html body [data-screen="home"] .home-mini-schengen .home-schengen-empty > span {
-    color:#c2d0d9 !important;
-    font-size:10.5px !important;
-    font-weight:700 !important;
-    line-height:1.2 !important;
-  }
-  html body [data-screen="home"] .home-mini-schengen:has(.home-schengen-empty) .home-schengen-content {
-    grid-template-rows:1fr auto !important;
-    align-content:stretch !important;
-  }
-}
-
 /* ========================================================================
    R18 — Emergency Travel Card direct edit closure · 27 Sep 2026
    The overview card must be editable without routing Kym through three

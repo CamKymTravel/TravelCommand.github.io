@@ -7,7 +7,7 @@
   "orientation": "any",
   "background_color": "#07101f",
   "theme_color": "#07101f",
-  "description": "Offline iPad Travel Command Centre. Local-only travel planning, budgeting, reservations and records.",
+  "description": "Offline iPad Travel Command Centre for Cameron & Kym. Local-only travel planning, budgeting, reservations and records.",
   "icons": [
     {
       "src": "./app-icon.png",
@@ -16,5 +16,5 @@
       "purpose": "any"
     }
   ],
-  "id": "./travel-command-centre-v1"
+  "id": "./travel-command-centre-s54-simulation-27-r18"
 }

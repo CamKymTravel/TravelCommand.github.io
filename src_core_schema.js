@@ -1,5 +1,5 @@
 export const SCHEMA_VERSION = 2;
-export const APP_VERSION = '1.2.0-v60-r7.18-s54-fresh-start-2026-09-27-r18';
+export const APP_VERSION = '1.2.0-v60-r7.18-s54-morocco-simulation-27-r18';
 
 export const TRAVEL_TYPES = Object.freeze(['standard', 'motorhome', 'cruise']);
 // `accommodation` is retained only as a legacy compatibility value. New/editable
